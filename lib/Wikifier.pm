@@ -112,8 +112,7 @@ sub handle_character {
     # delete the current word, setting its value to the last word.
     when (' ') {
         goto AFTER if defined $current{word} && $current{word} eq ' ';
-        $last{word}       = delete $current{word};
-        $last{word_since} = delete $current{word_since};
+        $last{word} = delete $current{word};
         print "last word: $last{word}\n" if defined $last{word};
         continue;
     }
@@ -209,9 +208,8 @@ sub handle_character {
     
         # if it's not a space, append to current word.
         if ($char ne ' ') {
-            $current{word}  = '', $current{word_since} = -1 if !defined $current{word};
+            $current{word}  = '' if !defined $current{word};
             $current{word} .= $char;
-            $current{word_since}++;
 
             print "current word: $current{word}\n";
         }
