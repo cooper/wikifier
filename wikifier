@@ -14,3 +14,6 @@ use Wikifier;
 my $wikifier = Wikifier->new(file => shift @ARGV);
 $wikifier->parse();
 
+foreach (@{$wikifier->{main_block}{content}}) {
+    print "content: $_\n";
+}

@@ -10,6 +10,7 @@ use strict;
 use feature qw(switch);
 
 use Carp;
+use Scalar::Util 'blessed';
 
 use Wikifier::Block;
 use Wikifier::Block::Main;
@@ -26,7 +27,7 @@ sub new {
     my $wikifier = bless \%opts, $class;
     
     # create the main block.
-    my $main_block = $wikifier->create_block(
+    $wikifier->{main_block} = my $main_block = $wikifier->create_block(
         type   => 'main',
         parent => undef     # main block has no parent.
     );
@@ -94,6 +95,7 @@ sub handle_line {
 
 
 # parse a single character.
+# note: never return from this method; instead goto AFTER.
 sub handle_character {
     my ($wikifier, $char) = @_;
     
@@ -109,10 +111,11 @@ sub handle_character {
     # space. terminates a word.
     # delete the current word, setting its value to the last word.
     when (' ') {
-        return if defined $current{word} && $current{word} eq ' ';
+        goto AFTER if defined $current{word} && $current{word} eq ' ';
         $last{word} = $current{word};
         delete $current{word};
         print "last word: $last{word}\n" if defined $last{word};
+        continue;
     }
     
     
@@ -130,16 +133,53 @@ sub handle_character {
     }
     
     # ignore backslashes - they are handled later below.
-    when ('\\') { }
+    when ('\\') {
+        # if it's escaped, continue to default.
+        continue if $current{escaped};
+    }
     
-    # any other character. append to the current word.
+    # any other character.
     default {
-        $current{word}  = '' if !defined $current{word};
-        $current{word} .= $char;
-        print "current word: $current{word}\n";
-    }
     
-    }
+        # if it's not a space, append to current word.
+        if ($char ne ' ') {
+            $current{word}  = '' if !defined $current{word};
+            $current{word} .= $char;
+            print "current word: $current{word}\n";
+        }
+        
+        # append character to current block's content.
+        
+        # if the current block's content array is empty, push the character.
+        if (!scalar @{$current{block}{content}}) {
+            push @{$current{block}{content}}, $char;
+        }
+        
+        # array is not empty.
+            else {
+            
+            # if last element of the block's content is blessed, it's a child block object.
+            my $last_value = $current{block}{content}[-1];
+            if (blessed($last_value)) {
+            
+                # push the character to the content array, creating a new string element.
+                push @{$current{block}{content}}, $char;
+                
+            }
+            
+            # not blessed, so simply append the character to the string.
+            else {
+                $current{block}{content}[-1] .= $char;
+            }
+            
+        }
+        
+        
+    } # end of default
+    
+    } # end of switch
+    
+    AFTER: # used in substitution of return.
     
     # set last character.
     $last{char}    = $char;
@@ -179,7 +219,15 @@ our %block_types = (
 # create a new block of the given type.
 sub create_block {
     my ($wikifier, $parent, $type) = @_;
-    return unless defined(my $class = $block_types{$type});
+    my $class = $block_types{$type};
+    
+    # no such block type; create a dummy block with no type.
+    if (!defined $class) {
+        return Wikifier::Block->new(
+            type   => 'dummy',
+            parent => $parent
+        );
+    }
     
     # create a new block of the correct type.
     my $block = $class->new(
