@@ -12,6 +12,7 @@ use feature qw(switch);
 use Carp;
 
 use Wikifier::Block;
+use Wikifier::Block::Main;
 
 ###############
 ### PARSING ###
@@ -22,8 +23,25 @@ use Wikifier::Block;
 #   file: the location of the file to be read.
 sub new {
     my ($class, %opts) = @_;
-    ($opts{current}, $opts{last}) = ({}, {});
-    return bless \%opts, $class;
+    my $wikifier = bless \%opts, $class;
+    
+    # create the main block.
+    my $main_block = $wikifier->create_block(
+        type   => 'main',
+        parent => undef     # main block has no parent.
+    );
+    
+    # initial current hash.
+    $wikifier->{current} = {
+        block => $main_block 
+    };
+    
+    # initial last hash.
+    $wikifier->{last} = {
+        block => undef      # main block has no parent.
+    };
+    
+    return $wikifier;
 }
 
 # parse the file.
@@ -62,15 +80,17 @@ sub handle_line {
 }
 
 # % current
-#   char: the current character.
-#   word: the current word. (may not yet be complete.)
-#   escaped: true if the current character was escaped. (last character = \)
+#   char:       the current character.
+#   word:       the current word. (may not yet be complete.)
+#   escaped:    true if the current character was escaped. (last character = \)
+#   block:      the current block object.
 # 
 
 # %last
-#   char: the last parsed character.
-#   word: the last full word.
-#   escaped: true if the last character was escaped. (2nd last character = \)
+#   char:       the last parsed character.
+#   word:       the last full word.
+#   escaped:    true if the last character was escaped. (2nd last character = \)
+#   block:      the current block object's parent block object.
 
 
 # parse a single character.
@@ -98,14 +118,14 @@ sub handle_character {
     
     # left bracket indicates the start of a block.
     when ('{') {
-        return if $current{escaped};
+        continue if $current{escaped}; # this character was escaped; continue to default.
         print "   LEFT BRACKET! last word: $last{word}\n";
-        $current{blockname} = $last{word};
+        $current{blockname} = $last{word}; ### XXX
     }
     
     # right bracket indicates the closing of a block.
     when ('}') {
-        return if $current{escaped}; # this character was escaped.
+        continue if $current{escaped}; # this character was escaped; continue to default.
         print "   CLOSING BRACKET. end of block: $current{blockname}\n";
     }
     
@@ -159,11 +179,11 @@ our %block_types = (
 # create a new block of the given type.
 sub create_block {
     my ($wikifier, $parent, $type) = @_;
-    return unless defined my $class = $block_types{$type};
+    return unless defined(my $class = $block_types{$type});
     
     # create a new block of the correct type.
     my $block = $class->new(
-        type   => undef,    # the subclass should set this.
+        type   => $type,    # the subclass should set this.
         parent => $parent
     );
     

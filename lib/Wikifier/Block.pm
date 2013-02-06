@@ -16,8 +16,9 @@ use feature qw(switch);
 
 # Required properties of blocks.
 #   
-#   parent: the parent block object. (for main block, undef)
-#   type:   the name type of block, such as 'imagebox', 'paragraph', etc.
+#   parent:     the parent block object. (for main block, undef)
+#   type:       the name type of block, such as 'imagebox', 'paragraph', etc.
+#   content:    the inner content of the block, initially an empty string.
 
 # Required methods of blocks.
 #   parse:  parse the inner contents of the block.
@@ -35,6 +36,7 @@ use feature qw(switch);
 #
 sub new {
     my ($class, %opts) = @_;
+    $opts{content} ||= q..;
     return bless \%opts, $class;
 }
 1
