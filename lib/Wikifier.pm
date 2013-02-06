@@ -1,4 +1,8 @@
 #!/usr/bin/perl
+# Copyright (c) 2013, Mitchell Cooper
+#
+# This class represents a wiki language parser.
+#
 package Wikifier;
 
 use warnings;
@@ -7,7 +11,15 @@ use feature qw(switch);
 
 use Carp;
 
+use Wikifier::Block;
+
+###############
+### PARSING ###
+###############
+
 # create a new wikifier instance.
+# Required options:
+#   file: the location of the file to be read.
 sub new {
     my ($class, %opts) = @_;
     ($opts{current}, $opts{last}) = ({}, {});
@@ -64,6 +76,8 @@ sub handle_line {
 # parse a single character.
 sub handle_character {
     my ($wikifier, $char) = @_;
+    
+    # extract parsing hashes.
     my %current = %{$wikifier->{current}};
     my %last    = %{$wikifier->{last}};
 
@@ -91,9 +105,12 @@ sub handle_character {
     
     # right bracket indicates the closing of a block.
     when ('}') {
-        return if $current{escaped};
-        print "   CLOSING BRACKET. last word: $last{word}\n";
+        return if $current{escaped}; # this character was escaped.
+        print "   CLOSING BRACKET. end of block: $current{blockname}\n";
     }
+    
+    # ignore backslashes - they are handled later below.
+    when ('\\') { }
     
     # any other character. append to the current word.
     default {
@@ -119,8 +136,38 @@ sub handle_character {
         $current{escaped} = 0;
     }
     
+    ### do not do anything below that depends on $current{escaped} ###
+    ###   because it has already been modified for the next char   ###
+    
+    # replace parsing hashes.
     $wikifier->{current} = \%current;
     $wikifier->{last}    = \%last;
+    
 }
 
-1;
+###################
+### BLOCK TYPES ###
+###################
+
+# defines the types of blocks and the classes associated with them.
+our %block_types = (
+    main     => 'Wikifier::Block::Main',        # used only for main block.
+    imagebox => 'Wikifier::Block::ImageBox',    # displays an image with a caption.
+    infobox  => 'Wikifier::Block::InfoBox'      # displays a box of general information.
+);
+
+# create a new block of the given type.
+sub create_block {
+    my ($wikifier, $parent, $type) = @_;
+    return unless defined my $class = $block_types{$type};
+    
+    # create a new block of the correct type.
+    my $block = $class->new(
+        type   => undef,    # the subclass should set this.
+        parent => $parent
+    );
+    
+    return $block;
+}
+
+1

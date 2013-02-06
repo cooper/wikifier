@@ -1,4 +1,9 @@
 #!/usr/bin/perl
+# Copyright (c) 2013, Mitchell Cooper
+#
+# This executable takes a filename as an argument,
+# printing the parser's resulting output to STDOUT.
+#
 
 use warnings;
 use strict;
