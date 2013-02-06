@@ -164,7 +164,11 @@ sub handle_character {
             
         }
         
-        print "BLOCK: TYPE[$block_type] NAME[$block_name]\n";
+        print "BLOCK: TYPE[$block_type] NAME[$block_name] $chars_scanned\n";
+        
+        # remove the block type and name.
+        $current{block}{content}[-1] = substr($current{block}{content}[-1], 0, -$chars_scanned);
+
         
         # create the new block.
         $current{block} = $wikifier->create_block(
