@@ -124,12 +124,28 @@ sub handle_character {
         continue if $current{escaped}; # this character was escaped; continue to default.
         print "   LEFT BRACKET! last word: $last{word}\n";
         $current{blockname} = $last{word}; ### XXX
+        
+        # create the new block.
+        $current{block} = $wikifier->create_block($current{block}, $last{word});
+            
     }
     
     # right bracket indicates the closing of a block.
     when ('}') {
         continue if $current{escaped}; # this character was escaped; continue to default.
-        print "   CLOSING BRACKET. end of block: $current{blockname}\n";
+        print "   CLOSING BRACKET. end of block: $current{block}{type}\n";
+        
+        # we cannot close the main block.
+        if ($current{block} == $wikifier->{main_block}) {
+            croak "attempted to close main block";
+            return;
+        }
+        
+        # close the block, returning to its parent.
+        $current{block}{closed} = 1;
+        push @{$current{block}{parent}{content}}, $current{block};
+        $current{block} = $current{block}{parent};
+        
     }
     
     # ignore backslashes - they are handled later below.
@@ -156,7 +172,7 @@ sub handle_character {
         }
         
         # array is not empty.
-            else {
+        else {
             
             # if last element of the block's content is blessed, it's a child block object.
             my $last_value = $current{block}{content}[-1];
@@ -212,8 +228,8 @@ sub handle_character {
 # defines the types of blocks and the classes associated with them.
 our %block_types = (
     main     => 'Wikifier::Block::Main',        # used only for main block.
-    imagebox => 'Wikifier::Block::ImageBox',    # displays an image with a caption.
-    infobox  => 'Wikifier::Block::InfoBox'      # displays a box of general information.
+    #imagebox => 'Wikifier::Block::ImageBox',    # displays an image with a caption.
+    #infobox  => 'Wikifier::Block::InfoBox'      # displays a box of general information.
 );
 
 # create a new block of the given type.

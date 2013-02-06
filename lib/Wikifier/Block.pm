@@ -19,6 +19,7 @@ use feature qw(switch);
 #   parent:     the parent block object. (for main block, undef)
 #   type:       the name type of block, such as 'imagebox', 'paragraph', etc.
 #   content:    the inner content of the block, an arrayref of strings and child blocks.
+#   closed:     parser sets this true after the block has been closed.
 
 # Required methods of blocks.
 #   parse:  parse the inner contents of the block.
