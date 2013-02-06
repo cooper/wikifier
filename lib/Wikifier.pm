@@ -111,25 +111,29 @@ sub handle_character {
     # space. terminates a word.
     # delete the current word, setting its value to the last word.
     when (' ') {
-        goto AFTER if defined $current{word} && $current{word} eq ' ';
-        $last{word} = delete $current{word};
-        print "last word: $last{word}\n" if defined $last{word};
-        continue;
+    
+        # that is, unless the current word a space.
+        # note: I can't remember why I felt the need for this code.
+        if (!(defined $current{word} && $current{word} eq ' ')) {
+            $last{word} = delete $current{word};
+            continue;
+        }
     }
     
     
     # left bracket indicates the start of a block.
     when ('{') {
         continue if $current{escaped}; # this character was escaped; continue to default.
-        print "   LEFT BRACKET! last word: $last{word}\n";
-        $current{blockname} = $last{word}; ### XXX
        
-        # remove the new block type from the current block's last content element.
-        my $content = $current{block}{content}[-1];
-        my $block_type = my $block_name = q..;
-        my $in_block_name = 0;
-        # section [hello]
-        my $chars_scanned = 0;
+        # now we must remove the new block type from the
+        # current block's last content element.
+        
+        # set some initial variables for the loop.
+        my $content       = $current{block}{content}[-1];
+        my $block_type    = my $block_name = q..;
+        my $in_block_name = my $chars_scanned = 0;
+        
+        # chop one character at a time from the end of the content.
         while (my $last_char = chop $content) { $chars_scanned++;
             
             # space.
@@ -165,9 +169,11 @@ sub handle_character {
         
         print "BLOCK: TYPE[$block_type] NAME[$block_name] $chars_scanned\n";
         
-        # remove the block type and name.
+        # remove the block type and name from the current block's content.
+        #
+        # note: it is very likely that a single space will remain, but this will later
+        # ..... be trimmed out by a further cleanup.
         $current{block}{content}[-1] = substr($current{block}{content}[-1], 0, -$chars_scanned);
-
         
         # create the new block.
         $current{block} = $wikifier->create_block(
@@ -182,7 +188,6 @@ sub handle_character {
     # right bracket indicates the closing of a block.
     when ('}') {
         continue if $current{escaped}; # this character was escaped; continue to default.
-        print "   CLOSING BRACKET. end of block: $current{block}{type}\n";
         
         # we cannot close the main block.
         if ($current{block} == $wikifier->{main_block}) {
@@ -210,8 +215,6 @@ sub handle_character {
         if ($char ne ' ') {
             $current{word}  = '' if !defined $current{word};
             $current{word} .= $char;
-
-            print "current word: $current{word}\n";
         }
         
         # append character to current block's content.
