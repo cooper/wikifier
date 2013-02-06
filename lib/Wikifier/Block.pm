@@ -20,6 +20,7 @@ use feature qw(switch);
 #   type:       the name type of block, such as 'imagebox', 'paragraph', etc.
 #   content:    the inner content of the block, an arrayref of strings and child blocks.
 #   closed:     parser sets this true after the block has been closed.
+#   name:       the name of the block or an empty string if it has no name.
 
 # Required methods of blocks.
 #   parse:  parse the inner contents of the block.

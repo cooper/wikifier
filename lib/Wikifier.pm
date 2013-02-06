@@ -112,8 +112,8 @@ sub handle_character {
     # delete the current word, setting its value to the last word.
     when (' ') {
         goto AFTER if defined $current{word} && $current{word} eq ' ';
-        $last{word} = $current{word};
-        delete $current{word};
+        $last{word}       = delete $current{word};
+        $last{word_since} = delete $current{word_since};
         print "last word: $last{word}\n" if defined $last{word};
         continue;
     }
@@ -124,9 +124,55 @@ sub handle_character {
         continue if $current{escaped}; # this character was escaped; continue to default.
         print "   LEFT BRACKET! last word: $last{word}\n";
         $current{blockname} = $last{word}; ### XXX
+       
+        # remove the new block type from the current block's last content element.
+        my $content = $current{block}{content}[-1];
+        my $block_type = my $block_name = q..;
+        my $in_block_name = 0;
+        # section [hello]
+        my $chars_scanned = 0;
+        while (my $last_char = chop $content) { $chars_scanned++;
+            
+            # space.
+            if ($last_char eq ' ') {
+                next unless length $block_type; # ignore it if there is no block type yet.
+                last unless $in_block_name; # otherwise this is the end of our type/name.
+                                            # unless we're in the block name, in which
+                                            # case this space is a part of the name.
+            }
+            
+            # entering block name.
+            if ($last_char eq ']') {
+                $in_block_name = 1;
+                next;
+            }
+            
+            # exiting block name.
+            if ($last_char eq '[') {
+                $in_block_name = 0;
+                next;
+            }
+            
+            # we are in the block name, so add this character to the front.
+            if ($in_block_name) {
+                $block_name = $last_char.$block_name;
+                next;
+            }
+            
+            # not in block name, so it's part of the type.
+            $block_type = $last_char.$block_type;
+            
+        }
+        
+        print "BLOCK: TYPE[$block_type] NAME[$block_name]\n";
         
         # create the new block.
-        $current{block} = $wikifier->create_block($current{block}, $last{word});
+        $current{block} = $wikifier->create_block(
+            parent => $current{block},
+            type   => $block_type,
+            name   => $block_name
+        );
+       
             
     }
     
@@ -159,8 +205,10 @@ sub handle_character {
     
         # if it's not a space, append to current word.
         if ($char ne ' ') {
-            $current{word}  = '' if !defined $current{word};
+            $current{word}  = '', $current{word_since} = -1 if !defined $current{word};
             $current{word} .= $char;
+            $current{word_since}++;
+
             print "current word: $current{word}\n";
         }
         
@@ -234,22 +282,17 @@ our %block_types = (
 
 # create a new block of the given type.
 sub create_block {
-    my ($wikifier, $parent, $type) = @_;
-    my $class = $block_types{$type};
+    my ($wikifier, %opts) = @_;
+    my $class = $block_types{$opts{type}};
     
     # no such block type; create a dummy block with no type.
     if (!defined $class) {
-        return Wikifier::Block->new(
-            type   => 'dummy',
-            parent => $parent
-        );
+        $opts{type} = 'dummy';
+        return Wikifier::Block->new(%opts);
     }
     
     # create a new block of the correct type.
-    my $block = $class->new(
-        type   => $type,    # the subclass should set this.
-        parent => $parent
-    );
+    my $block = $class->new(%opts);
     
     return $block;
 }
