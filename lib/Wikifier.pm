@@ -315,6 +315,7 @@ our %block_types = (
 sub create_block {
     my ($wikifier, %opts) = @_;
     my $class = $block_types{$opts{type}};
+    $opts{wikifier} = $wikifier;
     
     # no such block type; create a dummy block with no type.
     if (!defined $class) {
