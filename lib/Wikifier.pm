@@ -393,8 +393,7 @@ sub parse_formatted_text {
             
             # otherwise, the format type is ended and must now be parsed.
             else {
-            
-                print "FORMAT TYPE: $format_type\n";
+                $string   .= $wikifier->parse_format_type($format_type);
                 $in_format = 0;
             }
             
@@ -423,6 +422,30 @@ sub parse_formatted_text {
     }
     
     return $string;
+}
+
+# parses an individual format type, aka the content in [brackets].
+# for example, 'i' for italic. returns the string generated from it.
+sub parse_format_type {
+    my ($wikifier, $type) = @_;
+    
+    # simple formatting.
+    given ($type) {
+    
+        # italics.
+        when ( 'i') { return '<span style="font-style: italic;">' }
+        when ('/i') { return '</span>'                            }
+    
+    }
+    
+    # not-so-simple formatting.
+    #if ($type =~ m//) {
+    #}
+    
+    
+    # leave out anything else, I guess.
+    return q..;
+    
 }
 
 1
