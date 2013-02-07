@@ -53,28 +53,14 @@ sub parse {
 # HTML.
 sub result {
     my $block  = shift;
-    my $string = '<div class="wiki-imagebox ';
-    
-    # class based on alignment.
-    $string .= "wiki-imagebox-$$block{align}\">\n";
-    
-    # link and image.
-    $string .= "    <a href=\"full url\">\n";
-    $string .= "        <img src=\"short url\" ";
-    
-    # width/height.
-    $string .= "style=\"width: $$block{width}; height: $$block{height};\" />\n";
-    
-    # end of link.
-    $string .= "    </a>\n";
-    
-    # description.
-    $string .= "    <div class=\"wiki-imagebox-description\">$$block{description}</div>\n";
-    
-    # end of box.
-    $string .= "</div>";
-    
-    return $string;
+    return <<END;
+<div class="wiki-imagebox wiki-imagebox-$$block{align}">
+    <a href="full url">
+        <img src="short url" alt="image" style="width: $$block{width}; height: $$block{height};" />
+    </a>
+    <div class="wiki-imagebox-description">$$block{description}</div>
+</div>
+END
 }
 
 1
