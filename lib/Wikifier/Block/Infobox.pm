@@ -47,7 +47,10 @@ sub result {
             $value = $value->result();
         }
         
-        # TODO: parse values.
+        # Parse formatting in the value.
+        else {
+            $value = $block->wikifier->parse_formatted_text($value);
+        }
         
         # append table row.
         $string .= <<END
