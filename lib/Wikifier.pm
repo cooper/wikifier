@@ -79,7 +79,7 @@ sub handle_line {
     my ($wikifier, $line) = @_;
     
     # illegal regex filters out variable declaration. TODO.
-    if ($line =~ m/\@([\w\.]+):(.+);/) {
+    if ($line =~ m/^\s*\@([\w\.]+):(.+);/) {
         print "variable($1): $2\n";
         return 1;
     }
