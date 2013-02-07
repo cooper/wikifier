@@ -341,4 +341,14 @@ sub indent {
     return $final_string;
 }
 
+######################
+### FORMAT PARSING ###
+######################
+
+sub parse_formatted_text {
+    my ($wikifier, $text) = @_;
+    my $string = q();
+    return $string;
+}
+
 1
