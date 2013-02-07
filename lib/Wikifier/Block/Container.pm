@@ -23,8 +23,7 @@ sub parse {
     $block->remove_blank();
     
     foreach my $item (@{$block->{content}}) {
-        print "item: $item\n";
-        $item->parse();
+        $item->parse(@_);
     }
 }
 

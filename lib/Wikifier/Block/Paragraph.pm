@@ -23,11 +23,11 @@ sub parse {
 }
 
 sub result {
-    my $block = shift;
+    my ($block, $page) = @_;
 
     # Parse formatting.
     my $html = Wikifier::indent($block->{content}[0]);
-    $html = $block->wikifier->parse_formatted_text($html);
+    $html = $page->wikifier->parse_formatted_text($html);
 
     return "<p>\n$html\n</p>\n";
 }

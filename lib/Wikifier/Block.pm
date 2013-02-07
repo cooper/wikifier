@@ -62,7 +62,4 @@ sub remove_blank {
     $block->{content} = \@new;
 }
 
-# FIXME: wikifier may create a looping reference.
-sub wikifier { shift->{wikifier} }
-
 1

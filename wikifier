@@ -11,15 +11,7 @@ use lib 'lib';
 
 use Wikifier;
 
-my $wikifier = Wikifier->new(file => shift @ARGV);
-$wikifier->parse();
+my $page = Wikifier::Page->new(file => shift @ARGV);
+$page->parse();
+print $page->html();
 
-foreach (@{$wikifier->{main_block}{content}}) {
-    print "content: $_\n";
-}
-
-$wikifier->{main_block}->result();
-
-use Data::Dumper;
-$Data::Dumper::Maxdepth = 5;
-#print Dumper $wikifier->{main_block};

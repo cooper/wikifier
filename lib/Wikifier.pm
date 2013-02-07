@@ -12,6 +12,7 @@ use feature qw(switch);
 use Carp;
 use Scalar::Util 'blessed';
 
+use Wikifier::Page;
 use Wikifier::Block;
 use Wikifier::Block::Main;
 use Wikifier::Block::Hash;
@@ -53,7 +54,7 @@ sub new {
 
 # parse the file.
 sub parse {
-    my $wikifier = shift;
+    my ($wikifier, $page) = @_;
     
     # no file given.
     if (!defined $wikifier->{file}) {
@@ -72,7 +73,7 @@ sub parse {
         $line =~ s/^\s*//g;     # remove leading whitespace.
         $line =~ s/\s*$//g;     # remove trailing whitespace.
         next unless $line;      # line empty after removing unwanted characters.
-        $wikifier->handle_line("$line ") or last;
+        $wikifier->handle_line($page, "$line ") or last;
     }
     
     # run ->parse on children.
@@ -85,7 +86,7 @@ sub parse {
 
 # parse a single line.
 sub handle_line {
-    my ($wikifier, $line) = @_;
+    my ($wikifier, $page, $line) = @_;
     
     # illegal regex filters out variable declaration. TODO.
     if ($line =~ m/^\s*\@([\w\.]+):\s*(.+);\s*$/) {
@@ -95,7 +96,6 @@ sub handle_line {
     
     # illegal regex for __END__
     if ($line =~ m/^\s*__END__\s*$/) {
-        print "reached __END__\n";
         return;
     }
     
@@ -191,8 +191,6 @@ sub handle_character {
             $block_type = $last_char.$block_type;
             
         }
-        
-        print "BLOCK: TYPE[$block_type] NAME[$block_name] $chars_scanned\n";
         
         # remove the block type and name from the current block's content.
         #

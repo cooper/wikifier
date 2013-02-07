@@ -23,7 +23,7 @@ sub new {
 # properties to the imagebox from the found values.
 sub parse {
     my $block = shift;
-    $block->SUPER::parse() or return;
+    $block->SUPER::parse(@_) or return;
     
     $block->{$_} = $block->{hash}{$_} foreach qw(description file width height align);
     
@@ -52,10 +52,10 @@ sub parse {
 
 # HTML.
 sub result {
-    my $block  = shift;
+    my ($block, $page) = @_;
 
     # parse formatting in the image description.
-    my $description = $block->wikifier->parse_formatted_text($block->{description});
+    my $description = $page->wikifier->parse_formatted_text($block->{description});
     
     # TODO: do not hardcode to notroll.net!
     my $height = $block->{height}; my $width = $block->{width};

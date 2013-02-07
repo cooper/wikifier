@@ -38,10 +38,12 @@ sub parse {
 
 # HTML.
 sub result {
-    my $block = shift;
+    my ($block, $page) = @_;
+    my $string = q();
     foreach my $item (@{$block->{content}}) {
-        print $item->result,"\n";
+        $string .= $item->result($page),"\n";
     }
+    return $string;
 }
 
 1

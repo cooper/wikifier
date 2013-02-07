@@ -21,7 +21,7 @@ sub new {
 # parse(): inherited from hash.
 
 sub result {
-    my $block  = shift;
+    my ($block, $page) = @_;
     my $string = "<div class=\"wiki-infobox\">\n";
     
     # if an image is present, display it.
@@ -38,7 +38,7 @@ sub result {
         my $value = $block->{hash}{$key};
         
         # special pair - ignore it.
-        if ($key =~ m/^-/) {
+        if (substr($key, 0, 1) eq '-') {
             next;
         }
         
@@ -49,7 +49,7 @@ sub result {
         
         # Parse formatting in the value.
         else {
-            $value = $block->wikifier->parse_formatted_text($value);
+            $value = $page->wikifier->parse_formatted_text($value);
         }
         
         # append table row.
