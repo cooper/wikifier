@@ -355,6 +355,18 @@ sub indent {
     return $final_string;
 }
 
+sub safe_name {
+    my $string = shift;
+    $string =~ s/ /_/g;
+    return $string;
+}
+
+sub unsafe_name {
+    my $string = shift;
+    $string =~ s/_/ /g;
+    return $string;
+}
+
 ######################
 ### FORMAT PARSING ###
 ######################
@@ -469,16 +481,29 @@ sub parse_format_type {
     # simple formatting.
     given ($type) {
     
-        # italics.
-        when ( 'i') { return '<span style="font-style: italic;">' }
-        when ('/i') { return '</span>'                            }
+        # italic, bold, strikethrough.
+        when ('i') { return '<span style="font-style: italic;">'            }
+        when ('b') { return '<span style="font-weight: bold;">'             }
+        when ('s') { return '<span style="text-decoration: line-through;">' }
+        when (['/s', '/b', '/i']) { return '</span>' }
     
     }
     
     # not-so-simple formatting.
-    #if ($type =~ m//) {
-    #}
     
+    # a internal wiki link. TODO: don't hardcode to notroll.net.
+    if ($type =~ m/\[(.+)\]/) {
+        my $name      = $1;
+        my $safe_name = safe_name($name);
+        return "<a class=\"wiki-link-internal\" href=\"http://about.notroll.net/$safe_name\">$name</a>";
+    }
+    
+    # a wikipedia link. TODO: don't hardcode to english wikipedia.
+    if ($type =~ m/!(.+)!/) {
+        my $name      = $1;
+        my $safe_name = safe_name($name);
+        return "<a class=\"wiki-link-external\" href=\"http://en.wikipedia.org/wiki/$safe_name\">$name</a>";
+    }
     
     # leave out anything else, I guess.
     return q..;
