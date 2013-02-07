@@ -19,6 +19,7 @@ use Wikifier::Block::Container;
 use Wikifier::Block::Infobox;
 use Wikifier::Block::Imagebox;
 use Wikifier::Block::Section;
+use Wikifier::Block::Paragraph;
 
 ###############
 ### PARSING ###
@@ -303,10 +304,11 @@ sub handle_character {
 
 # defines the types of blocks and the classes associated with them.
 our %block_types = (
-    main     => 'Wikifier::Block::Main',        # used only for main block.
-    imagebox => 'Wikifier::Block::Imagebox',    # displays an image with a caption.
-    infobox  => 'Wikifier::Block::Infobox',     # displays a box of general information.
-    section  => 'Wikifier::Block::Section',     # container for paragraphs, images, etc.
+    main      => 'Wikifier::Block::Main',        # used only for main block.
+    imagebox  => 'Wikifier::Block::Imagebox',    # displays an image with a caption.
+    infobox   => 'Wikifier::Block::Infobox',     # displays a box of general information.
+    section   => 'Wikifier::Block::Section',     # container for paragraphs, images, etc.
+    paragraph => 'Wikifier::Block::Paragraph',   # paragraph of text.
 );
 
 # create a new block of the given type.
