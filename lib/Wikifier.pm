@@ -349,6 +349,79 @@ sub indent {
 sub parse_formatted_text {
     my ($wikifier, $text) = @_;
     my $string = q();
+    
+    my $last_char   = q();  # the last parsed character.
+    my $in_format   = 0;    # inside a formatting element.
+    my $format_type = q();  # format name such as 'i' or '/b'
+    
+    # parse character-by-character.
+    CHAR: foreach my $char (split //, $text) {
+
+        given ($char) {
+        
+        # [ marks the beginning of a formatting element.
+        when ('[') {
+
+            # if we're in format already, it's a [[link]].
+            if ($in_format && $last_char eq '[') {
+                $format_type .= $char;
+                
+                # skip to next character.
+                $last_char = $char;
+                next CHAR;
+                
+            }
+
+            # we are now inside the format type.
+            $in_format = 1;
+            $format_type = q();
+            
+        }
+        
+        # ] marks the end of a formatting element.
+        when (']') {
+
+            # ignore it for now if it starts with [ and doesn't end with ].
+            # this means it's a [[link]] which hasn't yet handled the second ].
+            my $first = substr $format_type, 0, 1;
+            my $last  = substr $format_type, -1, 1;
+            if ($in_format && $first eq '[' && $last ne ']') {
+                $format_type .= $char;
+                $in_format    = 0;
+            }
+            
+            
+            # otherwise, the format type is ended and must now be parsed.
+            else {
+            
+                print "FORMAT TYPE: $format_type\n";
+                $in_format = 0;
+            }
+            
+        }
+        
+        # any other character.
+        default {
+        
+            # if we're in the format type, append to it.
+            if ($in_format) {
+                $format_type .= $char;
+            }
+            
+            # it's any regular character, either within or outside of a format.
+            else {
+                $string .= $char;
+            }
+            
+        }
+        
+        } # end of switch
+        
+        # set last character.
+        $last_char = $char;
+        
+    }
+    
     return $string;
 }
 

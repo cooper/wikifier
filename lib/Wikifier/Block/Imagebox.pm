@@ -53,12 +53,9 @@ sub parse {
 # HTML.
 sub result {
     my $block  = shift;
-<<<<<<< HEAD
 
     # parse formatting in the image description.
     my $description = $block->wikifier->parse_formatted_text($block->{description});
-
-=======
     
     # TODO: do not hardcode to notroll.net!
     my $height = $block->{height}; my $width = $block->{width};
@@ -73,7 +70,6 @@ sub result {
     my $shorturl = 'http://images.notroll.net/paranoia/files/'.$block->{file};
     $shorturl   .= "?height=$height&width=$width&cropratio=";
     
->>>>>>> temporarily hardcoded to notroll.net image generator.
     return <<END;
 <div class="wiki-imagebox wiki-imagebox-$$block{align}">
     <a href="$fullurl">
