@@ -50,4 +50,15 @@ sub result {
     return '';
 }
 
+# remove empty content items.
+sub remove_blank {
+    my $block = shift;
+    my @new;
+    foreach my $item (@{$block->{content}}) {
+        my $_item = $item; $_item =~ s/^\s*//g; $_item =~ s/\s*$//g;
+        push @new, $item if length $_item;
+    }
+    $block->{content} = \@new;
+}
+
 1

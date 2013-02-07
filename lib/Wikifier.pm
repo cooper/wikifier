@@ -69,6 +69,9 @@ sub parse {
         $wikifier->handle_line("$line ");
     }
     
+    # remove blank spaces in main block.
+    $wikifier->{main_block}->remove_blank();
+    
     # success.
     return 1; # return the page object.
     
@@ -79,7 +82,7 @@ sub handle_line {
     my ($wikifier, $line) = @_;
     
     # illegal regex filters out variable declaration. TODO.
-    if ($line =~ m/^\s*\@([\w\.]+):(.+);/) {
+    if ($line =~ m/^\s*\@([\w\.]+):\s*(.+);\s*$/) {
         print "variable($1): $2\n";
         return 1;
     }
