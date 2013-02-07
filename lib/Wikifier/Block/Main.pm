@@ -23,10 +23,16 @@ sub new {
 # parse() just calls all of the parse()s of the children.
 sub parse {
     my $block = shift;
+    
+    # filter out blank items.
+    $block->remove_blank();
+    
+    # parse each item.
     foreach my $item (@{$block->{content}}) {
         next unless blessed $item;
         $item->parse();
     }
+    
     return 1;
 }
 

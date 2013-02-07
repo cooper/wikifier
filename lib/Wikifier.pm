@@ -15,8 +15,10 @@ use Scalar::Util 'blessed';
 use Wikifier::Block;
 use Wikifier::Block::Main;
 use Wikifier::Block::Hash;
+use Wikifier::Block::Container;
 use Wikifier::Block::Infobox;
 use Wikifier::Block::Imagebox;
+use Wikifier::Block::Section;
 
 ###############
 ### PARSING ###
@@ -71,9 +73,6 @@ sub parse {
         next unless $line;      # line empty after removing unwanted characters.
         $wikifier->handle_line("$line ") or last;
     }
-    
-    # remove blank spaces in main block.
-    $wikifier->{main_block}->remove_blank();
     
     # run ->parse on children.
     $wikifier->{main_block}->parse();
@@ -306,7 +305,8 @@ sub handle_character {
 our %block_types = (
     main     => 'Wikifier::Block::Main',        # used only for main block.
     imagebox => 'Wikifier::Block::Imagebox',    # displays an image with a caption.
-    infobox  => 'Wikifier::Block::Infobox'      # displays a box of general information.
+    infobox  => 'Wikifier::Block::Infobox',     # displays a box of general information.
+    section  => 'Wikifier::Block::Section',     # container for paragraphs, images, etc.
 );
 
 # create a new block of the given type.

@@ -17,3 +17,7 @@ $wikifier->parse();
 foreach (@{$wikifier->{main_block}{content}}) {
     print "content: $_\n";
 }
+
+use Data::Dumper;
+$Data::Dumper::Maxdepth = 5;
+#print Dumper $wikifier->{main_block};
