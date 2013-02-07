@@ -10,6 +10,8 @@ use strict;
 use feature qw(switch);
 use parent 'Wikifier::Block::Hash';
 
+use Scalar::Util 'blessed';
+
 sub new {
     my ($class, %opts) = @_;
     $opts{type} = 'infobox';
@@ -18,6 +20,44 @@ sub new {
 
 # parse(): inherited from hash.
 
-# 
+sub result {
+    my $block  = shift;
+    my $string = "<div class=\"wiki-infobox\">\n";
+    
+    # if an image is present, display it.
+    if (my $image = $block->{hash}{-image}) {
+        my $imagehtml = $image->result();
+        $string .= "    <div class=\"wiki-infobox-image-container\">$imagehtml</div>\n";
+    }
+    
+    # start table.
+    $string   .= "    <table class=\"wiki-infobox-table\">\n";
+    
+    foreach my $key (keys %{$block->{hash}}) {
+        my $value = $block->{hash}{$key};
+        
+        # special pair - ignore it.
+        if ($key =~ m/^-/) {
+            next;
+        }
+        
+        # value is a block. generate the HTML for it.
+        if (blessed $value) {
+            $value = $value->result();
+        }
+        
+        # TODO: parse values.
+        
+        $string .= "        <tr class=\"wiki-infobox-pair\">\n";
+        $string .= "            <td class=\"wiki-infobox-key\">$key</td>\n";
+        $string .= "            <td class=\"wiki-infobox-value\">$value</td>\n";
+        $string .= "        </tr>\n";
+    }
+    
+    $string .= "    </table>\n";
+    $string .= "</div>\n";
+    
+    return $string;
+}
 
 1

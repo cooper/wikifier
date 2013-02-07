@@ -18,6 +18,8 @@ foreach (@{$wikifier->{main_block}{content}}) {
     print "content: $_\n";
 }
 
+$wikifier->{main_block}->result();
+
 use Data::Dumper;
 $Data::Dumper::Maxdepth = 5;
 #print Dumper $wikifier->{main_block};

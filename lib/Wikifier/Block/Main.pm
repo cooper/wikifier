@@ -36,4 +36,12 @@ sub parse {
     return 1;
 }
 
+# HTML.
+sub result {
+    my $block = shift;
+    foreach my $item (@{$block->{content}}) {
+        print $item->result,"\n";
+    }
+}
+
 1

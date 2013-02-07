@@ -23,4 +23,14 @@ sub parse {
     $block->SUPER::parse();
 }
 
+sub result {
+    my $block = shift;
+    my $string = "<div class=\"wiki-section\">\n";
+    foreach my $item (@{$block->{content}}) {
+        $string .= Wikifier::indent($item->result())."\n";
+    }
+    $string .= "</div>\n";
+    return $string;
+}
+
 1

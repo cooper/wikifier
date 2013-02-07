@@ -326,4 +326,17 @@ sub create_block {
     return $block;
 }
 
+#################
+### UTILITIES ###
+#################
+
+sub indent {
+    my $string = shift;
+    my $final_string = q();
+    foreach my $line (split "\n", $string) {
+        $final_string .= "    $line\n";
+    }
+    return $final_string;
+}
+
 1
