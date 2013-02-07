@@ -32,6 +32,10 @@ sub parse {
         $block->{width} = 100;
     }
     
+    # default to auto.
+    $block->{width}  ||= 'auto';
+    $block->{height} ||= 'auto';
+    
     # no alignment; default to right.
     $block->{align} ||= 'right';
     
@@ -44,6 +48,33 @@ sub parse {
     # what should we do if a description is omitted?
     
     return 1;
+}
+
+# HTML.
+sub result {
+    my $block  = shift;
+    my $string = '<div class="wiki-imagebox ';
+    
+    # class based on alignment.
+    $string .= "wiki-imagebox-$$block{align}\">\n";
+    
+    # link and image.
+    $string .= "    <a href=\"full url\">\n";
+    $string .= "        <img src=\"short url\" ";
+    
+    # width/height.
+    $string .= "style=\"width: $$block{width}; height: $$block{height};\" />\n";
+    
+    # end of link.
+    $string .= "    </a>\n";
+    
+    # description.
+    $string .= "    <div class=\"wiki-imagebox-description\">$$block{description}</div>\n";
+    
+    # end of box.
+    $string .= "</div>";
+    
+    return $string;
 }
 
 1
