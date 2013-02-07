@@ -53,12 +53,16 @@ sub parse {
 # HTML.
 sub result {
     my $block  = shift;
+
+    # parse formatting in the image description.
+    my $description = $block->wikifier->parse_formatted_text($block->{description});
+
     return <<END;
 <div class="wiki-imagebox wiki-imagebox-$$block{align}">
     <a href="full url">
         <img src="short url" alt="image" style="width: $$block{width}; height: $$block{height};" />
     </a>
-    <div class="wiki-imagebox-description">$$block{description}</div>
+    <div class="wiki-imagebox-description">$description</div>
 </div>
 END
 }
