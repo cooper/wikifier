@@ -33,6 +33,7 @@ sub result {
     # start table.
     $string   .= "    <table class=\"wiki-infobox-table\">\n";
     
+    # append each pair.
     foreach my $key (keys %{$block->{hash}}) {
         my $value = $block->{hash}{$key};
         
@@ -48,15 +49,20 @@ sub result {
         
         # TODO: parse values.
         
-        $string .= "        <tr class=\"wiki-infobox-pair\">\n";
-        $string .= "            <td class=\"wiki-infobox-key\">$key</td>\n";
-        $string .= "            <td class=\"wiki-infobox-value\">$value</td>\n";
-        $string .= "        </tr>\n";
+        # append table row.
+        $string .= <<END
+
+        <tr class="wiki-infobox-pair">
+            <td class="wiki-infobox-key">$key</td>
+            <td class="wiki-infobox-value">$value</td>
+        </tr>
+        
+END
+;
+
     }
     
-    $string .= "    </table>\n";
-    $string .= "</div>\n";
-    
+    $string .= "    </table>\n</div>\n";
     return $string;
 }
 
