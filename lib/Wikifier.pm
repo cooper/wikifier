@@ -494,16 +494,32 @@ sub parse_format_type {
     
     # a internal wiki link. TODO: don't hardcode to notroll.net.
     if ($type =~ m/^\[(.+)\]$/) {
-        my $name      = $1;
-        my $safe_name = safe_name($name);
-        return "<a class=\"wiki-link-internal\" href=\"http://about.notroll.net/$safe_name\">$name</a>";
+        my ($name, $safe_name, $text) = ($1, $1, $1);
+        
+        # type [[ displayed text | link name ]]
+        if ($name =~ m/(.+)\|(.+)/) {
+            $text = $1;
+            $name = $2;
+        }
+        
+        $safe_name = safe_name($name);
+        
+        return "<a title=\"$name\" class=\"wiki-link-internal\" href=\"http://about.notroll.net/$safe_name\">$text</a>";
     }
     
     # a wikipedia link. TODO: don't hardcode to english wikipedia.
     if ($type =~ m/^!(.+)!$/) {
-        my $name      = $1;
-        my $safe_name = safe_name($name);
-        return "<a class=\"wiki-link-external\" href=\"http://en.wikipedia.org/wiki/$safe_name\">$name</a>";
+        my ($name, $safe_name, $text) = ($1, $1, $1);
+        
+        # type [[ displayed text | link name ]]
+        if ($name =~ m/(.+)\|(.+)/) {
+            $text = $1;
+            $name = $2;
+        }
+        
+        $safe_name = safe_name($name);
+        
+        return "<a title=\"$name\" class=\"wiki-link-external\" href=\"http://en.wikipedia.org/wiki/$safe_name\">$text</a>";
     }
     
     # variable.
