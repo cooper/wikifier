@@ -368,6 +368,7 @@ sub parse_formatted_text {
     my $format_type  = q();  # format name such as 'i' or '/b'
     my $escaped      = 0;    # this character was escaped.
     my $next_escaped = 0;    # the next character will be escaped.
+    my $ignored      = 0;    # this character is a parser syntax character.
     
     # parse character-by-character.
     CHAR: foreach my $char (split '', $text) {
@@ -376,13 +377,18 @@ sub parse_formatted_text {
         
         # escapes.
         when ('\\') {
+            $ignored = 1; # the master parser does not ignore this...
+                          # I'm not sure why this works this way, but it does.
+                          # It shall stay this way until I find a reason to change it.
+                          
             continue if $escaped; # this backslash was escaped.
             $next_escaped = 1;
         }
         
         # [ marks the beginning of a formatting element.
         when ('[') {
-
+            continue if $escaped;
+            
             # if we're in format already, it's a [[link]].
             if ($in_format && $last_char eq '[') {
                 $format_type .= $char;
@@ -401,7 +407,8 @@ sub parse_formatted_text {
         
         # ] marks the end of a formatting element.
         when (']') {
-
+            continue if $escaped;
+            
             # ignore it for now if it starts with [ and doesn't end with ].
             # this means it's a [[link]] which hasn't yet handled the second ].
             my $first = substr $format_type, 0, 1;
@@ -423,14 +430,21 @@ sub parse_formatted_text {
         # any other character.
         default {
         
+            # if this character is escaped and not ignored
+            # for escaping, reinject the last char (backslash.)
+            my $append = $char;
+            if (!$ignored && $escaped) {
+                $append = $last_char.$char;
+            }
+        
             # if we're in the format type, append to it.
             if ($in_format) {
-                $format_type .= $char;
+                $format_type .= $append;
             }
             
             # it's any regular character, either within or outside of a format.
             else {
-                $string .= $char;
+                $string .= $append;
             }
             
         }
@@ -440,6 +454,7 @@ sub parse_formatted_text {
         # set last character and escape for next character.
         $last_char = $char;
         $escaped   = $next_escaped;
+        $ignored   = 0;
         
     }
     
