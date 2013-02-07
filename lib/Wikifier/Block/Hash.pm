@@ -42,6 +42,10 @@ sub parse {
             # set the value to the block item itself.
             $values{$key} = $item;
             
+            # call the item's ->parse() to ensure its
+            # resulting values are ready when we need them.
+            $item->parse();
+            
             next;
         }
         
