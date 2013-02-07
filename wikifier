@@ -16,5 +16,4 @@ $wikifier->parse();
 
 foreach (@{$wikifier->{main_block}{content}}) {
     print "content: $_\n";
-    $_->parse();
 }

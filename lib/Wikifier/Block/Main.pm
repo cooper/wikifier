@@ -12,13 +12,22 @@ use strict;
 use feature qw(switch);
 use parent 'Wikifier::Block';
 
+use Scalar::Util 'blessed';
+
 sub new {
     my ($class, %opts) = @_;
     $opts{type} = 'main';
     return $class->SUPER::new(%opts);
 }
 
-# parse (): not needed for main.
-# result(): not needed for main.
+# parse() just calls all of the parse()s of the children.
+sub parse {
+    my $block = shift;
+    foreach my $item (@{$block->{content}}) {
+        next unless blessed $item;
+        $item->parse();
+    }
+    return 1;
+}
 
 1

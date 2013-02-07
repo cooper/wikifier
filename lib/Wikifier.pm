@@ -75,6 +75,9 @@ sub parse {
     # remove blank spaces in main block.
     $wikifier->{main_block}->remove_blank();
     
+    # run ->parse on children.
+    $wikifier->{main_block}->parse();
+    
     # success.
     return 1; # return the page object.
     
