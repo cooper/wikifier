@@ -77,6 +77,14 @@ sub parse {
 # parse a single line.
 sub handle_line {
     my ($wikifier, $line) = @_;
+    
+    # illegal regex filters out variable declaration. TODO.
+    if ($line =~ m/\@([\w\.]+):(.+);/) {
+        print "variable($1): $2\n";
+        return 1;
+    }
+    
+    # pass on to main parser.
     $wikifier->handle_character($_) foreach split //, $line;
 }
 

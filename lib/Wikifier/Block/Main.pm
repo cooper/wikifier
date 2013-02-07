@@ -18,4 +18,7 @@ sub new {
     return $class->SUPER::new(%opts);
 }
 
+# parse (): not needed for main.
+# result(): not needed for main.
+
 1

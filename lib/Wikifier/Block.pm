@@ -43,6 +43,7 @@ sub new {
 }
 
 sub parse {
+    return 1;
 }
 
 sub result {
