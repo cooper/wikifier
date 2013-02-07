@@ -109,7 +109,7 @@ sub handle_line {
 #   word:       the current word. (may not yet be complete.)
 #   escaped:    true if the current character was escaped. (last character = \)
 #   block:      the current block object.
-# 
+#   ignored:    true if the character is a master parster character({, }, etc.).
 
 # %last
 #   char:       the last parsed character.
@@ -147,6 +147,7 @@ sub handle_character {
     
     # left bracket indicates the start of a block.
     when ('{') {
+        $current{ignored} = 1;
         continue if $current{escaped}; # this character was escaped; continue to default.
        
         # now we must remove the new block type from the
@@ -211,6 +212,7 @@ sub handle_character {
     
     # right bracket indicates the closing of a block.
     when ('}') {
+        $current{ignored} = 1;
         continue if $current{escaped}; # this character was escaped; continue to default.
         
         # we cannot close the main block.
@@ -228,6 +230,7 @@ sub handle_character {
     
     # ignore backslashes - they are handled later below.
     when ('\\') {
+        # this character should NEVER be ignored.
         # if it's escaped, continue to default.
         continue if $current{escaped};
     }
@@ -235,17 +238,26 @@ sub handle_character {
     # any other character.
     default {
     
+        # at this point, anything that needs escaping should have been handled by now.
+        # so, if this character is escaped and reached all the way to here, we will
+        # pretend it's not escaped by reinjecting a backslash. this allows further parsers
+        # to handle escapes (in particular, the formatting parser.)
+        my $append = $char;
+        if (!$current{ignored} && $current{escaped}) {
+            $append = "$last{char}$char";
+        }
+    
         # if it's not a space, append to current word.
         if ($char ne ' ') {
             $current{word}  = '' if !defined $current{word};
-            $current{word} .= $char;
+            $current{word} .= $append;
         }
         
         # append character to current block's content.
         
         # if the current block's content array is empty, push the character.
         if (!scalar @{$current{block}{content}}) {
-            push @{$current{block}{content}}, $char;
+            push @{$current{block}{content}}, $append;
         }
         
         # array is not empty.
@@ -256,13 +268,13 @@ sub handle_character {
             if (blessed($last_value)) {
             
                 # push the character to the content array, creating a new string element.
-                push @{$current{block}{content}}, $char;
+                push @{$current{block}{content}}, $append;
                 
             }
             
             # not blessed, so simply append the character to the string.
             else {
-                $current{block}{content}[-1] .= $char;
+                $current{block}{content}[-1] .= $append;
             }
             
         }
@@ -274,9 +286,10 @@ sub handle_character {
     
     AFTER: # used in substitution of return.
     
-    # set last character.
-    $last{char}    = $char;
-    $last{escaped} = $current{escaped};
+    # set last stuff for next character.
+    $last{char}       = $char;
+    $last{escaped}    = $current{escaped};
+    $current{ignored} = 0;
     
     # the current character is \, so set $current{escaped} for the next character.
     # unless, of course, this escape itself is escaped. (determined with current{escaped})
@@ -350,14 +363,22 @@ sub parse_formatted_text {
     my ($wikifier, $text) = @_;
     my $string = q();
     
-    my $last_char   = q();  # the last parsed character.
-    my $in_format   = 0;    # inside a formatting element.
-    my $format_type = q();  # format name such as 'i' or '/b'
+    my $last_char    = q();  # the last parsed character.
+    my $in_format    = 0;    # inside a formatting element.
+    my $format_type  = q();  # format name such as 'i' or '/b'
+    my $escaped      = 0;    # this character was escaped.
+    my $next_escaped = 0;    # the next character will be escaped.
     
     # parse character-by-character.
-    CHAR: foreach my $char (split //, $text) {
-
+    CHAR: foreach my $char (split '', $text) {
+        $next_escaped = 0;
         given ($char) {
+        
+        # escapes.
+        when ('\\') {
+            continue if $escaped; # this backslash was escaped.
+            $next_escaped = 1;
+        }
         
         # [ marks the beginning of a formatting element.
         when ('[') {
@@ -416,8 +437,9 @@ sub parse_formatted_text {
         
         } # end of switch
         
-        # set last character.
+        # set last character and escape for next character.
         $last_char = $char;
+        $escaped   = $next_escaped;
         
     }
     
