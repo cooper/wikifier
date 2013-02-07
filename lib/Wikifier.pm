@@ -14,6 +14,9 @@ use Scalar::Util 'blessed';
 
 use Wikifier::Block;
 use Wikifier::Block::Main;
+use Wikifier::Block::Hash;
+use Wikifier::Block::Infobox;
+use Wikifier::Block::Imagebox;
 
 ###############
 ### PARSING ###
@@ -299,8 +302,8 @@ sub handle_character {
 # defines the types of blocks and the classes associated with them.
 our %block_types = (
     main     => 'Wikifier::Block::Main',        # used only for main block.
-    #imagebox => 'Wikifier::Block::ImageBox',    # displays an image with a caption.
-    #infobox  => 'Wikifier::Block::InfoBox'      # displays a box of general information.
+    imagebox => 'Wikifier::Block::Imagebox',    # displays an image with a caption.
+    infobox  => 'Wikifier::Block::Infobox'      # displays a box of general information.
 );
 
 # create a new block of the given type.
