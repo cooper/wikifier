@@ -66,7 +66,7 @@ sub parse {
         $line =~ s/^\s*//g;     # remove leading whitespace.
         $line =~ s/\s*$//g;     # remove trailing whitespace.
         next unless $line;      # line empty after removing unwanted characters.
-        $wikifier->handle_line("$line ");
+        $wikifier->handle_line("$line ") or last;
     }
     
     # remove blank spaces in main block.
@@ -87,8 +87,15 @@ sub handle_line {
         return 1;
     }
     
+    # illegal regex for __END__
+    if ($line =~ m/^\s*__END__\s*$/) {
+        print "reached __END__\n";
+        return;
+    }
+    
     # pass on to main parser.
     $wikifier->handle_character($_) foreach split //, $line;
+    return 1;
 }
 
 # % current
