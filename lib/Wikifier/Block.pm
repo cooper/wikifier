@@ -30,8 +30,9 @@ use feature qw(switch);
 # Create a new block.
 #
 # Required arguments:
-#   parent: the parent block. (for main block, undef)
-#   type:   the name of the block, such as 'imagebox', 'paragraph', etc.
+#   parent:     the parent block. (for main block, undef)
+#   type:       the name of the block, such as 'imagebox', 'paragraph', etc.
+#   wikifier:   the wikifier object. (FIXME: looping references)
 #
 # For subclasses, the type is provided automatically.
 # This should rarely be used directly; use $wikifier->create_block($parent, $type).
@@ -60,5 +61,8 @@ sub remove_blank {
     }
     $block->{content} = \@new;
 }
+
+# FIXME: wikifier may create a looping reference.
+sub wikifier { shift->{wikifier} }
 
 1
