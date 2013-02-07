@@ -49,7 +49,7 @@ sub result {
         
         # Parse formatting in the value.
         else {
-            $value = $page->wikifier->parse_formatted_text($value);
+            $value = $page->parse_formatted_text($value);
         }
         
         # append table row.

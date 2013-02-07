@@ -55,7 +55,7 @@ sub result {
     my ($block, $page) = @_;
 
     # parse formatting in the image description.
-    my $description = $page->wikifier->parse_formatted_text($block->{description});
+    my $description = $page->parse_formatted_text($block->{description});
     
     # TODO: do not hardcode to notroll.net!
     my $height = $block->{height}; my $width = $block->{width};

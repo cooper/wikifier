@@ -41,7 +41,7 @@ sub result {
     my ($block, $page) = @_;
     my $string = q();
     foreach my $item (@{$block->{content}}) {
-        $string .= $item->result($page),"\n";
+        $string .= $item->result($page)."\n";
     }
     return $string;
 }

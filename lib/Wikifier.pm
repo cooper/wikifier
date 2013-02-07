@@ -88,9 +88,9 @@ sub parse {
 sub handle_line {
     my ($wikifier, $page, $line) = @_;
     
-    # illegal regex filters out variable declaration. TODO.
+    # illegal regex filters out variable declaration.
     if ($line =~ m/^\s*\@([\w\.]+):\s*(.+);\s*$/) {
-        print "variable($1): $2\n";
+        $page->set($1, $wikifier->parse_formatted_text($page, $2));
         return 1;
     }
     
@@ -370,7 +370,7 @@ sub unsafe_name {
 ######################
 
 sub parse_formatted_text {
-    my ($wikifier, $text) = @_;
+    my ($wikifier, $page, $text) = @_;
     my $string = q();
     
     my $last_char    = q();  # the last parsed character.
@@ -431,7 +431,7 @@ sub parse_formatted_text {
             
             # otherwise, the format type is ended and must now be parsed.
             else {
-                $string   .= $wikifier->parse_format_type($format_type);
+                $string   .= $wikifier->parse_format_type($page, $format_type);
                 $in_format = 0;
             }
             
@@ -474,7 +474,7 @@ sub parse_formatted_text {
 # parses an individual format type, aka the content in [brackets].
 # for example, 'i' for italic. returns the string generated from it.
 sub parse_format_type {
-    my ($wikifier, $type) = @_;
+    my ($wikifier, $page, $type) = @_;
     
     # simple formatting.
     given ($type) {
@@ -484,23 +484,32 @@ sub parse_format_type {
         when ('b') { return '<span style="font-weight: bold;">'             }
         when ('s') { return '<span style="text-decoration: line-through;">' }
         when (['/s', '/b', '/i']) { return '</span>' }
+        
+        # new line.
+        when (['nl', 'br']) { return '<br />' }
     
     }
     
     # not-so-simple formatting.
     
     # a internal wiki link. TODO: don't hardcode to notroll.net.
-    if ($type =~ m/\[(.+)\]/) {
+    if ($type =~ m/^\[(.+)\]$/) {
         my $name      = $1;
         my $safe_name = safe_name($name);
         return "<a class=\"wiki-link-internal\" href=\"http://about.notroll.net/$safe_name\">$name</a>";
     }
     
     # a wikipedia link. TODO: don't hardcode to english wikipedia.
-    if ($type =~ m/!(.+)!/) {
+    if ($type =~ m/^!(.+)!$/) {
         my $name      = $1;
         my $safe_name = safe_name($name);
         return "<a class=\"wiki-link-external\" href=\"http://en.wikipedia.org/wiki/$safe_name\">$name</a>";
+    }
+    
+    # variable.
+    if ($type =~ m/^@([\w.]+)$/) {
+        my $var = $page->get($1);
+        return defined $var ? $var : '<style="color: red; font-weight: bold;">(null)</style>';
     }
     
     # leave out anything else, I guess.
