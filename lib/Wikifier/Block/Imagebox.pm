@@ -53,32 +53,74 @@ sub parse {
 # HTML.
 sub result {
     my ($block, $page) = @_;
-
+    
     # parse formatting in the image description.
     my $description = $page->parse_formatted_text($block->{description});
     
-    # TODO: do not hardcode to notroll.net!
+    # currently only exact pixel sizes or 'auto' are supported.
     my $height = $block->{height}; my $width = $block->{width};
+    $height =~ s/px// if defined $height;
+    $width  =~ s/px// if defined $width;
     
-    # image generator does not accept units.
-    $height =~ s/px//; $width =~ s/px//;
+    my ($h, $w, $link_address, $image_url);
+    my $image_root   = $page->wiki_info('image_address');
     
-    # if automatic scaling is desired, omit the width and height options.
-    $height = '' if $height eq 'auto'; $width = '' if $width eq 'auto';
+    # direct link to image.
+    $link_address = $image_url = "$image_root/$$block{file}";
     
-    my $fullurl  =
-    my $shorturl = 'http://images.notroll.net/paranoia/files/'.$block->{file};
-    $shorturl   .= "?height=$height&amp;width=$width&amp;cropratio=";
+    # use javascript image sizing
+    # - uses full-size images directly and uses javascript to size imageboxes.
+    # - this voids the validity as XHTML 1.0 Strict.
+    # - causes slight flash on page load (when images are scaled.)
+    my $js = q();
+    if (lc $page->wiki_info('size_images') eq 'javascript') {
     
-    # TODO: onload is illegal.
+        # inject javascript resizer if no width is given.
+        if (!defined $width || $width eq 'auto') {
+            $js = q{ onload="this.parentElement.parentElement.style.width = this.offsetWidth + 'px'; this.style.width = '100%';"};
+        }
+        
+        # use the image root address options to determine URL.
+        
+        # width and height dummies will be overriden by JavaScript.
+        $w = defined $width  ? $width  : '200px';
+        $h = defined $height ? $height : 'auto';
+        
+        $image_url = "$image_root/$$block{file}";
+    }
+    
+    # use server-side image sizing.
+    # - uses Image::Size to determine dimensions.
+    # - maintains XHTML 1.0 Strict validity.
+    # - eliminates flash on page load.
+    # - faster (since image files are smaller.)
+    # - require read access to local image directory.
+    elsif (lc $page->wiki_info('size_images') eq 'server') {
+    
+        # use Image::Size to determine the dimensions.
+        require Image::Size;
+        my $dir  = $page->wiki_info('image_directory');
+        ($w, $h) = Image::Size::imgsize("$dir/$$block{file}");
+    
+        # call the image_sizer.
+        my $url = $page->wiki_info('image_sizer')->(
+            file   => $block->{file},
+            height => $height,
+            width  => $width
+        );
+    
+        $image_url = $url;
+    }
+    
     return <<END;
 <div class="wiki-imagebox wiki-imagebox-$$block{align}">
-    <a href="$fullurl">
-        <img src="$shorturl" alt="image" style="width: $$block{width}; height: $$block{height};" onload="this.parentElement.parentElement.style.width = this.offsetWidth + 'px'; this.style.width = '100%';" />
+    <a href="$link_address">
+        <img src="$image_url" alt="image" style="width: $w; height: $h;"$js />
     </a>
-    <div class="wiki-imagebox-description"><div class="wiki-imagebox-description-inner">$description</div></div>
+    <div class="wiki-imagebox-description">
+        <div class="wiki-imagebox-description-inner">$description</div>
+    </div>
 </div>
 END
 }
-
 1
