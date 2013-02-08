@@ -26,8 +26,8 @@ sub result {
     $string .= "    <table class=\"wiki-history-table\">\n";
     
     # append each pair.
-    foreach my $key (@{$block->{key_order}}) {
-        my $value = $block->{hash}{$key};
+    foreach my $pair (@{$block->{hash_array}}) {
+        my ($key, $value) = @$pair;
         
         # special pair - ignore it.
         if (substr($key, 0, 1) eq '-') {

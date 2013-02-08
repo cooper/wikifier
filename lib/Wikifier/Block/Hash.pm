@@ -16,6 +16,7 @@ use Carp;
 sub new {
     my ($class, %opts) = @_;
     $opts{type} = 'hash';
+    $opts{hash_array} = [];
     return $class->SUPER::new(%opts);
 }
 
@@ -70,13 +71,24 @@ sub parse {
             when (';') {
             
                 # remove spaces from key and value.
-                $key   =~ s/(^\s*)|(\s*$)//g;
+                $key   =~ s/(^\s*)|(\s*$)//g; my $key_title = $key;
                 $value =~ s/(^\s*)|(\s*$)//g unless blessed $value;
-            
+           
+                # if this key exists, rename it to the next available <name>_key_<n>.
+                while (exists $values{$key}) {
+                    my ($key_name, $key_number) = split '_key_', $key;
+                    if (!defined $key_number) {
+                        $key = "${key}_key_2";
+                        next;
+                    }
+                    $key_number++;
+                    $key = "${key_name}_key_$key_number";
+                }
+                
                 # store the value.
                 $values{$key} = $value;
-                push @{$block->{key_order}}, $key;
-                
+                push @{$block->{hash_array}}, [$key_title, $value];
+            
                 # reset status.
                 $in_value = 0;
                 $key = $value = '';
