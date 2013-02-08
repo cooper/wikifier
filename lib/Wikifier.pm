@@ -314,6 +314,7 @@ our %block_types = (
     section   => 'Wikifier::Block::Section',     # container for paragraphs, images, etc.
     paragraph => 'Wikifier::Block::Paragraph',   # paragraph of text.
     image     => 'Wikifier::Block::Image',       # displays a standalone image.
+    history   => 'Wikifier::Block::History',     # displays a table of dates and events.
 );
 
 # create a new block of the given type.
