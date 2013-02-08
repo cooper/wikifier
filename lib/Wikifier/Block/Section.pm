@@ -25,9 +25,19 @@ sub parse {
 
 # HTML.
 sub result {
-    my $block = shift;
+    my ($block, $page) = (shift, @_);
     my $string = "<div class=\"wiki-section\">\n";
+    
+    # regular section.
+    if (length $block->{name}) {
        $string.= "    <h2 class=\"wiki-section-title\">$$block{name}</h2>\n";
+    }
+    
+    # introduction section.
+    else {
+       my $title = $page->get('page.title');
+       $string.= "    <h1 class=\"wiki-section-page-title\">$title</h1>\n";
+    }
    
     # append the indented HTML of each contained block.
     foreach my $item (@{$block->{content}}) {

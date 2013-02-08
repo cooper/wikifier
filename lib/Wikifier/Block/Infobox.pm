@@ -30,11 +30,12 @@ sub result {
     # if an image is present, display it.
     if (my $image = $block->{hash}{-image}) {
         my $imagehtml = $image->result();
-        $string .= "    <div class=\"wiki-infobox-image-container\">$imagehtml</div>\n";
+        $imagehtml = Wikifier::indent($imagehtml, 2);
+        $string .= "    <div class=\"wiki-infobox-image-container\">\n$imagehtml    </div>\n";
     }
     
     # start table.
-    $string   .= "    <table class=\"wiki-infobox-table\">\n";
+    $string .= "    <table class=\"wiki-infobox-table\">\n";
     
     # append each pair.
     foreach my $key (@{$block->{key_order}}) {

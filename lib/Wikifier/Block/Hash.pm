@@ -25,7 +25,7 @@ sub parse {
     my ($key, $value, $in_value, %values) = (q.., q..);
     
     # for each content item...
-    foreach my $item (@{$block->{content}}) {
+    ITEM: foreach my $item (@{$block->{content}}) {
     
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
@@ -36,18 +36,14 @@ sub parse {
                 return;
             }
             
-            # remove spaces.
-            $key =~ s/(^\s*)|(\s*$)//g;
-            
             # set the value to the block item itself.
-            $values{$key} = $item;
-            push @{$block->{key_order}}, $key;
+            $value = $values{$key} = $item;
             
             # call the item's ->parse() to ensure its
             # resulting values are ready when we need them.
             $item->parse();
-            
-            next;
+
+            next ITEM;
         }
         
         # for each character in this string...
@@ -73,10 +69,10 @@ sub parse {
             # a semicolon indicates the termination of a pair.
             when (';') {
             
-                # remove spaces.
+                # remove spaces from key and value.
                 $key   =~ s/(^\s*)|(\s*$)//g;
-                $value =~ s/(^\s*)|(\s*$)//g;
-                
+                $value =~ s/(^\s*)|(\s*$)//g unless blessed $value;
+            
                 # store the value.
                 $values{$key} = $value;
                 push @{$block->{key_order}}, $key;
@@ -113,7 +109,6 @@ sub parse {
     
     # reassign the hash.
     $block->{hash} = \%hash;
-    
     return 1;
 }
 

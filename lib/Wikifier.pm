@@ -14,13 +14,6 @@ use Scalar::Util 'blessed';
 
 use Wikifier::Page;
 use Wikifier::Block;
-use Wikifier::Block::Main;
-use Wikifier::Block::Hash;
-use Wikifier::Block::Container;
-use Wikifier::Block::Infobox;
-use Wikifier::Block::Imagebox;
-use Wikifier::Block::Section;
-use Wikifier::Block::Paragraph;
 
 ###############
 ### PARSING ###
@@ -320,6 +313,7 @@ our %block_types = (
     infobox   => 'Wikifier::Block::Infobox',     # displays a box of general information.
     section   => 'Wikifier::Block::Section',     # container for paragraphs, images, etc.
     paragraph => 'Wikifier::Block::Paragraph',   # paragraph of text.
+    image     => 'Wikifier::Block::Image',       # displays a standalone image.
 );
 
 # create a new block of the given type.
@@ -334,6 +328,13 @@ sub create_block {
         return Wikifier::Block->new(%opts);
     }
     
+    # load the class.
+    my $file = $class.q(.pm);
+    $file =~ s/::/\//g;
+    if (!$INC{$file}) {
+        require $file or croak "couldn't load block class '$opts{type}'";
+    }
+    
     # create a new block of the correct type.
     my $block = $class->new(%opts);
     
@@ -345,10 +346,11 @@ sub create_block {
 #################
 
 sub indent {
-    my $string = shift;
+    my ($string, $times) = (shift, shift || 1);
+    my $space = '    ' x $times;
     my $final_string = q();
     foreach my $line (split "\n", $string) {
-        $final_string .= "    $line\n";
+        $final_string .= "$space$line\n";
     }
     return $final_string;
 }
