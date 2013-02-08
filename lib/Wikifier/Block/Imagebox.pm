@@ -101,6 +101,7 @@ sub result {
         require Image::Size;
         my $dir  = $page->wiki_info('image_directory');
         ($w, $h) = Image::Size::imgsize("$dir/$$block{file}");
+        ($w, $h) = ($w.q(px), $h.q(px));
     
         # call the image_sizer.
         my $url = $page->wiki_info('image_sizer')->(
@@ -113,7 +114,7 @@ sub result {
     }
     
     return <<END;
-<div class="wiki-imagebox wiki-imagebox-$$block{align}">
+<div class="wiki-imagebox wiki-imagebox-$$block{align}" style="width: $w;">
     <a href="$link_address">
         <img src="$image_url" alt="image" style="width: $w; height: $h;"$js />
     </a>
