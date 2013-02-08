@@ -29,7 +29,7 @@ sub result {
     my $html = Wikifier::indent($block->{content}[0]);
     $html = $page->parse_formatted_text($html);
 
-    return "<p>\n$html\n</p>\n";
+    return "<p class=\"wiki-paragraph\">\n$html\n</p>\n";
 }
 
 1

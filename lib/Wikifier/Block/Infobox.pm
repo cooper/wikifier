@@ -18,11 +18,14 @@ sub new {
     return $class->SUPER::new(%opts);
 }
 
-# parse(): inherited from hash.
-
 sub result {
     my ($block, $page) = @_;
     my $string = "<div class=\"wiki-infobox\">\n";
+    
+    # display the title if it exists.
+    if (defined $block->{title}) {
+        $string .= "    <div class=\"wiki-infobox-title\">$$block{title}</div>\n";
+    }
     
     # if an image is present, display it.
     if (my $image = $block->{hash}{-image}) {
@@ -34,7 +37,7 @@ sub result {
     $string   .= "    <table class=\"wiki-infobox-table\">\n";
     
     # append each pair.
-    foreach my $key (keys %{$block->{hash}}) {
+    foreach my $key (@{$block->{key_order}}) {
         my $value = $block->{hash}{$key};
         
         # special pair - ignore it.

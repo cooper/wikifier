@@ -35,6 +35,7 @@ sub result {
     }
     
     # end the section.
+    $string .= "<div class=\"clear\"></div>\n";
     $string .= "</div>\n";
     return $string;
     

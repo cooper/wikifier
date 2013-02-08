@@ -41,6 +41,7 @@ sub parse {
             
             # set the value to the block item itself.
             $values{$key} = $item;
+            push @{$block->{key_order}}, $key;
             
             # call the item's ->parse() to ensure its
             # resulting values are ready when we need them.
@@ -77,7 +78,8 @@ sub parse {
                 $value =~ s/(^\s*)|(\s*$)//g;
                 
                 # store the value.
-                $values{$key} = $value if !$values{$key};
+                $values{$key} = $value;
+                push @{$block->{key_order}}, $key;
                 
                 # reset status.
                 $in_value = 0;
