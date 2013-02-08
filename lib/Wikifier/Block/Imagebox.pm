@@ -62,29 +62,38 @@ sub result {
     $height =~ s/px// if defined $height;
     $width  =~ s/px// if defined $width;
     
-    my ($h, $w, $link_address, $image_url);
-    my $image_root   = $page->wiki_info('image_address');
+    my ($js, $h, $w, $link_address, $image_url) = q();
+    my $image_root = $page->wiki_info('image_address');
     
     # direct link to image.
     $link_address = $image_url = "$image_root/$$block{file}";
+    
+    # decide which dimension(s) were given.
+    my $given_width  = defined $width &&  $width  ne 'auto' ? 1 : 0;
+    my $given_height = defined $height && $height ne 'auto' ? 1 : 0;
+    
+    # both dimensions were given, so we need to do no sizing.
+    if ($given_width && $given_height) {
+        $w =  $width.q(px);
+        $h = $height.q(px);
+    }
     
     # use javascript image sizing
     # - uses full-size images directly and uses javascript to size imageboxes.
     # - this voids the validity as XHTML 1.0 Strict.
     # - causes slight flash on page load (when images are scaled.)
-    my $js = q();
-    if (lc $page->wiki_info('size_images') eq 'javascript') {
+    elsif (lc $page->wiki_info('size_images') eq 'javascript') {
     
         # inject javascript resizer if no width is given.
-        if (!defined $width || $width eq 'auto') {
+        if (!$given_width) {
             $js = q{ onload="this.parentElement.parentElement.style.width = this.offsetWidth + 'px'; this.style.width = '100%';"};
         }
         
         # use the image root address options to determine URL.
         
         # width and height dummies will be overriden by JavaScript.
-        $w = defined $width  ? $width  : '200px';
-        $h = defined $height ? $height : 'auto';
+        $w = $given_width  ? $width  : '200px';
+        $h = $given_height ? $height : 'auto';
         
         $image_url = "$image_root/$$block{file}";
     }
@@ -101,6 +110,25 @@ sub result {
         require Image::Size;
         my $dir  = $page->wiki_info('image_directory');
         ($w, $h) = Image::Size::imgsize("$dir/$$block{file}");
+        
+        # now we must find the scaling factor.
+        my $scale_factor;
+        
+        # width was given; calculate height.
+        if ($given_width) {
+            $scale_factor = $w / $width;
+            $w = $width;
+            $h = int(($h / $scale_factor) + 0.5);
+        }
+        
+        # height was given; calculate width.
+        if ($given_height) {
+            $scale_factor = $h / $height;
+            $w = int(($w / $scale_factor) + 0.5);
+            $h = $height;
+        }
+        
+        # append px units.
         ($w, $h) = ($w.q(px), $h.q(px));
     
         # call the image_sizer.
