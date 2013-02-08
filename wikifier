@@ -21,7 +21,7 @@ sub image_sizer {
     $height = $height eq 'auto' ? '' : $height;
     
     # return the full URL of the image.
-    return "http://images.notroll.net/paranoia/files/$file?height=$height&width=$width";
+    return "http://images.notroll.net/paranoia/files/$file?height=$height&amp;width=$width";
 }
 
 # global wiki variables.
