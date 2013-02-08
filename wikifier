@@ -43,7 +43,8 @@ my $page = Wikifier::Page->new(
         image_address   => 'http://images.notroll.net/paranoia/files',
         variables       => \%wiki_variables,
         size_images     => 'server',
-        image_sizer     => \&image_sizer
+        image_sizer     => \&image_sizer,
+        external_root   => 'http://en.wikipedia.org/wiki'
     }
 );
 

@@ -19,7 +19,7 @@ sub new {
 }
 
 sub result {
-    my ($block, $page) = @_;
+    my ($block, $page) = (shift, @_);
     my $string = "<div class=\"wiki-infobox\">\n";
     
     # display the title if it exists.
@@ -29,7 +29,7 @@ sub result {
     
     # if an image is present, display it.
     if (my $image = $block->{hash}{-image}) {
-        my $imagehtml = $image->result();
+        my $imagehtml = $image->result(@_);
         $imagehtml = Wikifier::indent($imagehtml, 2);
         $string .= "    <div class=\"wiki-infobox-image-container\">\n$imagehtml    </div>\n";
     }
@@ -48,7 +48,7 @@ sub result {
         
         # value is a block. generate the HTML for it.
         if (blessed $value) {
-            $value = $value->result();
+            $value = $value->result(@_);
         }
         
         # Parse formatting in the value.

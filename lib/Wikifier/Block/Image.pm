@@ -46,27 +46,42 @@ sub parse {
     return 1;
 }
 
+# HTML.
 sub result {
-    my ($block, $page) = @_;
+    my ($block, $page) = (shift, @_);
     
-    # calculate height and width.
-    my $height = $block->{height}; my $width = $block->{width};
-    my ($realheight, $realwidth) = ($height, $width);
+    # currently only exact pixel sizes or 'auto' are supported.
+    my $px_h = $block->{height}; my $px_w = $block->{width};
+    my ($w, $h) = ($px_w, $px_h);
+    $px_h  =~ s/px// if defined $px_h;
+    $px_w  =~ s/px// if defined $px_w;
     
-    # image generator does not accept units.
-    $height =~ s/px//; $width =~ s/px//;
+    my ($link_address, $image_url) = q();
+    my $image_root = $page->wiki_info('image_address');
     
-    # if automatic scaling is desired, omit the width and height options.
-    $height = '' if $height eq 'auto'; $width = '' if $width eq 'auto';
+    # direct link to image.
+    $link_address = $image_url = "$image_root/$$block{file}";
     
-    # TODO: don't hardcode to notroll.net.
-    my $fullurl  =
-    my $shorturl = 'http://images.notroll.net/paranoia/files/'.$block->{file};
-    $shorturl   .= "?height=$height&amp;width=$width&amp;cropratio=";
+    # we just won't do anything special.
+    if (lc $page->wiki_info('size_images') eq 'javascript') {
+        $image_url = "$image_root/$$block{file}";
+    }
     
+    # use server-side image sizing.
+    elsif (lc $page->wiki_info('size_images') eq 'server') {
+    
+        # call the image_sizer.
+        my $url = $page->wiki_info('image_sizer')->(
+            file   => $block->{file},
+            height => $px_h,
+            width  => $px_w
+        );
+    
+        $image_url = $url;
+    }
     return <<END;
 <div class="wiki-image">
-    <a href="$fullurl"><img style="height: $realheight; width: $realwidth;" src="$shorturl" alt="image" /></a>
+    <a href="$link_address"><img style="height: $h; width: $w;" src="$image_url" alt="image" /></a>
 </div>
 END
 }

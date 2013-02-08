@@ -495,7 +495,7 @@ sub parse_format_type {
     
     # not-so-simple formatting.
     
-    # a internal wiki link. TODO: don't hardcode to notroll.net.
+    # a internal wiki link.
     if ($type =~ m/^\[(.+)\]$/) {
         my ($name, $safe_name, $text) = ($1, $1, $1);
         
@@ -506,11 +506,11 @@ sub parse_format_type {
         }
         
         $safe_name = safe_name($name);
-        
-        return "<a title=\"$name\" class=\"wiki-link-internal\" href=\"http://about.notroll.net/$safe_name\">$text</a>";
+        my $root   = $page->wiki_info('wiki_root');
+        return "<a title=\"$name\" class=\"wiki-link-internal\" href=\"$root/$safe_name\">$text</a>";
     }
     
-    # a wikipedia link. TODO: don't hardcode to english wikipedia.
+    # an external wiki link.
     if ($type =~ m/^!(.+)!$/) {
         my ($name, $safe_name, $text) = ($1, $1, $1);
         
@@ -521,8 +521,8 @@ sub parse_format_type {
         }
         
         $safe_name = safe_name($name);
-        
-        return "<a title=\"$name\" class=\"wiki-link-external\" href=\"http://en.wikipedia.org/wiki/$safe_name\">$text</a>";
+        my $root   = $page->wiki_info('external_root');
+        return "<a title=\"$name\" class=\"wiki-link-external\" href=\"$root/$safe_name\">$text</a>";
     }
     
     # variable.

@@ -18,6 +18,7 @@ use feature qw(switch);
 #   variables:          a hash reference of global wiki variables.
 #   size_images:        either 'javascript' or 'server' (see below)
 #   image_sizer:        a code reference returning URL to resized image (see below)
+#   external_root:      HTTP address of external wiki root (defaults to Wikipedia)
 
 # Image sizing with a server:
 #
@@ -66,7 +67,8 @@ my %wiki_defaults = (
     wiki_root       => '',        # AKA "/"
     variables       => {},
     size_images     => 'javascript',
-    image_sizer     => undef
+    image_sizer     => undef,
+    external_root   => 'http://en.wikipedia.org/wiki'
 );
 
 # create a new page.
