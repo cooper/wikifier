@@ -68,14 +68,15 @@ sub result {
     
     my $fullurl  =
     my $shorturl = 'http://images.notroll.net/paranoia/files/'.$block->{file};
-    $shorturl   .= "?height=$height&width=$width&cropratio=";
+    $shorturl   .= "?height=$height&amp;width=$width&amp;cropratio=";
     
+    # TODO: onload is illegal.
     return <<END;
 <div class="wiki-imagebox wiki-imagebox-$$block{align}">
     <a href="$fullurl">
-        <img src="$shorturl" alt="image" style="width: $$block{width}; height: $$block{height};" />
+        <img src="$shorturl" alt="image" style="width: $$block{width}; height: $$block{height};" onload="this.parentElement.parentElement.style.width = this.offsetWidth + 'px'; this.style.width = '100%';" />
     </a>
-    <div class="wiki-imagebox-description">$description</div>
+    <div class="wiki-imagebox-description"><div class="wiki-imagebox-description-inner">$description</div></div>
 </div>
 END
 }

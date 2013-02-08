@@ -525,7 +525,7 @@ sub parse_format_type {
     # variable.
     if ($type =~ m/^@([\w.]+)$/) {
         my $var = $page->get($1);
-        return defined $var ? $var : '<style="color: red; font-weight: bold;">(null)</style>';
+        return defined $var ? $var : '<span style="color: red; font-weight: bold;">(null)</span>';
     }
     
     # leave out anything else, I guess.
