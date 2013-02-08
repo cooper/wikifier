@@ -72,7 +72,8 @@ my %wiki_defaults = (
 # create a new page.
 sub new {
     my ($class, %opts) = @_;
-    $opts{content} ||= [];
+    $opts{content}   ||= [];
+    $opts{variables} ||= {};
     return bless \%opts, $class;
 }
 
@@ -92,21 +93,27 @@ sub html {
 # set a variable.
 sub set {
     my ($page, $var, $value) = @_;
-    my ($hash, $name) = $page->_get_hash($var);
+    my ($hash, $name) = _get_hash($page->{variables}, $var);
     $hash->{$name} = $value;
 }
 
 # fetch a variable.
 sub get {
     my ($page, $var)  = @_;
-    my ($hash, $name) = $page->_get_hash($var);
+    
+    # try page variables.
+    my ($hash, $name) = _get_hash($page->{variables}, $var);
+    return $hash->{$name} if defined $hash->{$name};
+    
+    # try global variables.
+    ($hash, $name) = _get_hash($page->{wiki}{variables}, $var);
     return $hash->{$name};
+    
 }
 
 # interna use only.
 sub _get_hash {
-    my ($page, $var) = @_;
-    my $hash = ($page->{variables} ||= {});
+    my ($hash, $var) = @_;
     my $i    = 0;
     my @parts = split /\./, $var;
     foreach my $part (@parts) {
