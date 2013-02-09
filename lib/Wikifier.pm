@@ -532,7 +532,7 @@ sub parse_format_type {
         when ('ref') {
             $page->{reference_number} ||= 1;
             my $ref = $page->{reference_number}++;
-            return "<sup style=\"font-size: 50%\"><a href=\"#\">[$ref]</a></sup>";
+            return "<sup style=\"font-size: 80%\"><a href=\"#\">[$ref]</a></sup>";
         }
     
     }
