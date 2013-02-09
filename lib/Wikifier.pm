@@ -155,11 +155,20 @@ sub handle_character {
             
             # space.
             if ($last_char eq ' ') {
-                next unless length $block_type; # ignore it if there is no block type yet.
-                # continue if we're in block name; this is part of it.
-                last unless $in_block_name; # otherwise this is the end of our type/name.
-                                            # unless we're in the block name, in which
-                                            # case this space is a part of the name.
+
+                # if we're in the block name, this is part of it.
+                if ($in_block_name) {
+                    # continue.
+                }
+                
+                # otherwise, this marks the end of our parsing.
+                else {
+                
+                    # that is, unless there is no block type yet.
+                    next unless length $block_type;
+                    
+                }
+                
             }
             
             # ignore newlines.
