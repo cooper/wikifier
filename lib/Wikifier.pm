@@ -153,21 +153,39 @@ sub handle_character {
         # chop one character at a time from the end of the content.
         while (my $last_char = chop $content) { $chars_scanned++;
             
-            # space.
+            # space. section section [block name] {
             if ($last_char eq ' ') {
-
-                # if we're in the block name, this is part of it.
+                
+                # this is space within [].
                 if ($in_block_name) {
+                    # append it to the block name.
                     # continue.
                 }
                 
-                # otherwise, this marks the end of our parsing.
+                # not in the block name.
                 else {
                 
-                    # that is, unless there is no block type yet.
-                    next if length $block_type;
+                    # spaces between things:
+                    # section [block name] {
+                    #        ^            ^
+                    # ignore them entirely.
+                    if (!length $block_type) {
+                        next;
+                    }
                     
+                    # space before the block type:
+                    #  section [block name] {
+                    # ^
+                    # marks the end of parsing.
+                    last;
+            
                 }
+                
+                # FIXME: in the rare situation that a file may start with a block
+                # with no prefixing newlines or spaces, this will not work, and the
+                # wikifier will probably output nothing.
+                # a simple workaround could be to inject a newline before the beginning of
+                # the file's first line during file parsing.
                 
             }
             
