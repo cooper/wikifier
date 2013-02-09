@@ -118,13 +118,13 @@ sub result {
         if ($given_width) {
             $scale_factor = $w / $width;
             $w = $width;
-            $h = int(($h / $scale_factor) + 0.5);
+            $h = $page->image_round($h / $scale_factor);
         }
         
         # height was given; calculate width.
         if ($given_height) {
             $scale_factor = $h / $height;
-            $w = int(($w / $scale_factor) + 0.5);
+            $w = $page->image_round($w / $scale_factor);
             $h = $height;
         }
         

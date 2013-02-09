@@ -19,6 +19,7 @@ use feature qw(switch);
 #   size_images:        either 'javascript' or 'server' (see below)
 #   image_sizer:        a code reference returning URL to resized image (see below)
 #   external_root:      HTTP address of external wiki root (defaults to Wikipedia)
+#   rounding:           'normal', 'up', or 'down' for how dimensions should be rounded.
 
 # Image sizing with a server:
 #
@@ -68,7 +69,8 @@ my %wiki_defaults = (
     variables       => {},
     size_images     => 'javascript',
     image_sizer     => undef,
-    external_root   => 'http://en.wikipedia.org/wiki'
+    external_root   => 'http://en.wikipedia.org/wiki',
+    rounding        => 'normal'
 );
 
 # create a new page.
@@ -141,5 +143,15 @@ sub wiki_info {
 }
 
 sub wikifier { shift->{wikifier} }
+
+# round dimension according to setting.
+sub image_round {
+    my ($page, $size) = @_;
+    my $round = $page->wiki_info('rounding');
+    return int($size + 0.5 ) if $round eq 'normal';
+    return int($size + 0.99) if $round eq 'up';
+    return int($size       ) if $round eq 'down';
+    return $size; # fallback.
+}
 
 1
