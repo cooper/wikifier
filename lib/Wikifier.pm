@@ -165,7 +165,7 @@ sub handle_character {
                 else {
                 
                     # that is, unless there is no block type yet.
-                    next unless length $block_type;
+                    next if length $block_type;
                     
                 }
                 
