@@ -45,7 +45,7 @@ my $page = Wikifier::Page->new(
         size_images     => 'server',
         image_sizer     => \&image_sizer,
         external_root   => 'http://en.wikipedia.org/wiki',
-        rounding        => 'down'
+        rounding        => 'up'
     }
 );
 
