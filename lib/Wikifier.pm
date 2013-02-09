@@ -138,6 +138,11 @@ sub handle_character {
     }
     
     
+    when ("\n") {
+        print "YES, NEWLINES DO EXIST.\n";
+    }
+    
+    
     # left bracket indicates the start of a block.
     when ('{') {
         $current{ignored} = 1;
