@@ -161,6 +161,11 @@ sub handle_character {
                                             # case this space is a part of the name.
             }
             
+            # ignore newlines.
+            if ($last_char eq "\n") {
+                next;
+            }
+            
             # entering block name.
             if ($last_char eq ']') {
                 $in_block_name = 1;
