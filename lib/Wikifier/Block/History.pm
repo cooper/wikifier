@@ -14,7 +14,7 @@ use Scalar::Util 'blessed';
 
 sub new {
     my ($class, %opts) = @_;
-    $opts{type} = 'infobox';
+    $opts{type} = 'history';
     return $class->SUPER::new(%opts);
 }
 
