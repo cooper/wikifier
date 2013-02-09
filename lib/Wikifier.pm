@@ -137,12 +137,6 @@ sub handle_character {
         }
     }
     
-    
-    when ("\n") {
-        print "YES, NEWLINES DO EXIST.\n";
-    }
-    
-    
     # left bracket indicates the start of a block.
     when ('{') {
         $current{ignored} = 1;
@@ -243,8 +237,8 @@ sub handle_character {
             $append = "$last{char}$char";
         }
     
-        # if it's not a space, append to current word.
-        if ($char ne ' ') {
+        # if it's not a space or newline, append to current word.
+        if ($char ne ' ' && $char ne "\n") {
             $current{word}  = '' if !defined $current{word};
             $current{word} .= $append;
         }
