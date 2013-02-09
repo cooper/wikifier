@@ -25,7 +25,7 @@ sub parse {
 sub result {
     my ($block, $page) = @_;
     my $code = $block->{content}[0];
-    return "<pre class=\"wiki-code\">\n$code\n</pre>\n";
+    return "<pre class=\"wiki-code\">$code</pre>\n";
 }
 
 1
