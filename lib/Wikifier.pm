@@ -521,8 +521,19 @@ sub parse_format_type {
         when ('s') { return '<span style="text-decoration: line-through;">' }
         when (['/s', '/b', '/i']) { return '</span>' }
         
+        # inline quote.
+        when ( 'q') { return '<span style="font-style: italic;">"'  }
+        when ('/q') { return '"</span>'                             }
+        
         # new line.
         when (['nl', 'br']) { return '<br />' }
+        
+        # references.
+        when ('ref') {
+            $page->{reference_number} ||= 1;
+            my $ref = $page->{reference_number}++;
+            return "<sup>$ref</sup>";
+        }
     
     }
     
