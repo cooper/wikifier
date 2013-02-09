@@ -522,8 +522,8 @@ sub parse_format_type {
         when (['/s', '/b', '/i']) { return '</span>' }
         
         # inline quote.
-        when ( 'q') { return '<span style="font-style: italic;">"'  }
-        when ('/q') { return '"</span>'                             }
+        when ( 'q') { return '"<span style="font-style: italic;">'  }
+        when ('/q') { return '</span>"'                             }
         
         # new line.
         when (['nl', 'br']) { return '<br />' }
