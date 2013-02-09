@@ -143,11 +143,13 @@ sub result {
     
     return <<END;
 <div class="wiki-imagebox wiki-imagebox-$$block{align}" style="width: $w;">
+    <div class="wiki-imagebox-inner">
     <a href="$link_address">
         <img src="$image_url" alt="image" style="width: $w; height: $h;"$js />
     </a>
     <div class="wiki-imagebox-description">
         <div class="wiki-imagebox-description-inner">$description</div>
+    </div>
     </div>
 </div>
 END
