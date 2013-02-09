@@ -66,7 +66,7 @@ sub parse {
         $line =~ s/^\s*//g;     # remove leading whitespace.
         $line =~ s/\s*$//g;     # remove trailing whitespace.
         next unless $line;      # line empty after removing unwanted characters.
-        $wikifier->handle_line($page, "$line \n") or last;
+        $wikifier->handle_line($page, $line) or last;
     }
     
     # run ->parse on children.
@@ -93,7 +93,7 @@ sub handle_line {
     }
     
     # pass on to main parser.
-    $wikifier->handle_character($_) foreach split //, $line;
+    $wikifier->handle_character($_) foreach (split(//, $line), "\n");
     return 1;
 }
 
