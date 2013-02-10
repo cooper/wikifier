@@ -187,7 +187,7 @@ sub display_page {
             my $cache_data = file_contents($cache_file);
             my @data = split /\n/, $cache_data;
             
-            $result->{title}    = shift $data;
+            $result->{title}    = shift @data;
             $result->{content} .= join "\n", @data;
             $result->{cached}   = 1;
             return;
