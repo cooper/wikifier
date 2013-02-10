@@ -55,7 +55,7 @@ sub handler {
     #    $r->rflush;
     #}
     
-    return &nginx::OK;
+    return &OK;
 }
 
 1;
