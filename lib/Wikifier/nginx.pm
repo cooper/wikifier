@@ -74,6 +74,12 @@ sub handler {
         $r->rflush;
     }
     
+    if ($result->{type} eq 'image') {
+        $r->send_http_header($result->{image_mime});
+        $r->print($result->{image_data});
+        return &OK;
+    }
+    
     # not found.
     if ($result->{type} eq 'not found') {
         $r->send_http_header("text/plain");
