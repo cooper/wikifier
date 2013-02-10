@@ -85,8 +85,41 @@ sub new {
 #       no other values are set.
 #
 sub display {
-    my ($wiki, $page_name, %result) = (shift, shift);
-    return \%result;
+    my ($wiki, $page_name, $result) = (shift, shift, {});
+    
+    # it's an image.
+    if ($page_name =~ m|^image/(.+)$|) {
+        my ($image_name, $width, $height, $file_name) = $1;
+        
+        # height and width were given, so it's a resized image.
+        if ($image_name =~ m/^(\d+)x(\d+)-(.+)$/) {
+            ($width, $height, $file_name) = ($1, $2, $3);
+        }
+        
+        # only file name was given, so the full sized image is desired.
+        else {
+            ($width, $height, $file_name) = (0, 0, $image_name);
+        }
+    
+        $wiki->display_image($result, $file_name, $width, $height);
+    }
+    
+    # it's a wiki page.
+    else {
+        $wiki->display_page($result, $page_name);
+    }
+    
+    return $result;
+}
+
+# displays an image of the supplied dimensions.
+sub display_image {
+    my ($wiki, $result, $file_name, $width, $height) = @_;
+}
+
+# displays a page.
+sub display_page {
+    my ($wiki, $result, $page_name) = @_;
 }
 
 1
