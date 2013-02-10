@@ -101,11 +101,10 @@ sub handler {
     
     # send headers.
     
-    $r->header_out('Content-Type',   $result->{mime}    );
     $r->header_out('Last-Modified',  $result->{modified});
     $r->header_out('Etag',           $result->{etag}    )   if defined $result->{etag};
     $r->header_out('Content-Length', $length            );
-    $r->send_http_header();
+    $r->send_http_header($result->{mime});
     return &OK if $r->header_only;
     
     # send body.
