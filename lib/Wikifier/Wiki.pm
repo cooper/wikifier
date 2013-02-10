@@ -79,7 +79,17 @@ sub new {
     # image sizer callback.
     $wiki->{image_sizer} = sub {
         my %img = @_;
-        return $wiki->{image_root}.q(/).$img{file}; # TODO
+        
+        # full-sized image.
+        if (!$wiki->opt('enable_image_sizing') || !$img{width} || !$img{height} ||
+            $img{width} eq 'auto' || $img{height} eq 'auto') {
+            
+            return $wiki->{image_root}.q(/).$img{file};
+        }
+        
+        # scaled image.
+        return $wiki->{image_root}.q(/).$img{width}.q(x).$img{height}.q(-).$img{file};
+        
     };
     
     return $wiki;
@@ -329,25 +339,25 @@ sub display_image {
         
     }
     
-    # we have no cached copy. an image must be generated.
-    
     # if image generation is disabled, we must supply the full-sized image data.
     if (!$wiki->opt('enable_image_sizing')) {
         return $wiki->display_image($result, $image_name, 0, 0);
     }
-      
+        
+    # we have no cached copy. an image must be generated.
+    
+    
     # caching is enabled, so let's save this for later.
     if ($wiki->opt('enable_image_caching')) {
     
         open my $fh, '>', $cache_file;
-        print {$fh} $result->{title}, "\n";
         print {$fh} $result->{content};
         close $fh;
         
         # overwrite modified date to actual.
         $result->{modified}  = time2str((stat $cache_file)[9]);
-        
         $result->{cache_gen} = 1;
+        
     }
     
 }
