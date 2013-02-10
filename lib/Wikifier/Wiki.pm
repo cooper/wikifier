@@ -16,6 +16,8 @@ use strict;
 use feature qw(switch);
 
 use GD;
+use HTTP::Date 'time2str';
+use Digest::MD5 'md5';
 
 use Wikifier;
 
