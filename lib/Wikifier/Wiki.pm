@@ -155,7 +155,7 @@ sub display_page {
     
     # determine the page file name.
     my $file       = $wiki->opt('page_directory') .q(/).$page_name;
-    my $cache_file = $wiki->opt('cache_directory').q(/).$page_name.q(.pagecache);
+    my $cache_file = $wiki->opt('cache_directory').q(/).$page_name.q(.cache);
     
     # file does not exist.
     if (!-f $file) {
@@ -182,7 +182,13 @@ sub display_page {
             my $time = scalar localtime $cache_modify;
             $result->{type}     = 'page';
             $result->{content}  = "<!-- cached page dated $time -->\n";
-            $result->{content} .= file_contents($cache_file);
+            
+            # fetch the title.
+            my $cache_data = file_contents($cache_file);
+            my @data = split /\n/, $cache_data;
+            
+            $result->{title}    = shift $data;
+            $result->{content} .= join "\n", @data;
             $result->{cached}   = 1;
             return;
         }
@@ -207,6 +213,7 @@ sub display_page {
     if ($wiki->opt('enable_page_caching')) {
     
         open my $fh, '>', $cache_file;
+        print {$fh} $page->get('page.title'), "\n";
         print {$fh} $result->{content};
         close $fh;
         

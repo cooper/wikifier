@@ -89,11 +89,8 @@ sub handler {
 sub _replace_variables {
     my ($result, $html) = @_;
     
-    my $page_title = $result->{page}->get('page.title');
-    my $page_file  = $result->{file};
-    
-    $html =~ s/\{\$page\.title\}/$page_title/g;
-    $html =~ s/\{\$page\.file\}/$page_file/g;
+    $html =~ s/\{\$page\.title\}/$$result{title}/g;
+    $html =~ s/\{\$page\.file\}/$$result{file}/g;
     
     return $html;
 }
