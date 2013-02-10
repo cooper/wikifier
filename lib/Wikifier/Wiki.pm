@@ -156,7 +156,7 @@ sub display_page {
     
     # file does not exist.
     if (!-f $file) {
-        $return->{error} = "File '$file' not found";
+        $result->{error} = "File '$file' not found";
         $result->{type}  = 'not found';
         return;
     }
