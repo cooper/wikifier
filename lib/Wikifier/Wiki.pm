@@ -15,6 +15,8 @@ use warnings;
 use strict;
 use feature qw(switch);
 
+use GD;
+
 use Wikifier;
 
 # Wiki options:
@@ -23,6 +25,8 @@ use Wikifier;
 #
 #   enable_page_caching: true if you wish to enable wiki page caching.
 #   enable_image_sizing: true if you wish to enable image sizing and caching.
+#                        note: if you are using image sizing, the 'image_root' option
+#                        below will be ignored as the Wikifier will generate image URLs.
 #   
 # Wikifier::Page wiki options:
 #
@@ -98,9 +102,10 @@ sub opt {
 #       file:       the filename (not path) of the page, such as 'some_page.page'
 #
 #   if the type is 'image'
-#       image_type: either 'jpg' or 'png'
+#       image_type: either 'jpeg' or 'png'
 #       image_data: the image binary data
 #       image_head: HTTP content type, such as 'image/png' or 'image/jpeg'
+#       image_mime: the mime type of the image
 #
 #   if the type is 'not found'
 #       error: a string error.
@@ -131,11 +136,6 @@ sub display {
     }
     
     return $result;
-}
-
-# displays an image of the supplied dimensions.
-sub display_image {
-    my ($wiki, $result, $file_name, $width, $height) = @_;
 }
 
 # displays a page.
@@ -223,11 +223,39 @@ sub display_page {
     
 }
 
+# displays an image of the supplied dimensions.
+sub display_image {
+    my ($wiki, $result, $image_name, $width, $height) = @_;
+
+    # check if the file exists.
+    my $file = $wiki->opt('image_directory').q(/).$image_name;
+    if (!-f $file) {
+        $result->{type}  = 'not found';
+        $result->{error} = 'image does not exist';
+        return;
+    }
+    
+    $image_name      =~ m/(.+)\.(.+)/;
+    my ($name, $ext) = ($1, $2);
+    my $mime         = $ext eq 'png' ? 'image/png' : 'image/jpeg';
+    
+    # if no width or height are specified,
+    # display the full-sized version of the image.
+    if (!$width && !$height) {
+        $result->{type} = 'image';
+        $result->{image_type} = $ext eq 'jpg' || $ext eq 'jpeg' ? 'jpeg' : 'png';
+        $result->{image_meme} = $mime;
+        $result->{image_data} = file_contents($file, 1);
+    }
+    
+}
+
 # returns entire contents of a file.
 sub file_contents {
-    my $file = shift;
+    my ($file, $binary) = @_;
     local $/ = undef;
     open my $fh, '<', $file;
+    binmode $fh if $binary;
     my $content = <$fh>;
     close $fh;
     return $content;
