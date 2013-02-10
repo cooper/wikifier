@@ -207,13 +207,14 @@ sub display_page {
     # generate the HTML.
     $result->{type}      = 'page';
     $result->{content}   = $page->html();
+    $result->{title}     = $page->get('page.title');
     $result->{generated} = 1;
     
     # caching is enabled, so let's save this for later.
     if ($wiki->opt('enable_page_caching')) {
     
         open my $fh, '>', $cache_file;
-        print {$fh} $page->get('page.title'), "\n";
+        print {$fh} $result->{title}, "\n";
         print {$fh} $result->{content};
         close $fh;
         
