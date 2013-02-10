@@ -77,16 +77,16 @@ sub handler {
     if ($result->{type} eq 'page') {
         
         # header.
-        if ($opts{header}) {
-            my $html = Wikifier::Wiki::file_contents($opts{header});
+        if ($options{header}) {
+            my $html = Wikifier::Wiki::file_contents($options{header});
             $html    = _replace_variables($result, $html);
             $result->{content} = $html.$result->{content};
             $r->header_out('Content-Length', length $result->{content});
         }
         
         # footer.
-        if ($opts{footer}) {
-            my $html = Wikifier::Wiki::file_contents($opts{footer});
+        if ($options{footer}) {
+            my $html = Wikifier::Wiki::file_contents($options{footer});
             $html    = _replace_variables($result, $html);
             $result->{content} = $result->{content}.$html;
             $r->header_out('Content-Length', length $result->{content});
