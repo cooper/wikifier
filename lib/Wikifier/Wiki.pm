@@ -37,7 +37,8 @@ use Wikifier;
 #
 #   Directories on the filesystem (ABSOLUTE DIRECTORIES, not relative)
 #
-#   image_directory:    local directory containing wiki media files and images.
+#   page_directory:     local directory containing page files.
+#   image_directory:    local directory containing wiki images.
 #   cache_directory:    local directory for storing cached pages and images. (writable)
 #
 #   The following are provided automatically by Wikifier::Wiki:
@@ -50,9 +51,18 @@ use Wikifier;
 # create a new wiki object.
 sub new {
     my ($class, %opts) = @_;
+    $opts{rounding}    = 'up';
+    $opts{size_images} = 'server';
+    $opts{image_sizer} = sub {}; # FIXME!!!
     return \%opts, $class;
 }
 
+# returns a wiki option.
+sub opt {
+    my ($wiki, $opt) = @_;
+    return $wiki{$opt} if exists $wiki{$opt};
+    return $Wikifier::Page::wiki_defaults{$opt};
+}
 
 # display() displays a wiki page or resource.
 #
@@ -75,6 +85,7 @@ sub new {
 #       cached:     true if the content was fetched from cache.
 #       generated:  true if the content was just generated.
 #       cache_gen:  true if the content was generated and has been cached.
+#       page:       the Wikifier::Page object representing the page. (if generated)
 #
 #   if the type is 'image'
 #       image_type: either 'jpg' or 'png'
@@ -119,7 +130,75 @@ sub display_image {
 
 # displays a page.
 sub display_page {
-    my ($wiki, $result, $page_name) = @_;
+    my ($wiki, $result, $page_file) = @_;
+    
+    # replace spaces with _ and lowercase.
+    $page_file =~ s/\w/_/g;
+    $page_file = lc $page_file;
+    
+    # append .page if it isn't already there.
+    if (substr($page_name, -1, 5) ne 'page') {
+        $page_name .= q(.page);
+    }
+    
+    # determine the page file name.
+    my $file       = $wiki->opt('page_directory') .q(/).$page_file;
+    my $cache_file = $wiki->opt('cache_directory').q(/).$page_file.q(.pagecache);
+    
+    # file does not exist.
+    if (!-f $file) {
+        $result->{type} = 'not found';
+        return;
+    }
+    
+    # caching is enabled, so let's check for a cached copy.
+    
+    if ($wiki->opt('enable_page_caching') && -f $cache_file) {
+        my ($page_modify, $cache_modify) = ((stat $file)[9], (stat $cache_file)[9]);
+    
+        # the page's file is more recent than the cache file.
+        if ($page_modify > $cache_modify) {
+        
+            # discard the outdated cached copy.
+            unlink $cache_file;
+        
+        }
+        
+        # the cached file is newer, so use it.
+        else {
+            local $/ = undef;
+            open my $fh, '<', $cache_file;
+            $result->{content} = <$fh>;
+            $result->{cached}  = 1;
+            close $fh;
+            return;
+        }
+        
+    }
+    
+    # cache was not used. generate a new copy.
+    my $page = $result->{page} = Wikifier::Page->new(
+        file => $file,
+        wiki => $wiki
+    );
+    
+    # parse the page.
+    $page->parse();
+    
+    # generate the HTML.
+    $result->{content}   = $page->html();
+    $result->{generated} = 1;
+    
+    # caching is enabled, so let's save this for later.
+    if ($wiki->opt('enable_page_caching')) {
+    
+        open my $fh, '>', $cache_file;
+        print {$fh} $result->{content};
+        close $fh;
+        
+        $result->{cache_gen} = 1;
+    }
+    
 }
 
 1
