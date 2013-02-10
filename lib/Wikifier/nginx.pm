@@ -5,6 +5,19 @@ use strict;
 
 use nginx;
 
+# global wiki variables.
+my %wiki_variables = (
+    stats => {
+        library => {
+            books => '151,785,778'
+        }
+    }
+);
+
+#############
+# OPTIONS ###
+#############
+
 my %options = (
     wikifier_dir => '/home/www/wikifier',
     wiki => {
@@ -23,15 +36,6 @@ my %options = (
 push @INC, (delete $options{wikifier_dir}).'/lib';
 require Wikifier;
 
-# global wiki variables.
-my %wiki_variables = (
-    stats => {
-        library => {
-            books => '151,785,778'
-        }
-    }
-);
-
 sub handler {
     my $r = shift;
     
@@ -46,7 +50,7 @@ sub handler {
     $r->rflush;
     
     # success.
-    return OK;
+    return OK();
 }
  
  
