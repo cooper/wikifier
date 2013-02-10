@@ -50,42 +50,19 @@ sub handler {
     my $page_name = $1;
     my $result    = $wiki->display($page_name);
 
-    
-    # it is a page.
-    if ($result->{type} eq 'page') {
-        $r->send_http_header("text/html");
-        return &OK if $r->header_only;
-        
-        # header.
-        if ($options{header}) {
-            my $html = Wikifier::Wiki::file_contents($options{header});
-            $r->print(_replace_variables($result, $html));
-        }
-        
-        # generated HTML content.
-        $r->print($result->{content});
-        
-        # footer.
-        if ($options{footer}) {
-            my $html = Wikifier::Wiki::file_contents($options{footer});
-            $r->print(_replace_variables($result, $html));
-        }
-        
-        $r->rflush;
-    }
-    
-    if ($result->{type} eq 'image') {
-        $r->send_http_header($result->{image_mime});
-        $r->print($result->{image_data});
-        return &OK;
-    }
-    
-    # not found.
     if ($result->{type} eq 'not found') {
-        $r->send_http_header("text/plain");
-        $r->print("error: $$result{error}");
+        return &HTTP_NOT_FOUND;
     }
     
+    $r->header_out('Content-Type',   $result->{mime}    );
+    $r->header_out('Content-Length', $result->{length}  );
+    $r->header_out('Last-Modified',  $result->{modified});
+    $r->header_out('Etag',           $result->{etag}    )   if defined $result->{etag};
+    
+    $r->send_http_header();
+    return &OK if $r->header_only;
+    
+    $r->print($result->{content});
     return &OK;
 }
 

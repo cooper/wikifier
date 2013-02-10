@@ -93,19 +93,24 @@ sub opt {
 # Returns a hash reference of results for display.
 #   type: either 'page', 'image', or 'not found'
 #   
-#   if the type is 'page'
-#       content:    the generated wiki HTML.
+#   if the type is 'page':
 #       cached:     true if the content was fetched from cache.
 #       generated:  true if the content was just generated.
 #       cache_gen:  true if the content was generated and has been cached.
 #       page:       the Wikifier::Page object representing the page. (if generated)
-#       file:       the filename (not path) of the page, such as 'some_page.page'
 #
-#   if the type is 'image'
+#   if the type is 'image':
 #       image_type: either 'jpeg' or 'png'
-#       image_data: the image binary data
-#       image_head: HTTP content type, such as 'image/png' or 'image/jpeg'
-#       image_mime: the mime type of the image
+#       image_data: the image binary data (synonym to 'content')
+#
+#   for anything except errors, the following will be set:
+#       file:       the filename of the resource (not path) ex 'hello.png' or 'some.page'
+#       path:       the full path of the resource ex '/srv/www/example.com/hello.png'
+#       mime:       the MIME type, such as 'text/html' or 'image/png'
+#       modified:   the last modified date of the resource in HTTP date format
+#       length:     the length of the resource in octets
+#       etag:       an HTTP etag for the resource in the form of an md5 string
+#       content:    the page content or binary data to be sent to the client
 #
 #   if the type is 'not found'
 #       error: a string error.
@@ -151,11 +156,12 @@ sub display_page {
         $page_name .= q(.page);
     }
     
-    $result->{file} = $page_name;
-    
     # determine the page file name.
     my $file       = $wiki->opt('page_directory') .q(/).$page_name;
     my $cache_file = $wiki->opt('cache_directory').q(/).$page_name.q(.cache);
+    
+    $result->{file} = $page_name;
+    $result->{path} = $file;
     
     # file does not exist.
     if (!-f $file) {
@@ -235,6 +241,14 @@ sub display_image {
         return;
     }
     
+    # stat for full-size image.
+    my @stat = $stat $file;
+    
+    # image name and full path.
+    $result->{file} = $image_name;
+    $result->{path} = $file;
+    
+    # determine image short name, extension, and mime type.
     $image_name      =~ m/(.+)\.(.+)/;
     my ($name, $ext) = ($1, $2);
     my $mime         = $ext eq 'png' ? 'image/png' : 'image/jpeg';
@@ -242,10 +256,13 @@ sub display_image {
     # if no width or height are specified,
     # display the full-sized version of the image.
     if (!$width && !$height) {
-        $result->{type} = 'image';
-        $result->{image_type} = $ext eq 'jpg' || $ext eq 'jpeg' ? 'jpeg' : 'png';
-        $result->{image_meme} = $mime;
-        $result->{image_data} = file_contents($file, 1);
+        $result->{type}         = 'image';
+        $result->{image_type}   = $ext eq 'jpg' || $ext eq 'jpeg' ? 'jpeg' : 'png';
+        $result->{mime}         = $mime;
+        $result->{content}      = file_contents($file, 1);
+        $result->{modified}     = time2str($stat[9]);
+        $result->{length}       = $stat[7];
+        $result->{etag}         = q(").md5($image_name.$result->{modified}).q(");
     }
     
 }
