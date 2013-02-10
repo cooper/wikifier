@@ -73,6 +73,27 @@ sub handler {
     $r->send_http_header();
     return &OK if $r->header_only;
     
+    # if this is a page, inject the header and footer.
+    if ($result->{type} eq 'page') {
+        
+        # header.
+        if ($opts{header}) {
+            my $html = Wikifier::Wiki::file_contents($opts{header});
+            $html    = _replace_variables($result, $html);
+            $result->{content} = $html.$result->{content};
+            $r->header_out('Content-Length', length $result->{content});
+        }
+        
+        # footer.
+        if ($opts{footer}) {
+            my $html = Wikifier::Wiki::file_contents($opts{footer});
+            $html    = _replace_variables($result, $html);
+            $result->{content} = $result->{content}.$html;
+            $r->header_out('Content-Length', length $result->{content});
+        }
+        
+    }
+    
     $r->print($result->{content});
     return &OK;
 }
