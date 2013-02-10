@@ -56,13 +56,13 @@ sub handler {
         return &OK if $r->header_only;
         
         # header.
-        $r->print(Wikifier::Wiki::file_contents($options{header}) if $options{header};
+        $r->print(Wikifier::Wiki::file_contents($options{header})) if $options{header};
         
         # generated HTML content.
         $r->print($result->{content});
         
         # footer.
-        $r->print(Wikifier::Wiki::file_contents($options{footer}) if $options{footer};
+        $r->print(Wikifier::Wiki::file_contents($options{footer})) if $options{footer};
         
         $r->rflush;
     }
