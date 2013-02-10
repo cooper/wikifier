@@ -17,7 +17,7 @@ use feature qw(switch);
 
 use GD;
 use HTTP::Date 'time2str';
-use Digest::MD5 'md5';
+use Digest::MD5 'md5_hex';
 
 use Wikifier;
 
@@ -264,7 +264,7 @@ sub display_image {
         $result->{content}      = file_contents($file, 1);
         $result->{modified}     = time2str($stat[9]);
         $result->{length}       = $stat[7];
-        $result->{etag}         = q(").md5($image_name.$result->{modified}).q(");
+        $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
     }
     
 }
