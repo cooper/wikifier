@@ -19,6 +19,7 @@ my %wiki_variables = (
 #############
 
 my %options = (
+    page_dir     => '/home/www/source/about/pages',
     wikifier_dir => '/home/www/wikifier',
     wiki => {
         name            => 'NoTrollPlzNet Library',
@@ -40,7 +41,7 @@ sub handler {
     my $r = shift;
     
     # create the page object.                # FIXME
-    my $page = Wikifier::Page->new(%options, file => 'notrollplznet_library.page');
+    my $page = Wikifier::Page->new(%options, file => "$options{page_dir}/notrollplznet_library.page");
 
     # parse the page.
     $page->parse();
