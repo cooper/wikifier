@@ -177,13 +177,10 @@ sub display_page {
         # the cached file is newer, so use it.
         else {
             my $time = scalar localtime $cache_modify;
-            local $/ = undef;
-            open my $fh, '<', $cache_file;
             $result->{type}     = 'page';
             $result->{content}  = "<!-- cached page dated $time -->\n";
-            $result->{content} .= <$fh>;
+            $result->{content} .= file_contents($cache_file);
             $result->{cached}   = 1;
-            close $fh;
             return;
         }
         
@@ -213,6 +210,16 @@ sub display_page {
         $result->{cache_gen} = 1;
     }
     
+}
+
+# returns entire contents of a file.
+sub file_contents {
+    my $file = shift;
+    local $/ = undef;
+    open my $fh, '<', $file;
+    my $content = <$fh>;
+    close $fh;
+    return $content;
 }
 
 1

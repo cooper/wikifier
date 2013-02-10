@@ -19,6 +19,10 @@ my %wiki_variables = (
 #############
 
 our %options = (
+
+    header_html     => '/home/www/source/about/header.tpl',
+    footer_html     => '/home/www/source/about/footer.tpl',
+    
     enable_page_caching  => 1,
     enable_image_caching => 1,
 
@@ -51,7 +55,15 @@ sub handler {
         $r->send_http_header("text/html");
         return &OK if $r->header_only;
         
+        # header.
+        $r->print(Wikifier::Wiki::file_contents($options{header}) if $options{header};
+        
+        # generated HTML content.
         $r->print($result->{content});
+        
+        # footer.
+        $r->print(Wikifier::Wiki::file_contents($options{footer}) if $options{footer};
+        
         $r->rflush;
     }
     
