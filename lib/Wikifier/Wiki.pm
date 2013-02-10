@@ -51,10 +51,17 @@ use Wikifier;
 # create a new wiki object.
 sub new {
     my ($class, %opts) = @_;
-    $opts{rounding}    = 'up';
-    $opts{size_images} = 'server';
-    $opts{image_sizer} = sub {}; # FIXME!!!
-    return \%opts, $class;
+    my $wiki = bless \%opts, $class;
+    $wiki->{rounding}    = 'up';
+    $wiki->{size_images} = 'server';
+    
+    # image sizer callback.
+    $wiki->{image_sizer} = sub {
+        my %img = @_;
+        return ""; # TODO
+    };
+    
+    return $wiki;
 }
 
 # returns a wiki option.
