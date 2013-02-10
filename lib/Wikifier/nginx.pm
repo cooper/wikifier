@@ -66,6 +66,17 @@ sub handler {
         }
         
     }
+    
+    # if we have a last modified date and the client sent one, check if they're the same.
+    if (defined $result->{modified} &&
+        defined(my $mod_in = $r->header_in('If-Modified-Since')) {
+        
+        # they're equal.
+        if ($mod_in eq $result->{modified}) {
+            return &HTTP_NOT_MODIFIED;
+        }
+        
+    }
         
     # if this is a page, inject the header and footer.
     if ($result->{type} eq 'page') {
