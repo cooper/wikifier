@@ -4,10 +4,9 @@ use warnings;
 use strict;
 
 use nginx;
-use Wikifier;
 
 my %options = (
-    file => shift @ARGV,
+    wikifier_dir => '/home/www/wikifier',
     wiki => {
         name            => 'NoTrollPlzNet Library',
         wiki_root       => '',
@@ -21,6 +20,8 @@ my %options = (
     }
 );
 
+push @INC, (delete $options{wikifier_dir}).'/lib';
+
 # global wiki variables.
 my %wiki_variables = (
     stats => {
@@ -33,8 +34,8 @@ my %wiki_variables = (
 sub handler {
     my $r = shift;
     
-    # create the page object.
-    my $page = Wikifier::Page->new(%options);
+    # create the page object.                # FIXME
+    my $page = Wikifier::Page->new(%options, file => 'notrollplznet_library.page');
 
     # parse the page.
     $page->parse();
