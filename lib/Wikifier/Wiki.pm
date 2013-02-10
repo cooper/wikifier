@@ -242,7 +242,7 @@ sub display_image {
     }
     
     # stat for full-size image.
-    my @stat = $stat $file;
+    my @stat = stat $file;
     
     # image name and full path.
     $result->{file} = $image_name;
