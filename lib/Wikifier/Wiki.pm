@@ -67,7 +67,7 @@ sub new {
     # image sizer callback.
     $wiki->{image_sizer} = sub {
         my %img = @_;
-        return $wiki->{image_root}.$img{file}; # TODO
+        return $wiki->{image_root}.q(/).$img{file}; # TODO
     };
     
     return $wiki;
