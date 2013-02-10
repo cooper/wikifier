@@ -44,17 +44,18 @@ sub handler {
     
     $r->uri =~ m|/(.+?)$|;
     my $page_name = $1;
+    my $result    = $wiki->display($page_name);
     
     # it is a page.
     if ($result->{type} eq 'page') {
         $r->send_http_header("text/html");
-        return OK if $r->header_only;
+        return &nginx::OK if $r->header_only;
         
         $r->print($result->{content});
         $r->rflush;
     }
     
-    return OK;
+    return &nginx::OK;
 }
 
 1;
