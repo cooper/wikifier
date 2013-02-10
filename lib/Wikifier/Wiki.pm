@@ -102,7 +102,7 @@ sub opt {
 #       image_head: HTTP content type, such as 'image/png' or 'image/jpeg'
 #
 #   if the type is 'not found'
-#       no other values are set.
+#       error: a string error.
 #
 sub display {
     my ($wiki, $page_name, $result) = (shift, shift, {});
@@ -156,7 +156,8 @@ sub display_page {
     
     # file does not exist.
     if (!-f $file) {
-        $result->{type} = 'not found';
+        $return->{error} = "File '$file' not found";
+        $result->{type}  = 'not found';
         return;
     }
     

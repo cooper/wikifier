@@ -56,7 +56,7 @@ sub handler {
     }
     
     $r->send_http_header("text/plain");
-    $r->print("error");
+    $r->print("error: $$result{error}");
     return &OK;
 }
 
