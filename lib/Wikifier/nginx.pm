@@ -92,10 +92,10 @@ sub _replace_variables {
     my $page_title = $result->{page}->get('page.title');
     my $page_file  = $result->{file};
     
-    $string =~ s/\{\$page\.title\}/$page_title/g;
-    $string =~ s/\{\$page\.file\}/$page_file/g;
+    $html =~ s/\{\$page\.title\}/$page_title/g;
+    $html =~ s/\{\$page\.file\}/$page_file/g;
     
-    return $string;
+    return $html;
 }
 
 1;
