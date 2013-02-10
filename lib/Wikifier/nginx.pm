@@ -56,8 +56,6 @@ sub handler {
         $r->send_http_header("text/html");
         return &OK if $r->header_only;
         
-        my $page_title = $result->{page}->get('page.title');
-        
         # header.
         if ($options{header}) {
             my $html = Wikifier::Wiki::file_contents($options{header});
