@@ -142,7 +142,7 @@ sub display_page {
     my ($wiki, $result, $page_name) = @_;
     
     # replace spaces with _ and lowercase.
-    $page_name =~ s/\w/_/g;
+    $page_name =~ s/\s/_/g;
     $page_name = lc $page_name;
     
     # append .page if it isn't already there.

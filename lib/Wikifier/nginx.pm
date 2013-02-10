@@ -55,8 +55,12 @@ sub handler {
         $r->rflush;
     }
     
-    $r->send_http_header("text/plain");
-    $r->print("error: $$result{error}");
+    # not found.
+    if ($result->{type} eq 'not found') {
+        $r->send_http_header("text/plain");
+        $r->print("error: $$result{error}");
+    }
+    
     return &OK;
 }
 
