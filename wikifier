@@ -39,12 +39,12 @@ my $page = Wikifier::Page->new(
     wiki => {
         name            => 'NoTrollPlzNet Library',
         wiki_root       => '',
+        image_root      => 'http://images.notroll.net/paranoia/files',
+        external_root   => 'http://en.wikipedia.org/wiki',
         image_directory => '/home/www/main/paranoia/files',
-        image_address   => 'http://images.notroll.net/paranoia/files',
         variables       => \%wiki_variables,
         size_images     => 'server',
         image_sizer     => \&image_sizer,
-        external_root   => 'http://en.wikipedia.org/wiki',
         rounding        => 'up'
     }
 );

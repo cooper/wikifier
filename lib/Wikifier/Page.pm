@@ -61,7 +61,7 @@ use feature qw(switch);
 # do not provide an 'image_sizer' option.
 #
 
-my %wiki_defaults = (
+our %wiki_defaults = (
     name            => 'Wiki',
     image_directory => './files',
     image_address   => '/files',  # relative to HTTP root.

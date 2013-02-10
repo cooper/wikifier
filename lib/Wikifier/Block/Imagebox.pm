@@ -63,7 +63,7 @@ sub result {
     $width  =~ s/px// if defined $width;
     
     my ($js, $h, $w, $link_address, $image_url) = q();
-    my $image_root = $page->wiki_info('image_address');
+    my $image_root = $page->wiki_info('image_root');
     
     # direct link to image.
     $link_address = $image_url = "$image_root/$$block{file}";
