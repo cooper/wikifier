@@ -25,10 +25,22 @@ use Wikifier;
 #
 # Wikifier::Wiki specific options:
 #
-#   enable_page_caching: true if you wish to enable wiki page caching.
-#   enable_image_sizing: true if you wish to enable image sizing and caching.
-#                        note: if you are using image sizing, the 'image_root' option
-#                        below will be ignored as the Wikifier will generate image URLs.
+#   enable_page_caching:    true if you wish to enable wiki page caching.
+#
+#   enable_image_sizing:    true if you wish to enable image sizing.
+#                           note: if you are using image sizing, the 'image_root' option
+#                           below will be ignored as the Wikifier will generate image URLs.
+#
+#   enable_image_caching:   true if you wish for sized images to be cached.
+#
+#   force_image_type:       you can specify 'jpeg' or 'png' if you prefer for images to
+#                           always be generated in one of these formats. by default, PNG
+#                           images generate PNG images, and JPEG images generate JPEG
+#                           images compressed with the highest possible quality.
+#
+#   force_jpeg_quality:     if you set 'force_image_type' to 'jpeg', this option forces
+#                           JPEG images to be compressed with this quality. (range: 1-100)
+#                           
 #   
 # Wikifier::Page wiki options:
 #
@@ -105,6 +117,9 @@ sub opt {
 #   if the type is 'image':
 #       image_type: either 'jpeg' or 'png'
 #       image_data: the image binary data (synonym to 'content')
+#       cached:     true if the image was fetched from cache.
+#       generated:  true if the image was just generated.
+#       cache_gen:  true if the image was generated and has been cached.
 #
 #   for anything except errors, the following will be set:
 #       file:       the filename of the resource (not path) ex 'hello.png' or 'some.page'
@@ -259,6 +274,7 @@ sub display_image {
     my @stat = stat $file;
     
     # image name and full path.
+    $result->{type} = 'image';
     $result->{file} = $image_name;
     $result->{path} = $file;
     
@@ -266,17 +282,72 @@ sub display_image {
     $image_name      =~ m/(.+)\.(.+)/;
     my ($name, $ext) = ($1, $2);
     my $mime         = $ext eq 'png' ? 'image/png' : 'image/jpeg';
+
+    # image type and mime type.    
+    $result->{image_type}   = $ext eq 'jpg' || $ext eq 'jpeg' ? 'jpeg' : 'png';
+    $result->{mime}         = $mime;
     
     # if no width or height are specified,
     # display the full-sized version of the image.
-    if (!$width && !$height) {
-        $result->{type}         = 'image';
-        $result->{image_type}   = $ext eq 'jpg' || $ext eq 'jpeg' ? 'jpeg' : 'png';
-        $result->{mime}         = $mime;
+    if (!$width || !$height) {
         $result->{content}      = file_contents($file, 1);
         $result->{modified}     = time2str($stat[9]);
         $result->{length}       = $stat[7];
         $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
+        return;
+    }
+    
+    # this is a smaller copy.
+    
+    my $full_name = $width.q(x).$height.q(-).$image_name;
+    my $cache_file = $wiki->opt('cache_directory').q(/).$full_name;
+    
+    # if caching is enabled, check if this exists in cache.
+    if ($wiki->opt('enable_image_caching') && -f $cache_file) {
+        my ($image_modify, $cache_modify) = ((stat $file)[9], (stat $cache_file)[9]);
+        
+        # the image's file is more recent than the cache file.
+        if ($image_modify > $cache_modify) {
+        
+            # discard the outdated cached copy.
+            unlink $cache_file;
+        
+        }
+        
+        # the cached file is newer, so use it.
+        else {
+            
+            # set HTTP data.
+            $result->{cached}       = 1;
+            $result->{content}      = file_contents($cache_file, 1);
+            $result->{modified}     = time2str($cache_modify);
+            $result->{length}       = length $result->{content};
+            $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
+            
+            return;
+        }
+        
+    }
+    
+    # we have no cached copy. an image must be generated.
+    
+    # if image generation is disabled, we must supply the full-sized image data.
+    if (!$wiki->opt('enable_image_sizing')) {
+        return $wiki->display_image($result, $image_name, 0, 0);
+    }
+      
+    # caching is enabled, so let's save this for later.
+    if ($wiki->opt('enable_image_caching')) {
+    
+        open my $fh, '>', $cache_file;
+        print {$fh} $result->{title}, "\n";
+        print {$fh} $result->{content};
+        close $fh;
+        
+        # overwrite modified date to actual.
+        $result->{modified}  = time2str((stat $cache_file)[9]);
+        
+        $result->{cache_gen} = 1;
     }
     
 }

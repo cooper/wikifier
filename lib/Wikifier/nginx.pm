@@ -24,7 +24,8 @@ our %options = (
     footer => '/home/www/source/about/footer.tpl',
     
     enable_page_caching  => 1,
-    enable_image_caching => 1,
+    #enable_image_sizing  => 1,
+    #enable_image_caching => 1,
 
     name            => 'NoTrollPlzNet Library',
     variables       => \%wiki_variables,
