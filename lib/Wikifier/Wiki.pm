@@ -62,7 +62,7 @@ sub new {
     # default options.
     $wiki->{rounding}    = 'up';
     $wiki->{size_images} = 'server';
-    $wiki->{image_root}  = $wiki->{wiki_root}.q(/images);
+    $wiki->{image_root}  = $wiki->{wiki_root}.q(/image);
     
     # image sizer callback.
     $wiki->{image_sizer} = sub {
