@@ -20,8 +20,8 @@ my %wiki_variables = (
 
 our %options = (
 
-    header_html     => '/home/www/source/about/header.tpl',
-    footer_html     => '/home/www/source/about/footer.tpl',
+    header => '/home/www/source/about/header.tpl',
+    footer => '/home/www/source/about/footer.tpl',
     
     enable_page_caching  => 1,
     enable_image_caching => 1,
