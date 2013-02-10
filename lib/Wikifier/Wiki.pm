@@ -162,15 +162,17 @@ sub display_page {
     my $file       = $wiki->opt('page_directory') .q(/).$page_name;
     my $cache_file = $wiki->opt('cache_directory').q(/).$page_name.q(.cache);
     
-    $result->{file} = $page_name;
-    $result->{path} = $file;
-    
     # file does not exist.
     if (!-f $file) {
         $result->{error} = "File '$file' not found";
         $result->{type}  = 'not found';
         return;
     }
+    
+    # set path, file, and meme type.
+    $result->{file} = $page_name;
+    $result->{path} = $file;
+    $result->{mime} = 'text/html';
     
     # caching is enabled, so let's check for a cached copy.
     
@@ -187,7 +189,7 @@ sub display_page {
         
         # the cached file is newer, so use it.
         else {
-            my $time = scalar localtime $cache_modify;
+            my $time = time2str($cache_modify);
             $result->{type}     = 'page';
             $result->{content}  = "<!-- cached page dated $time -->\n";
             
@@ -195,9 +197,14 @@ sub display_page {
             my $cache_data = file_contents($cache_file);
             my @data = split /\n/, $cache_data;
             
+            # set HTTP data.
             $result->{title}    = shift @data;
             $result->{content} .= join "\n", @data;
             $result->{cached}   = 1;
+            $result->{modified} = $time;
+            $result->{length}   = length $result->{content};
+            $result->{etag}     = md5_hex($page_name.q(.cache).$time);
+            
             return;
         }
         
@@ -212,11 +219,13 @@ sub display_page {
     # parse the page.
     $page->parse();
     
-    # generate the HTML.
+    # generate the HTML and headers.
     $result->{type}      = 'page';
     $result->{content}   = $page->html();
+    $result->{length}    = length $result->{content};
     $result->{title}     = $page->get('page.title');
     $result->{generated} = 1;
+    $result->{modified}  = time2str(time);
     
     # caching is enabled, so let's save this for later.
     if ($wiki->opt('enable_page_caching')) {
@@ -225,6 +234,9 @@ sub display_page {
         print {$fh} $result->{title}, "\n";
         print {$fh} $result->{content};
         close $fh;
+        
+        # overwrite modified date to actual.
+        $result->{modified}  = time2str((stat $cache_file)[9]);
         
         $result->{cache_gen} = 1;
     }
