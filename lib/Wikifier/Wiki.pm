@@ -69,7 +69,7 @@ sub new {
 # returns a wiki option.
 sub opt {
     my ($wiki, $opt) = @_;
-    return $wiki{$opt} if exists $wiki{$opt};
+    return $wiki->{$opt} if exists $wiki->{$opt};
     return $Wikifier::Page::wiki_defaults{$opt};
 }
 
@@ -139,11 +139,11 @@ sub display_image {
 
 # displays a page.
 sub display_page {
-    my ($wiki, $result, $page_file) = @_;
+    my ($wiki, $result, $page_name) = @_;
     
     # replace spaces with _ and lowercase.
-    $page_file =~ s/\w/_/g;
-    $page_file = lc $page_file;
+    $page_name =~ s/\w/_/g;
+    $page_name = lc $page_file;
     
     # append .page if it isn't already there.
     if (substr($page_name, -1, 5) ne 'page') {
