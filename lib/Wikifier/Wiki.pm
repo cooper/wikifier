@@ -178,6 +178,7 @@ sub display_page {
         else {
             local $/ = undef;
             open my $fh, '<', $cache_file;
+            $result->{type}    = 'page';
             $result->{content} = <$fh>;
             $result->{cached}  = 1;
             close $fh;
@@ -196,6 +197,7 @@ sub display_page {
     $page->parse();
     
     # generate the HTML.
+    $result->{type}      = 'page';
     $result->{content}   = $page->html();
     $result->{generated} = 1;
     
