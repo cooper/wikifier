@@ -42,18 +42,18 @@ our $wiki = Wikifier::Wiki->new(%options);
 sub handler {
     my $r = shift;
     
-    $r->uri =~ m|/(.+?)$|;
-    my $page_name = $1;
-    my $result    = $wiki->display($page_name);
-    
-    # it is a page.
-    if ($result->{type} eq 'page') {
-        $r->send_http_header("text/html");
-        return &nginx::OK if $r->header_only;
-        
-        $r->print($result->{content});
-        $r->rflush;
-    }
+    #$r->uri =~ m|/(.+?)$|;
+    #my $page_name = $1;
+    #my $result    = $wiki->display($page_name);
+    #
+    ## it is a page.
+    #if ($result->{type} eq 'page') {
+    #    $r->send_http_header("text/html");
+    #    return &nginx::OK if $r->header_only;
+    #    
+    #    $r->print($result->{content});
+    #    $r->rflush;
+    #}
     
     return &nginx::OK;
 }
