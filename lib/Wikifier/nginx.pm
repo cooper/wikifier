@@ -50,7 +50,7 @@ sub handler {
     $r->rflush;
     
     # success.
-    return OK();
+    #return OK();
 }
  
  
