@@ -203,7 +203,6 @@ sub display_page {
             $result->{cached}   = 1;
             $result->{modified} = $time;
             $result->{length}   = length $result->{content};
-            $result->{etag}     = md5_hex($page_name.q(.cache).$time);
             
             return;
         }
