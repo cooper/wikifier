@@ -44,7 +44,8 @@ require Wikifier::Wiki;
 our $wiki = Wikifier::Wiki->new(%options);
 
 sub handler {
-    my $r = shift;
+    my $r      = shift;
+    my $length = 0;
     
     $r->uri =~ m|/(.+?)$|;
     my $page_name = $1;
@@ -54,8 +55,8 @@ sub handler {
         return &HTTP_NOT_FOUND;
     }
     
+    $length = $result->{length};
     $r->header_out('Content-Type',   $result->{mime}    );
-    $r->header_out('Content-Length', $result->{length}  );
     $r->header_out('Last-Modified',  $result->{modified});
     $r->header_out('Etag',           $result->{etag}    )   if defined $result->{etag};
     
@@ -78,7 +79,7 @@ sub handler {
             my $html = Wikifier::Wiki::file_contents($options{header});
             $html    = _replace_variables($result, $html);
             $result->{content} = $html.$result->{content};
-            $r->header_out('Content-Length', length $result->{content});
+            $length = length $result->{content};
         }
         
         # footer.
@@ -86,12 +87,13 @@ sub handler {
             my $html = Wikifier::Wiki::file_contents($options{footer});
             $html    = _replace_variables($result, $html);
             $result->{content} = $result->{content}.$html;
-            $r->header_out('Content-Length', length $result->{content});
+            $length  = length $result->{content};
         }
         
     }
     
     # send headers.
+    $r->header_out('Content-Length', $length);
     $r->send_http_header();
     return &OK if $r->header_only;
     
