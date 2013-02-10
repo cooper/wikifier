@@ -49,20 +49,29 @@ sub handler {
     $r->uri =~ m|/(.+?)$|;
     my $page_name = $1;
     my $result    = $wiki->display($page_name);
+
     
     # it is a page.
     if ($result->{type} eq 'page') {
         $r->send_http_header("text/html");
         return &OK if $r->header_only;
         
+        my $page_title = $result->{page}->get('page.title');
+        
         # header.
-        $r->print(Wikifier::Wiki::file_contents($options{header})) if $options{header};
+        if ($options{header}) {
+            my $html = Wikifier::Wiki::file_contents($options{header});
+            $r->print(_replace_variables($result, $html));
+        }
         
         # generated HTML content.
         $r->print($result->{content});
         
         # footer.
-        $r->print(Wikifier::Wiki::file_contents($options{footer})) if $options{footer};
+        if ($options{footer}) {
+            my $html = Wikifier::Wiki::file_contents($options{footer});
+            $r->print(_replace_variables($result, $html));
+        }
         
         $r->rflush;
     }
@@ -74,6 +83,18 @@ sub handler {
     }
     
     return &OK;
+}
+
+# VERY illegal regex replaces for template variables.
+sub _replace_variables {
+    my ($result, $html) = @_;
+    
+    my $page_title = $result->{page}->get('page.title');
+    my $page_file  = $result->{file};
+    
+    $string =~ s/\{\$page.title\}/$page_title/g;
+    $string =~ s/\{\$page.file\}/$page_file/g;
+    return $string;
 }
 
 1;

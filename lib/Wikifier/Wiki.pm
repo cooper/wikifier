@@ -95,6 +95,7 @@ sub opt {
 #       generated:  true if the content was just generated.
 #       cache_gen:  true if the content was generated and has been cached.
 #       page:       the Wikifier::Page object representing the page. (if generated)
+#       file:       the filename (not path) of the page, such as 'some_page.page'
 #
 #   if the type is 'image'
 #       image_type: either 'jpg' or 'png'
@@ -149,6 +150,8 @@ sub display_page {
     if (substr($page_name, -1, 5) ne 'page') {
         $page_name .= q(.page);
     }
+    
+    $result->{file} = $page_name;
     
     # determine the page file name.
     my $file       = $wiki->opt('page_directory') .q(/).$page_name;
