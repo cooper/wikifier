@@ -56,16 +56,12 @@ sub handler {
     }
     
     $length = $result->{length};
-    $r->header_out('Content-Type',   $result->{mime}    );
-    $r->header_out('Last-Modified',  $result->{modified});
-    $r->header_out('Etag',           $result->{etag}    )   if defined $result->{etag};
     
     # if we have an etag and the client sent an etag, check if they're the same.
     if (defined $result->{etag} && defined(my $etag_in = $r->header_in('If-None-Match'))) {
     
-        # they're equak.
+        # they're equal.
         if ($etag_in eq $result->{etag}) {
-            $r->send_http_header();
             return &HTTP_NOT_MODIFIED;
         }
         
@@ -93,7 +89,11 @@ sub handler {
     }
     
     # send headers.
-    $r->header_out('Content-Length', $length);
+    
+    $r->header_out('Content-Type',   $result->{mime}    );
+    $r->header_out('Last-Modified',  $result->{modified});
+    $r->header_out('Etag',           $result->{etag}    )   if defined $result->{etag};
+    $r->header_out('Content-Length', $length            );
     $r->send_http_header();
     return &OK if $r->header_only;
     
