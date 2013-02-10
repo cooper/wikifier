@@ -21,6 +21,7 @@ my %options = (
 );
 
 push @INC, (delete $options{wikifier_dir}).'/lib';
+require Wikifier;
 
 # global wiki variables.
 my %wiki_variables = (
