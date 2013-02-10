@@ -143,7 +143,7 @@ sub display_page {
     
     # replace spaces with _ and lowercase.
     $page_name =~ s/\w/_/g;
-    $page_name = lc $page_file;
+    $page_name = lc $page_name;
     
     # append .page if it isn't already there.
     if (substr($page_name, -1, 5) ne 'page') {
@@ -151,8 +151,8 @@ sub display_page {
     }
     
     # determine the page file name.
-    my $file       = $wiki->opt('page_directory') .q(/).$page_file;
-    my $cache_file = $wiki->opt('cache_directory').q(/).$page_file.q(.pagecache);
+    my $file       = $wiki->opt('page_directory') .q(/).$page_name;
+    my $cache_file = $wiki->opt('cache_directory').q(/).$page_name.q(.pagecache);
     
     # file does not exist.
     if (!-f $file) {
