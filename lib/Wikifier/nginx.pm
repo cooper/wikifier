@@ -18,55 +18,43 @@ my %wiki_variables = (
 # OPTIONS ###
 #############
 
-my %options = (
-    page_dir     => '/home/www/source/about/pages',
-    wikifier_dir => '/home/www/wikifier',
-    wiki => {
-        name            => 'NoTrollPlzNet Library',
-        wiki_root       => '',
-        image_directory => '/home/www/main/paranoia/files',
-        image_address   => 'http://images.notroll.net/paranoia/files',
-        variables       => \%wiki_variables,
-        size_images     => 'server',
-        image_sizer     => \&image_sizer,
-        external_root   => 'http://en.wikipedia.org/wiki',
-        rounding        => 'up'
-    }
+our %options = (
+    enable_page_caching  => 1,
+    enable_image_caching => 1,
+
+    name            => 'NoTrollPlzNet Library',
+    variables       => \%wiki_variables,
+    wiki_root       => '',
+    image_root      => 'http://images.notroll.net/paranoia/files',
+    
+    external_root   => 'http://en.wikipedia.org/wiki',
+    image_directory => '/home/www/main/paranoia/files',
+    cache_directory => '/home/www/main/paranoia/cache',
+    page_directory  => '/home/www/source/about/pages',
+    wkfr_directory  => '/home/www/wikifier'
 );
 
-push @INC, (delete $options{wikifier_dir}).'/lib';
-require Wikifier;
+push @INC, (delete $options{wkfr_directory}).'/lib';
+require Wikifier::Wiki;
+
+our $wiki = Wikifier::Wiki->new(%options);
 
 sub handler {
     my $r = shift;
     
-    # create the page object.                # FIXME
-    my $page = Wikifier::Page->new(%options, file => "$options{page_dir}/notrollplznet_library.page");
-
-    # parse the page.
-    $page->parse();
-
-    # print the generated HTML.
-    $r->print($page->html());
-    $r->rflush;
+    $r->uri =~ m|/(.+?)$|;
+    my $page_name = $1;
     
-    # success.
-    #return OK();
-}
- 
- 
-
-# image sizer.
-sub image_sizer {
-    my %opts = @_;
-    my ($file, $width, $height) = ($opts{file}, $opts{width}, $opts{height});
+    # it is a page.
+    if ($result->{type} eq 'page') {
+        $r->send_http_header("text/html");
+        return OK if $r->header_only;
+        
+        $r->print($result->{content});
+        $r->rflush;
+    }
     
-    # notroll.net image sizer takes no 'auto' argument; just leave them out.
-    $width  = $width  eq 'auto' ? '' : $width;
-    $height = $height eq 'auto' ? '' : $height;
-    
-    # return the full URL of the image.
-    return "http://images.notroll.net/paranoia/files/$file?height=$height&amp;width=$width";
+    return OK;
 }
 
 1;

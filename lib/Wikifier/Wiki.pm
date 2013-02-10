@@ -52,6 +52,8 @@ use Wikifier;
 sub new {
     my ($class, %opts) = @_;
     my $wiki = bless \%opts, $class;
+    
+    # default options.
     $wiki->{rounding}    = 'up';
     $wiki->{size_images} = 'server';
     
