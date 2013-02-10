@@ -37,7 +37,6 @@ use Wikifier;
 #
 #   HTTP address roots.
 #
-#   image_root:         HTTP address of file directory, such as http://example.com/files .
 #   wiki_root:          HTTP address of wiki root (typically relative to /)
 #   external_root:      HTTP address of external wiki root (defaults to English Wikipedia)
 #
@@ -52,6 +51,7 @@ use Wikifier;
 #   size_images:        either 'javascript' or 'server' (see below)
 #   image_sizer:        a code reference returning URL to resized image (see below)
 #   rounding:           'normal', 'up', or 'down' for how dimensions should be rounded.
+#   image_root:         HTTP address of file directory, such as http://example.com/files .
 #
 
 # create a new wiki object.
@@ -62,11 +62,12 @@ sub new {
     # default options.
     $wiki->{rounding}    = 'up';
     $wiki->{size_images} = 'server';
+    $wiki->{image_root}  = $wiki->{wiki_root}.q(/images);
     
     # image sizer callback.
     $wiki->{image_sizer} = sub {
         my %img = @_;
-        return ""; # TODO
+        return $wiki->{image_root}.$img{file}; # TODO
     };
     
     return $wiki;
