@@ -69,10 +69,7 @@ sub handler {
         }
         
     }
-    
-    $r->send_http_header();
-    return &OK if $r->header_only;
-    
+        
     # if this is a page, inject the header and footer.
     if ($result->{type} eq 'page') {
         
@@ -94,8 +91,14 @@ sub handler {
         
     }
     
+    # send headers.
+    $r->send_http_header();
+    return &OK if $r->header_only;
+    
+    # send body.
     $r->print($result->{content});
     return &OK;
+    
 }
 
 # VERY illegal regex replaces for template variables.
