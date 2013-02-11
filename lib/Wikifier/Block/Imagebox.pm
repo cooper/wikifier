@@ -50,10 +50,9 @@ sub parse {
     # if we have an 'author' or 'license', save this reference.
     if (defined $block->{author} || defined $block->{license}) {
         my $ref    = q();
-        my $author = defined $block->{author}  ? $block->{author}  : q();
 
-        if (defined $author && defined $license) {
-            $ref = "$author, $license";
+        if (defined $block->{author} && defined $block->{license}) {
+            $ref = "$$block{author}, $$block{license}";
         }
         else {
             $ref = $block->{author} || $block->{license};
