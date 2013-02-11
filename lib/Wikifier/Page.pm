@@ -171,10 +171,10 @@ sub _default_calculator {
     # use Image::Size to determine the dimensions.
     if (!$width || !$height) {
         require Image::Size;
+        my $dir = $img{page}->wiki_info('image_directory');
         ($width, $height) = Image::Size::imgsize("$dir/$img{file}");
     }
 
-    my $dir = $img{page}->wiki_info('image_directory');
     my ($w, $h) = ($width, $height);
 
     # now we must find the scaling factor.
