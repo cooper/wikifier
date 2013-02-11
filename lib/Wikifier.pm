@@ -541,6 +541,12 @@ sub parse_format_type {
         return qq{<sup style="font-size: 75%"><a href="#">[$ref]</a></sup>};
     }
     
+    # variable.
+    when (/^@([\w.]+)$/) {
+        my $var = $page->get($1);
+        return defined $var ? $var : '<span style="color: red; font-weight: bold;">(null)</span>';
+    }
+    
     # a link in the form of [[link]], [!link!], or [$link$]
     when (/^([\!\[\$]+?)(.+)([\!\]\$]+?)$/) { # inner match should be most greedy.
     
@@ -575,12 +581,6 @@ sub parse_format_type {
         
         $title = qq( title="$title") if $title;
         return qq{<a class="wiki-link-$link_type" href="$target"$title>$text</a>};
-    }
-    
-    # variable.
-    when (/^@([\w.]+)$/) {
-        my $var = $page->get($1);
-        return defined $var ? $var : '<span style="color: red; font-weight: bold;">(null)</span>';
     }
     
     } # end switch
