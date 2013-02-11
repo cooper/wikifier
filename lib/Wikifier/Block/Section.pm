@@ -20,7 +20,7 @@ sub new {
 
 sub parse {
     my $block = shift;
-    $block->SUPER::parse();
+    $block->SUPER::parse(@_);
 }
 
 # HTML.

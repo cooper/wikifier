@@ -23,8 +23,6 @@ sub new {
 # properties to the imagebox from the found values.
 sub parse {
     my ($block, $page) = (shift, @_);
-    die "block[$block] page[$page] _[@_]";
-    
     $block->SUPER::parse(@_) or return;
     
     $block->{$_} = $block->{hash}{$_} foreach qw(
