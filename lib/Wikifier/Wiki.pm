@@ -97,8 +97,10 @@ sub new {
     $wiki->{image_dimension_calculator} = sub {
         my %img = @_;
         
+        my $file = $img{page}->wiki_info('image_directory').q(/).$img{file};
+        
         # find the image size.
-        my $full_image      = GD::Image->new($img{file}) or return (0, 0);
+        my $full_image      = GD::Image->new($file) or return (0, 0);
         my ($big_w, $big_h) = $full_image->getBounds();
         undef $full_image;
         
