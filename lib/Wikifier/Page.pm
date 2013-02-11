@@ -159,23 +159,22 @@ sub image_round {
 # default image dimension calculator. requires Image::Size.
 sub _default_calculator {
     my %img = @_;
+    my ($width, $height) = ($img{width}, $img{height});
     
     # decide which dimension(s) were given.
-    my $given_width  = defined $img{width}  && $img{width}  ne 'auto' ? 1 : 0;
-    my $given_height = defined $img{height} && $img{height} ne 'auto' ? 1 : 0;
+    my $given_width  = defined $width  && $width  ne 'auto' ? 1 : 0;
+    my $given_height = defined $height && $height ne 'auto' ? 1 : 0;
     
     # maybe these were found for us already.
-    my ($width, $height) = ($img{big_width}, $img{big_height});
+    my ($w, $h) = ($img{big_width}, $img{big_height});
     
     # gotta do it the hard way.
     # use Image::Size to determine the dimensions.
-    if (!$width || !$height) {
+    if (!$w || !$h) {
         require Image::Size;
         my $dir = $img{page}->wiki_info('image_directory');
-        ($width, $height) = Image::Size::imgsize("$dir/$img{file}");
+        ($w, $h) = Image::Size::imgsize("$dir/$img{file}");
     }
-
-    my ($w, $h);
 
     # now we must find the scaling factor.
     my $scale_factor;
