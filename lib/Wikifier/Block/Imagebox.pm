@@ -22,7 +22,7 @@ sub new {
 # Hash handles the actual parsing; this assigns
 # properties to the imagebox from the found values.
 sub parse {
-    my $block = shift;
+    my ($block, $page) = (shift, @_);
     $block->SUPER::parse(@_) or return;
     
     $block->{$_} = $block->{hash}{$_} foreach qw(description file width height align author license);
