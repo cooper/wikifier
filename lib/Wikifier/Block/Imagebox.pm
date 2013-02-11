@@ -79,7 +79,7 @@ sub result {
     
     # append citation if one exists.
     if (defined(my $ref = $block->{citation})) {
-        $description .= qq{<sup style="font-size: 75%"><a href="#wiki-ref-$ref">[$ref]</a></sup>}};
+        $description .= qq{<sup style="font-size: 75%"><a href="#wiki-ref-$ref">[$ref]</a></sup>};
     }
     
     # currently only exact pixel sizes or 'auto' are supported.
