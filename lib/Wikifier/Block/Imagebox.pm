@@ -106,7 +106,7 @@ sub result {
     elsif (lc $page->wiki_info('size_images') eq 'server') {
     
         # find the resized dimensions.
-        my ($w, $h) = $page->wiki_info('image_dimension_calculator')->(
+        ($w, $h) = $page->wiki_info('image_dimension_calculator')->(
             file   => $block->{file},
             height => $height,
             width  => $width,
@@ -128,7 +128,7 @@ sub result {
 <div class="wiki-imagebox wiki-imagebox-$$block{align}">
     <div class="wiki-imagebox-inner" style="width: $w;">
     <a href="$link_address">
-        <img src="$image_url" alt="image" style="width: $w; height: $h;"$js />
+        <img src="$image_url" alt="image" style="width: ${w}px; height: ${h}px;"$js />
     </a>
     <div class="wiki-imagebox-description">
         <div class="wiki-imagebox-description-inner">$description</div>
