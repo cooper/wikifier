@@ -73,8 +73,8 @@ sub result {
         # find the resized dimensions.
         ($w, $h) = $page->wiki_info('image_dimension_calculator')->(
             file   => $block->{file},
-            height => $pix_h,
-            width  => $pix_w,
+            height => $px_h,
+            width  => $px_w,
             page   => $page
         );
         
