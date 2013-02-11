@@ -25,7 +25,10 @@ sub parse {
     my ($block, $page) = (shift, @_);
     $block->SUPER::parse(@_) or return;
     
-    $block->{$_} = $block->{hash}{$_} foreach qw(description file width height align author license);
+    $block->{$_} = $block->{hash}{$_} foreach qw(
+        description file width height
+        align author license
+    );
     
     # no width or height specified; default to 100 width.
     if (!$block->{width} && !$block->{height}) {
@@ -49,7 +52,7 @@ sub parse {
     
     # if we have an 'author' or 'license', save this reference.
     if (defined $block->{author} || defined $block->{license}) {
-        my $ref    = q();
+        my $ref = q();
 
         if (defined $block->{author} && defined $block->{license}) {
             $ref = "$$block{author}, $$block{license}";
@@ -58,9 +61,9 @@ sub parse {
             $ref = $block->{author} || $block->{license};
         }
         
-        $page->{references} ||= [];
-        $page->{auto_ref}   ||= 'a';
+        # store for later.
         push @{$page->{references}}, [$page->{auto_ref}++, $ref];
+        
     }
     
     return 1;
