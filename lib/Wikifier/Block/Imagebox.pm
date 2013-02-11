@@ -69,7 +69,7 @@ sub result {
     $link_address = $image_url = "$image_root/$$block{file}";
     
     # decide which dimension(s) were given.
-    my $given_width  = defined $width &&  $width  ne 'auto' ? 1 : 0;
+    my $given_width  = defined $width  && $width  ne 'auto' ? 1 : 0;
     my $given_height = defined $height && $height ne 'auto' ? 1 : 0;
     
     # both dimensions were given, so we need to do no sizing.

@@ -160,11 +160,16 @@ sub image_round {
 sub _default_calculator {
     my %img = @_;
     
+    # decide which dimension(s) were given.
+    my $given_width  = defined $img{width}  && $img{width}  ne 'auto' ? 1 : 0;
+    my $given_height = defined $img{height} && $img{height} ne 'auto' ? 1 : 0;
+    
     # use Image::Size to determine the dimensions.
     require Image::Size;
 
-    my $dir  = $img{page}->wiki_info('image_directory');
-    ($w, $h) = Image::Size::imgsize("$dir/$img{file}");
+    my $dir              = $img{page}->wiki_info('image_directory');
+    my ($width, $height) = Image::Size::imgsize("$dir/$img{file}");
+    my ($w    , $h     ) = ($width, $height);
             
     # now we must find the scaling factor.
     my $scale_factor;
