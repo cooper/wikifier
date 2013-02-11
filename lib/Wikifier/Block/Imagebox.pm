@@ -128,15 +128,15 @@ sub result {
             $h = $height;
         }
         
-        # append px units.
-        ($w, $h) = ($w.q(px), $h.q(px));
-    
         # call the image_sizer.
         my $url = $page->wiki_info('image_sizer')->(
             file   => $block->{file},
             height => $w,
             width  => $h
         );
+    
+        # append px units.
+        ($w, $h) = ($w.q(px), $h.q(px));
     
         $image_url = $url;
     }
