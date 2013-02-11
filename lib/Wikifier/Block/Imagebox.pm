@@ -23,7 +23,7 @@ sub new {
 # properties to the imagebox from the found values.
 sub parse {
     my ($block, $page) = (shift, @_);
-    croak "block[$block] page[$page] _[@_]";
+    die "block[$block] page[$page] _[@_]";
     
     $block->SUPER::parse(@_) or return;
     
