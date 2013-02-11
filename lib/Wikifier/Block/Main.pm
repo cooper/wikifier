@@ -30,7 +30,7 @@ sub parse {
     # parse each item.
     foreach my $item (@{$block->{content}}) {
         next unless blessed $item;
-        $item->parse();
+        $item->parse(@_);
     }
     
     return 1;

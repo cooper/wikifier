@@ -70,7 +70,7 @@ sub parse {
     }
     
     # run ->parse on children.
-    $wikifier->{main_block}->parse();
+    $wikifier->{main_block}->parse($page);
     
     # success.
     return 1; # return the page object.
