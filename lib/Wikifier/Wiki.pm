@@ -64,6 +64,7 @@ use Wikifier;
 #   image_sizer:        a code reference returning URL to resized image (see below)
 #   rounding:           'normal', 'up', or 'down' for how dimensions should be rounded.
 #   image_root:         HTTP address of file directory, such as http://example.com/files .
+#   image_dimension_calculator: code returning dimensions of a resized image
 #
 
 # create a new wiki object.
@@ -90,6 +91,29 @@ sub new {
         # scaled image.
         return $wiki->{image_root}.q(/).$img{width}.q(x).$img{height}.q(-).$img{file};
         
+    };
+    
+    # we use GD for image resizing because it is already a dependency.
+    $wiki->{image_dimension_calculator} = sub {
+        my %img = @_;
+        
+        my $full_image = GD::Image->new($img{file}) or return (0, 0);
+        
+        # auto -> undef
+        delete $img{width}  if $img{width}  eq 'auto';
+        delete $img{height} if $img{height} eq 'auto';
+        
+        # create resized image.
+        my $image = GD::Image->new($img{width}, $img{height});
+        $image->copyResampled($full_image,
+            0, 0,
+            0, 0,
+            $img{width} || undef, $img{height} || undef,
+            $full_image->getBounds
+        );
+        
+        my ($w, $h) = $image->
+    
     };
     
     return $wiki;

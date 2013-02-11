@@ -99,34 +99,18 @@ sub result {
     }
     
     # use server-side image sizing.
-    # - uses Image::Size to determine dimensions.
     # - maintains XHTML 1.0 Strict validity.
     # - eliminates flash on page load.
     # - faster (since image files are smaller.)
     # - require read access to local image directory.
     elsif (lc $page->wiki_info('size_images') eq 'server') {
     
-        # use Image::Size to determine the dimensions.
-        require Image::Size;
-        my $dir  = $page->wiki_info('image_directory');
-        ($w, $h) = Image::Size::imgsize("$dir/$$block{file}");
-        
-        # now we must find the scaling factor.
-        my $scale_factor;
-        
-        # width was given; calculate height.
-        if ($given_width) {
-            $scale_factor = $w / $width;
-            $w = $width;
-            $h = $page->image_round($h / $scale_factor);
-        }
-        
-        # height was given; calculate width.
-        if ($given_height) {
-            $scale_factor = $h / $height;
-            $w = $page->image_round($w / $scale_factor);
-            $h = $height;
-        }
+        # find the resized dimensions.
+        my ($w, $h) = $page->wiki_info('image_dimension_calculator')->(
+            file   => $block->{file},
+            height => $height,
+            width  => $width
+        );
         
         # call the image_sizer.
         my $url = $page->wiki_info('image_sizer')->(
@@ -134,9 +118,6 @@ sub result {
             height => $h,
             width  => $w
         );
-    
-        # append px units.
-        ($w, $h) = ($w.q(px), $h.q(px));
     
         $image_url = $url;
     }

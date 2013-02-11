@@ -20,6 +20,7 @@ use feature qw(switch);
 #   image_sizer:        a code reference returning URL to resized image (see below)
 #   external_root:      HTTP address of external wiki root (defaults to Wikipedia)
 #   rounding:           'normal', 'up', or 'down' for how dimensions should be rounded.
+#   image_dimension_calculator: code returning dimensions of a resized image
 
 # Image sizing with a server:
 #
@@ -70,7 +71,8 @@ our %wiki_defaults = (
     size_images     => 'javascript',
     image_sizer     => undef,
     external_root   => 'http://en.wikipedia.org/wiki',
-    rounding        => 'normal'
+    rounding        => 'normal',
+    image_dimension_calculator => \&_default_calculator
 );
 
 # create a new page.
@@ -152,6 +154,36 @@ sub image_round {
     return int($size + 0.99) if $round eq 'up';
     return int($size       ) if $round eq 'down';
     return $size; # fallback.
+}
+
+# default image dimension calculator. requires Image::Size.
+sub _default_calculator {
+    my %img = @_;
+    
+    # use Image::Size to determine the dimensions.
+    require Image::Size;
+
+    my $dir  = $img{page}->wiki_info('image_directory');
+    ($w, $h) = Image::Size::imgsize("$dir/$img{file}");
+            
+    # now we must find the scaling factor.
+    my $scale_factor;
+    
+    # width was given; calculate height.
+    if ($given_width) {
+        $scale_factor = $w / $width;
+        $w = $img{width};
+        $h = $img{page}->image_round($h / $scale_factor);
+    }
+    
+    # height was given; calculate width.
+    if ($given_height) {
+        $scale_factor = $h / $height;
+        $w = $img{page}->image_round($w / $scale_factor);
+        $h = $img{height};
+    }
+
+    return ($w, $h);
 }
 
 1
