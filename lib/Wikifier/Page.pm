@@ -175,7 +175,7 @@ sub _default_calculator {
         ($width, $height) = Image::Size::imgsize("$dir/$img{file}");
     }
 
-    my ($w, $h) = ($width, $height);
+    my ($w, $h);
 
     # now we must find the scaling factor.
     my $scale_factor;

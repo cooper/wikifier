@@ -98,7 +98,7 @@ sub new {
         my %img = @_;
         
         # find the image size.
-        my $full_image = GD::Image->new($img{file}) or return (0, 0);
+        my $full_image      = GD::Image->new($img{file}) or return (0, 0);
         my ($big_w, $big_h) = $full_image->getBounds();
         undef $full_image;
         
