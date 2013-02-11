@@ -401,6 +401,12 @@ sub unsafe_name {
     return $string;
 }
 
+sub trim {
+    my $string = shift;
+    $string =~ s/^\s*//g;     # remove leading whitespace.
+    $string =~ s/\s*$//g;     # remove trailing whitespace.
+    return $string;
+}
 ######################
 ### FORMAT PARSING ###
 ######################
@@ -545,8 +551,8 @@ sub parse_format_type {
         
         # type [[ displayed text | link name ]]
         if ($name =~ m/(.+)\|(.+)/) {
-            $text = $1;
-            $name = $2;
+            $text = trim($1);
+            $name = trim($2);
         }
         
         $safe_name = safe_name($name);
@@ -560,8 +566,8 @@ sub parse_format_type {
         
         # type [! displayed text | link name !]
         if ($name =~ m/(.+)\|(.+)/) {
-            $text = $1;
-            $name = $2;
+            $text = trim($1);
+            $name = trim($2);
         }
         
         $safe_name = safe_name($name);
@@ -581,8 +587,8 @@ sub parse_format_type {
         
         # type [$ displayed text | URL $]
         if ($name =~ m/(.+)\|(.+)/) {
-            $url  = $1;
-            $text = $2;
+            $url  = trim($1);
+            $text = trim($2);
         }
         
         return "<a title=\"External link\" class=\"wiki-link-other\" href=\"$url\">$text</a>";
