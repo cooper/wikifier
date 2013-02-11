@@ -407,6 +407,7 @@ sub trim {
     $string =~ s/\s*$//g;     # remove trailing whitespace.
     return $string;
 }
+
 ######################
 ### FORMAT PARSING ###
 ######################
@@ -518,83 +519,71 @@ sub parse_formatted_text {
 sub parse_format_type {
     my ($wikifier, $page, $type) = @_;
     
-    # simple formatting.
     given ($type) {
     
-        # italic, bold, strikethrough.
-        when ('i') { return '<span style="font-style: italic;">'            }
-        when ('b') { return '<span style="font-weight: bold;">'             }
-        when ('s') { return '<span style="text-decoration: line-through;">' }
-        when (['/s', '/b', '/i']) { return '</span>' }
-        
-        # inline quote.
-        when ( 'q') { return '"<span style="font-style: italic;">'  }
-        when ('/q') { return '</span>"'                             }
-        
-        # new line.
-        when (['nl', 'br']) { return '<br />' }
-        
-        # references.
-        when ('ref') {
-            $page->{reference_number} ||= 1;
-            my $ref = $page->{reference_number}++;
-            return "<sup style=\"font-size: 75%\"><a href=\"#\">[$ref]</a></sup>";
-        }
-        
+    # italic, bold, strikethrough.
+    when ('i') { return '<span style="font-style: italic;">'            }
+    when ('b') { return '<span style="font-weight: bold;">'             }
+    when ('s') { return '<span style="text-decoration: line-through;">' }
+    when (['/s', '/b', '/i']) { return '</span>' }
+    
+    # inline quote.
+    when ( 'q') { return '"<span style="font-style: italic;">'  }
+    when ('/q') { return '</span>"'                             }
+    
+    # new line.
+    when (['nl', 'br']) { return '<br />' }
+    
+    # references.
+    when ('ref') {
+        $page->{reference_number} ||= 1;
+        my $ref = $page->{reference_number}++;
+        return qq{<sup style="font-size: 75%"><a href="#">[$ref]</a></sup>};
     }
     
-    # not-so-simple formatting.
-    
-    # a internal wiki link.
-    if ($type =~ m/^\[(.+)\]$/) {
-        my ($name, $safe_name, $text) = ($1, $1, $1);
+    # a link in the form of [[link]], [!link!], or [$link$]
+    when (/^([\!\[\$]+?)(.+)([\!\[\$]+?)$/) { # inner match should be most greedy.
+        my ($link_char, $inner) = ($1, $2);
+        my ($target, $title, $text, $title) = ($inner, $inner, $inner, '');
         
-        # type [[ displayed text | link name ]]
-        if ($name =~ m/(.+)\|(.+)/) {
-            $text = trim($1);
-            $name = trim($2);
+        # format is <text>|<target>
+        if ($inner =~ m/^(.+?)\|(.+)$/) {
+            $text   = trim($1);
+            $target = trim($2);
         }
         
-        $safe_name = safe_name($name);
-        my $root   = $page->wiki_info('wiki_root');
-        return "<a title=\"$name\" class=\"wiki-link-internal\" href=\"$root/$safe_name\">$text</a>";
-    }
-    
-    # an external wiki link.
-    if ($type =~ m/^!(.+)!$/) {
-        my ($name, $safe_name, $text) = ($1, $1, $1);
-        
-        # type [! displayed text | link name !]
-        if ($name =~ m/(.+)\|(.+)/) {
-            $text = trim($1);
-            $name = trim($2);
+        # internal wiki link [[article]]
+        if ($link_char eq '[') {
+            $link_type = 'internal';
+            $title     = $target;
+            $target    = safe_name($target);
         }
         
-        $safe_name = safe_name($name);
-        my $root   = $page->wiki_info('external_root');
-        return "<a title=\"$name\" class=\"wiki-link-external\" href=\"$root/$safe_name\">$text</a>";
+        # external wiki link [!article!]
+        elsif ($link_char eq '!') {
+            $link_type = 'external';
+            $title     = 'Wikipedia: '.$target;
+            $target    = safe_name($target);
+        }
+        
+        # other non-wiki link [$url$]
+        elsif ($link_char eq '$') {
+            $link_type = 'other';
+            $title     = 'external link';
+        }
+        
+        $title = qq( title="$title") if $title;
+        return qq{<a class="wiki-link-$link_type" href="$target"$title>$text</a>};
     }
     
     # variable.
-    if ($type =~ m/^@([\w.]+)$/) {
+    when (/^@([\w.]+)$/) {
         my $var = $page->get($1);
         return defined $var ? $var : '<span style="color: red; font-weight: bold;">(null)</span>';
     }
     
-    # external non-wiki link.
-    if ($type =~ m/^\$(.+)\$$/) {
-        my ($url, $text) = ($1, $1);
-        
-        # type [$ displayed text | URL $]
-        if ($name =~ m/(.+)\|(.+)/) {
-            $url  = trim($1);
-            $text = trim($2);
-        }
-        
-        return "<a title=\"External link\" class=\"wiki-link-other\" href=\"$url\">$text</a>";
-    }
-    
-    
+    } # end switch
+  
     # leave out anything else, I guess.
     return q..;
     
