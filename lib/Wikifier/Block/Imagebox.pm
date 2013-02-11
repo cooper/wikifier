@@ -131,8 +131,8 @@ sub result {
         # call the image_sizer.
         my $url = $page->wiki_info('image_sizer')->(
             file   => $block->{file},
-            height => $w,
-            width  => $h
+            height => $h,
+            width  => $w
         );
     
         # append px units.
