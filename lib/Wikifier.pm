@@ -534,7 +534,7 @@ sub parse_format_type {
             my $ref = $page->{reference_number}++;
             return "<sup style=\"font-size: 75%\"><a href=\"#\">[$ref]</a></sup>";
         }
-    
+        
     }
     
     # not-so-simple formatting.
@@ -558,7 +558,7 @@ sub parse_format_type {
     if ($type =~ m/^!(.+)!$/) {
         my ($name, $safe_name, $text) = ($1, $1, $1);
         
-        # type [[ displayed text | link name ]]
+        # type [! displayed text | link name !]
         if ($name =~ m/(.+)\|(.+)/) {
             $text = $1;
             $name = $2;
@@ -574,6 +574,20 @@ sub parse_format_type {
         my $var = $page->get($1);
         return defined $var ? $var : '<span style="color: red; font-weight: bold;">(null)</span>';
     }
+    
+    # external non-wiki link.
+    if ($type =~ m/^\$(.+)\$$/) {
+        my ($url, $text) = ($1, $1);
+        
+        # type [$ displayed text | URL $]
+        if ($name =~ m/(.+)\|(.+)/) {
+            $url  = $1;
+            $text = $2;
+        }
+        
+        return "<a title=\"External link\" class=\"wiki-link-other\" href=\"$url\">$text</a>";
+    }
+    
     
     # leave out anything else, I guess.
     return q..;
