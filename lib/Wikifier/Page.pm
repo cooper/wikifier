@@ -164,10 +164,14 @@ sub _default_calculator {
     my $given_width  = defined $img{width}  && $img{width}  ne 'auto' ? 1 : 0;
     my $given_height = defined $img{height} && $img{height} ne 'auto' ? 1 : 0;
     
+    # maybe these were found for us already.
+    my ($width, $height) = ($img{big_width}, $img{big_height});
+    
+    # gotta do it the hard way.
     # use Image::Size to determine the dimensions.
-    if (!$opts{big_width} || !$opts{big_height}) {
+    if (!$width || !$height) {
         require Image::Size;
-        my ($width, $height) = Image::Size::imgsize("$dir/$img{file}");
+        ($width, $height) = Image::Size::imgsize("$dir/$img{file}");
     }
 
     my $dir = $img{page}->wiki_info('image_directory');
