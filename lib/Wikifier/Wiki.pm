@@ -403,6 +403,8 @@ sub display_image {
 
     # create resized image.
     my $image = GD::Image->new($width, $height);
+    $image->saveAlpha(1);
+    $image->alphaBlending(0);
     $image->copyResampled($full_image,
         0, 0,
         0, 0,
