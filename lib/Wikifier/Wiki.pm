@@ -346,6 +346,34 @@ sub display_image {
         
     # we have no cached copy. an image must be generated.
     
+    GD::Image->trueColor(1);
+    
+    my $full_image = GD::Image->new($file);
+
+
+    # create resized image.
+    my $image = GD::Image->new($width, $height);
+    $image->copyResampled($full_image,
+        0, 0,
+        0, 0,
+        $width, $height,
+        $full_image->getBounds
+    );
+    
+    # create JPEG or PNG data.
+    my $use = $wiki->opt('force_image_type') || $result->{image_type};
+    if ($use eq 'jpeg') {
+        my $compression = $wiki->opt('force_jpeg_quality') || 100;
+        $result->{content} = $image->jpeg($compression);
+    }
+    else {
+        $result->{content} = $image->png();
+    }
+
+    $result->{generated}    = 1;
+    $result->{modified}     = time2str(time);
+    $result->{length}       = length $result->{content};
+    $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
     
     # caching is enabled, so let's save this for later.
     if ($wiki->opt('enable_image_caching')) {
@@ -357,6 +385,7 @@ sub display_image {
         # overwrite modified date to actual.
         $result->{modified}  = time2str((stat $cache_file)[9]);
         $result->{cache_gen} = 1;
+        $result->{etag}      = q(").md5_hex($image_name.$result->{modified}).q(");
         
     }
     
