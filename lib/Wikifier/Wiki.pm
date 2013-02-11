@@ -296,6 +296,7 @@ sub display_image {
     
     # retina image. double its dimensions.
     if ($file =~ m/(.+)\@2x\.(.+)/) {
+        $file    = $1.q(.).$3;
         $width  *= 2;
         $height *= 2;
     }
