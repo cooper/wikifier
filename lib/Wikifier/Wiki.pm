@@ -417,6 +417,8 @@ sub display_image {
         $result->{content} = $image->jpeg($compression);
     }
     else {
+        $image->saveAlpha(1);
+        $image->alphaBlending(0);
         $result->{content} = $image->png();
     }
 
