@@ -112,7 +112,7 @@ sub new {
             $full_image->getBounds
         );
         
-        my ($w, $h) = $image->
+        return $image->getBounds;
     
     };
     
