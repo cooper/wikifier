@@ -70,18 +70,27 @@ sub result {
     # use server-side image sizing.
     elsif (lc $page->wiki_info('size_images') eq 'server') {
     
+        # find the resized dimensions.
+        ($w, $h) = $page->wiki_info('image_dimension_calculator')->(
+            file   => $block->{file},
+            height => $pix_h,
+            width  => $pix_w,
+            page   => $page
+        );
+        
         # call the image_sizer.
         my $url = $page->wiki_info('image_sizer')->(
             file   => $block->{file},
-            height => $px_h,
-            width  => $px_w
+            height => $h,
+            width  => $w,
+            page   => $page
         );
-    
+
         $image_url = $url;
     }
     return <<END;
 <div class="wiki-image">
-    <a href="$link_address"><img style="height: $h; width: $w;" src="$image_url" alt="image" /></a>
+    <a href="$link_address"><img style="height: ${h}px; width: ${w}px;" src="$image_url" alt="image" /></a>
 </div>
 END
 }

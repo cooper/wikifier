@@ -105,6 +105,7 @@ sub handler {
     $r->header_out('Last-Modified',  $result->{modified});
     $r->header_out('Etag',           $result->{etag}    )   if defined $result->{etag};
     $r->header_out('Content-Length', $length            );
+    $r->header_out('X-Powered-By',   'https://github.com/cooper/wikifier');
     $r->send_http_header($result->{mime});
     return &OK if $r->header_only;
     
