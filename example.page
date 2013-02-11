@@ -44,7 +44,7 @@ section {
             it has remained the largest [!library!] in the world by both number of [!books!]
             and shelf space since its initial stocking in early 1801.[ref] The NoTrollPlzNet
             Library houses more historical information than any other library in the world,[ref]
-            dating back to [!before humans were smart enough to date things|Prehistory!]
+            dating back to [!before humans were smart enough to date things | Prehistory!]
             (assuming humans even existed at the time.)
     }
     paragraph {
@@ -86,7 +86,7 @@ section [History] {
     paragraph {
         NoTrollPlzNet Library, originally named Troll-Free-Library, was built
         singlehandedly by [[Foxy]] with a $60,000,000,000 grant from the
-        [!People's Republic of China|Government of the People's Republic of China!].
+        [!Chinese Government | Government of the People's Republic of China!].
         The money was donated by request of [[Kim Jong-il]], former supreme leader of the
         [!Democratic People's Republic of Korea!] and dear friend of Foxy.[ref] The
         construction of the library lasted merely two weeks due to Foxy's surreal muscular 
@@ -95,8 +95,8 @@ section [History] {
         feel. This allows privacy in areas such as the Foxy lounge (shown below.) Kim
         Jong-il first visited the library in 1858. Surprised by how beautifully the
         library appeared with such a limited budget, he returned to the DPRK and built an
-        [!even larger, more expensive library|Grand People's Study House!].[ref] This action
-        has been criticized to be the cause of the [!North Korean famine!].[ref][ref][ref]
+        [!even larger, more expensive library | Grand People's Study House!].[ref] This action
+        has been criticized to have been the cause of the [!North Korean famine!].[ref][ref][ref]
         However, the size of the NoTrollPlzNet Library has more than quadrupled
         since the time of its construction, and today it outshines the national library of
         the DPRK (not to mention, the rest of the libraries in the world as well) by a landslide.
@@ -115,7 +115,7 @@ section [History] {
     /* appear in bold to the left of the event description.                             */
     
     history {
-        1799: $60 billion donated by [!China|People's Republic of China!] for construction
+        1799: $60 billion donated by [!China | People's Republic of China!] for construction
               by request of [[Foxy]]'s friend, [[Kim Jong-il]];
         1800: Library construction began, construction led by [[Foxy]];
         1800: In August, construction was complete with furnishings in place;
@@ -250,7 +250,7 @@ section [Facility] {
 section [References] {
 
     references {
-        1: "NoTrollPlzNet" [a: http://notroll.net]
+        1: "NoTrollPlzNet" [$ http://notroll.net $];
     }
 
 }
