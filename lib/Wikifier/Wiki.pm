@@ -367,6 +367,12 @@ sub display_image {
         
     # we have no cached copy. an image must be generated.
     
+    # ensure that the images aren't enormous.
+    if ($width > 1000 || $height > 1000) {
+        $result->{type}  = 'not found';
+        $result->{error} = 'that is way bigger than an image on a wiki should be.';
+    }
+    
     GD::Image->trueColor(1);
     my $full_image = GD::Image->new($file);
 
