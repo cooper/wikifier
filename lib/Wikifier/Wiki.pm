@@ -329,7 +329,7 @@ sub display_image {
     
     # if no width or height are specified,
     # display the full-sized version of the image.
-    if (!$width || !$height && !$retina) {
+    if (!$retina and !$width || !$height) {
         $result->{content}      = file_contents($file, 1);
         $result->{modified}     = time2str($stat[9]);
         $result->{length}       = $stat[7];
