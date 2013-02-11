@@ -557,14 +557,14 @@ sub parse_format_type {
         if ($link_char eq '[') {
             $link_type = 'internal';
             $title     = $target;
-            $target    = safe_name($target);
+            $target    = $page->wiki_info('wiki_root').q(/).safe_name($target);
         }
         
         # external wiki link [!article!]
         elsif ($link_char eq '!') {
             $link_type = 'external';
-            $title     = 'Wikipedia: '.$target;
-            $target    = safe_name($target);
+            $title     = $page->wiki_info('external_name').q(: ).$target;
+            $target    = $page->wiki_info('external_root').q(/).safe_name($target);
         }
         
         # other non-wiki link [$url$]

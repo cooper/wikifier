@@ -18,7 +18,8 @@ use feature qw(switch);
 #   variables:          a hash reference of global wiki variables.
 #   size_images:        either 'javascript' or 'server' (see below)
 #   image_sizer:        a code reference returning URL to resized image (see below)
-#   external_root:      HTTP address of external wiki root (defaults to Wikipedia)
+#   external_name:      name of external wiki (defaults to Wikipedia)
+#   external_root:      HTTP address of external wiki root (defaults to en.wikipedia.org)
 #   rounding:           'normal', 'up', or 'down' for how dimensions should be rounded.
 #   image_dimension_calculator: code returning dimensions of a resized image
 
