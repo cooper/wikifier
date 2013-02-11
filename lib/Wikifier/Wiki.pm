@@ -80,6 +80,10 @@ sub new {
     $wiki->{image_sizer} = sub {
         my %img = @_;
         
+        foreach (keys %img) {
+            warn "\$img{$_}: $img{$_}\n";
+        }
+        
         # full-sized image.
         if (!$wiki->opt('enable_image_sizing') || !$img{width} || !$img{height} ||
             $img{width} eq 'auto' || $img{height} eq 'auto') {
@@ -347,9 +351,7 @@ sub display_image {
     # we have no cached copy. an image must be generated.
     
     GD::Image->trueColor(1);
-    
     my $full_image = GD::Image->new($file);
-
 
     # create resized image.
     my $image = GD::Image->new($width, $height);
