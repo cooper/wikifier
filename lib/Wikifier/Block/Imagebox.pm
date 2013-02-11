@@ -62,7 +62,8 @@ sub parse {
         }
         
         # store for later.
-        push @{$page->{references}}, [$page->{auto_ref}++, $ref];
+        $block->{citation} = $page->{auto_ref}++;
+        push @{$page->{references}}, [$block->{citation}, $ref];
         
     }
     
@@ -75,6 +76,11 @@ sub result {
     
     # parse formatting in the image description.
     my $description = $page->parse_formatted_text($block->{description});
+    
+    # append citation if one exists.
+    if (defined(my $ref = $block->{citation})) {
+        $description .= qq{<sup style="font-size: 75%"><a href="#wiki-ref-$ref">[$ref]</a></sup>}};
+    }
     
     # currently only exact pixel sizes or 'auto' are supported.
     my $height = $block->{height}; my $width = $block->{width};
