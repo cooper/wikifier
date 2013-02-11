@@ -371,6 +371,7 @@ sub display_image {
     if ($width > 1000 || $height > 1000) {
         $result->{type}  = 'not found';
         $result->{error} = 'that is way bigger than an image on a wiki should be.';
+        return;
     }
     
     GD::Image->trueColor(1);
