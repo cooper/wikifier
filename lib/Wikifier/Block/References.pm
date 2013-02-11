@@ -21,9 +21,10 @@ sub new {
 sub result {
     my ($block, $page) = (shift, @_);
     my $string = qq{<ul class="wiki-references">\n};
-
+    my @pairs  = @{$block->{hash_array}}, @{$page->{references} || {}};
+    
     # append each reference.
-    foreach my $pair (@{$block->{hash_array}}) {
+    foreach my $pair (@pairs) {
         my ($key, $value) = @$pair;
         
         # special pair - ignore it.

@@ -25,7 +25,7 @@ sub parse {
     my $block = shift;
     $block->SUPER::parse(@_) or return;
     
-    $block->{$_} = $block->{hash}{$_} foreach qw(description file width height align);
+    $block->{$_} = $block->{hash}{$_} foreach qw(description file width height align author license);
     
     # no width or height specified; default to 100 width.
     if (!$block->{width} && !$block->{height}) {
@@ -46,6 +46,23 @@ sub parse {
     }
     
     # what should we do if a description is omitted?
+    
+    # if we have an 'author' or 'license', save this reference.
+    if (defined $block->{author} || defined $block->{license}) {
+        my $ref    = q();
+        my $author = defined $block->{author}  ? $block->{author}  : q();
+
+        if (defined $author && defined $license) {
+            $ref = "$author, $license";
+        }
+        else {
+            $ref = $block->{author} || $block->{license};
+        }
+        
+        $page->{references} ||= [];
+        $page->{auto_ref}   ||= 'a';
+        push @{$page->{references}}, [$page->{auto_ref}++, $ref];
+    }
     
     return 1;
 }
