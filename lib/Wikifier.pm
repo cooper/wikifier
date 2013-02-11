@@ -544,7 +544,7 @@ sub parse_format_type {
     # a link in the form of [[link]], [!link!], or [$link$]
     when (/^([\!\[\$]+?)(.+)([\!\[\$]+?)$/) { # inner match should be most greedy.
         my ($link_char, $inner) = ($1, $2);
-        my ($target, $title, $text, $title) = ($inner, $inner, $inner, '');
+        my ($target, $text, $title) = ($inner, $inner, '');
         
         # format is <text>|<target>
         if ($inner =~ m/^(.+?)\|(.+)$/) {
