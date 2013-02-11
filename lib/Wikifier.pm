@@ -534,13 +534,6 @@ sub parse_format_type {
     # new line.
     when (['nl', 'br']) { return '<br />' }
     
-    # references.
-    when ('ref') {
-        $page->{reference_number} ||= 1;
-        my $ref = $page->{reference_number}++;
-        return qq{<sup style="font-size: 75%"><a href="#">[$ref]</a></sup>};
-    }
-    
     # variable.
     when (/^@([\w.]+)$/) {
         my $var = $page->get($1);
@@ -581,6 +574,18 @@ sub parse_format_type {
         
         $title = qq( title="$title") if $title;
         return qq{<a class="wiki-link-$link_type" href="$target"$title>$text</a>};
+    }
+    
+    # fake references.
+    when ('ref') {
+        $page->{reference_number} ||= 1;
+        my $ref = $page->{reference_number}++;
+        return qq{<sup style="font-size: 75%"><a href="#">[$ref]</a></sup>};
+    }
+    
+    # real references.
+    when (\&Scalar::Util::looks_like_number) {
+        return qq{<sup style="font-size: 75%"><a href="#wiki-ref-$type">[$type]</a></sup>};
     }
     
     } # end switch
