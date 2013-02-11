@@ -340,14 +340,15 @@ sub handle_character {
 
 # defines the types of blocks and the classes associated with them.
 our %block_types = (
-    main      => 'Wikifier::Block::Main',        # used only for main block.
-    imagebox  => 'Wikifier::Block::Imagebox',    # displays an image with a caption.
-    infobox   => 'Wikifier::Block::Infobox',     # displays a box of general information.
-    section   => 'Wikifier::Block::Section',     # container for paragraphs, images, etc.
-    paragraph => 'Wikifier::Block::Paragraph',   # paragraph of text.
-    image     => 'Wikifier::Block::Image',       # displays a standalone image.
-    history   => 'Wikifier::Block::History',     # displays a table of dates and events.
-    code      => 'Wikifier::Block::Code',        # displays a block of code.
+    main       => 'Wikifier::Block::Main',        # used only for main block.
+    imagebox   => 'Wikifier::Block::Imagebox',    # displays an image with a caption.
+    infobox    => 'Wikifier::Block::Infobox',     # displays a box of general information.
+    section    => 'Wikifier::Block::Section',     # container for paragraphs, images, etc.
+    paragraph  => 'Wikifier::Block::Paragraph',   # paragraph of text.
+    image      => 'Wikifier::Block::Image',       # displays a standalone image.
+    history    => 'Wikifier::Block::History',     # displays a table of dates and events.
+    code       => 'Wikifier::Block::Code',        # displays a block of code.
+    references => 'Wikifier::Block::References',  # displays a list of citations.
 );
 
 # create a new block of the given type.
