@@ -62,7 +62,6 @@ sub parse {
         }
         
         # store for later.
-        die "storing $page->{auto_ref} to $page\n";
         push @{$page->{references}}, [$page->{auto_ref}++, $ref];
         
     }
