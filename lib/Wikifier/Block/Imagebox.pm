@@ -109,14 +109,16 @@ sub result {
         my ($w, $h) = $page->wiki_info('image_dimension_calculator')->(
             file   => $block->{file},
             height => $height,
-            width  => $width
+            width  => $width,
+            page   => $page
         );
         
         # call the image_sizer.
         my $url = $page->wiki_info('image_sizer')->(
             file   => $block->{file},
             height => $h,
-            width  => $w
+            width  => $w,
+            page   => $page
         );
     
         $image_url = $url;
