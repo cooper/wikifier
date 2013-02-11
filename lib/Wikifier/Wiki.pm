@@ -292,12 +292,14 @@ sub display_page {
 # displays an image of the supplied dimensions.
 sub display_image {
     my ($wiki, $result, $image_name, $width, $height) = @_;
+    my $retina;
     
     # retina image. double its dimensions.
     if ($image_name =~ m/^(.+)\@2x(.+?)$/) {
         $image_name = $1.$2;
         $width     *= 2;
         $height    *= 2;
+        $retina     = 1;
     }
 
     # check if the file exists.
@@ -327,7 +329,7 @@ sub display_image {
     
     # if no width or height are specified,
     # display the full-sized version of the image.
-    if (!$width || !$height) {
+    if (!$width || !$height && !$retina) {
         $result->{content}      = file_contents($file, 1);
         $result->{modified}     = time2str($stat[9]);
         $result->{length}       = $stat[7];
@@ -336,6 +338,21 @@ sub display_image {
     }
     
     # this is a smaller copy.
+    
+    # at this point, if we have no width or height, we must
+    # check the dimensions of the original image.
+    if (!$width || !$height) {
+        my $full_image      = GD::Image->new($file) or return (0, 0);
+        ($width, $height)   = $full_image->getBounds();
+        undef $full_image;
+        
+        # if retina, double.
+        if ($retina) {
+            $width  *= 2;
+            $height *= 2;
+        }
+        
+    }
     
     my $full_name = $width.q(x).$height.q(-).$image_name;
     my $cache_file = $wiki->opt('cache_directory').q(/).$full_name;
