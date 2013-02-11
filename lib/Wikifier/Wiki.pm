@@ -292,6 +292,13 @@ sub display_page {
 # displays an image of the supplied dimensions.
 sub display_image {
     my ($wiki, $result, $image_name, $width, $height) = @_;
+    my $scale = 1;
+    
+    # retina image. double its dimensions.
+    if ($file =~ m/(.+)\@2x\.(.+)/) {
+        $width  *= 2;
+        $height *= 2;
+    }
 
     # check if the file exists.
     my $file = $wiki->opt('image_directory').q(/).$image_name;
