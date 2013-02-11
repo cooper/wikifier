@@ -126,7 +126,7 @@ sub result {
     
     return <<END;
 <div class="wiki-imagebox wiki-imagebox-$$block{align}">
-    <div class="wiki-imagebox-inner" style="width: $w;">
+    <div class="wiki-imagebox-inner" style="width: ${w}px;">
     <a href="$link_address">
         <img src="$image_url" alt="image" style="width: ${w}px; height: ${h}px;"$js />
     </a>
