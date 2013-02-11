@@ -93,26 +93,21 @@ sub new {
         
     };
     
-    # we use GD for image resizing because it is already a dependency.
+    # we use GD for image size finding because it is already a dependency of WiWiki.
     $wiki->{image_dimension_calculator} = sub {
         my %img = @_;
         
+        # find the image size.
         my $full_image = GD::Image->new($img{file}) or return (0, 0);
+        my ($big_w, $big_h) = $full_image->getBounds();
+        undef $full_image;
         
-        # auto -> undef
-        delete $img{width}  if $img{width}  eq 'auto';
-        delete $img{height} if $img{height} eq 'auto';
-        
-        # create resized image.
-        my $image = GD::Image->new($img{width}, $img{height});
-        $image->copyResampled($full_image,
-            0, 0,
-            0, 0,
-            $img{width} || undef, $img{height} || undef,
-            $full_image->getBounds
+        # call the default handler with these dimensions.
+        return Wikifier::Page::_default_calculator(
+            %img,
+            big_width  => $big_w,
+            big_height => $big_h
         );
-        
-        return $image->getBounds;
     
     };
     
