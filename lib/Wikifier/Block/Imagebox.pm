@@ -23,6 +23,8 @@ sub new {
 # properties to the imagebox from the found values.
 sub parse {
     my ($block, $page) = (shift, @_);
+    croak "not a page?" if !$page->isa('Wikifier::Page');
+    
     $block->SUPER::parse(@_) or return;
     
     $block->{$_} = $block->{hash}{$_} foreach qw(
