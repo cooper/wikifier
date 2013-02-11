@@ -80,12 +80,6 @@ sub new {
     $wiki->{image_sizer} = sub {
         my %img = @_;
         
-        my $str = '';
-        foreach (keys %img) {
-            $str .= "\$img{$_}: $img{$_}\n";
-        }
-        die $str;
-        
         # full-sized image.
         if (!$wiki->opt('enable_image_sizing') || !$img{width} || !$img{height} ||
             $img{width} eq 'auto' || $img{height} eq 'auto') {
