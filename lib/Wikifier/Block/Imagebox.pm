@@ -134,8 +134,8 @@ sub result {
         # call the image_sizer.
         my $url = $page->wiki_info('image_sizer')->(
             file   => $block->{file},
-            height => $height,
-            width  => $width
+            height => $w,
+            width  => $h
         );
     
         $image_url = $url;
