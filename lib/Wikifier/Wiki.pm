@@ -294,8 +294,8 @@ sub display_image {
     my ($wiki, $result, $image_name, $width, $height) = @_;
     
     # retina image. double its dimensions.
-    if ($image_name =~ m/(.+)\@2x\.(.+?)/) {
-        $image_name = $1.q(.).$2;
+    if ($image_name =~ m/^(.+)\@2x(.+?)$/) {
+        $image_name = $1.$2;
         $width     *= 2;
         $height    *= 2;
     }
