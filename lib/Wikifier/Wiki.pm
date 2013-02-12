@@ -40,6 +40,9 @@ use Wikifier;
 #
 #   force_jpeg_quality:     if you set 'force_image_type' to 'jpeg', this option forces
 #                           JPEG images to be compressed with this quality. (range: 1-100)
+#
+#   enable_retina_display:  enable if you wish to support high-resolution image generation
+#                           for clear images on Apple's Retina display technology.
 #                           
 #   
 # Wikifier::Page wiki options:
@@ -295,7 +298,7 @@ sub display_image {
     my $retina;
     
     # retina image. double its dimensions.
-    if ($image_name =~ m/^(.+)[\@\_]2x(.+?)$/) {
+    if ($wiki->opt('enable_retina_display') && $image_name =~ m/^(.+)[\@\_]2x(.+?)$/) {
         $image_name = $1.$2;
         $width     *= 2;
         $height    *= 2;
