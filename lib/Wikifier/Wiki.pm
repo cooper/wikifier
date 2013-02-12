@@ -110,7 +110,7 @@ sub new {
         undef $full_image;
         
         # call the default handler with these dimensions.
-        my ($w, $h) Wikifier::Page::_default_calculator(
+        my ($w, $h) = Wikifier::Page::_default_calculator(
             %img,
             big_width  => $big_w,
             big_height => $big_h
