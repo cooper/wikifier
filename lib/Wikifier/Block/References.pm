@@ -45,7 +45,7 @@ sub result {
         # append table row.
         $string .= <<END;
     <li class="wiki-ref-item"><a class="wiki-ref-anchor" name="wiki-ref-$key">
-        <span class="wiki-ref-key">$key.</span> $value
+        <span class="wiki-ref-key">$key.</span> $value.
     </a></li>        
 END
     }
