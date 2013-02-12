@@ -55,12 +55,13 @@ sub parse {
         my $ref = q();
 
         if (defined $block->{author} && defined $block->{license}) {
-            $ref = "By [b]$$block{author}[/b], released under [i]$$block{license}[/i]";
+            $ref = 'By [b]'.$block->{author}.'[/b], released under [i]'.$block->{license}.'[/i]';
         }
+        
         else {
-            $ref = $block->{author}         ?
-            "By [b]$$block{author}[/b]"     :
-            "Released under [i]$$block{license}[/i]";
+            $ref = $block->{author}          ?
+            'By [b]'.$block->{author}.'[/b]' :
+            'Released under [i]'.$block->{license}.'[/i]';
         }
         
         # store for later.
