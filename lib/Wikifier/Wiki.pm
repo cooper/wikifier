@@ -302,11 +302,13 @@ sub display_page {
 # displays an image of the supplied dimensions.
 sub display_image {
     my ($wiki, $result, $image_name, $width, $height) = @_;
-    my $retina;
+    my ($retina, $scaled_w, $scaled_h) = (0, $width, $height);
     
     # retina image. double its dimensions.
     if ($wiki->opt('enable_retina_display') && $image_name =~ m/^(.+)[\@\_]2x(.+?)$/) {
         $image_name = $1.$2;
+        $scaled_w   = $width;
+        $scaled_h   = $height;
         $width     *= 2;
         $height    *= 2;
         $retina     = 1;
@@ -404,7 +406,7 @@ sub display_image {
     
     # if we are restricting to only sizes used in the wiki, check.
     if ($wiki->opt('restrict_image_size')) {
-        if (!$wiki->{allowed_dimensions}{$image_name}{$width.q(x).$height}) {
+        if (!$wiki->{allowed_dimensions}{$image_name}{$scaled_w.q(x).$scaled_h}) {
             $result->{type}  = 'not found';
             $result->{error} = 'invalid image size.';
             return;
