@@ -18,7 +18,7 @@ sub new {
     return $class->SUPER::new(%opts);
 }
 
-sub result {
+sub _result {
     my ($block, $page) = @_;
     my $string = "<div class=\"wiki-history\">\n";
     

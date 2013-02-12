@@ -15,10 +15,19 @@ use Scalar::Util 'blessed';
 sub new {
     my ($class, %opts) = @_;
     $opts{type} = 'references';
+    
+    # book subblock.
+    $opts{subblocks}{book} = {
+        type    => 'book',
+        base    => 'Wikifier::Block::Hash',
+        # parse => 
+        result  => \&_book_result
+    };
+    
     return $class->SUPER::new(%opts);
 }
 
-sub result {
+sub _result {
     my ($block, $page) = (shift, @_);
     my $string = qq{<ul class="wiki-references">\n};
     my @pairs  = (@{$block->{hash_array}}, @{$page->{references}});

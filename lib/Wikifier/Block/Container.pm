@@ -16,7 +16,7 @@ sub new {
     return $class->SUPER::new(%opts);
 }
 
-sub parse {
+sub _parse {
     my $block = shift;
     
     # filter blank items.

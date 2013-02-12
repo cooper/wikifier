@@ -21,7 +21,7 @@ sub new {
 }
 
 # parse() just calls all of the parse()s of the children.
-sub parse {
+sub _parse {
     my $block = shift;
     
     # filter out blank items.
@@ -37,7 +37,7 @@ sub parse {
 }
 
 # HTML.
-sub result {
+sub _result {
     my ($block, $page) = @_;
     my $string = q();
     foreach my $item (@{$block->{content}}) {

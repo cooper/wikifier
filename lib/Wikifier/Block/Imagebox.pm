@@ -21,9 +21,9 @@ sub new {
 
 # Hash handles the actual parsing; this assigns
 # properties to the imagebox from the found values.
-sub parse {
+sub _parse {
     my ($block, $page) = (shift, @_);
-    $block->SUPER::parse(@_) or return;
+    $block->SUPER::_parse(@_) or return;
     
     $block->{$_} = $block->{hash}{$_} foreach qw(
         description file width height
@@ -74,7 +74,7 @@ sub parse {
 }
 
 # HTML.
-sub result {
+sub _result {
     my ($block, $page) = @_;
     
     # parse formatting in the image description.

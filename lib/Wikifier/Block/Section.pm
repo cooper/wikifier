@@ -18,13 +18,13 @@ sub new {
     return $class->SUPER::new(%opts);
 }
 
-sub parse {
+sub _parse {
     my $block = shift;
-    $block->SUPER::parse(@_);
+    $block->SUPER::_parse(@_);
 }
 
 # HTML.
-sub result {
+sub _result {
     my ($block, $page) = (shift, @_);
     my $string = "<div class=\"wiki-section\">\n";
     

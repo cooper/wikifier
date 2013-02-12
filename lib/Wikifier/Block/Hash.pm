@@ -21,7 +21,7 @@ sub new {
 }
 
 # parse key:value pairs.
-sub parse {
+sub _parse {
     my $block = shift;
     my ($key, $value, $in_value, %values) = (q.., q..);
     
@@ -121,6 +121,7 @@ sub parse {
     
     # reassign the hash.
     $block->{hash} = \%hash;
+    
     return 1;
 }
 

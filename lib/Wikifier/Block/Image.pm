@@ -22,9 +22,9 @@ sub new {
 
 # Hash handles the actual parsing; this assigns
 # properties to the image from the found values.
-sub parse {
+sub _parse {
     my $block = shift;
-    $block->SUPER::parse(@_) or return;
+    $block->SUPER::_parse(@_) or return;
     
     $block->{$_} = $block->{hash}{$_} foreach qw(file width height);
     
@@ -47,7 +47,7 @@ sub parse {
 }
 
 # HTML.
-sub result {
+sub _result {
     my ($block, $page) = (shift, @_);
     
     # currently only exact pixel sizes or 'auto' are supported.

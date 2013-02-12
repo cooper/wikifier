@@ -43,11 +43,47 @@ sub new {
     return bless \%opts, $class;
 }
 
+# parse the contents.
 sub parse {
+    my $block = shift;
+    
+    # parse property.
+    if ($block->{parse}) {
+        return $block->{parse}->(@_);
+    }
+    
+    # _parse method.
+    if ($block->can('_parse')) {
+        return $block->_parse(@_);
+    }
+    
+    return;
+}
+
+# HTML result.
+sub result {
+    my $block = shift;
+    
+    # result property.
+    if ($block->{result}) {
+        return $block->{result}->(@_);
+    }
+    
+    # _result method.
+    if ($block->can('_result')) {
+        return $block->_result(@_);
+    }
+    
+    return;
+}
+
+# default _parse.
+sub _parse {
     return 1;
 }
 
-sub result {
+# default _result.
+sub _result {
     return '';
 }
 

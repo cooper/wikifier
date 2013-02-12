@@ -357,8 +357,22 @@ sub create_block {
     my $class = $block_types{$opts{type}};
     $opts{wikifier} = $wikifier;
     
-    # no such block type; create a dummy block with no type.
+    # no such block type.
     if (!defined $class) {
+        
+        # if the type starts with a hyphen, it's a subblock.
+        if ($opts{type} =~ m/^\-(.+)$/) {
+        
+            # if the subblock exists, use it; otherwise, use a dummy block.
+            my $type = $1;
+            if (my $sub = $opts{parent}{subblocks}{$type}) {
+                $opts{type} = $opts{parent}{type}.q(-).$type;
+                return ($sub->{base} || 'Wikifier::Block')->new(%opts, %$sub);
+            }
+
+        }
+
+        # create a dummy block with no type.
         $opts{type} = 'dummy';
         return Wikifier::Block->new(%opts);
     }
