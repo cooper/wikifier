@@ -27,6 +27,7 @@ our %options = (
     enable_image_sizing     => 1,
     enable_image_caching    => 1,
     enable_retina_display   => 1,
+    restrict_image_size     => 1,
 
     name            => 'NoTrollPlzNet Library',
     variables       => \%wiki_variables,

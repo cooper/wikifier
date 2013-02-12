@@ -43,6 +43,8 @@ use Wikifier;
 #
 #   enable_retina_display:  enable if you wish to support high-resolution image generation
 #                           for clear images on Apple's Retina display technology.
+#
+#   restrict_image_size:    restrict image generation to dimensions used in the wiki.
 #                           
 #   
 # Wikifier::Page wiki options:
@@ -108,11 +110,16 @@ sub new {
         undef $full_image;
         
         # call the default handler with these dimensions.
-        return Wikifier::Page::_default_calculator(
+        my ($w, $h) Wikifier::Page::_default_calculator(
             %img,
             big_width  => $big_w,
             big_height => $big_h
         );
+        
+        # store this as accepted dimensions.
+        $wiki->{allowed_dimensions}{$img{file}}{$w.q(x).$h} = 1;
+        
+        return ($w, $h);
     
     };
     
@@ -394,12 +401,25 @@ sub display_image {
         
     # we have no cached copy. an image must be generated.
     
-    # ensure that the images aren't enormous.
-    if ($width > 1500 || $height > 1500) {
-        $result->{type}  = 'not found';
-        $result->{error} = 'that is way bigger than an image on a wiki should be.';
-        return;
+    
+    # if we are restricting to only sizes used in the wiki, check.
+    if (!$wiki->opt('restrict_image_size')) {
+        if (!$wiki->{allowed_dimensions}{$img{file}}{$width.q(x).$height}) {
+            $result->{type}  = 'not found';
+            $result->{error} = 'invalid image size.';
+            return;
+        }
     }
+    
+    # otherwise, ensure that the images aren't enormous.
+    else {
+        if ($width > 1500 || $height > 1500) {
+            $result->{type}  = 'not found';
+            $result->{error} = 'that is way bigger than an image on a wiki should be.';
+            return;
+        }
+    }
+    
     
     GD::Image->trueColor(1);
     my $full_image = GD::Image->new($file);
