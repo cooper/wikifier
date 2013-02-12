@@ -55,12 +55,12 @@ sub parse {
         my $ref = q();
 
         if (defined $block->{author} && defined $block->{license}) {
-            $ref = "By $$block{author}, released under $$block{license}";
+            $ref = "By [b]$$block{author}[/b], released under [i]$$block{license}[/i]";
         }
         else {
-            $ref = $block->{author}     ?
-            "By $$block{author}"        :
-            "Released under $$block{license}";
+            $ref = $block->{author}         ?
+            "By [b]$$block{author}[/b]"     :
+            "Released under [i]$$block{license}[/i]";
         }
         
         # store for later.
@@ -81,7 +81,7 @@ sub result {
     
     # append citation if one exists.
     if (defined(my $ref = $block->{citation})) {
-        $description .= qq{<sup style="font-size: 75%"><a href="#wiki-ref-$ref">[$ref]</a></sup>};
+        $description .= qq{ <sup style="font-size: 75%"><a href="#wiki-ref-$ref">[$ref]</a></sup>};
     }
     
     # currently only exact pixel sizes or 'auto' are supported.
