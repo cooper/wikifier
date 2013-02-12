@@ -403,7 +403,7 @@ sub display_image {
     
     
     # if we are restricting to only sizes used in the wiki, check.
-    if (!$wiki->opt('restrict_image_size')) {
+    if ($wiki->opt('restrict_image_size')) {
         if (!$wiki->{allowed_dimensions}{$image_name}{$width.q(x).$height}) {
             $result->{type}  = 'not found';
             $result->{error} = 'invalid image size.';
