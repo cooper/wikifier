@@ -95,7 +95,7 @@ sub _book_result {
 sub _webpage_result {
     my ($block, $page) = (shift, @_);
     my %h = %{$block->{hash}};
-    my $accessed = $h{accessed} || q();
+    my $accessed = q(Accessed ).$h{accessed} || q();
     return qq{"$h{title}" <a href="$h{url}">$h{url}</a>. $accessed};    
 }
 

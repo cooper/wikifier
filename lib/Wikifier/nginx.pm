@@ -33,11 +33,13 @@ our %options = (
     wiki_root       => '',
     image_root      => 'http://images.notroll.net/paranoia/files',
     
+    external_name   => 'Wikipedia',
     external_root   => 'http://en.wikipedia.org/wiki',
     image_directory => '/home/www/main/paranoia/files',
     cache_directory => '/home/www/main/paranoia/cache',
     page_directory  => '/home/www/source/about/pages',
     wkfr_directory  => '/home/www/wikifier'
+    
 );
 
 push @INC, (delete $options{wkfr_directory}).'/lib';
