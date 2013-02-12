@@ -49,7 +49,7 @@ sub parse {
     
     # parse property.
     if ($block->{parse}) {
-        return $block->{parse}->(@_);
+        return $block->{parse}->($block, @_);
     }
     
     # _parse method.
@@ -66,7 +66,7 @@ sub result {
     
     # result property.
     if ($block->{result}) {
-        return $block->{result}->(@_);
+        return $block->{result}->($block, @_);
     }
     
     # _result method.
