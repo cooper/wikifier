@@ -1,4 +1,12 @@
 # Copyright (c) 2013, Mitchell Cooper
+#
+# Wikifier::Parser is a function class of Wikifier which parses a wiki file.
+# The parser separates the file into block types and then passes those to 
+# Wikifier::BlockManager for block class loading and object creation.
+#
+# This class is never to be used on its own. You must use Wikifier::Wiki for a high-level
+# Wiki manager or the medium-level Wikifier::Page for managing a single page.
+#
 package Wikifier::Parser;
 
 use warnings;

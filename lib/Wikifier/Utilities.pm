@@ -1,4 +1,7 @@
 # Copyright (c) 2013, Mitchell Cooper
+#
+# Wikifier::Utilities provides several functions used throughout the Wikifier.
+# It exports any of the functions as needed.
 package Wikifier::Utilities;
 
 use warnings;
@@ -15,6 +18,7 @@ sub import {
 ### UTILITIES ###
 #################
 
+# Increase indention level by $times indents.
 sub indent {
     my ($string, $times) = (shift, shift || 1);
     my $space = '    ' x $times;
@@ -25,18 +29,21 @@ sub indent {
     return $final_string;
 }
 
+# 'Some Article' -> 'Some_Article'
 sub safe_name {
     my $string = shift;
     $string =~ s/ /_/g;
     return $string;
 }
 
+# 'Some_Article' -> 'Some Article'
 sub unsafe_name {
     my $string = shift;
     $string =~ s/_/ /g;
     return $string;
 }
 
+# removes leading and trailing whitespace from a string.
 sub trim {
     my $string = shift;
     $string =~ s/^\s*//g;     # remove leading whitespace.
