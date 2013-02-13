@@ -22,7 +22,7 @@ sub _parse {
     my ($block, $page) = (shift, @_);
     
     # increment the current reference prefix.
-    $block->{ref_prefix}++;
+    $block->{ref_prefix}++; #XXX: references{} takes care of this now.
     
     $block->SUPER::_parse(@_);
 }

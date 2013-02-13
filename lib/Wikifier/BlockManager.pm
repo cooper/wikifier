@@ -40,7 +40,7 @@ sub create_block {
 }
 
 # register a block type.
-sub register {
+sub register_block {
 }
 
 1

@@ -1,7 +1,17 @@
 #!/usr/bin/perl
 # Copyright (c) 2013, Mitchell Cooper
 #
-# references{} displays a list of citations and sources.
+# Wikifier::Block::References
+#
+# This file provides reference and citation functionality.
+#
+# references{} is used to cite information sources for each section{}.
+#   -book{} represents a book source.
+#   -webpage{} represents a WWW source.
+#
+# references-section{} displays a section of references at the end of a page.
+#
+# Formatting type [<number>] (i.e. [1]) links to a reference in a references-section{}.
 #
 package Wikifier::Block::References;
 
@@ -12,40 +22,82 @@ use parent 'Wikifier::Block::Hash';
 
 use Scalar::Util 'blessed';
 
-# register block types to Wikifier.
-sub register {
-    
+# set initial values.
+sub init {
+    my $page = shift;
+    $page->{ref_prefix}   = 0;      # incremented for each reference{} block.
+    $page->{auto_ref}   ||= 'a';    # used for automatic image citations.
 }
 
-our %subblocks = (
-    book => {
-        type    => 'book',
-        base    => 'Wikifier::Block::Hash',
-        result  => \&_book_result
-    },
-    webpage => {
-        type    => 'webpage',
-        base    => 'Wikifier::Block::Hash',
-        result  => \&_webpage_result
-    }
-);
+# register block and formatting types to Wikifier.
+sub register {
+    my $page = shift;
+    
+    # register references{}
+    $page->register_block(
+        type  => 'references',      # name of type
+        new   => \&new,             # constructor; defaults to \&Wikifier::Block::new
+        base  => 'hash',            # parser method will be called on this type first
+      # parse => none,              # parser method
+        html  => \&_reference_html  # HTML generation method
+    ) or return;
+    
+    # register -book{}
+    $page->register_block(
+        type => 'references-book',
+        base => 'hash',
+        html => \&_book_html
+    ) or return;
+    
+    # register -webpage{}
+    $page->register_block(
+        type => 'references-webpage',
+        base => 'hash',
+        html > \&_webpage_html
+    ) or return;
+    
+    # register references-section{}
+    $page->register_block(
+        type => 'references-section',
+        base => 'section',              # for the most part, this has no meaning
+        html => \&_section_html
+    }) or return;
+    
+    # register [#] formatting
+    $page->register_format(
+        type     => 'citation',     # short name for the format type
+      # regex    => qr//,           # regex comparison
+      # string   => '',             # string comparison
+        function => \&Scalar::Util::looks_like_number # function checker
+    ) or return;
+    
+    return 1;
+}
 
+####################
+### references{} ###
+####################
+
+# create a new references{} block.
 sub new {
     my ($class, %opts) = @_;
-    $opts{type} = 'references';
-    return $class->SUPER::new(%opts);
+    my $block = $class->SUPER::new(%opts);
+    
+    $block->{type} = 'references';
+    
+    return $block;
 }
 
 # reference blocks display nothing.
-sub _result {
+sub _reference_html {
     return q();
 }
 
-#####################
-### BOOK SUBBLOCK ###
-#####################
+##########################
+### references-books{} ###
+##########################
 
-sub _book_result {
+sub _book_html {
     my ($block, $page) = (shift, @_);
     my %h = %{$block->{hash}};
     
@@ -60,23 +112,27 @@ sub _book_result {
     return qq{$author. <span style="font-style: italic;">$h{title}</span>$pagenum};    
 }
 
-########################
-### WEBPAGE SUBBLOCK ###
-########################
+############################
+### references-webpage{} ###
+############################
 
-sub _webpage_result {
+sub _webpage_html {
     my ($block, $page) = (shift, @_);
-    my %h = %{$block->{hash}};
+    
+    # accessed date?
+    my %h        = %{$block->{hash}};
     my $accessed = q(Accessed ).$h{accessed} || q();
+    
     return qq{"$h{title}" <a href="$h{url}">$h{url}</a>. $accessed};    
 }
 
-########################
-### SECTION SUBBLOCK ###
-########################
+############################
+### references-section{} ###
+############################
 
-sub _section_result {
+sub _section_html {
     my ($block, $page) = (shift, @_);
+    
     my $string = qq{<ul class="wiki-references">\n};
     my @pairs  = (@{$block->{hash_array}}, @{$page->{references}});
     
@@ -91,7 +147,7 @@ sub _section_result {
         
         # value is a block. generate the HTML for it.
         if (blessed $value) {
-            $value = $value->result(@_);
+            $value = $value->html(@_);
         }
         
         # Parse formatting in the value.
