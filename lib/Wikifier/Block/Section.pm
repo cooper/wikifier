@@ -19,7 +19,11 @@ sub new {
 }
 
 sub _parse {
-    my $block = shift;
+    my ($block, $page) = (shift, @_);
+    
+    # increment the current reference prefix.
+    $block->{ref_prefix}++;
+    
     $block->SUPER::_parse(@_);
 }
 

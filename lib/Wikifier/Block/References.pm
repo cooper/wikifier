@@ -12,28 +12,70 @@ use parent 'Wikifier::Block::Hash';
 
 use Scalar::Util 'blessed';
 
-sub new {
-    my ($class, %opts) = @_;
-    $opts{type} = 'references';
+# register block types to Wikifier.
+sub register {
     
-    # book subblock.
-    $opts{subblocks}{book} = {
+}
+
+our %subblocks = (
+    book => {
         type    => 'book',
         base    => 'Wikifier::Block::Hash',
         result  => \&_book_result
-    };
-    
-    # webpage subblock.
-    $opts{subblocks}{webpage} = {
-        type    => 'book',
+    },
+    webpage => {
+        type    => 'webpage',
         base    => 'Wikifier::Block::Hash',
         result  => \&_webpage_result
-    };
-    
+    }
+);
+
+sub new {
+    my ($class, %opts) = @_;
+    $opts{type} = 'references';
     return $class->SUPER::new(%opts);
 }
 
+# reference blocks display nothing.
 sub _result {
+    return q();
+}
+
+#####################
+### BOOK SUBBLOCK ###
+#####################
+
+sub _book_result {
+    my ($block, $page) = (shift, @_);
+    my %h = %{$block->{hash}};
+    
+    # Last, First (year).
+    my $author = $h{author};
+    $author   .= qq| ($h{year})| if $h{year};
+
+    # (pagenum).
+    my $pagenum = q();
+    $pagenum   .= qq| ($h{page})| if $h{page};
+
+    return qq{$author. <span style="font-style: italic;">$h{title}</span>$pagenum};    
+}
+
+########################
+### WEBPAGE SUBBLOCK ###
+########################
+
+sub _webpage_result {
+    my ($block, $page) = (shift, @_);
+    my %h = %{$block->{hash}};
+    my $accessed = q(Accessed ).$h{accessed} || q();
+    return qq{"$h{title}" <a href="$h{url}">$h{url}</a>. $accessed};    
+}
+
+########################
+### SECTION SUBBLOCK ###
+########################
+
+sub _section_result {
     my ($block, $page) = (shift, @_);
     my $string = qq{<ul class="wiki-references">\n};
     my @pairs  = (@{$block->{hash_array}}, @{$page->{references}});
@@ -67,36 +109,6 @@ END
     
     $string .= qq{</ul>\n};
     return $string;
-}
-
-#####################
-### BOOK SUBBLOCK ###
-#####################
-
-sub _book_result {
-    my ($block, $page) = (shift, @_);
-    my %h = %{$block->{hash}};
-    
-    # Last, First (year).
-    my $author = $h{author};
-    $author   .= qq| ($h{year})| if $h{year};
-
-    # (pagenum).
-    my $pagenum = q();
-    $pagenum   .= qq| ($h{page})| if $h{page};
-
-    return qq{$author. <span style="font-style: italic;">$h{title}</span>$pagenum};    
-}
-
-########################
-### WEBPAGE SUBBLOCK ###
-########################
-
-sub _webpage_result {
-    my ($block, $page) = (shift, @_);
-    my %h = %{$block->{hash}};
-    my $accessed = q(Accessed ).$h{accessed} || q();
-    return qq{"$h{title}" <a href="$h{url}">$h{url}</a>. $accessed};    
 }
 
 1

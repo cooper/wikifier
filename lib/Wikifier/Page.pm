@@ -79,6 +79,7 @@ our %wiki_defaults = (
 # create a new page.
 sub new {
     my ($class, %opts) = @_;
+    $opts{ref_prefix}   = 0; # incremented for each section.
     $opts{auto_ref}   ||= 'a';
     $opts{references} ||= [];
     $opts{content}    ||= [];
