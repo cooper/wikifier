@@ -82,14 +82,27 @@ sub new {
     $opts{references} ||= [];
     $opts{content}    ||= [];
     $opts{variables}  ||= {};
+    
+    # no wikifier given, create a new one.
+    $page->{wikifier} ||= Wikifier->new();
+    
+    # create the page's main block.
+    $page->{main_block} = $wikifier->create_block(
+        type   => 'main',
+        parent => undef     # main block has no parent.
+    );
+    
+    # initial parser hashes.
+    $wikifier->{parse_current} = { block => $main_block };
+    $wikifier->{parse_last}    = { block => undef       };
+    
     return bless \%opts, $class;
 }
 
 # parses the file.
 sub parse {
     my $page = shift;
-    $page->{wikifier} = Wikifier->new(file => $page->{file});
-    return $page->wikifier->parse($page);
+    return $page->wikifier->parse($page, $page->{file});
 }
 
 # returns the generated page HTML.
@@ -146,18 +159,6 @@ sub wiki_info {
     return $wiki_defaults{$var};
 }
 
-sub wikifier { shift->{wikifier} }
-
-# round dimension according to setting.
-sub image_round {
-    my ($page, $size) = @_;
-    my $round = $page->wiki_info('rounding');
-    return int($size + 0.5 ) if $round eq 'normal';
-    return int($size + 0.99) if $round eq 'up';
-    return int($size       ) if $round eq 'down';
-    return $size; # fallback.
-}
-
 # default image dimension calculator. requires Image::Size.
 sub _default_calculator {
     my %img = @_;
@@ -197,5 +198,17 @@ sub _default_calculator {
 
     return ($w, $h);
 }
+
+# round dimension according to setting.
+sub image_round {
+    my ($page, $size) = @_;
+    my $round = $page->wiki_info('rounding');
+    return int($size + 0.5 ) if $round eq 'normal';
+    return int($size + 0.99) if $round eq 'up';
+    return int($size       ) if $round eq 'down';
+    return $size; # fallback.
+}
+
+sub wikifier { shift->{wikifier} }
 
 1

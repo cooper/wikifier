@@ -2,7 +2,23 @@
 # Copyright (c) 2013, Mitchell Cooper
 #
 # This class represents a wiki language manager.
-# This class is based upon several subclasses which each have different functions:
+# The same Wikifier instance may be used for several pages. However, the Wikifier object
+# should not be used for a wiki implementation. For example, an HTTPd module which manages
+# an entire wiki site would do so by using a Wikifier::Wiki. This Wikifier::Wiki might
+# use the same Wikifier object for each page, saving the need to reregister blocks,
+# formatting parsers, etc.
+#
+# This change was made when the Wikifier class was split into several smaller classes and
+# the block loading system was redesigned to require registration rather than dynamically
+# loading modules as they are needed. This new approach may require more memory, but it
+# will be more faster and more practical for an HTTPd wiki application.
+# 
+# Whereas before a Wikifier::Page object would store most parser-related storage, the
+# Wikifier object now has this duty; Wikifier::Page objects represent a single page now.
+# (That makes more sense anyway, right?)
+#
+# As of this change that was implemented on February 13, 2013,
+# this class is based upon several subclasses which each have different functions:
 #
 #   Parser:         parses a wiki language file, separating it into individual blocks.
 #   Formatter:      parses text formatting such as [b] and [i] formatting.
@@ -19,7 +35,7 @@ package Wikifier;
 use warnings;
 use strict;
 use feature qw(switch);
-use parent qw(Wikifier::Parser Wikifier::Formatter Wikifier::BlockManager);
+use parent qw(Wikifier::Parser Wikifier::BlockManager Wikifier::Formatter);
 
 use Wikifier::Parser;
 use Wikifier::Formatter;
@@ -30,28 +46,9 @@ use Wikifier::Page;
 use Wikifier::Block;
 
 # create a new wikifier instance.
-# Required options:
-#   file: the location of the file to be read.
 sub new {
     my ($class, %opts) = @_;
     my $wikifier = bless \%opts, $class;
-    
-    # create the main block.
-    $wikifier->{main_block} = my $main_block = $wikifier->create_block(
-        type   => 'main',
-        parent => undef     # main block has no parent.
-    );
-    
-    # initial current hash.
-    $wikifier->{current} = {
-        block => $main_block 
-    };
-    
-    # initial last hash.
-    $wikifier->{last} = {
-        block => undef      # main block has no parent.
-    };
-    
     return $wikifier;
 }
 

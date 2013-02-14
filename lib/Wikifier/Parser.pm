@@ -22,18 +22,18 @@ use Wikifier::Utilities qw(trim);
 ### PARSING ###
 ###############
 
-# parse the file.
+# parse a wiki file.
 sub parse {
-    my ($wikifier, $page) = @_;
+    my ($wikifier, $page, $file) = @_;
     
     # no file given.
-    if (!defined $wikifier->{file}) {
+    if (!defined $file) {
         croak "no file specified for parsing.";
         return;
     }
     
     # open the file.
-    open my $fh, '<', $wikifier->{file} or croak "couldn't read '$$wikifier{file}': $!";
+    open my $fh, '<', $file or croak "couldn't read '$file': $!";
     
     # read it line-by-line.
     while (my $line = <$fh>) {
@@ -47,7 +47,11 @@ sub parse {
     }
     
     # run ->parse on children.
-    $wikifier->{main_block}->parse($page);
+    $page->{main_block}->parse($page);
+    
+    # clear parsing-related options.
+    delete $wikifier->{parse_current};
+    delete $wikifier->{parse_last};
     
     # success.
     return 1; # return the page object.
@@ -94,8 +98,8 @@ sub handle_character {
     my ($wikifier, $char) = @_;
     
     # extract parsing hashes.
-    my %current = %{$wikifier->{current}};
-    my %last    = %{$wikifier->{last}};
+    my %current = %{$wikifier->{parse_current}};
+    my %last    = %{$wikifier->{parse_last}};
 
     # set current character.
     $current{char} = $char;
@@ -216,7 +220,7 @@ sub handle_character {
         continue if $current{escaped}; # this character was escaped; continue to default.
         
         # we cannot close the main block.
-        if ($current{block} == $wikifier->{main_block}) {
+        if ($current{block} == $page->{main_block}) {
             croak "attempted to close main block";
             return;
         }
@@ -306,8 +310,8 @@ sub handle_character {
     ###   because it has already been modified for the next char   ###
     
     # replace parsing hashes.
-    $wikifier->{current} = \%current;
-    $wikifier->{last}    = \%last;
+    $wikifier->{parse_current} = \%current;
+    $wikifier->{parse_last}    = \%last;
     
 }
 

@@ -15,9 +15,9 @@ use warnings;
 use strict;
 use feature qw(switch);
 
-use GD;
-use HTTP::Date 'time2str';
-use Digest::MD5 'md5_hex';
+use GD;                     # used for image sizing
+use HTTP::Date 'time2str';  # used for HTTP date formatting
+use Digest::MD5 'md5_hex';  # used for etags
 
 use Wikifier;
 
@@ -77,7 +77,11 @@ sub new {
     my ($class, %opts) = @_;
     my $wiki = bless \%opts, $class;
     
-    # default options.
+    # create the Wiki's Wikifier instance.
+    # using the same wikifier instance over and over makes parsing much faster.
+    $wiki->{wikifier} ||= Wikifier->new();
+    
+    # hardcoded Wikifier::Page wiki info options. (always same for Wikifier::Wiki)
     $wiki->{rounding}    = 'up';
     $wiki->{size_images} = 'server';
     $wiki->{image_root}  = $wiki->{wiki_root}.q(/image);
@@ -268,8 +272,9 @@ sub display_page {
     
     # cache was not used. generate a new copy.
     my $page = $result->{page} = Wikifier::Page->new(
-        file => $file,
-        wiki => $wiki
+        file     => $file,
+        wiki     => $wiki,
+        wikifier => $wiki->{wikifier}
     );
     
     # parse the page.
