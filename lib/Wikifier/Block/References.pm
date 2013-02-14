@@ -22,49 +22,44 @@ use parent 'Wikifier::Block::Hash';
 
 use Scalar::Util 'blessed';
 
-# set initial values.
-sub init {
-    my $page = shift;
-    $page->{ref_prefix}   = 0;      # incremented for each reference{} block.
-    $page->{auto_ref}   ||= 'a';    # used for automatic image citations.
-}
-
-# register block and formatting types to Wikifier.
+# register block and formatting types to Wikifier. this is called only once per Wikifier.
+# in other words, this should not be used for anything relating to a specific page. It is
+# intended to be used for registering block and formatting types to the Wikifier object.
 sub register {
-    my $page = shift;
+    my $wikifier = shift;
     
     # register references{}
-    $page->register_block(
+    $wikifier->register_block(
         type  => 'references',      # name of type
-        new   => \&new,             # constructor; defaults to \&Wikifier::Block::new
+        new   => \&_references_new, # constructor; defaults to \&Wikifier::Block::new
         base  => 'hash',            # parser method will be called on this type first
       # parse => none,              # parser method
-        html  => \&_reference_html  # HTML generation method
+        html  => \&_references_html # HTML generation method
     ) or return;
     
     # register -book{}
-    $page->register_block(
+    $wikifier->register_block(
         type => 'references-book',
         base => 'hash',
         html => \&_book_html
     ) or return;
     
     # register -webpage{}
-    $page->register_block(
+    $wikifier->register_block(
         type => 'references-webpage',
         base => 'hash',
         html > \&_webpage_html
     ) or return;
     
     # register references-section{}
-    $page->register_block(
+    $wikifier->register_block(
         type => 'references-section',
         base => 'section',              # for the most part, this has no meaning
         html => \&_section_html
     }) or return;
     
     # register [#] formatting
-    $page->register_format(
+    $wikifier->register_format(
         type     => 'citation',     # short name for the format type
       # regex    => qr//,           # regex comparison
       # string   => '',             # string comparison
@@ -74,12 +69,21 @@ sub register {
     return 1;
 }
 
+# This is called before the parsing of each page. It allows this class to set any options
+# that may be needed during the parsing which will immediately follow.
+sub init {
+    my $page = shift;
+    $page->{ref_prefix}   = 0;      # incremented for each reference{} block.
+    $page->{auto_ref}   ||= 'a';    # used for automatic image citations.
+}
+
+
 ####################
 ### references{} ###
 ####################
 
 # create a new references{} block.
-sub new {
+sub _references_new {
     my ($class, %opts) = @_;
     my $block = $class->SUPER::new(%opts);
     
@@ -89,7 +93,7 @@ sub new {
 }
 
 # reference blocks display nothing.
-sub _reference_html {
+sub _references_html {
     return q();
 }
 

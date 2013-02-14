@@ -36,11 +36,13 @@ our %block_types = (
 
 # create a new block of the given type.
 sub create_block {
-    # TODO.
+    my ($wikifier, %opts) = @_;
 }
 
 # register a block type.
 sub register_block {
+    my ($wikifier, %opts) = @_;
+    
 }
 
 1
