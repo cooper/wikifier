@@ -74,7 +74,7 @@ sub handle_line {
     }
     
     # pass on to main parser.
-    $wikifier->handle_character($_) foreach (split(//, $line), "\n");
+    $wikifier->handle_character($page, $_) foreach (split(//, $line), "\n");
     return 1;
 }
 
@@ -95,7 +95,7 @@ sub handle_line {
 # parse a single character.
 # note: never return from this method; instead goto AFTER.
 sub handle_character {
-    my ($wikifier, $char) = @_;
+    my ($wikifier, $page, $char) = @_;
     
     # extract parsing hashes.
     my %current = %{$wikifier->{parse_current}};

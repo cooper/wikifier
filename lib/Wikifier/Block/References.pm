@@ -75,6 +75,7 @@ sub init {
     my $page = shift;
     $page->{ref_prefix}   = 0;      # incremented for each reference{} block.
     $page->{auto_ref}   ||= 'a';    # used for automatic image citations.
+                                    # TODO: move me to Imagebox.pm.
 }
 
 

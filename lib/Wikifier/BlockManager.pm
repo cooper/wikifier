@@ -37,6 +37,15 @@ our %block_types = (
 # create a new block of the given type.
 sub create_block {
     my ($wikifier, %opts) = @_;
+    
+    # check for required options.
+    my @required = qw(parent type name);
+    foreach my $requirement (@required) {
+        croak "create_block(): missing option $requirement"
+        unless exists $opts{$requirement};
+    }
+    
+    
 }
 
 # register a block type.
