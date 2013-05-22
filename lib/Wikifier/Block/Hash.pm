@@ -57,7 +57,7 @@ sub _parse {
                 
                 # if there is no key, give up.
                 if (!length $key) {
-                    croak "no key for text value in hash-based block";
+                    croak "no key for text value in hash-based block ($value)";
                     return;
                 }
                 
