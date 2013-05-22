@@ -46,9 +46,35 @@ sub create_block {
         unless exists $opts{$requirement};
     }
     
+    my $class = $block_types{$opts{type}};
+    $opts{wikifier} = $wikifier;
+    
+    # no such block type.
+    if (!defined $class) {
+        
+        # if the type contains a hyphen, it's a subblock.
+        if ($opts{type} =~ m/^(.*)\-(.+)$/) {
+            # TODO.
+        }
+
+        # create a dummy block with no type.
+        $opts{type} = 'dummy';
+        return Wikifier::Block->new(%opts);
+    }
+    
+    # load the class.
+    my $file = $class.q(.pm);
+    $file =~ s/::/\//g;
+    if (!$INC{$file}) {
+        require $file or croak "couldn't load block class '$opts{type}'";
+    }
+    
+    # create a new block of the correct type.
+    my $block = $class->new(%opts);
+    
+    return $block;
     
 }
-
 # register a block type.
 sub register_block {
     my ($wikifier, %opts) = @_;
