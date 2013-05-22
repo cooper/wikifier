@@ -56,7 +56,7 @@ sub register {
         type => 'references-section',
         base => 'section',              # for the most part, this has no meaning
         html => \&_section_html
-    }) or return;
+    ) or return;
     
     # register [#] formatting
     $wikifier->register_format(
