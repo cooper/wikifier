@@ -36,8 +36,8 @@ our %options = (
     
     external_name   => 'Wikipedia',
     external_root   => 'http://en.wikipedia.org/wiki',
-    image_directory => '/home/www/main/paranoia/files',
-    cache_directory => '/home/www/main/paranoia/cache',
+    image_directory => '/home/www/source/about/images',
+    cache_directory => '/home/www/images/imagecache',
     page_directory  => '/home/www/source/about/pages',
     wkfr_directory  => '/home/www/wikifier'
     
