@@ -66,7 +66,7 @@ sub create_block {
     my $file = $class.q(.pm);
     $file =~ s/::/\//g;
     if (!$INC{$file}) {
-        require $file or croak "couldn't load block class '$opts{type}'";
+        do $file or croak "couldn't load block class '$opts{type}'";
     }
     
     # create a new block of the correct type.
