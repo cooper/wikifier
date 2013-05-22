@@ -87,7 +87,7 @@ sub new {
     $page->{wikifier} ||= Wikifier->new();
     
     # create the page's main block.
-    $page->{main_block} = $wikifier->create_block(
+    my $main_block = $page->{main_block} = $wikifier->create_block(
         type   => 'main',
         parent => undef     # main block has no parent.
     );
