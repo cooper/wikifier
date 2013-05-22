@@ -45,7 +45,7 @@ sub _result {
    
     # append the indented HTML of each contained block.
     foreach my $item (@{$block->{content}}) {
-        $string .= Wikifier::indent($item->result(@_))."\n";
+        $string .= Wikifier::Utilities::indent($item->result(@_))."\n";
     }
     
     # end the section.

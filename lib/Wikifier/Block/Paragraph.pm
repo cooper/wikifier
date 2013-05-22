@@ -26,7 +26,7 @@ sub _result {
     my ($block, $page) = @_;
 
     # Parse formatting.
-    my $html = Wikifier::indent($block->{content}[0]);
+    my $html = Wikifier::Utilities::indent($block->{content}[0]);
     $html = $page->parse_formatted_text($html);
 
     return "<p class=\"wiki-paragraph\">\n$html\n</p>\n";

@@ -30,7 +30,7 @@ sub _result {
     # if an image is present, display it.
     if (my $image = $block->{hash}{-image}) {
         my $imagehtml = $image->result(@_);
-        $imagehtml = Wikifier::indent($imagehtml, 2);
+        $imagehtml = Wikifier::Utilities::indent($imagehtml, 2);
         $string .= "    <div class=\"wiki-infobox-image-container\">\n$imagehtml    </div>\n";
     }
     
