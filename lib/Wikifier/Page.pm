@@ -93,8 +93,8 @@ sub new {
     );
     
     # initial parser hashes.
-    $wikifier->{parse_current} = { block => $main_block };
-    $wikifier->{parse_last}    = { block => undef       };
+    $opts{parse_current} = { block => $main_block };
+    $opts{parse_last}    = { block => undef       };
     
     return bless \%opts, $class;
 }
