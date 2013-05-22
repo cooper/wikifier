@@ -84,17 +84,18 @@ sub new {
     $opts{variables}  ||= {};
     
     # no wikifier given, create a new one.
-    $page->{wikifier} ||= Wikifier->new();
+    $opts{wikifier} ||= Wikifier->new();
+    my $wikifier = $opts{wikifier};
     
     # create the page's main block.
-    my $main_block = $page->{main_block} = $wikifier->create_block(
+    my $main_block = $opts{main_block} = $wikifier->create_block(
         type   => 'main',
         parent => undef     # main block has no parent.
     );
     
     # initial parser hashes.
-    $opts{parse_current} = { block => $main_block };
-    $opts{parse_last}    = { block => undef       };
+    $wikifier->{parse_current} = { block => $main_block };
+    $wikifier->{parse_last}    = { block => undef       };
     
     return bless \%opts, $class;
 }
