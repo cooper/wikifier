@@ -46,16 +46,19 @@ sub create_block {
         unless exists $opts{$requirement};
     }
     
-    my $class = $block_types{$opts{type}};
-    $opts{wikifier} = $wikifier;
+    my $root_type = $opts{type};
+    my $sub_type;
+    
+    # if the type contains a hyphen, it's a subblock.
+    if ($opts{type} =~ m/^(.*)\-(.+)$/) {
+        $root_type = $1;
+        $sub_type  = $2;
+    }
+    
+    my $class = $block_types{$root_type};
     
     # no such block type.
     if (!defined $class) {
-        
-        # if the type contains a hyphen, it's a subblock.
-        if ($opts{type} =~ m/^(.*)\-(.+)$/) {
-            # TODO.
-        }
 
         # create a dummy block with no type.
         $opts{type} = 'dummy';
@@ -70,7 +73,7 @@ sub create_block {
     }
     
     # create a new block of the correct type.
-    my $block = $class->new(%opts);
+    my $block = $class->new(wikifier => $wikifier, %opts);
     
     return $block;
     
@@ -78,6 +81,7 @@ sub create_block {
 # register a block type.
 sub register_block {
     my ($wikifier, %opts) = @_;
+    return 1; # TODO.
     
 }
 

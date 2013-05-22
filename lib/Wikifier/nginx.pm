@@ -32,7 +32,7 @@ our %options = (
     name            => 'NoTrollPlzNet Library',
     variables       => \%wiki_variables,
     wiki_root       => '',
-    image_root      => 'http://images.notroll.net/paranoia/files',
+    image_root      => 'http://source.notroll.net/about/images',
     
     external_name   => 'Wikipedia',
     external_root   => 'http://en.wikipedia.org/wiki',
