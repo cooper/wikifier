@@ -1,0 +1,12 @@
+HOW TO PICKUP
+
+I don't feel like working on this right now, but I don't want to forget where I left off.
+
+Months ago, I was in the process of implementing a block type registration API.
+See Wikifier::Block::References for an example. I need to fix blockmanager's
+register methods and such... register_block register_format.
+
+the create_block should check if a module is loaded by if the block type (or i.e. 
+blah1-blah2 = blah1)... haha.
+
+thx
