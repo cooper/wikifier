@@ -41,7 +41,8 @@ sub create_block {
     # check for required options.
     my @required = qw(parent type name);
     foreach my $requirement (@required) {
-        croak "create_block(): missing option $requirement"
+        my ($pkg, $file, $line) = caller;
+        croak "create_block(): missing option $requirement ($pkg line $line)"
         unless exists $opts{$requirement};
     }
     
