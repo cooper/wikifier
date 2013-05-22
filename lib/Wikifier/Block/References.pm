@@ -48,7 +48,7 @@ sub register {
     $wikifier->register_block(
         type => 'references-webpage',
         base => 'hash',
-        html > \&_webpage_html
+        html => \&_webpage_html
     ) or return;
     
     # register references-section{}
