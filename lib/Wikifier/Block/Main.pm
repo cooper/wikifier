@@ -41,6 +41,7 @@ sub _result {
     my ($block, $page) = @_;
     my $string = q();
     foreach my $item (@{$block->{content}}) {
+        next unless blessed $item;
         $string .= $item->result($page)."\n";
     }
     return $string;
