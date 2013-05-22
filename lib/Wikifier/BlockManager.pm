@@ -39,7 +39,7 @@ sub create_block {
     my ($wikifier, %opts) = @_;
     
     # check for required options.
-    my @required = qw(parent type name);
+    my @required = qw(parent type);
     foreach my $requirement (@required) {
         my ($pkg, $file, $line) = caller;
         croak "create_block(): missing option $requirement ($pkg line $line)"

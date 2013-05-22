@@ -89,9 +89,8 @@ sub new {
     
     # create the page's main block.
     my $main_block = $opts{main_block} = $wikifier->create_block(
-        wikifier => $wikifier,
-        type     => 'main',
-        parent   => undef     # main block has no parent.
+        type   => 'main',
+        parent => undef     # main block has no parent.
     );
     
     # initial parser hashes.
