@@ -2,18 +2,7 @@ package Wikifier::nginx;
 
 use warnings;
 use strict;
-
 use nginx;
-
-# global wiki variables.
-my %wiki_variables = (
-    stats => {
-        library => {
-            books => '151,785,778'
-        }
-    }
-);
-
 require Wikifier::Wiki;
 
 our $wiki = Wikifier::Wiki->new();
