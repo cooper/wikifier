@@ -185,9 +185,9 @@ sub opt {
     return $Wikifier::Page::wiki_defaults{$opt};
 }
 
-#############
-# display() #   returns information for displaying a wiki page or resource.
-#############
+#############   This is Wikifier's built in URI handler. If you wish to implement your own
+# display() #   URI handler, simply have it call the other display_*() methods directly.
+#############   Returns information for displaying a wiki page or resource.
 #
 # Pages
 # -----
@@ -239,7 +239,7 @@ sub opt {
 #       error: a string error.
 #
 sub display {
-    my ($wiki, $page_name, $result) = (shift, shift, {});
+    my ($wiki, $page_name) = (shift, shift);
     
     # it's an image.
     if ($page_name =~ m|^image/(.+)$|) {
@@ -255,20 +255,20 @@ sub display {
             ($width, $height, $file_name) = (0, 0, $image_name);
         }
     
-        $wiki->display_image($result, $file_name, $width, $height);
+        $wiki->display_image($file_name, $width, $height);
     }
     
     # it's a wiki page.
     else {
-        $wiki->display_page($result, $page_name);
+        $wiki->display_page($page_name);
     }
     
     return $result;
 }
 
-# displays a page. do not use directly.
+# Displays a page.
 sub display_page {
-    my ($wiki, $result, $page_name) = @_;
+    my ($wiki, $page_name) = @_; my $result = {};
     
     # replace spaces with _ and lowercase.
     $page_name =~ s/\s/_/g;
@@ -362,11 +362,12 @@ sub display_page {
         $result->{cache_gen} = 1;
     }
     
+    return $result;
 }
 
-# displays an image of the supplied dimensions. do not use directly.
+# Displays an image of the supplied dimensions.
 sub display_image {
-    my ($wiki, $result, $image_name, $width, $height) = @_;
+    my ($wiki, $image_name, $width, $height) = @_; my $result = {};
     my ($retina, $scaled_w, $scaled_h) = (0, $width, $height);
     
     # retina image. double its dimensions.
@@ -533,6 +534,7 @@ sub display_image {
         
     }
     
+    return $result;
 }
 
 # returns entire contents of a file.
