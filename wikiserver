@@ -25,9 +25,15 @@ my $loop = IO::Async::Loop->new;
 my $listener = IO::Async::Listener->new(on_stream => \&handle_stream);
 $loop->add($listener);
 
+# if a file already exists and is a socket, I assume we should delete it.
+my $path = $conf->get('server.socket.path');
+if ($path && -S $path) {
+    unlink $path;
+}
+
 # create the socket.
 my $socket = IO::Socket::UNIX->new(
-    Local  => $conf->get('server.socket.path') || die("No socket file path specified\n"),
+    Local  => $path || die("No socket file path specified\n"),
     Listen => 1
 ) or die "Can't create UNIX socket: $!\n";
 
