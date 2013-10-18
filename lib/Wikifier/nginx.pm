@@ -56,21 +56,21 @@ sub handler {
     # if this is a page, inject the header and footer.
     if ($result->{type} eq 'page') {
         
-        # header.
-        if ($options{header}) {
-            my $html = Wikifier::Wiki::file_contents($options{header});
-            $html    = _replace_variables($result, $html);
-            $result->{content} = $html.$result->{content};
-            $length = length $result->{content};
-        }
-        
-        # footer.
-        if ($options{footer}) {
-            my $html = Wikifier::Wiki::file_contents($options{footer});
-            $html    = _replace_variables($result, $html);
-            $result->{content} = $result->{content}.$html;
-            $length  = length $result->{content};
-        }
+#        # header.          FIXME
+#        if ($options{header}) {
+#            my $html = Wikifier::Wiki::file_contents($options{header});
+#            $html    = _replace_variables($result, $html);
+#            $result->{content} = $html.$result->{content};
+#            $length = length $result->{content};
+#        }
+#        
+#        # footer.
+#        if ($options{footer}) {
+#            my $html = Wikifier::Wiki::file_contents($options{footer});
+#            $html    = _replace_variables($result, $html);
+#            $result->{content} = $result->{content}.$html;
+#            $length  = length $result->{content};
+#        }
         
     }
     
