@@ -239,7 +239,7 @@ sub opt {
 #       error: a string error.
 #
 sub display {
-    my ($wiki, $page_name) = (shift, shift);
+    my ($wiki, $page_name, $result) = (shift, shift);
     
     # it's an image.
     if ($page_name =~ m|^image/(.+)$|) {
@@ -255,12 +255,12 @@ sub display {
             ($width, $height, $file_name) = (0, 0, $image_name);
         }
     
-        $wiki->display_image($file_name, $width, $height);
+        $result = $wiki->display_image($file_name, $width, $height);
     }
     
     # it's a wiki page.
     else {
-        $wiki->display_page($page_name);
+        $result = $wiki->display_page($page_name);
     }
     
     return $result;
