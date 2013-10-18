@@ -287,7 +287,7 @@ sub display_page {
     if (!-f $file) {
         $result->{error} = "File '$file' not found";
         $result->{type}  = 'not found';
-        return;
+        return $result;
     }
     
     # set path, file, and meme type.
@@ -325,7 +325,7 @@ sub display_page {
             $result->{modified} = $time;
             $result->{length}   = length $result->{content};
             
-            return;
+            return $result;
         }
         
     }
@@ -385,7 +385,7 @@ sub display_image {
     if (!-f $file) {
         $result->{type}  = 'not found';
         $result->{error} = 'image does not exist';
-        return;
+        return $result;
     }
     
     # stat for full-size image.
@@ -412,7 +412,7 @@ sub display_image {
         $result->{modified}     = time2str($stat[9]);
         $result->{length}       = $stat[7];
         $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
-        return;
+        return $result;
     }
     
     # this is a smaller copy.
@@ -420,7 +420,7 @@ sub display_image {
     # at this point, if we have no width or height, we must
     # check the dimensions of the original image.
     if (!$width || !$height) {
-        my $full_image      = GD::Image->new($file) or return (0, 0);
+        my $full_image      = GD::Image->new($file) or return; # FIXME: I don't really know!
         ($width, $height)   = $full_image->getBounds();
         undef $full_image;
         
@@ -457,7 +457,7 @@ sub display_image {
             $result->{length}       = length $result->{content};
             $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
             
-            return;
+            return $result;
         }
         
     }
@@ -475,7 +475,7 @@ sub display_image {
         if (!$wiki->{allowed_dimensions}{$image_name}{$scaled_w.q(x).$scaled_h}) {
             $result->{type}  = 'not found';
             $result->{error} = 'invalid image size.';
-            return;
+            return $result;
         }
     }
     
@@ -484,7 +484,7 @@ sub display_image {
         if ($width > 1500 || $height > 1500) {
             $result->{type}  = 'not found';
             $result->{error} = 'that is way bigger than an image on a wiki should be.';
-            return;
+            return $result;
         }
     }
     
