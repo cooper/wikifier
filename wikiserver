@@ -8,6 +8,15 @@ use IO::Async::Loop;
 use IO::Async::Listener;
 use IO::Socket::UNIX;
 
+use Wikifier;
+
+# read the configuration page.
+if (!@ARGV) {
+    die "Please provide the configuration file as the first argument.\n";
+}
+my $conf = Wikifier::Page->new(file => shift @ARGV) or die "Configuration error\n";
+
+# create a loop.
 my $loop = IO::Async::Loop->new;
 
 # create a new listener and add it to the loop.
@@ -16,7 +25,7 @@ $loop->add($listener);
 
 # create the socket.
 my $socket = IO::Socket::UNIX->new(
-    Local  =>
+    Local  => $conf->get('server.socket'),
     Listen => 1
 ) or die "Can't create UNIX socket: $!\n";
 
