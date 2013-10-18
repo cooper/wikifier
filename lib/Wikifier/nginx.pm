@@ -23,23 +23,24 @@ our %options = (
     header => '/home/www/source/about/header.tpl',
     footer => '/home/www/source/about/footer.tpl',
     
-    enable_page_caching     => 1,
-    enable_image_sizing     => 1,
-    enable_image_caching    => 1,
-    enable_retina_display   => 1,
-    restrict_image_size     => 1,
+    enable_page_caching     => 1,                                   # cache pages?
+    enable_image_sizing     => 1,                                   # use GD to resize images?
+    enable_image_caching    => 1,                                   # cache images in different sizes?
+    enable_retina_display   => 1,                                   # enable 2x images for retina displays?
+    restrict_image_size     => 1,                                   # prevent abuse of image resizer?
 
-    name            => 'NoTrollPlzNet Library',
-    variables       => \%wiki_variables,
-    wiki_root       => '',
-    image_root      => 'http://source.notroll.net/about/images',
+    name            => 'NoTrollPlzNet Library',                     # name of the wiki website
+    variables       => \%wiki_variables,                            # wiki-wide variables
+    wiki_root       => '',                                          # http address (typically relative) of wiki root
+    image_root      => 'http://source.notroll.net/about/images',    # http address of wiki image root
+
+    external_name   => 'Wikipedia',                                 # external wiki name
+    external_root   => 'http://en.wikipedia.org/wiki',              # http address of external wiki root
+    image_directory => '/home/www/source/about/images',             # local directory of wiki images
+    cache_directory => '/home/www/images/imagecache',               # local directory for storing cached images
+    page_directory  => '/home/www/source/about/pages',              # local directory where pages are stored
     
-    external_name   => 'Wikipedia',
-    external_root   => 'http://en.wikipedia.org/wiki',
-    image_directory => '/home/www/source/about/images',
-    cache_directory => '/home/www/images/imagecache',
-    page_directory  => '/home/www/source/about/pages',
-    wkfr_directory  => '/home/www/wikifier'
+    wkfr_directory  => '/home/www/wikifier'                         # local directory of the wikifier repository
     
 );
 

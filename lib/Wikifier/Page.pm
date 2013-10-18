@@ -71,6 +71,7 @@ our %wiki_defaults = (
     variables       => {},
     size_images     => 'javascript',
     image_sizer     => undef,
+    external_name   => 'Wikipedia',
     external_root   => 'http://en.wikipedia.org/wiki',
     rounding        => 'normal',
     image_dimension_calculator => \&_default_calculator

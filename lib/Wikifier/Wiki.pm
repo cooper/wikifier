@@ -21,9 +21,9 @@ use Digest::MD5 'md5_hex';  # used for etags
 
 use Wikifier;
 
-# Wiki options:
-#
-# Wikifier::Wiki specific options:
+##############################
+### Wikifier::Wiki options ###
+##############################
 #
 #   enable_page_caching:    true if you wish to enable wiki page caching.
 #
@@ -45,32 +45,50 @@ use Wikifier;
 #                           for clear images on Apple's Retina display technology.
 #
 #   restrict_image_size:    restrict image generation to dimensions used in the wiki.
-#                           
-#   
-# Wikifier::Page wiki options:
+#                
+#           
+##############################
+### Wikifier::Page options ###
+##############################
+#
 #
 #   name:               simple name of the wiki, such as "NoTrollPlzNet Library."
+#
 #   variables:          a hash reference of global wiki variables.
 #
-#   HTTP address roots.
+#   external_name:      the string name of the external wiki (i.e. Wikipedia)
 #
-#   wiki_root:          HTTP address of wiki root (typically relative to /)
-#   external_root:      HTTP address of external wiki root (defaults to English Wikipedia)
 #
-#   Directories on the filesystem (ABSOLUTE DIRECTORIES, not relative)
+#   === HTTP address roots ===
 #
-#   page_directory:     local directory containing page files.
-#   image_directory:    local directory containing wiki images.
-#   cache_directory:    local directory for storing cached pages and images. (writable)
+#       wiki_root:          HTTP address of wiki root (typically relative to /)
 #
-#   The following are provided automatically by Wikifier::Wiki:
+#       external_root:      HTTP address of external wiki root (defaults to English Wikipedia)
 #
-#   size_images:        either 'javascript' or 'server' (see below)
-#   image_sizer:        a code reference returning URL to resized image (see below)
-#   rounding:           'normal', 'up', or 'down' for how dimensions should be rounded.
-#   image_root:         HTTP address of file directory, such as http://example.com/files .
-#   image_dimension_calculator: code returning dimensions of a resized image
 #
+#   === Directories on the filesystem (ABSOLUTE DIRECTORIES, not relative) ===
+#
+#       page_directory:     local directory containing page files.
+#
+#       image_directory:    local directory containing wiki images.
+#
+#       cache_directory:    local directory for storing cached pages and images. (writable)
+#
+#
+#   === Provided automatically by Wikifier::Wiki (always the same when using ::Wiki) ===
+#
+#       size_images:        either 'javascript' or 'server' (see below)
+#
+#       image_sizer:        a code reference returning URL to resized image (see below)
+#
+#       rounding:           'normal', 'up', or 'down' for how dimensions should be rounded.
+#
+#       image_root:         HTTP address of file directory, such as http://example.com/files .
+#
+#       image_dimension_calculator: code returning dimensions of a resized image
+#
+#
+##############################
 
 # create a new wiki object.
 sub new {
@@ -137,18 +155,30 @@ sub opt {
     return $Wikifier::Page::wiki_defaults{$opt};
 }
 
-# display() displays a wiki page or resource.
+#############
+# display() #   returns information for displaying a wiki page or resource.
+#############
 #
-# takes a page name such as:
-#   Some Page
-#   some_page
+# Pages
+# -----
 #
-# takes an image in the form of:
-#   image/[imagename].png
-#   image/[width]x[height]-[imagename].png
-# For example:
-#   image/flower.png
-#   image/400x200-flower.png
+#  Takes a page name such as:
+#    Some Page
+#    some_page
+#
+# Images
+# ------
+#
+#  Takes an image in the form of:
+#    image/[imagename].png
+#    image/[width]x[height]-[imagename].png
+#
+#  For example:
+#    image/flower.png
+#    image/400x200-flower.png
+#
+# Returns
+# -------
 #
 # Returns a hash reference of results for display.
 #   type: either 'page', 'image', or 'not found'
@@ -206,7 +236,7 @@ sub display {
     return $result;
 }
 
-# displays a page.
+# displays a page. do not use directly.
 sub display_page {
     my ($wiki, $result, $page_name) = @_;
     
@@ -304,7 +334,7 @@ sub display_page {
     
 }
 
-# displays an image of the supplied dimensions.
+# displays an image of the supplied dimensions. do not use directly.
 sub display_image {
     my ($wiki, $result, $image_name, $width, $height) = @_;
     my ($retina, $scaled_w, $scaled_h) = (0, $width, $height);
@@ -418,7 +448,7 @@ sub display_image {
         }
     }
     
-    # otherwise, ensure that the images aren't enormous.
+    # otherwise, ensure that the images aren't enormous. XXX: remove this, ha.
     else {
         if ($width > 1500 || $height > 1500) {
             $result->{type}  = 'not found';
