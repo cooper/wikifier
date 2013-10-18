@@ -18,6 +18,7 @@ use feature qw(switch);
 use GD;                     # used for image sizing
 use HTTP::Date 'time2str';  # used for HTTP date formatting
 use Digest::MD5 'md5_hex';  # used for etags
+use Carp;
 
 use Wikifier;
 
