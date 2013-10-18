@@ -14,40 +14,9 @@ my %wiki_variables = (
     }
 );
 
-#############
-# OPTIONS ###
-#############
-
-our %options = (
-
-    #header => '/home/www/source/about/header.tpl',
-    #footer => '/home/www/source/about/footer.tpl',
-    
-    enable_page_caching     => 1,                                   # cache pages?
-    enable_image_sizing     => 1,                                   # use GD to resize images?
-    enable_image_caching    => 1,                                   # cache images in different sizes?
-    enable_retina_display   => 1,                                   # enable 2x images for retina displays?
-    restrict_image_size     => 1,                                   # prevent abuse of image resizer?
-
-    name            => 'Wikifier test wiki',                        # name of the wiki website
-    variables       => \%wiki_variables,                            # wiki-wide variables
-    wiki_root       => '',                                          # http address (typically relative) of wiki root
-    image_root      => 'http://wikifier.rlygd.net/images',          # http address of wiki image root
-
-    external_name   => 'Wikipedia',                                 # external wiki name
-    external_root   => 'http://en.wikipedia.org/wiki',              # http address of external wiki root
-    image_directory => '/home/www/test-wiki/images',                # local directory of wiki images
-    cache_directory => '/home/www/test-wiki/imagecache',            # local directory for storing cached images
-    page_directory  => '/home/www/test-wiki/pages',                 # local directory where pages are stored
-    
-    wkfr_directory  => '/home/www/wikifier'                         # local directory of the wikifier repository
-    
-);
-
-push @INC, (delete $options{wkfr_directory}).'/lib';
 require Wikifier::Wiki;
 
-our $wiki = Wikifier::Wiki->new(%options);
+our $wiki = Wikifier::Wiki->new();
 
 sub handler {
     my $r      = shift;
