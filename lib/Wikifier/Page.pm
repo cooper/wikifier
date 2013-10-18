@@ -134,7 +134,7 @@ sub get {
     
 }
 
-# interna use only.
+# internal use only.
 sub _get_hash {
     my ($hash, $var) = @_;
     my $i    = 0;
