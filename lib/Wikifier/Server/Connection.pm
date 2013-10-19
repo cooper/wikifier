@@ -23,10 +23,12 @@ sub send {
 # close the connection.
 sub close {
     my $connection = shift;
+    return if $connection->{closed};
+    $connection->{closed} = 1;
     my $stream = delete $connection->{stream};
+    delete $stream->{connection};
     say 'Closing connection '.$stream;
     $stream->close;
-    delete $stream->{connection};
 }
 
 # send an error and close connection.
