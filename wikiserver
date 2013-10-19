@@ -3,7 +3,7 @@
 
 use warnings;
 use strict;
-
+use feature 'say';
 use lib 'lib';
 
 use IO::Async::Loop;
@@ -40,6 +40,7 @@ my $socket = IO::Socket::UNIX->new(
 
 # begin listening.
 $listener->listen(handle => $socket);
+say 'Listening on '.$path;
 
 # run forever.
 $loop->run;
@@ -54,6 +55,7 @@ sub handle_stream {
     # add the stream to the loop.
     $loop->add($stream);
     
+    say "New connection $stream";
 }
 
 # handle incoming data.
@@ -61,5 +63,6 @@ sub handle_data {
     my ($stream, $buffref, $eof) = @_;
     while ($$buffref =~ s/^(.*?)\n//) {
         # handle the data ($1)
+        say "[$stream] $1";
     }
 }
