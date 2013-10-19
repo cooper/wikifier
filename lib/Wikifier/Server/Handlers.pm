@@ -56,7 +56,6 @@ sub _required {
     foreach (@required) {
         next if defined $msg->{$_};
         $connection->error("Required option '$_' missing");
-        say "Required option '$_' missing in request from $connection";
         return;
     }
     return my @a = ($connection, $msg);
