@@ -4,6 +4,7 @@ package Wikifier::Server::Connection;
 
 use warnings;
 use strict;
+use feature 'say';
 
 use JSON qw(encode_json decode_json);
 
@@ -24,6 +25,7 @@ sub close {
     my $connection = shift;
     my $stream = delete $connection->{stream};
     delete $stream->{connection};
+    say 'Closing connection '.$stream;
     $stream->close;
 }
 
@@ -33,7 +35,7 @@ sub handle {
     
     # make sure it's a JSON array.
     my $data = eval { decode_json($line) };
-    if (!$line || !$data) {
+    if (!$line || !$data || ref $data ne 'ARRAY') {
         $connection->send(error => { reason => 'Message must be a JSON array' });
         $connection->close;
         return;
