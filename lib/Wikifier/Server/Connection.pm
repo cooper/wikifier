@@ -35,8 +35,8 @@ sub close {
 sub error {
     my ($connection, $error) = @_;
     $connection->send(error => { reason => $error });
+    say "Connection error '$error' $connection";
     $connection->close;
-    say "Connection closed with error '$error' $connection";
 }
 
 # handle a line of data.
