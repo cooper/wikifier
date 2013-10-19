@@ -158,11 +158,10 @@ sub new {
 # read options from a configuration page file.
 sub read_config {
     my ($wiki, $file) = @_;
-    
     my $conf = Wikifier::Page->new(file => $file);
     $conf->parse or croak; # XXX: probably shouldn't croak.
     
-    %opts = (
+    my %opts = (
         enable_page_caching     => $conf->get('enable.cache.page'),
         enable_image_sizing     => 1, # XXX: should this even be an option?
         enable_image_caching    => $conf->get('enable.cache.image'),
