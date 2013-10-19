@@ -24,9 +24,9 @@ sub send {
 sub close {
     my $connection = shift;
     my $stream = delete $connection->{stream};
-    delete $stream->{connection};
     say 'Closing connection '.$stream;
     $stream->close;
+    delete $stream->{connection};
 }
 
 # send an error and close connection.
