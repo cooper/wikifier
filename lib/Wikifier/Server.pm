@@ -41,6 +41,9 @@ sub start {
     $listener->listen(handle => $socket);
     say 'Listening on '.$path;
 
+    # set up handlers.
+    Wikifier::Server::Handlers::initialize();
+
     # run forever.
     $loop->run;
     

@@ -8,7 +8,11 @@ use feature qw(say switch);
 
 use Digest::SHA 'sha1_hex';
 
-my ($loop, $conf) = ($Wikifier::server::loop, $Wikifier::Server::conf);
+my ($loop, $conf);
+
+sub initialize {
+    ($loop, $conf) = ($Wikifier::server::loop, $Wikifier::Server::conf);
+}
 
 sub handle_wiki {
     my ($connection, $msg) = _required(@_, qw(name password)) or return;
@@ -16,14 +20,14 @@ sub handle_wiki {
     
     # ensure that this wiki is configured on this server.
     if (!$conf->get("server.wiki.$name")) {
-        $connection->error("Wiki '$$msg{name}' not configured on this server");
+        $connection->error("Wiki '$name' not configured on this server");
         return;
     }
     
     # see if the passwords match.
     my $encrypted = sha1_hex($msg->{password});
     if ($encrypted ne $conf->get("server.wiki.$name.password")) {
-        $connection->error("Passwords do not match");
+        $connection->error("Password does not match configuration");
         return;
     }
     
