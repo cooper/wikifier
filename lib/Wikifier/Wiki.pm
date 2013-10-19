@@ -97,33 +97,10 @@ sub new {
     my $wiki = bless \%opts, $class;
     
     # if there were no provided options, assume we're reading from /etc/wikifier.conf.
-    if (not scalar keys %opts) {
-        my $conf = Wikifier::Page->new(file => '/etc/wikifier.conf');
-        $conf->parse or croak; # XXX: probably shouldn't croak.
-        
-        %opts = (
-            enable_page_caching     => $conf->get('enable.cache.page'),
-            enable_image_sizing     => 1, # XXX: should this even be an option?
-            enable_image_caching    => $conf->get('enable.cache.image'),
-            enable_retina_display   => $conf->get('enable.retina_display'),
-            restrict_image_size     => $conf->get('enable.image_size_restrictor'),
-
-            name            => $conf->get('wiki.name'),
-            variables       => $conf->get('var'),
-            wiki_root       => $conf->get('wiki.root'),
-            image_root      => $conf->get('wiki.image_root'),
-
-            external_name   => $conf->get('external.name'),
-            external_root   => $conf->get('external.root'),
-            
-            image_directory => $conf->get('dir.image'),
-            cache_directory => $conf->get('dir.cache'),
-            page_directory  => $conf->get('dir.page'),
-            wkfr_directory  => $conf->get('dir.wkfr')
-        );
-        
-        undef $conf;
-    }
+    $wiki->read_config('/etc/wikifier.conf') if not scalar keys %opts;
+    
+    # if a config file is provided, use it.
+    $wiki->read_config($opts{config_file}) if defined $opts{config_file};
     
     # create the Wiki's Wikifier instance.
     # using the same wikifier instance over and over makes parsing much faster.
@@ -176,6 +153,38 @@ sub new {
     };
     
     return $wiki;
+}
+
+# read options from a configuration page file.
+sub read_config {
+    my ($wiki, $file) = @_;
+    
+    my $conf = Wikifier::Page->new(file => $file);
+    $conf->parse or croak; # XXX: probably shouldn't croak.
+    
+    %opts = (
+        enable_page_caching     => $conf->get('enable.cache.page'),
+        enable_image_sizing     => 1, # XXX: should this even be an option?
+        enable_image_caching    => $conf->get('enable.cache.image'),
+        enable_retina_display   => $conf->get('enable.retina_display'),
+        restrict_image_size     => $conf->get('enable.image_size_restrictor'),
+
+        name            => $conf->get('wiki.name'),
+        variables       => $conf->get('var'),
+        wiki_root       => $conf->get('wiki.root'),
+        image_root      => $conf->get('wiki.image_root'),
+
+        external_name   => $conf->get('external.name'),
+        external_root   => $conf->get('external.root'),
+        
+        image_directory => $conf->get('dir.image'),
+        cache_directory => $conf->get('dir.cache'),
+        page_directory  => $conf->get('dir.page'),
+        wkfr_directory  => $conf->get('dir.wkfr')
+    );
+    
+    $wiki->{$_} = $opts{$_} foreach keys %opts;
+    return 1;
 }
 
 # returns a wiki option.

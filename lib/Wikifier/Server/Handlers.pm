@@ -31,7 +31,7 @@ sub handle_wiki {
         return;
     }
     
-    say "Got wiki command: $$msg{name} $$msg{password}";
+    # authentication succeeded.
 }
 
 # check for all required things.

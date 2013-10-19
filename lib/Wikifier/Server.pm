@@ -15,7 +15,7 @@ use Wikifier::Wiki;
 use Wikifier::Server::Connection;
 use Wikifier::Server::Handlers;
 
-our ($loop, $conf);
+our ($loop, $conf, %wikis);
 
 # start the server.
 sub start {
@@ -43,6 +43,9 @@ sub start {
 
     # set up handlers.
     Wikifier::Server::Handlers::initialize();
+    
+    # create Wikifier::Wiki instances.
+    create_wikis();
 
     # run forever.
     $loop->run;
@@ -76,6 +79,18 @@ sub handle_data {
     while ($$buffref =~ s/^(.*?)\n//) {
         # handle the data ($1)
         $stream->{connection}->handle($1);
+    }
+}
+
+# create Wikifier::Wiki instances.
+sub create_wikis {
+    my $w = $conf->get('server.wiki');
+    my %wikis = %{ $w && ref $w eq 'HASH' ? $w : {} };
+    foreach my $name (keys %wikis) {
+        my $wiki = Wikifier::Wiki->new(config_file => $conf->get("server.wiki.$name.config"));
+        say "Error with wiki configuration for '$name'" and next unless $wiki;
+        say "Initialized '$name' wiki";
+        $wikis{$name} = $wiki;
     }
 }
 
