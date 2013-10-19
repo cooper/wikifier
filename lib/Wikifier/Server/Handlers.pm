@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use feature qw(say switch);
 
-my ($loop, $conf) = ($Wikifier::server:loop, $Wikifier::Server::conf);
+my ($loop, $conf) = ($Wikifier::server::loop, $Wikifier::Server::conf);
 
 sub handle_wiki {
     my ($connection, $msg) = _required(@_, qw(name password)) or return;
