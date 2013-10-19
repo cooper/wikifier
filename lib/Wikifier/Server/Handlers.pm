@@ -37,6 +37,8 @@ sub handle_wiki {
     $connection->{wiki_name}     = $name;
     $connection->{wiki}          = $Wikifier::Server::wiki{$name};
     
+    say "Successful authentication for '$name' by $connection";
+    
 }
 
 # page request.
@@ -44,6 +46,7 @@ sub handle_page {
     my ($connection, $msg) = _required(@_, 'name') or return;
     my $result = $connection->{wiki}->display_page($msg->{name});
     $connection->send('page', $result);
+    say "Page '$$msg{name}' requested by $connection";
 }
 
 # check for all required things.
@@ -53,6 +56,7 @@ sub _required {
     foreach (@required) {
         next if defined $msg->{$_};
         $connection->error("Required option '$_' missing");
+        say "Required option '$_' missing in request from $connection";
         return;
     }
     return my @a = ($connection, $msg);

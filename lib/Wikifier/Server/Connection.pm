@@ -27,7 +27,7 @@ sub close {
     $connection->{closed} = 1;
     my $stream = delete $connection->{stream};
     delete $stream->{connection};
-    say 'Closing connection '.$stream;
+    say 'Closing connection '.$connection;
     $stream->close;
 }
 

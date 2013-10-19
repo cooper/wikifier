@@ -56,9 +56,9 @@ sub start {
 sub handle_stream {
     my (undef, $stream) = @_;
    
-    say "New connection $stream";
     $stream->{connection} = Wikifier::Server::Connection->new($stream);
-   
+    say "New connection $$stream{connection}";
+    
     # configure the stream.
     $stream->configure(
         on_read         => \&handle_data,
