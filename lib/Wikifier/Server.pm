@@ -15,14 +15,11 @@ use Wikifier::Wiki;
 use Wikifier::Server::Connection;
 use Wikifier::Server::Handlers;
 
-our $loop;
+our ($loop, $conf);
 
 # start the server.
 sub start {
-    my $conf = shift;
-    
-    # create a loop.
-    $loop = IO::Async::Loop->new;
+    ($loop, $conf) = @_;
 
     # create a new listener and add it to the loop.
     my $listener = IO::Async::Listener->new(on_stream => \&handle_stream);
