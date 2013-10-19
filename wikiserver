@@ -66,8 +66,8 @@ sub handle_data {
     while ($$buffref =~ s/^(.*?)\n//) {
         # handle the data ($1)
         say "[$stream] $1";
-        my $data = $json->decode($1);
-        if (!$data || ref $data ne 'ARRAY') {
+        my $data = eval { $json->decode($1) };
+        if (!$data || ref $data ne 'ARRAY' || $@) {
             $stream->write($json->encode(['error', { reason => 'Message must be a JSON array'} ]));
             $stream->close;
         }
