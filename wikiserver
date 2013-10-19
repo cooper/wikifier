@@ -9,6 +9,7 @@ use lib 'lib';
 use IO::Async::Loop;
 use IO::Async::Listener;
 use IO::Socket::UNIX;
+use JSON;
 
 use Wikifier;
 
@@ -39,6 +40,9 @@ my $socket = IO::Socket::UNIX->new(
 
 # begin listening.
 $listener->listen(handle => $socket);
+
+# run forever.
+$loop->run;
 
 # handle a new stream.
 sub handle_stream {
