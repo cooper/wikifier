@@ -15,7 +15,7 @@ use Wikifier::Wiki;
 use Wikifier::Server::Connection;
 use Wikifier::Server::Handlers;
 
-our ($loop, $conf, %wikis);
+our ($loop, $conf, %wiki);
 
 # start the server.
 sub start {
@@ -90,7 +90,7 @@ sub create_wikis {
         my $wiki = Wikifier::Wiki->new(config_file => $conf->get("server.wiki.$name.config"));
         say "Error with wiki configuration for '$name'" and next unless $wiki;
         say "Initialized '$name' wiki";
-        $wikis{$name} = $wiki;
+        $wiki{$name} = $wiki;
     }
 }
 
