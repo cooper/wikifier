@@ -14,12 +14,14 @@ use JSON qw(encode_json decode_json);
 use Wikifier::Wiki;
 use Wikifier::Server::Connection;
 
+our $loop;
+
 # start the server.
 sub start {
     my $conf = shift;
     
     # create a loop.
-    my $loop = IO::Async::Loop->new;
+    $loop = IO::Async::Loop->new;
 
     # create a new listener and add it to the loop.
     my $listener = IO::Async::Listener->new(on_stream => \&handle_stream);
