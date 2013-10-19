@@ -3,73 +3,13 @@
 
 use warnings;
 use strict;
-use feature 'say';
 use lib 'lib';
 
-use IO::Async::Loop;
-use IO::Async::Listener;
-use IO::Socket::UNIX;
-use JSON;
-
-use Wikifier;
-
-my $json = JSON->new;
+use Wikifier::Server;
 
 # read the configuration page.
-if (!@ARGV) {
-    die "Please provide the configuration file as the first argument\n";
-}
+die "Please provide the configuration file as the first argument\n" unless @ARGV;
 (my $conf = Wikifier::Page->new(file => shift @ARGV))->parse or die "Configuration error\n";
 
-# create a loop.
-my $loop = IO::Async::Loop->new;
-
-# create a new listener and add it to the loop.
-my $listener = IO::Async::Listener->new(on_stream => \&handle_stream);
-$loop->add($listener);
-
-# if a file already exists and is a socket, I assume we should delete it.
-my $path = $conf->get('server.socket.path');
-if ($path && -S $path) {
-    unlink $path;
-}
-
-# create the socket.
-my $socket = IO::Socket::UNIX->new(
-    Local  => $path || die("No socket file path specified\n"),
-    Listen => 1
-) or die "Can't create UNIX socket: $!\n";
-
-# begin listening.
-$listener->listen(handle => $socket);
-say 'Listening on '.$path;
-
-# run forever.
-$loop->run;
-
-# handle a new stream.
-sub handle_stream {
-    my (undef, $stream) = @_;
-   
-    # configure the stream.
-    $stream->configure(on_read => \&handle_data);
-    
-    # add the stream to the loop.
-    $loop->add($stream);
-    
-    say "New connection $stream";
-}
-
-# handle incoming data.
-sub handle_data {
-    my ($stream, $buffref, $eof) = @_;
-    while ($$buffref =~ s/^(.*?)\n//) {
-        # handle the data ($1)
-        say "[$stream] $1";
-        my $data = eval { $json->decode($1) };
-        if (!$data || ref $data ne 'ARRAY' || $@) {
-            $stream->write($json->encode(['error', { reason => 'Message must be a JSON array'} ]));
-            $stream->close;
-        }
-    }
-}
+# start the server.
+Wikifier::Server::start($conf);
