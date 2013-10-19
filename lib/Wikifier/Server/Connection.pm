@@ -61,7 +61,7 @@ sub handle {
     }
     
     # pass it on to handlers.
-    if (my $code = Wikifier::Server::Handlers->can("handle_$$data[0]") {
+    if (my $code = Wikifier::Server::Handlers->can("handle_$$data[0]")) {
         return $code->($connection, $data->[1] || {});
     }
     
