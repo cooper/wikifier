@@ -77,3 +77,5 @@ sub handle_data {
         $stream->{connection}->handle($1);
     }
 }
+
+1
