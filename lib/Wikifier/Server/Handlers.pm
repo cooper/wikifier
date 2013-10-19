@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use feature qw(say switch);
 
-use Digest::SHA1 'sha1_hex';
+use Digest::SHA 'sha1_hex';
 
 my ($loop, $conf) = ($Wikifier::server::loop, $Wikifier::Server::conf);
 
