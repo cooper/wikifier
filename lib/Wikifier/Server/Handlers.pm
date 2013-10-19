@@ -14,12 +14,13 @@ sub initialize {
     ($loop, $conf) = ($Wikifier::server::loop, $Wikifier::Server::conf);
 }
 
+# authentication.
 sub handle_wiki {
     my ($connection, $msg) = _required(@_, qw(name password)) or return;
     my $name = (split /\./, $msg->{name})[0];
     
     # ensure that this wiki is configured on this server.
-    if (!$conf->get("server.wiki.$name")) {
+    if (!$conf->get("server.wiki.$name") || !$Wikifier::Server::wikis{$name}) {
         $connection->error("Wiki '$name' not configured on this server");
         return;
     }
@@ -32,6 +33,17 @@ sub handle_wiki {
     }
     
     # authentication succeeded.
+    $connection->{authenticated} = 1;
+    $connection->{wiki_name}     = $name;
+    $connection->{wiki}          = $Wikifier::Server::wikis{$name};
+    
+}
+
+# page request.
+sub handle_page {
+    my ($connection, $msg) = _required(@_, 'name') or return;
+    my $result = $connection->{wiki}->display_page($msg->{name});
+    $connection->send('page', $result);
 }
 
 # check for all required things.
