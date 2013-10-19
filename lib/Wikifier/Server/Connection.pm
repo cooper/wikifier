@@ -4,7 +4,7 @@ package Wikifier::Server::Connection;
 
 use warnings;
 use strict;
-use feature 'say';
+use feature qw(say switch);
 
 use JSON qw(encode_json decode_json);
 
@@ -29,6 +29,13 @@ sub close {
     $stream->close;
 }
 
+# send an error and close connection.
+sub error {
+    my ($connection, $error) = @_;
+    $connection->send(error => { reason => $error });
+    $connection->close;
+}
+
 # handle a line of data.
 sub handle {
     my ($connection, $line) = @_;
@@ -36,11 +43,29 @@ sub handle {
     # make sure it's a JSON array.
     my $data = eval { decode_json($line) };
     if (!$line || !$data || ref $data ne 'ARRAY') {
-        $connection->send(error => { reason => 'Message must be a JSON array' });
+        $connection->error('Message must be a JSON array');
         $connection->close;
         return;
     }
     
+    # make sure it has a message type.
+    if (!$data->[0] && !length $data->[0]) {
+        $connection->error('Empty message type received');
+        return;
+    }
+    
+    # make sure the second element is an object.
+    if ($data->[1] && ref $data->[1] ne 'HASH') {
+        $connection->error('Second element of message must be a JSON object');
+        return;
+    }
+    
+    # pass it on to handlers.
+    if (my $code = Wikifier::Server::Handlers->can("handle_$$data[0]") {
+        return $code->($connection, $data->[1] || {});
+    }
+    
+    return;
 }
 
 1

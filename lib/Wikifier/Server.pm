@@ -13,6 +13,7 @@ use JSON qw(encode_json decode_json);
 
 use Wikifier::Wiki;
 use Wikifier::Server::Connection;
+use Wikifier::Server::Handlers;
 
 our $loop;
 
