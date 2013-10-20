@@ -390,7 +390,7 @@ sub display_image {
 
     # check if the file exists.
     my $file = $wiki->opt('image_directory').q(/).$image_name;
-    if (!-f $file) {
+    if (!-f $file && !-l $file) {
         $result->{type}  = 'not found';
         $result->{error} = 'image does not exist';
         return $result;
