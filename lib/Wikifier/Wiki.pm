@@ -289,7 +289,7 @@ sub display_page {
     }
     
     # determine the page file name.
-    my $file       = $wiki->opt('page_directory') .q(/).$page_name;
+    my $file       = abs_path($wiki->opt('page_directory') .q(/).$page_name);
     my $cache_file = $wiki->opt('cache_directory').q(/).$page_name.q(.cache);
     
     # file does not exist.
