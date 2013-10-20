@@ -19,6 +19,7 @@ use GD;                     # used for image sizing
 use HTTP::Date 'time2str';  # used for HTTP date formatting
 use Digest::MD5 'md5_hex';  # used for etags
 use Carp;
+use Cwd 'abs_path';
 
 use Wikifier;
 
@@ -549,7 +550,7 @@ sub display_image {
 sub file_contents {
     my ($file, $binary) = @_;
     local $/ = undef;
-    open my $fh, '<', $file;
+    open my $fh, '<', abs_path($file);
     binmode $fh if $binary;
     my $content = <$fh>;
     close $fh;
