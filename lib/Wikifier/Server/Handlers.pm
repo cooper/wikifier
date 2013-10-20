@@ -50,6 +50,18 @@ sub handle_page {
     say "Page '$$msg{name}' requested by $$connection{id}";
 }
 
+# image request.
+sub handle_image {
+    my ($connection, $msg) = _required(@_, 'name') or return;
+    my $result = $connection->{wiki}->display_image(
+        $msg->{name}, 
+        $msg->{width}  || 0,
+        $msg->{height} || 0
+    );
+    $connection->send('image', $result);
+    say "Image '$$msg{name}' requested by $$connection{id}";
+}
+
 # check for all required things.
 # disconnect from the client if one is missing.
 sub _required {
