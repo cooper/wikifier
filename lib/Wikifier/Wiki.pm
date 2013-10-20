@@ -404,6 +404,7 @@ sub display_image {
     $result->{type} = 'image';
     $result->{file} = $image_name;
     $result->{path} = $file;
+    $result->{fullsize_path} = $file;
     
     # determine image short name, extension, and mime type.
     $image_name      =~ m/(.+)\.(.+)/;
@@ -460,6 +461,7 @@ sub display_image {
         else {
             
             # set HTTP data.
+            $result->{path}         = $cache_file;
             $result->{cache_path}   = $cache_file;
             $result->{cached}       = 1;
             $result->{content}      = file_contents($cache_file, 1) unless $dont_open;
@@ -538,6 +540,7 @@ sub display_image {
         close $fh;
         
         # overwrite modified date to actual.
+        $result->{path}       = $cache_file;
         $result->{cache_path} = $cache_file;
         $result->{modified}   = time2str((stat $cache_file)[9]);
         $result->{cache_gen}  = 1;
