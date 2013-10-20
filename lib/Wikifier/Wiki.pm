@@ -545,7 +545,7 @@ sub display_image {
         
     }
     
-    delete $result{content} if $dont_open;
+    delete $result->{content} if $dont_open;
     return $result;
 }
 
