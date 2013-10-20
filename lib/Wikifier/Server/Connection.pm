@@ -44,6 +44,7 @@ sub error {
 # handle a line of data.
 sub handle {
     my ($connection, $line) = @_;
+    my $return = undef;
     
     # make sure it's a JSON array.
     my $data = eval { decode_json($line) };
@@ -74,7 +75,7 @@ sub handle {
     
     # pass it on to handlers.
     if (my $code = Wikifier::Server::Handlers->can("handle_$command")) {
-        return $code->($connection, $msg || {});
+        $return = $code->($connection, $msg || {});
     }
     
     # if the 'close' option exists, close the connection afterward.
@@ -83,7 +84,7 @@ sub handle {
         $connection->close;
     }
     
-    return;
+    return $return;
 }
 
 1
