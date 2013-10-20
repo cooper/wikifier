@@ -8,10 +8,12 @@ use feature qw(say switch);
 
 use JSON qw(encode_json decode_json);
 
+my $id = 'a';
+
 # create a new connection.
 sub new {
     my ($class, $stream) = @_;
-    return bless { stream => $stream }, $class;
+    return bless { stream => $stream, id => $id++ }, $class;
 }
 
 # write a line of JSON-encoded data.
@@ -27,7 +29,7 @@ sub close {
     $connection->{closed} = 1;
     my $stream = delete $connection->{stream};
     delete $stream->{connection};
-    say 'Closing connection '.$connection;
+    say 'Closing connection '.$connection->{id};
     $stream->close;
 }
 
@@ -35,7 +37,7 @@ sub close {
 sub error {
     my ($connection, $error) = @_;
     $connection->send(error => { reason => $error });
-    say "Connection error '$error' $connection";
+    say "Connection error '$error' $$connection{id}";
     $connection->close;
 }
 
