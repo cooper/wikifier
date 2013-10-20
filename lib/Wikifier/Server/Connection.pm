@@ -77,6 +77,12 @@ sub handle {
         return $code->($connection, $msg || {});
     }
     
+    # if the 'close' option exists, close the connection afterward.
+    if ($msg->{close}) {
+        say "Connection $$connection{id} requested close";
+        $connection->close;
+    }
+    
     return;
 }
 
