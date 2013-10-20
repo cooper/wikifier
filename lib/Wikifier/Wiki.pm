@@ -460,7 +460,7 @@ sub display_image {
         else {
             
             # set HTTP data.
-            $result->{cache_file}   = $cache_file;
+            $result->{cache_path}   = $cache_file;
             $result->{cached}       = 1;
             $result->{content}      = file_contents($cache_file, 1) unless $dont_open;
             $result->{modified}     = time2str($cache_modify);
@@ -538,7 +538,7 @@ sub display_image {
         close $fh;
         
         # overwrite modified date to actual.
-        $result->{cache_file} = $cache_file;
+        $result->{cache_path} = $cache_file;
         $result->{modified}   = time2str((stat $cache_file)[9]);
         $result->{cache_gen}  = 1;
         $result->{etag}       = q(").md5_hex($image_name.$result->{modified}).q(");
