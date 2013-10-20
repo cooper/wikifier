@@ -73,6 +73,16 @@ class Wikiclient {
         if (!$this->connected) $this->connect();
         return $this->command('page', array( 'name' => $name ));
     }
+    
+    // send an image request.
+    public function image($name, $width, $height) {
+        if (!$this->connected) $this->connect();
+        return $this->command('image', array(
+            'name'   => $name,
+            'width'  => $width,
+            'height' => $height
+        ));
+    }
 
 }
 
