@@ -43,7 +43,7 @@ class Wikiclient {
             return true;
         }
         
-        return false;
+        return;
     }
     
     // send a command/message.
@@ -62,7 +62,9 @@ class Wikiclient {
         fclose($this->sock);
         
         // decode JSON.
-        return json_decode(trim($data));
+        $res = json_decode(trim($data));
+        $res[1]->response = $res[0];
+        return $res[1];
         
     }
 
