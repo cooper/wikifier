@@ -417,7 +417,7 @@ sub display_image {
     # if no width or height are specified,
     # display the full-sized version of the image.
     if (!$retina and !$width || !$height) {
-        $result->{content}      = file_contents($file, 1) unless $dont_open;
+        $result->{content}      = file_contents($file, 1);
         $result->{modified}     = time2str($stat[9]);
         $result->{length}       = $stat[7];
         $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
@@ -460,8 +460,9 @@ sub display_image {
         else {
             
             # set HTTP data.
+            $result->{cache_file}   = $cache_file;
             $result->{cached}       = 1;
-            $result->{content}      = file_contents($cache_file, 1);
+            $result->{content}      = file_contents($cache_file, 1) unless $dont_open;
             $result->{modified}     = time2str($cache_modify);
             $result->{length}       = length $result->{content};
             $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
@@ -537,12 +538,14 @@ sub display_image {
         close $fh;
         
         # overwrite modified date to actual.
-        $result->{modified}  = time2str((stat $cache_file)[9]);
-        $result->{cache_gen} = 1;
-        $result->{etag}      = q(").md5_hex($image_name.$result->{modified}).q(");
+        $result->{cache_file} = $cache_file;
+        $result->{modified}   = time2str((stat $cache_file)[9]);
+        $result->{cache_gen}  = 1;
+        $result->{etag}       = q(").md5_hex($image_name.$result->{modified}).q(");
         
     }
     
+    delete $result{content} if $dont_open;
     return $result;
 }
 
