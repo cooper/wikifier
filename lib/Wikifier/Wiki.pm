@@ -376,7 +376,7 @@ sub display_page {
 
 # Displays an image of the supplied dimensions.
 sub display_image {
-    my ($wiki, $image_name, $width, $height) = @_; my $result = {};
+    my ($wiki, $image_name, $width, $height, $dont_open) = @_; my $result = {};
     my ($retina, $scaled_w, $scaled_h) = (0, $width, $height);
     
     # retina image. double its dimensions.
@@ -417,7 +417,7 @@ sub display_image {
     # if no width or height are specified,
     # display the full-sized version of the image.
     if (!$retina and !$width || !$height) {
-        $result->{content}      = file_contents($file, 1);
+        $result->{content}      = file_contents($file, 1) unless $dont_open;
         $result->{modified}     = time2str($stat[9]);
         $result->{length}       = $stat[7];
         $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");

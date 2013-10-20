@@ -56,7 +56,8 @@ sub handle_image {
     my $result = $connection->{wiki}->display_image(
         $msg->{name}, 
         $msg->{width}  || 0,
-        $msg->{height} || 0
+        $msg->{height} || 0,
+        1
     );
     $connection->send('image', $result);
     say "Image '$$msg{name}' requested by $$connection{id}";
