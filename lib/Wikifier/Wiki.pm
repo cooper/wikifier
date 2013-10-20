@@ -403,7 +403,7 @@ sub display_image {
     # image name and full path.
     $result->{type} = 'image';
     $result->{file} = $image_name;
-    $result->{path} = $file;
+    $result->{path} = abs_path($file);
     
     # determine image short name, extension, and mime type.
     $image_name      =~ m/(.+)\.(.+)/;
