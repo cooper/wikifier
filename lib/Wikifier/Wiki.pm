@@ -390,8 +390,8 @@ sub display_image {
     }
 
     # check if the file exists.
-    my $file = $wiki->opt('image_directory').q(/).$image_name;
-    if (!-f $file && !-l $file) {
+    my $file = abs_path($wiki->opt('image_directory').q(/).$image_name);
+    if (!-f $file) {
         $result->{type}  = 'not found';
         $result->{error} = 'image does not exist';
         return $result;
@@ -403,7 +403,7 @@ sub display_image {
     # image name and full path.
     $result->{type} = 'image';
     $result->{file} = $image_name;
-    $result->{path} = abs_path($file);
+    $result->{path} = $file;
     
     # determine image short name, extension, and mime type.
     $image_name      =~ m/(.+)\.(.+)/;
@@ -550,7 +550,7 @@ sub display_image {
 sub file_contents {
     my ($file, $binary) = @_;
     local $/ = undef;
-    open my $fh, '<', abs_path($file);
+    open my $fh, '<', $file;
     binmode $fh if $binary;
     my $content = <$fh>;
     close $fh;
