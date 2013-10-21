@@ -134,7 +134,7 @@ sub _result {
     elsif (lc $page->wiki_info('size_images') eq 'server') {
     
         # find the resized dimensions.
-        ($w, $h) = $page->wiki_info('image_dimension_calculator')->(
+        ($w, $h) = $page->wiki_info('image_calc')->(
             file   => $block->{file},
             height => $height,
             width  => $width,
