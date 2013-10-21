@@ -21,7 +21,8 @@ use feature qw(switch);
 #   external_name:      name of external wiki (defaults to Wikipedia)
 #   external_root:      HTTP address of external wiki root (defaults to en.wikipedia.org)
 #   rounding:           'normal', 'up', or 'down' for how dimensions should be rounded.
-#   image_dimension_calculator: code returning dimensions of a resized image
+#   image_calc:         code returning dimensions of a resized image
+#
 
 # Image sizing with a server:
 #
@@ -74,7 +75,7 @@ our %wiki_defaults = (
     external_name   => 'Wikipedia',
     external_root   => 'http://en.wikipedia.org/wiki',
     rounding        => 'normal',
-    image_dimension_calculator => \&_default_calculator
+    image_calc      => \&_default_calculator
 );
 
 # create a new page.

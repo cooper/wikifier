@@ -79,6 +79,10 @@ use Wikifier;
 #
 #       cache_directory:    local directory for storing cached pages and images. (writable)
 #
+#       wkfr_directory:     local directory of wikifier repository.
+#
+#       cat_directory:      local directory containing category files.
+#
 #
 #   === Provided automatically by Wikifier::Wiki (always the same when using ::Wiki) ===
 #
@@ -90,7 +94,7 @@ use Wikifier;
 #
 #       image_root:         HTTP address of file directory, such as http://example.com/files .
 #
-#       image_dimension_calculator: code returning dimensions of a resized image
+#       image_calc:         code returning dimensions of a resized image
 #
 #
 ##############################
@@ -132,7 +136,7 @@ sub new {
     };
     
     # we use GD for image size finding because it is already a dependency of WiWiki.
-    $wiki->{image_dimension_calculator} = sub {
+    $wiki->{image_calc} = sub {
         my %img = @_;
         
         my $file = $img{page}->wiki_info('image_directory').q(/).$img{file};
@@ -184,7 +188,8 @@ sub read_config {
         image_directory => $conf->get('dir.image'),
         cache_directory => $conf->get('dir.cache'),
         page_directory  => $conf->get('dir.page'),
-        wkfr_directory  => $conf->get('dir.wkfr')
+        wkfr_directory  => $conf->get('dir.wikifier')
+        cat_directory   => $conf->get('dir.category')
     );
     
     $wiki->{$_} = $opts{$_} foreach keys %opts;
