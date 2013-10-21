@@ -591,6 +591,10 @@ sub file_contents {
     return $content;
 }
 
+##################
+### CATEGORIES ###
+##################
+
 # deal with categories after parsing a page.
 sub check_categories {
     my $page = shift;
@@ -598,11 +602,11 @@ sub check_categories {
     return if !$cats || ref $cats ne 'HASH';
     $page->{categories} = [keys %$cats];
     
-    add_page_cat($page, $_) foreach keys %$cats;
+    cat_add_page($page, $_) foreach keys %$cats;
 }
 
 # add a page to a category if it is not in it already.
-sub add_page_cat {
+sub cat_add_page {
     my ($page, $category) = @_;
     my $cat_file = $page->wiki_info('cat_directory').q(/).$category.q(.cat);
     
@@ -614,7 +618,6 @@ sub add_page_cat {
     # the category does not yet exist.
     open my $fh, '>', $cat_file;
     
-    # save prefixing data.
     my $time = time;
     print {$fh} JSON->new->pretty(1)->encode({
         category   => $category,
@@ -624,6 +627,76 @@ sub add_page_cat {
     
     # save the content.
     close $fh;
+    
+}
+
+# returns the names of the pages in the given category.
+# if the category does not exist, an undefined value is returned.
+sub cat_get_pages {
+    my $category = shift;
+    # this should read a file for pages of a category.
+    # it should then check if the 'asof' time is older than the modification date of the
+    # page file in question. if it is, it should check the page again. if it still in
+    # the category, the time in the cat file should be updated to the current time. if it
+    # is no longer in the category, it should be removed from the cat file.
+    
+    # this category does not exist.
+    my $cat_file = $page->wiki_info('cat_directory').q(/).$category.q(.cat);
+    return unless -f $cat_file;
+    
+    # it exists; let's see what's inside.
+    my $cat = eval { decode_json(file_contents($cat_file)) };
+    return if !$cat || ref $cat ne 'HASH'; # an error or something happened.
+    
+    # check each page's modification date.
+    my ($changed, @final_pages) = @_;
+    PAGE: foreach my $p (@{ $cat->{pages} || [] }) {
+        my $page_name = $p->{page};
+        
+        # determine the page file name.
+        my $page_path = abs_path($wiki->opt('page_directory').q(/).$page_name);
+        
+        # page no longer exists.
+        if (!-f $path_path) {
+            $changed = 1;
+            next PAGE;
+        }
+        
+        # check if the modification date is more recent than as of date.
+        $mod_date = (stat $page_path)[9];
+        if ($mod_date > $p->{asof}) {
+        
+            # the page has since been modified.
+            # we will create a dummy Wikifier::Page that will stop after reading variables.
+            my $page = Wikifier::Page->new(
+                name      => $page_name,
+                file      => $page_path,
+                wikifier  => $wiki->{wikifier},
+                vars_only => 1
+            );
+            $page->parse;
+            
+            # page is no longer member of category.
+            if (!$page->get("category.$category")) {
+                $changed = 1;
+                next PAGE;
+            }
+            
+        }
+        
+        # nothing has changed. this one made it.
+        push @final_pages, $page_name;
+        
+    }
+    
+    # it looks like something has changed. we need to update the cat file.
+    if ($changed) {
+        my $time = time;
+        $cat->{pages} = [ map { my $h = { page => $_, asof => $time } } @final_pages ];
+        open my $fh, '>', $cat_file;
+        print {$fh} JSON->new->pretty(1)->encode($cat);
+        close $fh;
+    }
     
 }
 
