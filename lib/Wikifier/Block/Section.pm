@@ -41,7 +41,7 @@ sub _result {
     else {
        my $title = $page->get('page.title');
        $string .= "    <h1 class=\"wiki-section-page-title\">$title</h1>\n"
-       unless $page->{no_page_title};
+       unless $page->wiki_info('no_page_title');
     }
    
     # append the indented HTML of each contained block.
