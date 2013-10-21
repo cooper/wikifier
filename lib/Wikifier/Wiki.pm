@@ -698,6 +698,7 @@ sub cat_get_pages {
         close $fh;
     }
     
+    return @final_pages;
 }
 
 1
