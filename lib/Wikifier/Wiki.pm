@@ -364,7 +364,7 @@ sub display_page {
     
     # parse the page.
     $page->parse();
-    check_categories($page);
+    $wiki->check_categories($page);
     
     # generate the HTML and headers.
     $result->{type}       = 'page';
@@ -597,18 +597,18 @@ sub file_contents {
 
 # deal with categories after parsing a page.
 sub check_categories {
-    my $page = shift;
+    my ($wiki, $page) = @_;
     my $cats = $page->get('category');
     return if !$cats || ref $cats ne 'HASH';
     $page->{categories} = [keys %$cats];
     
-    cat_add_page($page, $_) foreach keys %$cats;
+    $wiki->cat_add_page($page, $_) foreach keys %$cats;
 }
 
 # add a page to a category if it is not in it already.
 sub cat_add_page {
-    my ($page, $category) = @_;
-    my $cat_file = $page->wiki_info('cat_directory').q(/).$category.q(.cat);
+    my ($wiki, $page, $category) = @_;
+    my $cat_file = $wiki->{cat_directory}.q(/).$category.q(.cat);
     
     # first, check if the category exists yet.
     if (-f $cat_file) {
@@ -633,7 +633,7 @@ sub cat_add_page {
 # returns the names of the pages in the given category.
 # if the category does not exist, an undefined value is returned.
 sub cat_get_pages {
-    my $category = shift;
+    my ($wiki, $category) = @_;
     # this should read a file for pages of a category.
     # it should then check if the 'asof' time is older than the modification date of the
     # page file in question. if it is, it should check the page again. if it still in
@@ -641,7 +641,7 @@ sub cat_get_pages {
     # is no longer in the category, it should be removed from the cat file.
     
     # this category does not exist.
-    my $cat_file = $page->wiki_info('cat_directory').q(/).$category.q(.cat);
+    my $cat_file = $wiki->{cat_directory}.q(/).$category.q(.cat);
     return unless -f $cat_file;
     
     # it exists; let's see what's inside.
