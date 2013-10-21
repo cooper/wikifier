@@ -615,10 +615,11 @@ sub add_page_cat {
     open my $fh, '>', $cat_file;
     
     # save prefixing data.
+    my $time = time;
     print {$fh} JSON->new->pretty(1)->encode({
         category   => $category,
-        created    => time,
-        pages      => [ $page->{name} ]
+        created    => $time,
+        pages      => [ { page => $page->{name}, asof => $time } ]
     });
     
     # save the content.
