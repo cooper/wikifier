@@ -44,7 +44,7 @@ sub handle_wiki {
 # page request.
 sub handle_page {
     my ($connection, $msg) = _required(@_, 'name') or return;
-    my $result = $connection->{wiki}->display_page($msg->{name});
+    my $result = $connection->{wiki}->display_page($msg->{name}, 1);
     delete $result->{page};
     $connection->send('page', $result);
     say "Page '$$msg{name}' requested by $$connection{id}";

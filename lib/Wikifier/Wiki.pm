@@ -60,6 +60,8 @@ use Wikifier;
 #
 #   external_name:      the string name of the external wiki (i.e. Wikipedia)
 #
+#   no_page_title:      true if page titles should not be included in resulting HTML
+#
 #
 #   === HTTP address roots ===
 #
@@ -168,6 +170,7 @@ sub read_config {
         enable_image_caching    => $conf->get('enable.cache.image'),
         enable_retina_display   => $conf->get('enable.retina_display'),
         restrict_image_size     => $conf->get('enable.image_size_restrictor'),
+        no_page_title           => !$conf->get('enable.page_titles'),
 
         name            => $conf->get('wiki.name'),
         variables       => $conf->get('var'),
