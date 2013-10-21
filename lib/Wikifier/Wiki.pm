@@ -365,13 +365,18 @@ sub display_page {
     $page->parse();
     
     # generate the HTML and headers.
-    $result->{type}      = 'page';
-    $result->{content}   = $page->html();
-    $result->{length}    = length $result->{content};
-    $result->{title}     = $page->get('page.title');
-    $result->{created}   = $page->get('page.created') if $page->get('page.created');
-    $result->{generated} = 1;
-    $result->{modified}  = time2str(time);
+    $result->{type}       = 'page';
+    $result->{content}    = $page->html();
+    $result->{length}     = length $result->{content};
+    $result->{title}      = $page->get('page.title');
+    $result->{created}    = $page->get('page.created') if $page->get('page.created');
+    $result->{generated}  = 1;
+    $result->{modified}   = time2str(time);
+    $result->{categories} = keys %{
+        $page->get('category') &&
+        ref $page->get('category') eq 'HASH' ?
+        $page->get('category') : {}
+    };
     
     # caching is enabled, so let's save this for later.
     if ($wiki->opt('enable_page_caching')) {
@@ -380,8 +385,9 @@ sub display_page {
         
         # save prefixing data.
         print {$fh} encode_json({
-            title   => $result->{title},
-            created => $result->{created}
+            title      => $result->{title},
+            created    => $result->{created},
+            categories => $result->{categories} || []
         }), "\n";
         
         # save the content.
