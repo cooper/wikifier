@@ -68,6 +68,12 @@ sub handle_line {
         return 1;
     }
     
+    # variable boolean.
+    elsif ($line =~ m/^\s*\@([\w\.]+);\s*$/) {
+        $page->set($1, 1);
+        return 1;
+    }
+    
     # illegal regex for __END__
     if ($line =~ m/^\s*__END__\s*$/) {
         return;
