@@ -298,7 +298,7 @@ sub display_page {
     }
     
     # determine the page file name.
-    my $file       = abs_path($wiki->opt('page_directory') .q(/).$page_name);
+    my $file       = abs_path($wiki->opt('page_directory').q(/).$page_name);
     my $cache_file = $wiki->opt('cache_directory').q(/).$page_name.q(.cache);
     
     # file does not exist.
@@ -356,6 +356,7 @@ sub display_page {
     
     # cache was not used. generate a new copy.
     my $page = $result->{page} = Wikifier::Page->new(
+        name     => $page_name,
         file     => $file,
         wiki     => $wiki,
         wikifier => $wiki->{wikifier}
@@ -363,6 +364,7 @@ sub display_page {
     
     # parse the page.
     $page->parse();
+    check_categories($page);
     
     # generate the HTML and headers.
     $result->{type}       = 'page';
@@ -372,11 +374,7 @@ sub display_page {
     $result->{created}    = $page->get('page.created') if $page->get('page.created');
     $result->{generated}  = 1;
     $result->{modified}   = time2str(time);
-    $result->{categories} = keys %{
-        $page->get('category') &&
-        ref $page->get('category') eq 'HASH' ?
-        $page->get('category') : {}
-    };
+    $result->{categories} = $page->{categories} if $page->{categories};
     
     # caching is enabled, so let's save this for later.
     if ($wiki->opt('enable_page_caching')) {
@@ -591,6 +589,41 @@ sub file_contents {
     my $content = <$fh>;
     close $fh;
     return $content;
+}
+
+# deal with categories after parsing a page.
+sub check_categories {
+    my $page = shift;
+    my $cats = $page->get('category');
+    return if !$cats || ref $cats ne 'HASH';
+    $page->{categories} = [keys %$cats];
+    
+    add_page_cat($page, $_) foreach keys %$cats;
+}
+
+# add a page to a category if it is not in it already.
+sub add_page_cat {
+    my ($page, $category) = @_;
+    my $cat_file = $page->wiki_opt('cat_directory').q(/).$category.q(.cat);
+    
+    # first, check if the category exists yet.
+    if (-f $cat_file) {
+        return 1;
+    }
+    
+    # the category does not yet exist.
+    open my $fh, '>', $cat_file;
+    
+    # save prefixing data.
+    print {$fh} JSON->new->pretty(1)->encode({
+        category   => $category
+        created    => time,
+        pages      => [ $page->{name} ]
+    });
+    
+    # save the content.
+    close $fh;
+    
 }
 
 1
