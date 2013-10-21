@@ -612,6 +612,7 @@ sub check_categories {
 sub cat_add_page {
     my ($wiki, $page, $category) = @_;
     my $cat_file = $wiki->{cat_directory}.q(/).$category.q(.cat);
+    my $time = time;
     
     # first, check if the category exists yet.
     if (-f $cat_file) {
@@ -624,14 +625,13 @@ sub cat_add_page {
     # fetch page infos.
     my $p_vars = $page->get('page');
     my $page_data = {
-        page    => $page_name,
+        page    => $page->{name},
         asof    => $time
     };
     if (ref $p_vars eq 'HASH') {
         $page_data->{$_} = $p_vars->{$_} foreach keys %$p_vars;
     }
     
-    my $time = time;
     print {$fh} JSON->new->pretty(1)->encode({
         category   => $category,
         created    => $time,
