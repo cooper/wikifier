@@ -657,13 +657,13 @@ sub cat_get_pages {
         my $page_path = abs_path($wiki->opt('page_directory').q(/).$page_name);
         
         # page no longer exists.
-        if (!-f $path_path) {
+        if (!-f $page_path) {
             $changed = 1;
             next PAGE;
         }
         
         # check if the modification date is more recent than as of date.
-        $mod_date = (stat $page_path)[9];
+        my $mod_date = (stat $page_path)[9];
         if ($mod_date > $p->{asof}) {
         
             # the page has since been modified.
