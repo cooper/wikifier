@@ -631,7 +631,7 @@ sub cat_add_page {
     if (ref $p_vars eq 'HASH') {
         foreach my $var (keys %$p_vars) {
             next if $var eq 'page' || $var eq 'asof';
-            $page_data->{$var} = $p_vars{$var};
+            $page_data->{$var} = $p_vars->{$var};
         }
     }
     
@@ -702,7 +702,7 @@ sub cat_get_pages {
             if (ref $p_vars eq 'HASH') {
                 foreach my $var (keys %$p_vars) {
                     next if $var eq 'page' || $var eq 'asof';
-                    $page_data->{$var} = $p_vars{$var};
+                    $page_data->{$var} = $p_vars->{$var};
                 }
             }
             
