@@ -621,16 +621,21 @@ sub cat_add_page {
     # the category does not yet exist.
     open my $fh, '>', $cat_file; # XXX: what if this errors out?
     
+    # fetch page infos.
+    my $p_vars = $page->get('page');
+    my $page_data = {
+        page    => $page_name,
+        asof    => $time
+    };
+    if (ref $p_vars eq 'HASH') {
+        $page_data->{$_} = $p_vars->{$_} foreach keys %$p_vars;
+    }
+    
     my $time = time;
     print {$fh} JSON->new->pretty(1)->encode({
         category   => $category,
         created    => $time,
-        pages      => [ {
-            page    => $page->{name},
-            title   => $page->get('page.title'),
-            created => $page->get('page.created'),
-            asof    => $time
-        } ]
+        pages      => [ $page_data ]
     });
     
     # save the content.
@@ -686,12 +691,14 @@ sub cat_get_pages {
             $page->parse;
             
             # update data.
+            my $p_vars = $page->get('page');
             $page_data = {
                 page    => $page_name,
-                title   => $page->get('page.title'),
-                created => $page->get('page.created'),
                 asof    => $time
             };
+            if (ref $p_vars eq 'HASH') {
+                $page_data->{$_} = $p_vars->{$_} foreach keys %$p_vars;
+            }
             
             # page is no longer member of category.
             if (!$page->get("category.$category")) {
