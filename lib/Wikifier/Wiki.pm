@@ -188,7 +188,7 @@ sub read_config {
         image_directory => $conf->get('dir.image'),
         cache_directory => $conf->get('dir.cache'),
         page_directory  => $conf->get('dir.page'),
-        wkfr_directory  => $conf->get('dir.wikifier')
+        wkfr_directory  => $conf->get('dir.wikifier'),
         cat_directory   => $conf->get('dir.category')
     );
     
