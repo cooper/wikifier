@@ -18,8 +18,9 @@ use feature qw(switch);
 use GD;                     # used for image sizing
 use HTTP::Date 'time2str';  # used for HTTP date formatting
 use Digest::MD5 'md5_hex';  # used for etags
-use Carp;
 use Cwd 'abs_path';
+use JSON qw(encode_json decode_json);
+use Carp;
 
 use Wikifier;
 
@@ -326,12 +327,18 @@ sub display_page {
             $result->{type}     = 'page';
             $result->{content}  = "<!-- cached page dated $time -->\n";
             
-            # fetch the title.
+            # fetch the prefixing data.
             my $cache_data = file_contents($cache_file);
             my @data = split /\n/, $cache_data;
             
+            # decode.
+            my $jdata = eval { decode_json(shift @data) } || {};
+            if (ref $jdata eq 'HASH') {
+                $result->{$_} = $jdata->{$_} foreach keys %$jdata;
+            }
+            
             # set HTTP data.
-            $result->{title}    = shift @data;
+            
             $result->{content} .= join "\n", @data;
             $result->{cached}   = 1;
             $result->{modified} = $time;
@@ -365,8 +372,16 @@ sub display_page {
     if ($wiki->opt('enable_page_caching')) {
     
         open my $fh, '>', $cache_file;
-        print {$fh} $result->{title}, "\n";
+        
+        # save prefixing data.
+        print {$fh} encode_json({
+            title   => $result->{title},
+            created => $result->{created}
+        }), "\n";
+        
+        # save the content.
         print {$fh} $result->{content};
+        
         close $fh;
         
         # overwrite modified date to actual.
