@@ -626,7 +626,7 @@ sub cat_add_page {
         category   => $category,
         created    => $time,
         pages      => [ {
-            page    => $page_name,
+            page    => $page->{name},
             title   => $page->get('page.title'),
             created => $page->get('page.created'),
             asof    => $time
