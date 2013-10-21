@@ -615,7 +615,7 @@ sub cat_add_page {
     my $time = time;
     
     # first, check if the category exists yet.
-    if (-f $cat_file) {
+    if (-f $cat_file) { # TODO: do something about it.
         return 1;
     }
     
@@ -629,7 +629,10 @@ sub cat_add_page {
         asof    => $time
     };
     if (ref $p_vars eq 'HASH') {
-        $page_data->{$_} = $p_vars->{$_} foreach keys %$p_vars;
+        foreach my $var (keys %$p_vars) {
+            next if $var eq 'page' || $var eq 'asof';
+            $page_data->{$var} = $p_vars{$var};
+        }
     }
     
     print {$fh} JSON->new->pretty(1)->encode({
@@ -697,7 +700,10 @@ sub cat_get_pages {
                 asof    => $time
             };
             if (ref $p_vars eq 'HASH') {
-                $page_data->{$_} = $p_vars->{$_} foreach keys %$p_vars;
+                foreach my $var (keys %$p_vars) {
+                    next if $var eq 'page' || $var eq 'asof';
+                    $page_data->{$var} = $p_vars{$var};
+                }
             }
             
             # page is no longer member of category.
