@@ -616,7 +616,7 @@ sub add_page_cat {
     
     # save prefixing data.
     print {$fh} JSON->new->pretty(1)->encode({
-        category   => $category
+        category   => $category,
         created    => time,
         pages      => [ $page->{name} ]
     });
