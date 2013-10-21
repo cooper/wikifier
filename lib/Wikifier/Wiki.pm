@@ -604,7 +604,7 @@ sub check_categories {
 # add a page to a category if it is not in it already.
 sub add_page_cat {
     my ($page, $category) = @_;
-    my $cat_file = $page->wiki_opt('cat_directory').q(/).$category.q(.cat);
+    my $cat_file = $page->wiki_info('cat_directory').q(/).$category.q(.cat);
     
     # first, check if the category exists yet.
     if (-f $cat_file) {
