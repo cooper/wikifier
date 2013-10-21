@@ -74,6 +74,9 @@ sub handle_line {
         return 1;
     }
     
+    # only parsing variables.
+    return 1 if $page->{vars_only};
+    
     # illegal regex for __END__
     if ($line =~ m/^\s*__END__\s*$/) {
         return;

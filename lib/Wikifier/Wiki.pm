@@ -166,7 +166,10 @@ sub new {
 # read options from a configuration page file.
 sub read_config {
     my ($wiki, $file) = @_;
-    my $conf = Wikifier::Page->new(file => $file);
+    my $conf = Wikifier::Page->new(
+        file      => $file,
+        vars_only => 1       # don't waste time parsing anything but variables
+    );
     $conf->parse or croak; # XXX: probably shouldn't croak.
     
     my %opts = (
@@ -616,13 +619,18 @@ sub cat_add_page {
     }
     
     # the category does not yet exist.
-    open my $fh, '>', $cat_file;
+    open my $fh, '>', $cat_file; # XXX: what if this errors out?
     
     my $time = time;
     print {$fh} JSON->new->pretty(1)->encode({
         category   => $category,
         created    => $time,
-        pages      => [ { page => $page->{name}, asof => $time } ]
+        pages      => [ {
+            page    => $page_name,
+            title   => $page->get('page.title'),
+            created => $page->get('page.created'),
+            asof    => $time
+        } ]
     });
     
     # save the content.
@@ -649,9 +657,10 @@ sub cat_get_pages {
     return if !$cat || ref $cat ne 'HASH'; # an error or something happened.
     
     # check each page's modification date.
-    my ($changed, @final_pages) = @_;
+    my ($time, $changed, @final_pages) = time;
     PAGE: foreach my $p (@{ $cat->{pages} || [] }) {
         my $page_name = $p->{page};
+        my $page_data = $p;
         
         # determine the page file name.
         my $page_path = abs_path($wiki->opt('page_directory').q(/).$page_name);
@@ -672,9 +681,17 @@ sub cat_get_pages {
                 name      => $page_name,
                 file      => $page_path,
                 wikifier  => $wiki->{wikifier},
-                vars_only => 1
+                vars_only => 1 # don't waste time parsing anything but variables
             );
             $page->parse;
+            
+            # update data.
+            $page_data = {
+                page    => $page_name,
+                title   => $page->get('page.title'),
+                created => $page->get('page.created'),
+                asof    => $time
+            };
             
             # page is no longer member of category.
             if (!$page->get("category.$category")) {
@@ -685,15 +702,14 @@ sub cat_get_pages {
         }
         
         # nothing has changed. this one made it.
-        push @final_pages, $page_name;
+        push @final_pages, $page_data;
         
     }
     
     # it looks like something has changed. we need to update the cat file.
     if ($changed) {
-        my $time = time;
-        $cat->{pages} = [ map { my $h = { page => $_, asof => $time } } @final_pages ];
-        open my $fh, '>', $cat_file;
+        $cat->{pages} = \@final_pages;
+        open my $fh, '>', $cat_file; # XXX: what if this errors out?
         print {$fh} JSON->new->pretty(1)->encode($cat);
         close $fh;
     }
