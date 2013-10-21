@@ -354,6 +354,7 @@ sub display_page {
     $result->{content}   = $page->html();
     $result->{length}    = length $result->{content};
     $result->{title}     = $page->get('page.title');
+    $result->{created}   = $page->get('page.created') if $page->get('page.created');
     $result->{generated} = 1;
     $result->{modified}  = time2str(time);
     
