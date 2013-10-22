@@ -86,6 +86,7 @@ class Wikiclient {
     
     // send a category posts request.
     public function catposts($category, $page_n) {
+        if (!$this->connected) $this->connect();
         return $this->command('catposts', array(
             'name'   => $category,
             'page_n' => $page_n
