@@ -658,6 +658,12 @@ sub cat_add_page {
         }
         
         push @final_pages, $page_data;
+        $cat->{pages} = \@final_pages;
+        
+        open my $fh, '>', $cat_file; # XXX: what if this errors out?
+        print {$fh} JSON->new->pretty(1)->encode($cat);
+        close $fh;
+        
         return 1;
     }
     
