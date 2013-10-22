@@ -83,6 +83,14 @@ class Wikiclient {
             'height' => $height
         ));
     }
+    
+    // send a category posts request.
+    public function catposts($category, $page_n) {
+        return $this->command('catposts', array(
+            'name'   => $category,
+            'page_n' => $page_n
+        ));
+    }
 
 }
 
