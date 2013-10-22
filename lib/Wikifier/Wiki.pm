@@ -609,8 +609,8 @@ sub display_category_posts {
     $result->{category} = $category;
     $result->{pages}    = [];
     
-    foreach my $page_name (@$pages) {
-        push @{ $result->{pages} }, $wiki->display_page($page_name);
+    foreach my $page_data (@$pages) {
+        push @{ $result->{pages} }, $wiki->display_page($page_data->{name});
     }
     
     return $result;
