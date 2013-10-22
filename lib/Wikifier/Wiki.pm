@@ -632,14 +632,6 @@ sub cat_add_page {
     my $cat_file = $wiki->{cat_directory}.q(/).$category.q(.cat);
     my $time = time;
     
-    # first, check if the category exists yet.
-    if (-f $cat_file) { # TODO: do something about it.
-        return 1;
-    }
-    
-    # the category does not yet exist.
-    open my $fh, '>', $cat_file; # XXX: what if this errors out?
-    
     # fetch page infos.
     my $p_vars = $page->get('page');
     my $page_data = {
@@ -652,6 +644,25 @@ sub cat_add_page {
             $page_data->{$var} = $p_vars->{$var};
         }
     }
+    
+    # first, check if the category exists yet.
+    if (-f $cat_file) {
+        my $cat = eval { decode_json(file_contents($cat_file)) };
+        return if !$cat || ref $cat ne 'HASH'; # an error or something happened.
+        
+        # remove from the category if it's there already.
+        my @final_pages;
+        foreach my $p (@{ $cat->{pages} }) {
+            next if $p->{page} eq $page->{name};
+            push @final_pages, $p;
+        }
+        
+        push @final_pages, $page_data;
+        return 1;
+    }
+    
+    # the category does not yet exist.
+    open my $fh, '>', $cat_file; # XXX: what if this errors out?
     
     print {$fh} JSON->new->pretty(1)->encode({
         category   => $category,
