@@ -300,7 +300,7 @@ sub display_page {
     $page_name = lc $page_name;
     
     # append .page if it isn't already there.
-    if (substr($page_name, -1, 5) ne 'page') {
+    if ($page_name !~ m/\.page$/) {
         $page_name .= q(.page);
     }
     
