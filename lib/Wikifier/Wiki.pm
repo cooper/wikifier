@@ -610,7 +610,7 @@ sub display_category_posts {
     $result->{pages}    = [];
     
     foreach my $page_data (@$pages) {
-        push @{ $result->{pages} }, $wiki->display_page($page_data->{name});
+        push @{ $result->{pages} }, $wiki->display_page($page_data->{page});
     }
     
     return $result;
