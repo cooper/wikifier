@@ -287,6 +287,10 @@ sub display {
     return {}; # FIXME
 }
 
+#############
+### PAGES ###
+#############
+
 # Displays a page.
 sub display_page {
     my ($wiki, $page_name) = @_; my $result = {};
@@ -404,6 +408,10 @@ sub display_page {
     
     return $result;
 }
+
+##############
+### IMAGES ###
+##############
 
 # Displays an image of the supplied dimensions.
 sub display_image {
@@ -583,20 +591,30 @@ sub display_image {
     return $result;
 }
 
-# returns entire contents of a file.
-sub file_contents {
-    my ($file, $binary) = @_;
-    local $/ = undef;
-    open my $fh, '<', $file;
-    binmode $fh if $binary;
-    my $content = <$fh>;
-    close $fh;
-    return $content;
-}
-
 ##################
 ### CATEGORIES ###
 ##################
+
+# displays a pages from a category in a blog-like form.
+sub display_category_posts {
+    my ($wiki, $category, $page_n) = @_; my $result = {};
+    my $pages = $wiki->cat_get_pages($category);
+    if (!$pages) {
+        $result->{error} = "Category '$category' does not exist";
+        $result->{type}  = 'not found';
+        return $result;
+    }
+    
+    $result->{type}     = 'catposts';
+    $result->{category} = $category;
+    $result->{pages}    = [];
+    
+    foreach my $page_name (@$pages) {
+        push @{ $result->{pages} }, $wiki->display_page($page_name);
+    }
+    
+    return $result;
+}
 
 # deal with categories after parsing a page.
 sub check_categories {
@@ -727,7 +745,22 @@ sub cat_get_pages {
         close $fh;
     }
     
-    return @final_pages;
+    return \@final_pages;
+}
+
+#####################
+### MISCELLANEOUS ###
+#####################
+
+# returns entire contents of a file.
+sub file_contents {
+    my ($file, $binary) = @_;
+    local $/ = undef;
+    open my $fh, '<', $file;
+    binmode $fh if $binary;
+    my $content = <$fh>;
+    close $fh;
+    return $content;
 }
 
 1

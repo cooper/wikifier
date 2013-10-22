@@ -63,6 +63,14 @@ sub handle_image {
     say "Image '$$msg{name}' requested by $$connection{id}";
 }
 
+# category posts.
+sub handle_catposts {
+    my ($connection, $msg) = _required(@_, 'name') or return;
+    my $result = $connection->{wiki}->display_category_posts($msg->{name});
+    $connection->send('catposts', $result);
+    say "Category posts for '$$msg{name}' requested by $$connection{id}";
+}
+
 # check for all required things.
 # disconnect from the client if one is missing.
 sub _required {
