@@ -622,7 +622,7 @@ sub display_category_posts {
     }
     
     # order with newest first.
-    my @pages_in_order = sort { $pagecreates{$a} cmp $pagecreates{$b} } keys %p;
+    my @pages_in_order = sort { $p{$a} cmp $p{$b} } keys %p;
     $result->{pages} = \@pages_in_order;
     
     return $result;
