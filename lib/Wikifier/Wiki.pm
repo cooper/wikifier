@@ -310,7 +310,7 @@ sub display_page {
     
     # file does not exist.
     if (!-f $file) {
-        $result->{error} = "File '$file' not found";
+        $result->{error} = "Page '$page_name' does not exist.";
         $result->{type}  = 'not found';
         return $result;
     }
@@ -432,7 +432,7 @@ sub display_image {
     my $file = abs_path($wiki->opt('image_directory').q(/).$image_name);
     if (!-f $file) {
         $result->{type}  = 'not found';
-        $result->{error} = 'image does not exist';
+        $result->{error} = "Image '$image_name' does not exist.";
         return $result;
     }
     
@@ -525,7 +525,7 @@ sub display_image {
     if ($wiki->opt('restrict_image_size')) {
         if (!$wiki->{allowed_dimensions}{$image_name}{$scaled_w.q(x).$scaled_h}) {
             $result->{type}  = 'not found';
-            $result->{error} = 'invalid image size.';
+            $result->{error} = "Image '$image_name' does not exist in these dimensions.";
             return $result;
         }
     }
@@ -534,7 +534,7 @@ sub display_image {
     else {
         if ($width > 1500 || $height > 1500) {
             $result->{type}  = 'not found';
-            $result->{error} = 'that is way bigger than an image on a wiki should be.';
+            $result->{error} = 'that is way bigger than an image on a wiki should be.'; # FIXME: just remove this nonsense already
             return $result;
         }
     }
@@ -600,7 +600,7 @@ sub display_category_posts {
     my ($wiki, $category, $page_n) = @_; my $result = {};
     my $pages = $wiki->cat_get_pages($category);
     if (!$pages) {
-        $result->{error} = "Category '$category' does not exist";
+        $result->{error} = "Category '$category' does not exist.";
         $result->{type}  = 'not found';
         return $result;
     }
