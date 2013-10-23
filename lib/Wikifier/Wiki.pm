@@ -609,9 +609,21 @@ sub display_category_posts {
     $result->{category} = $category;
     $result->{pages}    = [];
     
+    my %p;
     foreach my $page_data (@$pages) {
-        push @{ $result->{pages} }, $wiki->display_page($page_data->{page});
+        my $page = Wikifier::Page->new(
+            name      => $page_data->{page},
+            file      => $wiki->{page_directory}.q(/).$page_data->{page},
+            wikifier  => $wiki->{wikifier},
+            vars_only => 1 # don't waste time parsing anything but variables
+        );
+        $page->parse;
+        $p{ $page_data->{page} } = $page->get('page.created') || 0;
     }
+    
+    # order with newest first.
+    my @pages_in_order = sort { $pagecreates{$a} cmp $pagecreates{$b} } keys %p;
+    $result->{pages} = \@pages_in_order;
     
     return $result;
 }
