@@ -598,7 +598,7 @@ sub display_image {
 # displays a pages from a category in a blog-like form.
 sub display_category_posts {
     my ($wiki, $category, $page_n) = @_; my $result = {};
-    my $page_names = $wiki->cat_get_pages($category);
+    my ($page_names, $title) = $wiki->cat_get_pages($category);
     if (!$page_names) {
         $result->{error} = "Category '$category' does not exist.";
         $result->{type}  = 'not found';
@@ -607,6 +607,7 @@ sub display_category_posts {
     
     $result->{type}     = 'catposts';
     $result->{category} = $category;
+    $result->{title}    = $title if defined $title;
     
     my (%times, %reses);
     foreach my $page_data (@$page_names) {
@@ -770,7 +771,7 @@ sub cat_get_pages {
         close $fh;
     }
     
-    return \@final_pages;
+    return wantarray ? (\@final_pages, $cat->{title}) : \@final_pages;
 }
 
 #####################
