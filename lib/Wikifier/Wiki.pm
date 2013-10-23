@@ -598,8 +598,8 @@ sub display_image {
 # displays a pages from a category in a blog-like form.
 sub display_category_posts {
     my ($wiki, $category, $page_n) = @_; my $result = {};
-    my $pages = $wiki->cat_get_pages($category);
-    if (!$pages) {
+    my $page_names = $wiki->cat_get_pages($category);
+    if (!$page_names) {
         $result->{error} = "Category '$category' does not exist.";
         $result->{type}  = 'not found';
         return $result;
@@ -607,22 +607,18 @@ sub display_category_posts {
     
     $result->{type}     = 'catposts';
     $result->{category} = $category;
-    $result->{pages}    = [];
     
-    my %p;
-    foreach my $page_data (@$pages) {
-        my $page = Wikifier::Page->new(
-            name      => $page_data->{page},
-            file      => $wiki->{page_directory}.q(/).$page_data->{page},
-            wikifier  => $wiki->{wikifier},
-            vars_only => 1 # don't waste time parsing anything but variables
-        );
-        $page->parse;
-        $p{ $page_data->{page} } = $page->get('page.created') || 0;
+    my (%times, %reses);
+    foreach my $page_data (@$page_names) {
+        my $res  = $wiki->display_page($page_data->{page});
+        my $time = $res->{page} ? $res->{page}->get('page.created') : 0;
+        $times{ $page_data->{page} } = $time || 0;
+        $reses{ $page_data->{page} } = $res;
     }
     
     # order with newest first.
-    my @pages_in_order = sort { $p{$a} cmp $p{$b} } keys %p;
+    my @pages_in_order = sort { $times{$a} cmp $times{$b} } keys %times;
+    @pages_in_order    = map { $reses{$_} } @pages_in_order;
     $result->{pages} = \@pages_in_order;
     
     return $result;
