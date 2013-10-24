@@ -457,7 +457,7 @@ sub display_image {
     # if no width or height are specified,
     # display the full-sized version of the image.
     if (!$retina and !$width || !$height) {
-        $result->{content}      = file_contents($file, 1);
+        $result->{content}      = file_contents($file, 1) unless $dont_open;
         $result->{modified}     = time2str($stat[9]);
         $result->{length}       = $stat[7];
         $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
