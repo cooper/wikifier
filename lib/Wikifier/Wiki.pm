@@ -619,7 +619,7 @@ sub display_category_posts {
     }
     
     # order with newest first.
-    my @pages_in_order = sort { $times{$a} cmp $times{$b} } keys %times;
+    my @pages_in_order = sort { $times{$b} cmp $times{$a} } keys %times;
     @pages_in_order    = map  { $reses{$_} } @pages_in_order;
     $result->{pages} = \@pages_in_order;
     
