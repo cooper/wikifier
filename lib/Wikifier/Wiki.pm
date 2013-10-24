@@ -726,7 +726,8 @@ sub cat_get_pages {
         # check if the modification date is more recent than as of date.
         my $mod_date = (stat $page_path)[9];
         if ($mod_date > $p->{asof}) {
-        
+            $changed = 1;
+            
             # the page has since been modified.
             # we will create a dummy Wikifier::Page that will stop after reading variables.
             my $page = Wikifier::Page->new(
@@ -751,10 +752,7 @@ sub cat_get_pages {
             }
             
             # page is no longer member of category.
-            if (!$page->get("category.$category")) {
-                $changed = 1;
-                next PAGE;
-            }
+            next PAGE unless $page->get("category.$category");
             
         }
         
@@ -765,7 +763,8 @@ sub cat_get_pages {
     
     # it looks like something has changed. we need to update the cat file.
     if ($changed) {
-        $cat->{pages} = \@final_pages;
+        $cat->{updated} = $time;
+        $cat->{pages}   = \@final_pages;
         open my $fh, '>', $cat_file; # XXX: what if this errors out?
         print {$fh} JSON->new->pretty(1)->encode($cat);
         close $fh;
