@@ -612,14 +612,15 @@ sub display_category_posts {
     my (%times, %reses);
     foreach my $page_data (@$page_names) {
         my $res  = $wiki->display_page($page_data->{page});
-        my $time = $res->{page} ? $res->{page}->get('page.created') : 0;
+        my $time = $res->{page} ? $res->{page}->get('page.created')
+                   : $res->{created} || 0;
         $times{ $page_data->{page} } = $time || 0;
         $reses{ $page_data->{page} } = $res;
     }
     
     # order with newest first.
     my @pages_in_order = sort { $times{$a} cmp $times{$b} } keys %times;
-    @pages_in_order    = map { $reses{$_} } @pages_in_order;
+    @pages_in_order    = map  { $reses{$_} } @pages_in_order;
     $result->{pages} = \@pages_in_order;
     
     return $result;
