@@ -19,7 +19,8 @@ sub new {
 # write a line of JSON-encoded data.
 sub send {
     my ($connection, @etc) = @_;
-    $connection->{stream}->write(encode_json(\@etc)."\n");
+    my $json = JSON->new->allow_blessed(1)->encode(\@etc);
+    $connection->{stream}->write("$json\n");
 }
 
 # close the connection.
