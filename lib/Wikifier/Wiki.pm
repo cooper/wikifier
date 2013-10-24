@@ -179,6 +179,7 @@ sub read_config {
         enable_retina_display   => $conf->get('enable.retina_display'),
         restrict_image_size     => $conf->get('enable.image_size_restrictor'),
         no_page_title           => !$conf->get('enable.page_titles'),
+        category_post_limit     => $conf->get('enable.category_post_limit'),
 
         name            => $conf->get('wiki.name'),
         variables       => $conf->get('var'),
@@ -621,7 +622,19 @@ sub display_category_posts {
     # order with newest first.
     my @pages_in_order = sort { $times{$b} cmp $times{$a} } keys %times;
     @pages_in_order    = map  { $reses{$_} } @pages_in_order;
-    $result->{pages} = \@pages_in_order;
+    #$result->{pages} = \@pages_in_order;
+    
+    # order into PAGES of pages. wow.
+    my $limit = $wiki->{category_post_limit};
+    my $n = 1;
+    while (@pages_in_order) {
+        $result->{pages}{$n} ||= [];
+        for (1..$limit) {
+            last unless @pages_in_order; # no more
+            push @{ $result->{pages}{$n} }, shift @pages_in_order;
+        }
+        $n++;
+    }
     
     return $result;
 }
