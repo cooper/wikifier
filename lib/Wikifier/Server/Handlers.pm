@@ -58,6 +58,7 @@ sub handle_image {
         $msg->{height} || 0,
         1
     );
+    delete $result->{content};
     $connection->send('image', $result);
     say "Image '$$msg{name}' requested by $$connection{id}";
 }
