@@ -114,8 +114,32 @@ sub create_block {
     return Wikifier::Block->new(%opts);
 }
 
+# load a block module.
 sub load_block {
+    my ($wikifier, $type) = @_;
+    return 1 if $block_types{$type};
+    
+    # is there a file?
+    my $file = q(lib/Wikifier/Block/).lc($type).q(.pm);
+    return if !-f $file && !-l $file;
+    
+    # do the file.
+    my $package = do $file or croak "error loading $type block module: ".($@ || $! || 'idk');
+    
+    # fetch blocks.
+    my %blocks;
+    {
+        no strict 'refs';
+        %blocks = %{qq(${package}::block_types)};
+    }
 
+    # register blocks.
+    foreach my $block_type (keys %blocks) {
+        $block_types{$block_type} = $blocks{$block_type};
+        # TODO: aliases.
+    }
+
+    return 1;
 }
 
 1
