@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright (c) 2013, Mitchell Cooper
+# Copyright (c) 2014, Mitchell Cooper
 #
 # This class represents a wiki language manager.
 # The same Wikifier instance may be used for several pages. However, the Wikifier object
@@ -17,7 +17,7 @@
 # Wikifier object now has this duty; Wikifier::Page objects represent a single page now.
 # (That makes more sense anyway, right?)
 #
-# As of this change that was implemented on February 13, 2013,
+# As of this change that was implemented on February 13, 2014,
 # this class is based upon several subclasses which each have different functions:
 #
 #   Parser:         parses a wiki language file, separating it into individual blocks.

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright (c) 2013, Mitchell Cooper
+# Copyright (c) 2014, Mitchell Cooper
 #
 # image blocks represent a single HTML image.
 # this is rarely used inside of a section. most images are displayed using imageboxes

@@ -1,4 +1,4 @@
-# Copyright (c) 2013, Mitchell Cooper
+# Copyright (c) 2014, Mitchell Cooper
 #
 # Wikifier::Utilities provides several functions used throughout the Wikifier.
 # It exports any of the functions as needed.

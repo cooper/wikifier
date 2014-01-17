@@ -1,4 +1,4 @@
-# Copyright (c) 2013, Mitchell Cooper
+# Copyright (c) 2014, Mitchell Cooper
 #
 # Wikifier::Parser is a function class of Wikifier which parses a wiki file.
 # The parser separates the file into block types and then passes those to 

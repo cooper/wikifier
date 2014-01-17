@@ -1,4 +1,4 @@
-# Copyright (c) 2013, Mitchell Cooper
+# Copyright (c) 2014, Mitchell Cooper
 # 
 # Wikifier::BlockManager is in charge of managing block classes. When Wikifier::Parser
 # segregates wiki code into blocks, the BlockManager loads block classes as needed.

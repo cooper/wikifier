@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright (c) 2013, Mitchell Cooper
+# Copyright (c) 2014, Mitchell Cooper
 #
 # sections are containers for paragraphs, image boxes, etc., each with a title.
 # the one exception is the introductory section, which has no title and does not display

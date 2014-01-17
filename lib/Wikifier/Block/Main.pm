@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright (c) 2013, Mitchell Cooper
+# Copyright (c) 2014, Mitchell Cooper
 #
 # The main block is the only block which does not have a parent. There is only one
 # instance of this type of block. It is an implied block containing all first-level

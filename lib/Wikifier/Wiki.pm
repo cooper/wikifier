@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright (c) 2013, Mitchell Cooper
+# Copyright (c) 2014, Mitchell Cooper
 #
 # The Wikifier is a simple wiki language parser. It merely converts wiki language to HTML.
 # Wikifier::Wiki, on the other hand, provides a full wiki management mechanism. It
