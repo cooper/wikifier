@@ -89,33 +89,38 @@ sub parse_base {
 sub html {
     my $block = shift;
     my $type  = $block->{type};
+    my $html;
+    
     $block->{html_done} = {};
     
     while ($type) {
         my $type_opts = $Wikifier::BlockManager::block_types{$type};
         if ($type_opts->{html} && !$block->{html_done}{$type}) {
-            $type_opts->{html}->($block, @_);
+            $html = $type_opts->{html}->($block, @_);
             $block->{parse_done}{$type} = 1;
         }
         $type = $type_opts->{base};
     }
 
+    return $html;
 }
 
 # run the base's html() now instead of afterward.
 sub html_base {
     my $block = shift;
     my $type  = $Wikifier::BlockManager::block_types{ $block->{type} }{base};
+    my $html;
     
     while ($type) {
         my $type_opts = $Wikifier::BlockManager::block_types{$type};
         if ($type_opts->{html} && !$block->{html_done}{$type}) {
-            $type_opts->{html}->($block, @_);
+            $html = $type_opts->{html}->($block, @_);
             $block->{html_done}{$type} = 1;
         }
         $type = $type_opts->{base};
     }
     
+    return $html;   
 }
 
 #############
