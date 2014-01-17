@@ -84,7 +84,7 @@ our %block_types;
 
 sub create_block {
     my ($wikifier, %opts) = @_;
-    
+    print "create block @_\n";
     # check for required options.
     # XXX: I don't think this is ever called directly.
     #      Is there even a change that options are missing?
@@ -111,11 +111,13 @@ sub create_block {
     # is this an alias?
     $opts{type} = $block_types{$type}{alias} if $block_types{$type}{alias};
     
+    print "wow\n";
     return Wikifier::Block->new(%opts);
 }
 
 # load a block module.
 sub load_block {
+    print "load block: @_\n";
     my ($wikifier, $type) = @_;
     return 1 if $block_types{$type};
     
@@ -138,6 +140,7 @@ sub load_block {
         $block_types{$block_type} = $blocks{$block_type};
         # TODO: aliases.
     }
+    print "made it\n";
 
     return 1;
 }
