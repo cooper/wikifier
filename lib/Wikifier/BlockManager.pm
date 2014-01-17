@@ -123,6 +123,8 @@ sub load_block {
 print "r\n";
     # is there a file?
     my $file = q(Wikifier/Block/).ucfirst(lc $type).q(.pm);
+print "FILE $file\n";
+print "INC @INC\n";
     croak "no such type $type", return if !-f $file && !-l $file;
 print "rr\n";
     # do the file.
