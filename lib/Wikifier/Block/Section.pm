@@ -30,10 +30,11 @@ sub _parse {
 # HTML.
 sub _result {
     my ($block, $page) = (shift, @_);
+    $page->{section_n} ||= 0;
     my $string = "<div class=\"wiki-section\">\n";
     
     # regular section.
-    if (length $block->{name}) {
+    if ($page->{section_n}++) {
        $string .= "    <h2 class=\"wiki-section-title\">$$block{name}</h2>\n";
     }
     
