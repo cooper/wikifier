@@ -122,7 +122,7 @@ sub load_block {
     return 1 if $block_types{$type};
 print "r\n";
     # is there a file?
-    my $file = q(Wikifier/Block/).lc($type).q(.pm);
+    my $file = q(Wikifier/Block/).ucfirst(lc $type).q(.pm);
     croak "no such type $type", return if !-f $file && !-l $file;
 print "rr\n";
     # do the file.
