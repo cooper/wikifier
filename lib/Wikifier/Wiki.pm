@@ -376,7 +376,7 @@ sub display_page {
     
     # generate the HTML and headers.
     $result->{type}       = 'page';
-    $result->{content}    = $page->html();
+    $result->{content}    = $page->html;
     $result->{length}     = length $result->{content};
     $result->{title}      = $page->get('page.title');
     $result->{created}    = $page->get('page.created') if $page->get('page.created');
