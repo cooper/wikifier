@@ -120,21 +120,21 @@ sub load_block {
     print "load block: @_\n";
     my ($wikifier, $type) = @_;
     return 1 if $block_types{$type};
-    
+print "r\n";
     # is there a file?
     my $file = q(lib/Wikifier/Block/).lc($type).q(.pm);
     croak "no such type $type", return if !-f $file && !-l $file;
-    
+print "rr\n";
     # do the file.
     my $package = do $file or croak "error loading $type block module: ".($@ || $! || 'idk');
-    
+print "rr\n";
     # fetch blocks.
     my %blocks;
     {
         no strict 'refs';
         %blocks = %{qq(${package}::block_types)};
     }
-
+print "rrr\n";
     # register blocks.
     foreach my $block_type (keys %blocks) {
         $block_types{$block_type} = $blocks{$block_type};
