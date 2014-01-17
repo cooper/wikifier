@@ -98,19 +98,19 @@ sub create_block {
     
     # if this block type doesn't exist, try loading its module.
     $wikifier->load_block($type) if !$block_types{$type};
-
+print "1\n";
     # if it still doesn't exist, make a dummy.
     return Wikifier::Block->new(
         type => 'dummy',
         %opts
     ) if !$block_types{$type};
-    
+print "2\n";
     # it does exist at this point.
     my %type_opts = %{ $block_types{$type} };
-    
+print "3\n";
     # is this an alias?
     $opts{type} = $block_types{$type}{alias} if $block_types{$type}{alias};
-    
+print "4\n";
     print "wow\n";
     return Wikifier::Block->new(%opts);
 }
