@@ -97,7 +97,7 @@ sub html {
         my $type_opts = $Wikifier::BlockManager::block_types{$type};
         if ($type_opts->{html} && !$block->{html_done}{$type}) {
             $html = $type_opts->{html}->($block, @_);
-            $block->{parse_done}{$type} = 1;
+            $block->{html_done}{$type} = 1;
         }
         $type = $type_opts->{base};
     }
