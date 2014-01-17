@@ -40,52 +40,87 @@ use feature qw(switch);
 sub new {
     my ($class, %opts) = @_;
     $opts{content} ||= [];
+    $opts{type} = lc $opts{type};
     return bless \%opts, $class;
 }
+
+#############
+### PARSE ###
+#############
 
 # parse the contents.
 sub parse {
     my $block = shift;
+    my $type  = $block->{type};
+    $block->{parse_done} = {};
     
-    # parse property.
-    if ($block->{parse}) {
-        return $block->{parse}->($block, @_);
+    while ($type) {
+        my $type_opts = $Wikifier::BlockManager::block_types{$type};
+        if ($type_opts->{parse} && !$block->{parse_done}{$type}) {
+            $type_opts->{parse}->($block, @_);
+            $block->{parse_done}{$type} = 1;
+        }
+        $type = $type_opts->{base};
     }
-    
-    # _parse method.
-    if ($block->can('_parse')) {
-        return $block->_parse(@_);
-    }
-    
-    return;
+
 }
 
-# HTML result.
-sub result {
+# run the base's parse() now instead of afterward.
+sub parse_base {
     my $block = shift;
+    my $type  = $Wikifier::BlockManager::block_types{$type}{base};
     
-    # result property.
-    if ($block->{result}) {
-        return $block->{result}->($block, @_);
+    while ($type) {
+        my $type_opts = $Wikifier::BlockManager::block_types{$type};
+        if ($type_opts->{parse} && !$block->{parse_done}{$type}) {
+            $type_opts->{parse}->($block, @_);
+            $block->{parse_done}{$type} = 1;
+        }
+        $type = $type_opts->{base};
     }
     
-    # _result method.
-    if ($block->can('_result')) {
-        return $block->_result(@_);
+}
+
+############
+### HTML ###
+############
+
+# HTML result
+sub html {
+    my $block = shift;
+    my $type  = $block->{type};
+    $block->{html_done} = {};
+    
+    while ($type) {
+        my $type_opts = $Wikifier::BlockManager::block_types{$type};
+        if ($type_opts->{html} && !$block->{html_done}{$type}) {
+            $type_opts->{html}->($block, @_);
+            $block->{parse_done}{$type} = 1;
+        }
+        $type = $type_opts->{base};
+    }
+
+}
+
+# run the base's html() now instead of afterward.
+sub html_base {
+    my $block = shift;
+    my $type  = $Wikifier::BlockManager::block_types{$type}{base};
+    
+    while ($type) {
+        my $type_opts = $Wikifier::BlockManager::block_types{$type};
+        if ($type_opts->{html} && !$block->{html_done}{$type}) {
+            $type_opts->{html}->($block, @_);
+            $block->{html_done}{$type} = 1;
+        }
+        $type = $type_opts->{base};
     }
     
-    return;
 }
 
-# default _parse.
-sub _parse {
-    return 1;
-}
-
-# default _result.
-sub _result {
-    return '';
-}
+#############
+### OTHER ###
+#############
 
 # remove empty content items.
 sub remove_blank {

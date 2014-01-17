@@ -7,21 +7,24 @@ package Wikifier::Block::Hash;
 
 use warnings;
 use strict;
-use feature qw(switch);
-use parent 'Wikifier::Block';
 
 use Scalar::Util 'blessed';
 use Carp;
 
-sub new {
-    my ($class, %opts) = @_;
-    $opts{type} = 'hash';
-    $opts{hash_array} = [];
-    return $class->SUPER::new(%opts);
+our %block_types = (
+    hash => {
+        init   => \&hash_init
+        parser => \&hash_parse
+    }
+);
+
+sub hash_init {
+    my $block = shift;
+    $block->{hash_array} = [];
 }
 
 # parse key:value pairs.
-sub _parse {
+sub hash_parse {
     my $block = shift;
     my ($key, $value, $in_value, %values) = (q.., q..);
     
@@ -125,4 +128,4 @@ sub _parse {
     return 1;
 }
 
-1
+__PACKAGE__

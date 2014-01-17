@@ -9,19 +9,17 @@ package Wikifier::Block::Main;
 
 use warnings;
 use strict;
-use feature qw(switch);
-use parent 'Wikifier::Block';
 
 use Scalar::Util 'blessed';
 
-sub new {
-    my ($class, %opts) = @_;
-    $opts{type} = 'main';
-    return $class->SUPER::new(%opts);
-}
+our %block_types = (
+    main => {
+        parser => \&main_parse,
+        html   => \&main_html
+    }
+);
 
-# parse() just calls all of the parse()s of the children.
-sub _parse {
+sub main_parse {
     my $block = shift;
     
     # filter out blank items.
@@ -36,15 +34,14 @@ sub _parse {
     return 1;
 }
 
-# HTML.
-sub _result {
+sub main_html {
     my ($block, $page) = @_;
     my $string = q();
     foreach my $item (@{$block->{content}}) {
         next unless blessed $item;
-        $string .= $item->result($page)."\n";
+        $string .= $item->html($page)."\n";
     }
     return $string;
 }
 
-1
+__PACKAGE__

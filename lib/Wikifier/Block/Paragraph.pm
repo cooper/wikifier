@@ -7,22 +7,10 @@ package Wikifier::Block::Paragraph;
 
 use warnings;
 use strict;
-use feature qw(switch);
-use parent 'Wikifier::Block';
 
-sub new {
-    my ($class, %opts) = @_;
-    $opts{type} = 'paragraph';
-    return $class->SUPER::new(%opts);
-}
+our %block_types = ( paragraph => { html => \&paragraph_html } );
 
-sub _parse {
-    my $block = shift;
-    # there's not too much to parse in a paragraph of text.
-    # formatting, etc. is handled later.
-}
-
-sub _result {
+sub paragraph_html {
     my ($block, $page) = @_;
 
     # Parse formatting.
@@ -32,4 +20,4 @@ sub _result {
     return "<p class=\"wiki-paragraph\">\n$html\n</p>\n";
 }
 
-1
+__PACKAGE__

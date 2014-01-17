@@ -2,33 +2,20 @@
 # Copyright (c) 2014, Mitchell Cooper
 #
 # sections are containers for paragraphs, image boxes, etc., each with a title.
-# the one exception is the introductory section, which has no title and does not display
-# at all in the article's table of contents.
 #
 package Wikifier::Block::Section;
 
 use warnings;
 use strict;
-use feature qw(switch);
-use parent 'Wikifier::Block::Container';
 
-sub new {
-    my ($class, %opts) = @_;
-    $opts{type} = 'section';
-    return $class->SUPER::new(%opts);
-}
+our %block_types = (
+    section => {
+        base => 'Container',
+        html => \&section_html
+    }
+);
 
-sub _parse {
-    my ($block, $page) = (shift, @_);
-    
-    # increment the current reference prefix.
-    $block->{ref_prefix}++; #XXX: references{} takes care of this now.
-    
-    $block->SUPER::_parse(@_);
-}
-
-# HTML.
-sub _result {
+sub section_html {
     my ($block, $page) = (shift, @_);
     $page->{section_n} ||= 0;
     my $string = "<div class=\"wiki-section\">\n";
@@ -58,4 +45,4 @@ sub _result {
     
 }
 
-1
+__PACKAGE__

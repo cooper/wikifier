@@ -7,23 +7,22 @@ package Wikifier::Block::Imagebox;
 
 use warnings;
 use strict;
-use feature qw(switch);
-use parent 'Wikifier::Block::Hash';
 
 use Carp;
 
-# create a new imagebox.
-sub new {
-    my ($class, %opts) = @_;
-    $opts{type} = 'imagebox';
-    return $class->SUPER::new(%opts);
-}
+our %block_types = (
+    imagebox => {
+        base   => 'hash',
+        parser => \&imagebox_parse,
+        html   => \&imagebox_html
+    }
+);
 
 # Hash handles the actual parsing; this assigns
 # properties to the imagebox from the found values.
-sub _parse {
+sub imagebox_parse {
     my ($block, $page) = (shift, @_);
-    $block->SUPER::_parse(@_) or return;
+    $block->parse_base;
     
     $block->{$_} = $block->{hash}{$_} foreach qw(
         description file width height
@@ -74,7 +73,7 @@ sub _parse {
 }
 
 # HTML.
-sub _result {
+sub imagebox_html {
     my ($block, $page) = @_;
     
     # parse formatting in the image description.
@@ -165,4 +164,5 @@ sub _result {
 </div>
 END
 }
-1
+
+__PACKAGE__

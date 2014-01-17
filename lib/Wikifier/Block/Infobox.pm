@@ -7,18 +7,17 @@ package Wikifier::Block::Infobox;
 
 use warnings;
 use strict;
-use feature qw(switch);
-use parent 'Wikifier::Block::Hash';
 
 use Scalar::Util 'blessed';
 
-sub new {
-    my ($class, %opts) = @_;
-    $opts{type} = 'infobox';
-    return $class->SUPER::new(%opts);
-}
+our %block_types = (
+    infobox => {
+        base => 'hash',
+        html => \&infobox_html
+    }
+);
 
-sub _result {
+sub infobox_html {
     my ($block, $page) = (shift, @_);
     my $string = "<div class=\"wiki-infobox\">\n";
     
@@ -73,4 +72,4 @@ END
     return $string;
 }
 
-1
+__PACKAGE__

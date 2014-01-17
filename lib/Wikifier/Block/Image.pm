@@ -9,22 +9,22 @@ package Wikifier::Block::Image;
 
 use warnings;
 use strict;
-use feature qw(switch);
-use parent 'Wikifier::Block::Hash';
 
 use Carp;
 
-sub new {
-    my ($class, %opts) = @_;
-    $opts{type} = 'image';
-    return $class->SUPER::new(%opts);
-}
+our %block_types = (
+    image => {
+        base   => 'hash',
+        parser => \&image_parse,
+        html   => \&image_html
+    }
+);
 
 # Hash handles the actual parsing; this assigns
 # properties to the image from the found values.
 sub _parse {
     my $block = shift;
-    $block->SUPER::_parse(@_) or return;
+    $block->parse_base;
     
     $block->{$_} = $block->{hash}{$_} foreach qw(file width height);
     
@@ -95,4 +95,4 @@ sub _result {
 END
 }
 
-1
+__PACKAGE__

@@ -7,18 +7,17 @@ package Wikifier::Block::History;
 
 use warnings;
 use strict;
-use feature qw(switch);
-use parent 'Wikifier::Block::Hash';
 
 use Scalar::Util 'blessed';
 
-sub new {
-    my ($class, %opts) = @_;
-    $opts{type} = 'history';
-    return $class->SUPER::new(%opts);
-}
+our %block_types = (
+    history => {
+        base   => 'hash',
+        html   => \&history_html
+    }
+);
 
-sub _result {
+sub history_html {
     my ($block, $page) = @_;
     my $string = "<div class=\"wiki-history\">\n";
     
@@ -61,4 +60,4 @@ END
     return $string;
 }
 
-1
+__PACKAGE__

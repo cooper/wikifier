@@ -8,15 +8,14 @@ package Wikifier::Block::Container;
 use warnings;
 use strict;
 use feature qw(switch);
-use parent 'Wikifier::Block';
 
-sub new {
-    my ($class, %opts) = @_;
-    $opts{type} = 'container';
-    return $class->SUPER::new(%opts);
-}
+our %block_types = (
+    container => {
+        parser => \&container_parse
+    }
+);
 
-sub _parse {
+sub container_parse {
     my $block = shift;
     
     # filter blank items.

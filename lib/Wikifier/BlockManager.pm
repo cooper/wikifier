@@ -13,77 +13,109 @@ use feature 'switch';
 
 use Carp;
 
+our %block_types;
+
 ###########################
 ### DEFAULT BLOCK TYPES ###
 ###########################
 
 # defines the types of blocks and the classes associated with them.
-our %block_types = (
-    main       => 'Wikifier::Block::Main',        # used only for main block.
-    imagebox   => 'Wikifier::Block::Imagebox',    # displays an image with a caption.
-    infobox    => 'Wikifier::Block::Infobox',     # displays a box of general information.
-    section    => 'Wikifier::Block::Section',     # container for paragraphs, images, etc.
-    paragraph  => 'Wikifier::Block::Paragraph',   # paragraph of text.
-    image      => 'Wikifier::Block::Image',       # displays a standalone image.
-    history    => 'Wikifier::Block::History',     # displays a table of dates and events.
-    code       => 'Wikifier::Block::Code',        # displays a block of code.
-    references => 'Wikifier::Block::References',  # displays a list of citations.
-);
+#our %block_types = (
+#    main       => 'Wikifier::Block::Main',        # used only for main block.
+#    imagebox   => 'Wikifier::Block::Imagebox',    # displays an image with a caption.
+#    infobox    => 'Wikifier::Block::Infobox',     # displays a box of general information.
+#    section    => 'Wikifier::Block::Section',     # container for paragraphs, images, etc.
+#    paragraph  => 'Wikifier::Block::Paragraph',   # paragraph of text.
+#    image      => 'Wikifier::Block::Image',       # displays a standalone image.
+#    history    => 'Wikifier::Block::History',     # displays a table of dates and events.
+#    code       => 'Wikifier::Block::Code',        # displays a block of code.
+#    references => 'Wikifier::Block::References',  # displays a list of citations.
+#);
 
 ##############################
 ### BLOCK CLASS MANAGEMENT ###
 ##############################
 
 # create a new block of the given type.
+#sub create_block {
+#    my ($wikifier, %opts) = @_;
+#    
+#    # check for required options.
+#    my @required = qw(parent type);
+#    foreach my $requirement (@required) {
+#        my ($pkg, $file, $line) = caller;
+#        croak "create_block(): missing option $requirement ($pkg line $line)"
+#        unless exists $opts{$requirement};
+#    }
+#    
+#    my $root_type = $opts{type};
+#    my $sub_type;
+#    
+#    # if the type contains a hyphen, it's a subblock.
+#    if ($opts{type} =~ m/^(.*)\-(.+)$/) {
+#        $root_type = $1;
+#        $sub_type  = $2;
+#    }
+#    
+#    my $class = $block_types{$root_type};
+#    
+#    # no such block type.
+#    if (!defined $class) {
+#
+#        # create a dummy block with no type.
+#        $opts{type} = 'dummy';
+#        return Wikifier::Block->new(%opts);
+#    }
+#    
+#    # load the class.
+#    my $file = $class.q(.pm);
+#    $file =~ s/::/\//g;
+#    if (!$INC{$file}) {
+#        do $file or croak "couldn't load '$opts{type}' block class: ".
+#        ($@ ? $@ : $! ? $! : 'unknown error');
+#    }
+#    
+#    # create a new block of the correct type.
+#    my $block = $class->new(wikifier => $wikifier, %opts);
+#    
+#    return $block;
+#    
+#}
+
 sub create_block {
     my ($wikifier, %opts) = @_;
     
     # check for required options.
+    # XXX: I don't think this is ever called directly.
+    #      Is there even a change that options are missing?
     my @required = qw(parent type);
     foreach my $requirement (@required) {
         my ($pkg, $file, $line) = caller;
         croak "create_block(): missing option $requirement ($pkg line $line)"
         unless exists $opts{$requirement};
     }
+    my $type = $opts{type};
     
-    my $root_type = $opts{type};
-    my $sub_type;
-    
-    # if the type contains a hyphen, it's a subblock.
-    if ($opts{type} =~ m/^(.*)\-(.+)$/) {
-        $root_type = $1;
-        $sub_type  = $2;
-    }
-    
-    my $class = $block_types{$root_type};
-    
-    # no such block type.
-    if (!defined $class) {
+    # if this block type doesn't exist, try loading its module.
+    $wikifier->load_block($type) if !$block_types{$type};
 
-        # create a dummy block with no type.
-        $opts{type} = 'dummy';
-        return Wikifier::Block->new(%opts);
-    }
+    # if it still doesn't exist, make a dummy.
+    return Wikifier::Block->new(
+        type => 'dummy',
+        %opts
+    ) if !$block_types{$type};
     
-    # load the class.
-    my $file = $class.q(.pm);
-    $file =~ s/::/\//g;
-    if (!$INC{$file}) {
-        do $file or croak "couldn't load '$opts{type}' block class: ".
-        ($@ ? $@ : $! ? $! : 'unknown error');
-    }
+    # it does exist at this point.
+    my %type_opts = %{ $block_types{$type} };
     
-    # create a new block of the correct type.
-    my $block = $class->new(wikifier => $wikifier, %opts);
+    # is this an alias?
+    $opts{type} = $block_types{$type}{alias} if $block_types{$type}{alias};
     
-    return $block;
-    
+    return Wikifier::Block->new(%opts);
 }
-# register a block type.
-sub register_block {
-    my ($wikifier, %opts) = @_;
-    return 1; # TODO.
-    
+
+sub load_block {
+
 }
 
 1
