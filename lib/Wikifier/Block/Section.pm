@@ -33,16 +33,17 @@ sub _result {
     $page->{section_n} ||= 0;
     my $string = "<div class=\"wiki-section\">\n";
     
-    # regular section.
-    if ($page->{section_n}++) {
-       $string .= "    <h2 class=\"wiki-section-title\">$$block{name}</h2>\n";
-    }
+    # determine if this is the intro section.
+    my $is_intro = !$page->{section_n}++;
+    my $class    = $is_intro ? 'wiki-section-page-title' : 'wiki-section-title';
     
-    # introduction section.
-    else {
-       my $title = $page->get('page.title');
-       $string .= "    <h1 class=\"wiki-section-page-title\">$title</h1>\n"
-       unless $page->wiki_info('no_page_title');
+    # determine the page title.
+    my $title    = $block->{name};
+       $title    = $page->get('page.title') if $is_intro && !length $title;
+    
+    # if we have a title, and this type of title is enabled.
+    if (length $title and !($is_intro && $page->wiki_info('no_page_title'))) {
+        $string .= "    <h1 class=\"wiki-section-page-title\">$title</h1>\n";
     }
    
     # append the indented HTML of each contained block.
