@@ -68,7 +68,7 @@ sub parse {
 # run the base's parse() now instead of afterward.
 sub parse_base {
     my $block = shift;
-    my $type  = $Wikifier::BlockManager::block_types{$type}{base};
+    my $type  = $Wikifier::BlockManager::block_types{ $block->{type} }{base};
     
     while ($type) {
         my $type_opts = $Wikifier::BlockManager::block_types{$type};
@@ -105,7 +105,7 @@ sub html {
 # run the base's html() now instead of afterward.
 sub html_base {
     my $block = shift;
-    my $type  = $Wikifier::BlockManager::block_types{$type}{base};
+    my $type  = $Wikifier::BlockManager::block_types{ $block->{type} }{base};
     
     while ($type) {
         my $type_opts = $Wikifier::BlockManager::block_types{$type};
