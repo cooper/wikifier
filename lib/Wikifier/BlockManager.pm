@@ -125,13 +125,20 @@ sub create_block {
 sub load_block {
     my ($wikifier, $type) = @_;
     return 1 if $block_types{$type};
-    
-    # is there a file?
     my $file = q(lib/Wikifier/Block/).ucfirst(lc $type).q(.pm); # TODO: how to configure dir
-    croak "no such type $type", return if !-f $file && !-l $file;
+
+    # symlink?
+    if (-l $file) {
+        $file = abs_path($file);
+    }
+    
+    # does the file exist?
+    if (!-f $file) {
+        croak "no such file $file";
+        return;
+    }
     
     # do the file.
-    $file = abs_path($file);
     my $package = do $file or croak "error loading $type block module: ".($@ || $! || 'idk');
     
     # fetch blocks.
