@@ -67,7 +67,7 @@ sub section_html {
     
     # disabled </div>.
     return $string if
-        $page->wiki_info('last_section_footer') &&
+        $page->wiki_info('enable.last_section_footer') &&
         $page->{c_section_n} == $page->{section_n};
     
     $string .= "</div>\n";
