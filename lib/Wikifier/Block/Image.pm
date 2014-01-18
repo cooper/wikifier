@@ -22,7 +22,7 @@ our %block_types = (
 
 # Hash handles the actual parsing; this assigns
 # properties to the image from the found values.
-sub _parse {
+sub image_parse {
     my $block = shift;
     $block->parse_base;
     
@@ -47,7 +47,7 @@ sub _parse {
 }
 
 # HTML.
-sub _result {
+sub image_html {
     my ($block, $page) = (shift, @_);
     
     # currently only exact pixel sizes or 'auto' are supported.
