@@ -33,7 +33,7 @@ sub infobox_html {
     
     # if an image is present, display it.
     if (my $image = $block->{hash}{-image}) {
-        my $imagehtml = $image->result(@_);
+        my $imagehtml = $image->html(@_);
         $imagehtml = Wikifier::Utilities::indent($imagehtml, 2);
         $string .= "    <div class=\"wiki-infobox-image-container\">\n$imagehtml    </div>\n";
     }
@@ -52,7 +52,7 @@ sub infobox_html {
         
         # value is a block. generate the HTML for it.
         if (blessed $value) {
-            $value = $value->result(@_);
+            $value = $value->html(@_);
         }
         
         # Parse formatting in the value.
