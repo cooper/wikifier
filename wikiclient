@@ -30,6 +30,7 @@ $loop->connect(
                 say '-> '.$_[1];
             }
         );
+        $loop->add($stream);
     },
     on_connect_error => sub { die "connection error\n" }
 );
