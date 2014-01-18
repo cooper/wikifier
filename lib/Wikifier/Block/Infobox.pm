@@ -13,12 +13,16 @@ use Scalar::Util 'blessed';
 our %block_types = (
     infobox => {
         base => 'hash',
-        html => \&infobox_html
+        html => \&infobox_html,
+        parse => \&infobox_parse
     }
 );
 
-sub infobox_html {
+sub parse {
     print "INFOBOX PARSE\n";
+}
+
+sub infobox_html {
     my ($block, $page) = (shift, @_);
     my $string = "<div class=\"wiki-infobox\">\n";
     
