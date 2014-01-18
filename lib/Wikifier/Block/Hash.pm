@@ -7,6 +7,7 @@ package Wikifier::Block::Hash;
 
 use warnings;
 use strict;
+use feature 'switch';
 
 use Scalar::Util 'blessed';
 use Carp;
