@@ -45,7 +45,7 @@ $loop->add(IO::Async::Stream->new(
        my (undef, $buffref, $eof) = @_;
        while( $$buffref =~ s/^(.*\n)// ) {
           return unless $stream;
-          print $1;
+          print "<- $1";
           $stream->write($1);
        }
     }
