@@ -23,11 +23,14 @@ $loop->connect(
         path     => $conf->get('server.socket.path')
     },
     on_stream => sub {
-        $stream = shift;
         say 'Connected to '.$stream;
+        $stream = shift;
         $stream->configure(
             on_read => sub {
-                say '-> '.$_[1];
+               my ( $self, $buffref, $eof ) = @_;
+               while( $$buffref =~ s/^(.*\n)// ) {
+                  say "-> $1";
+               }
             }
         );
         $loop->add($stream);
