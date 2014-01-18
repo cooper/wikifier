@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+# Copyright (c) 2013 Mitchell Cooper
+
+use warnings;
+use strict;
+use lib 'lib';
+use 5.010;
+
+use Wikifier::Server;
+
+# read the configuration page.
+die "Please provide the configuration file as the first argument\n" unless @ARGV;
+(my $conf = Wikifier::Page->new(file => shift @ARGV))->parse or die "Configuration error\n";
+
+# create a loop.
+my $loop = IO::Async::Loop->new;
+
+my $stream;
+$loop->connect(
+    addr => {
+        family   => 'unix',
+        socktype => 'stream',
+        path     => $conf->get('server.socket.path')
+    },
+    on_stream => sub {
+        $stream = shift;
+        say 'Connected';
+        $stream->configure(
+            on_read => sub {
+                say $_[1];
+            }
+        );
+    }
+);
+
+$loop->add(IO::Async::Stream->new(
+    read_handle => \*STDIN,
+    on_read => sub {
+       while( $$_[1] =~ s/^(.*\n)// ) {
+          $stream->write("$1\n");
+       }
+    }
+));
+
