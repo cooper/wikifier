@@ -24,7 +24,7 @@ our %block_types = (
 # properties to the image from the found values.
 sub image_parse {
     my $block = shift;
-    $block->parse_base;
+    $block->parse_base(@_);
     
     $block->{$_} = $block->{hash}{$_} foreach qw(file width height);
     
