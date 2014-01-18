@@ -31,8 +31,8 @@ $loop->connect(
                while( $$buffref =~ s/^(.*\n)// ) {
                   print "-> $1";
                }
+                die "EOF\n" if $eof;
             }
-            die 'EOF' if $eof;
         );
         $loop->add($stream);
     },
