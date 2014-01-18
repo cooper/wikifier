@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 # Copyright (c) 2013 Mitchell Cooper
+# don't expect this to be pretty because it's just for testing
 
 use warnings;
 use strict;
 use lib 'lib';
-use 5.010;
 
 use Wikifier::Server;
 
@@ -29,9 +29,10 @@ $loop->connect(
             on_read => sub {
                my (undef, $buffref, $eof ) = @_;
                while( $$buffref =~ s/^(.*\n)// ) {
-                  say "-> $1";
+                  print "-> $1";
                }
             }
+            die 'EOF' if $eof;
         );
         $loop->add($stream);
     },
@@ -43,8 +44,9 @@ $loop->add(IO::Async::Stream->new(
     on_read     => sub {
        my (undef, $buffref, $eof) = @_;
        while( $$buffref =~ s/^(.*\n)// ) {
-          say '<- '.$1;
-          $stream->write("$1\n");
+          return unless $stream;
+          print $1;
+          $stream->write($1);
        }
     }
 ));
