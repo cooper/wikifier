@@ -8,18 +8,14 @@ package Wikifier::Block::Section;
 use warnings;
 use strict;
 
+use Scalar::Util 'blessed';
+
 our %block_types = (
     section => {
         base => 'Container',
-        init => \&section_parse,
         html => \&section_html
     }
 );
-
-sub section_parse {
-    my $block = shift;
-    $block->remove_blank;
-}
 
 sub section_html {
     my ($block, $page) = (shift, @_);
@@ -42,6 +38,7 @@ sub section_html {
     # append the indented HTML of each contained block.
     foreach my $item (@{$block->{content}}) {
     print "ITEM: $item\n";
+        next unless blessed $item;
         $string .= Wikifier::Utilities::indent($item->html(@_))."\n";
     }
     
