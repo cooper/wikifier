@@ -37,7 +37,8 @@ $loop->connect(
 $loop->add(IO::Async::Stream->new(
     read_handle => \*STDIN,
     on_read => sub {
-       while( $$_[1] =~ s/^(.*\n)// ) {
+       my (undef, $buffref, $eof) = @_;
+       while( $$buffref =~ s/^(.*\n)// ) {
           $stream->write("$1\n");
        }
     }
