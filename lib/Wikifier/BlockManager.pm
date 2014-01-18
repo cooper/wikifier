@@ -144,7 +144,7 @@ sub load_block {
         $block_types{$block_type} = $blocks{$block_type};
         
         # create aliases.
-        if (my $aliases = $blocks{$block_type}{alias}) {
+        if (my $aliases = delete $blocks{$block_type}{alias}) {
             $aliases = [$aliases] unless ref $aliases; # single alias.
             $block_types{$_} = { alias => $block_type } foreach @$aliases;
         }
