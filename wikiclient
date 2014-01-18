@@ -43,3 +43,4 @@ $loop->add(IO::Async::Stream->new(
     }
 ));
 
+$loop->run_forever
