@@ -57,12 +57,14 @@ sub parse {
     while ($type) {
         my $type_opts = $Wikifier::BlockManager::block_types{$type};
         if ($type_opts->{parse} && !$block->{parse_done}{$type}) {
+            print "doing $type for $$block{type}\n";
             $type_opts->{parse}->($block, @_);
             $block->{parse_done}{$type} = 1;
         }
         $type = $type_opts->{base};
     }
 
+    delete $block->{parse_done};
 }
 
 # run the base's parse() now instead of afterward.
@@ -102,6 +104,7 @@ sub html {
         $type = $type_opts->{base};
     }
 
+    delete $block->{html_done};
     return $html;
 }
 
