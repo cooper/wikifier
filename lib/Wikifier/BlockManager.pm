@@ -141,7 +141,11 @@ sub load_block {
     foreach my $block_type (keys %blocks) {
         $block_types{$block_type} = $blocks{$block_type};
         
-        # TODO: aliases.
+        # create aliases.
+        if (my $aliases = $blocks{$block_type}{alias}) {
+            $aliases = [$aliases] unless ref $aliases; # single alias.
+            $block_types{$_} = { alias => $block_type } foreach @$aliases;
+        }
         
         # if this depends on a base, load it.
         $wikifier->load_block($blocks{$block_type}{base}) if $blocks{$block_type}{base};

@@ -8,7 +8,12 @@ package Wikifier::Block::Paragraph;
 use warnings;
 use strict;
 
-our %block_types = ( paragraph => { html => \&paragraph_html } );
+our %block_types = (
+    paragraph => {
+        html  => \&paragraph_html,
+        alias => 'p'
+    }
+);
 
 sub paragraph_html {
     my ($block, $page) = @_;
