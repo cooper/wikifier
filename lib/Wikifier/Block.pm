@@ -54,9 +54,10 @@ sub parse {
     my $type  = $block->{type};
     $block->{parse_done} = {};
     
-    print 'called parse for '.$$block{type};
+    print 'called parse for '.$$block{type}."\n";
     
     while ($type) {
+        print 'checking '.$type."\n";
         my $type_opts = $Wikifier::BlockManager::block_types{$type};
         if ($type_opts->{parse} && !$block->{parse_done}{$type}) {
             print "regular parsing $type for $$block{type}\n";
