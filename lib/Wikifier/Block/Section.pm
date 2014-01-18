@@ -13,6 +13,7 @@ use Scalar::Util 'blessed';
 our %block_types = (
     section => {
         base  => 'container',
+        parse => \&section_parse,
         html  => \&section_html,
         alias => 'sec'
     },
@@ -21,6 +22,10 @@ our %block_types = (
     }
 );
 
+# this counts how many sections there are.
+# this is then compared in section_html to see if it's the last section.
+# if it is and last_section_footer is enabled, the </div> is omitted
+# in order to leave room for a footer.
 sub section_parse {
     my ($block, $page) = @_;
     $page->{section_n} = 0 if not defined $page->{section_n};
