@@ -91,7 +91,7 @@ sub parse_base {
 sub html {
     my $block = shift;
     my $type  = $block->{type};
-    my $html;
+    my $html  = '';
     
     $block->{html_done} = {};
     
