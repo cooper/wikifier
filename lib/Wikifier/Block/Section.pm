@@ -11,9 +11,14 @@ use strict;
 our %block_types = (
     section => {
         base => 'Container',
+        init => \&section_parse,
         html => \&section_html
     }
 );
+
+sub section_parse {
+    $block->remove_blank;
+}
 
 sub section_html {
     my ($block, $page) = (shift, @_);
