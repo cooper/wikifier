@@ -34,12 +34,14 @@ sub section_parse {
 
     $page->{section_n}++;
 
+    print 'parse section '.$page->{section_n};
 }
 
 sub section_html {
     my ($block, $page) = (shift, @_);
     my $string = "<div class=\"wiki-section\">\n";
     $page->{c_section_n}++;
+    print 'html section '.$page->{c_section_n};
     
     # determine if this is the intro section.
     my $is_intro = !$page->{c_section_n};
