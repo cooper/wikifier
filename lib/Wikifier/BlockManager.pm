@@ -106,10 +106,10 @@ sub create_block {
     ) if !$block_types{$type};
     
     # it does exist at this point.
-    my %type_opts = %{ $block_types{$type} };
     
     # is this an alias?
-    $opts{type} = $type = $block_types{$type}{alias} if $block_types{$type}{alias};
+    $opts{type} = $block_types{$type}{alias} if $block_types{$type}{alias};
+    $type       = $opts{type};
     
     # call init sub.
     my $block = Wikifier::Block->new(%opts);
