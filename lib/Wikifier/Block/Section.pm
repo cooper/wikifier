@@ -66,6 +66,7 @@ sub section_html {
     $string .= "    <div class=\"clear\"></div>\n";
     
     # disabled </div>.
+    print "checking if disabled: C($$page{c_section_n} S($$page{section_n})\n";
     print "yes\n" and return $string if
         $page->wiki_info('enable.last_section_footer') &&
         $page->{c_section_n} == $page->{section_n};
