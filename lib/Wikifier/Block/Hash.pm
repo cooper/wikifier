@@ -25,6 +25,7 @@ sub hash_init {
 
 # parse key:value pairs.
 sub hash_parse {
+    print "HASH PARSE\n";
     my $block = shift;
     my ($key, $value, $in_value, %values) = (q.., q..);
     

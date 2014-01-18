@@ -18,6 +18,7 @@ our %block_types = (
 );
 
 sub infobox_html {
+    print "INFOBOX PARSE\n";
     my ($block, $page) = (shift, @_);
     my $string = "<div class=\"wiki-infobox\">\n";
     
