@@ -22,6 +22,7 @@ our %block_types = (
 );
 
 sub section_parse {
+    my ($block, $page) = @_;
     $page->{section_n} = 0 if not defined $page->{section_n};
     $page->{section_n}++;
 }
