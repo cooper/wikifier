@@ -62,6 +62,7 @@ sub parse {
             $block->{parse_done}{$type} = 1;
         }
         $type = $type_opts->{base};
+        print "then trying $type\n";
     }
 
     delete $block->{parse_done};
