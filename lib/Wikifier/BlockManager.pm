@@ -12,6 +12,7 @@ use strict;
 use feature 'switch';
 
 use Carp;
+use Cwd 'abs_path';
 
 our %block_types;
 
@@ -130,7 +131,7 @@ sub load_block {
     croak "no such type $type", return if !-f $file && !-l $file;
     
     # do the file.
-    my $package = do $file or croak "error loading $type block module: ".($@ || $! || 'idk');
+    my $package = do abs_path($file) or croak "error loading $type block module: ".($@ || $! || 'idk');
     
     # fetch blocks.
     my %blocks;

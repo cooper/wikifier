@@ -786,6 +786,8 @@ sub cat_get_pages {
         close $fh;
     }
     
+    # FIXME: We need to delete categories when they become empty.
+    
     return wantarray ? (\@final_pages, $cat->{title}) : \@final_pages;
 }
 
