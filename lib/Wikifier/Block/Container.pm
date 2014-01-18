@@ -31,4 +31,4 @@ sub container_parse {
     }
 }
 
-1
+__PACKAGE__
