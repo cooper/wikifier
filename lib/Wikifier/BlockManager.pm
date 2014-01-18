@@ -111,7 +111,11 @@ sub create_block {
     # is this an alias?
     $opts{type} = $block_types{$type}{alias} if $block_types{$type}{alias};
     
-    return Wikifier::Block->new(%opts);
+    # call init sub.
+    my $block = Wikifier::Block->new(%opts);
+    $block_types{$type}{init}->($block) if $block_types{$type}{init};
+    
+    return $block;
 }
 
 # load a block module.
@@ -132,8 +136,6 @@ sub load_block {
         no strict 'refs';
         %blocks = %{qq(${package}::block_types)};
     }
-
-    # TODO: block init.
 
     # register blocks.
     foreach my $block_type (keys %blocks) {

@@ -57,12 +57,10 @@ sub parse {
     while ($type) {
         my $type_opts = $Wikifier::BlockManager::block_types{$type};
         if ($type_opts->{parse} && !$block->{parse_done}{$type}) {
-            print "doing $type for $$block{type}\n";
             $type_opts->{parse}->($block, @_);
             $block->{parse_done}{$type} = 1;
         }
         $type = $type_opts->{base};
-        print "then trying $type\n";
     }
 
     delete $block->{parse_done};

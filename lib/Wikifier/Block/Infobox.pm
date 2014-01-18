@@ -13,14 +13,9 @@ use Scalar::Util 'blessed';
 our %block_types = (
     infobox => {
         base => 'hash',
-        html => \&infobox_html,
-        parse => \&infobox_parse
+        html => \&infobox_html
     }
 );
-
-sub infobox_parse {
-    print "INFOBOX PARSE\n";
-}
 
 sub infobox_html {
     my ($block, $page) = (shift, @_);
