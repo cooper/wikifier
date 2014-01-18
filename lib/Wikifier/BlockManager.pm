@@ -133,10 +133,17 @@ sub load_block {
         %blocks = %{qq(${package}::block_types)};
     }
 
+    # TODO: block init.
+
     # register blocks.
     foreach my $block_type (keys %blocks) {
         $block_types{$block_type} = $blocks{$block_type};
+        
         # TODO: aliases.
+        
+        # if this depends on a base, load it.
+        $wikifier->load_block($blocks{$block_type}{base}) if $blocks{$block_type}{base};
+        
     }
 
     return 1;
