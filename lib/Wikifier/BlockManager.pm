@@ -84,7 +84,7 @@ our %block_types;
 
 sub create_block {
     my ($wikifier, %opts) = @_;
-    print "create block @_\n";
+    
     # check for required options.
     # XXX: I don't think this is ever called directly.
     #      Is there even a change that options are missing?
@@ -98,51 +98,46 @@ sub create_block {
     
     # if this block type doesn't exist, try loading its module.
     $wikifier->load_block($type) if !$block_types{$type};
-print "1\n";
+
     # if it still doesn't exist, make a dummy.
     return Wikifier::Block->new(
         type => 'dummy',
         %opts
     ) if !$block_types{$type};
-print "2\n";
+    
     # it does exist at this point.
     my %type_opts = %{ $block_types{$type} };
-print "3\n";
+    
     # is this an alias?
     $opts{type} = $block_types{$type}{alias} if $block_types{$type}{alias};
-print "4\n";
-    print "wow\n";
+    
     return Wikifier::Block->new(%opts);
 }
 
 # load a block module.
 sub load_block {
-    print "load block: @_\n";
     my ($wikifier, $type) = @_;
     return 1 if $block_types{$type};
-print "r\n";
+    
     # is there a file?
     my $file = q(lib/Wikifier/Block/).ucfirst(lc $type).q(.pm); # TODO: how to configure dir
-print "FILE $file\n";
-print "INC @INC\n";
     croak "no such type $type", return if !-f $file && !-l $file;
-print "rr\n";
+    
     # do the file.
     my $package = do $file or croak "error loading $type block module: ".($@ || $! || 'idk');
-print "rr\n";
+    
     # fetch blocks.
     my %blocks;
     {
         no strict 'refs';
         %blocks = %{qq(${package}::block_types)};
     }
-print "rrr\n";
+
     # register blocks.
     foreach my $block_type (keys %blocks) {
         $block_types{$block_type} = $blocks{$block_type};
         # TODO: aliases.
     }
-    print "made it\n";
 
     return 1;
 }
