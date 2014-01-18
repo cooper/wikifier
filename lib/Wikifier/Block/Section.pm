@@ -66,7 +66,7 @@ sub section_html {
     
     $string .= "</div>\n";
     
-    $page->{c_section_n}++
+    $page->{c_section_n}++;
     return $string;
     
 }
