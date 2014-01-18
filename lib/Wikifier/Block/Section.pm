@@ -17,6 +17,7 @@ our %block_types = (
 );
 
 sub section_parse {
+    my $block = shift;
     $block->remove_blank;
 }
 
