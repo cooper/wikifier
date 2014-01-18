@@ -12,7 +12,6 @@ use strict;
 use feature 'switch';
 
 use Carp;
-use Cwd 'abs_path';
 
 our %block_types;
 
@@ -126,14 +125,9 @@ sub load_block {
     my ($wikifier, $type) = @_;
     return 1 if $block_types{$type};
     my $file = q(lib/Wikifier/Block/).ucfirst(lc $type).q(.pm); # TODO: how to configure dir
-
-    # symlink?
-    if (-l $file) {
-        $file = abs_path($file);
-    }
     
     # does the file exist?
-    if (!-f $file) {
+    if (!-f $file && !-l $file) {
         croak "no such file $file";
         return;
     }
