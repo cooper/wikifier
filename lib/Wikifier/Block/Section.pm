@@ -15,6 +15,9 @@ our %block_types = (
         base  => 'container',
         html  => \&section_html,
         alias => 'sec'
+    },
+    clear => {
+        html => \&clear_html
     }
 );
 
@@ -47,6 +50,10 @@ sub section_html {
     $string .= "</div>\n";
     return $string;
     
+}
+
+sub clear_html {
+    return '<div class="clear"></div>';
 }
 
 __PACKAGE__
