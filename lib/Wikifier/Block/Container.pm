@@ -9,6 +9,8 @@ use warnings;
 use strict;
 use feature qw(switch);
 
+use Scalar::Utils 'blessed';
+
 our %block_types = (
     container => {
         parse => \&container_parse
@@ -22,6 +24,7 @@ sub container_parse {
     $block->remove_blank();
     
     foreach my $item (@{$block->{content}}) {
+        next unless blessed $item;
         $item->parse(@_);
     }
 }
