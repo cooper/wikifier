@@ -54,13 +54,9 @@ sub parse {
     my $type  = $block->{type};
     $block->{parse_done} = {};
     
-    print 'called parse for '.$$block{type}."\n";
-    
     while ($type) {
-        print 'checking '.$type."\n";
         my $type_opts = $Wikifier::BlockManager::block_types{$type};
         if ($type_opts->{parse} && !$block->{parse_done}{$type}) {
-            print "regular parsing $type for $$block{type}\n";
             $type_opts->{parse}->($block, @_);
             $block->{parse_done}{$type} = 1;
         }
@@ -74,11 +70,10 @@ sub parse {
 sub parse_base {
     my $block = shift;
     my $type  = $Wikifier::BlockManager::block_types{ $block->{type} }{base};
-    print "PARSE BASE for $type by $$block{type}\n";
+    
     while ($type) {
         my $type_opts = $Wikifier::BlockManager::block_types{$type};
         if ($type_opts->{parse} && !$block->{parse_done}{$type}) {
-            print "parsin $type\n";
             $type_opts->{parse}->($block, @_);
             $block->{parse_done}{$type} = 1;
         }

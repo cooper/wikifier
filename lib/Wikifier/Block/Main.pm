@@ -28,7 +28,6 @@ sub main_parse {
     # parse each item.
     foreach my $item (@{$block->{content}}) {
         next unless blessed $item;
-        print "parsing $$item{type}\n";
         $item->parse(@_);
     }
     

@@ -18,7 +18,6 @@ our %block_types = (
 );
 
 sub container_parse {
-    print "container parse\n";
     my $block = shift;
     
     # filter blank items.
@@ -26,9 +25,9 @@ sub container_parse {
     
     foreach my $item (@{$block->{content}}) {
         next unless blessed $item;
-        print "container going to parse $$item{type}\n";
         $item->parse(@_);
     }
+    
 }
 
 __PACKAGE__
