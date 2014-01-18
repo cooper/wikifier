@@ -24,7 +24,7 @@ $loop->connect(
     },
     on_stream => sub {
         $stream = shift;
-        say 'Connected to '.$stream;
+        say "Connected to $stream\n";
         $stream->configure(
             on_read => sub {
                my (undef, $buffref, $eof ) = @_;
