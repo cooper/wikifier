@@ -24,10 +24,10 @@ $loop->connect(
     },
     on_stream => sub {
         $stream = shift;
-        say 'Connected';
+        say 'Connected to '.$stream;
         $stream->configure(
             on_read => sub {
-                say $_[1];
+                say '-> '.$_[1];
             }
         );
     },
@@ -36,9 +36,10 @@ $loop->connect(
 
 $loop->add(IO::Async::Stream->new(
     read_handle => \*STDIN,
-    on_read => sub {
+    on_read     => sub {
        my (undef, $buffref, $eof) = @_;
        while( $$buffref =~ s/^(.*\n)// ) {
+          say '<- '.$1;
           $stream->write("$1\n");
        }
     }
