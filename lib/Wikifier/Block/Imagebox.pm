@@ -22,6 +22,7 @@ our %block_types = (
 # properties to the imagebox from the found values.
 sub imagebox_parse {
     my ($block, $page) = (shift, @_);
+    print "imagebox parse\n";
     $block->parse_base(@_);
     
     $block->{$_} = $block->{hash}{$_} foreach qw(
