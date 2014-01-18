@@ -21,13 +21,18 @@ our %block_types = (
     }
 );
 
+sub section_parse {
+    $page->{section_n} = 0 if not defined $page->{section_n};
+    $page->{section_n}++;
+}
+
 sub section_html {
     my ($block, $page) = (shift, @_);
-    $page->{section_n} ||= 0;
+    $page->{current_section_n} ||= 0;
     my $string = "<div class=\"wiki-section\">\n";
     
     # determine if this is the intro section.
-    my $is_intro = !$page->{section_n}++;
+    my $is_intro = !$page->{current_section_n}++;
     my $class    = $is_intro ? 'wiki-section-page-title' : 'wiki-section-title';
     
     # determine the page title.
@@ -47,6 +52,12 @@ sub section_html {
     
     # end the section.
     $string .= "<div class=\"clear\"></div>\n";
+    
+    # disabled.
+    return $string if
+        $page->wiki_info('last_section_footer') &&
+        $page->{current_section_n} == $page->{section_n};
+    
     $string .= "</div>\n";
     return $string;
     
