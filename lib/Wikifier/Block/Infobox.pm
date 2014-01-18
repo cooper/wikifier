@@ -18,7 +18,7 @@ our %block_types = (
     }
 );
 
-sub parse {
+sub infobox_parse {
     print "INFOBOX PARSE\n";
 }
 
