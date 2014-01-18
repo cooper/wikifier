@@ -14,7 +14,7 @@ use Carp;
 
 our %block_types = (
     hash => {
-        init  => \&hash_init
+        init  => \&hash_init,
         parse => \&hash_parse
     }
 );
