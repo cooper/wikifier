@@ -172,6 +172,7 @@ sub read_config {
     );
     $conf->parse or croak; # XXX: probably shouldn't croak.
     
+    # XXX: THIS IS STUPID I HATE IT NEED TO REMOVE IT AND MAKE IT ALL THE SAME AS CONFIG
     my %opts = (
         enable_page_caching     => $conf->get('enable.cache.page'),
         enable_image_sizing     => 1, # XXX: should this even be an option?
@@ -180,6 +181,7 @@ sub read_config {
         restrict_image_size     => $conf->get('enable.image_size_restrictor'),
         no_page_title           => !$conf->get('enable.page_titles'),
         category_post_limit     => $conf->get('enable.category_post_limit'),
+        enable_section_footer   => $conf->get('enable.last_section_footer'),
 
         name            => $conf->get('wiki.name'),
         variables       => $conf->get('var'),
