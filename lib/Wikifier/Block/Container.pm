@@ -9,7 +9,7 @@ use warnings;
 use strict;
 use feature qw(switch);
 
-use Scalar::Utils 'blessed';
+use Scalar::Util 'blessed';
 
 our %block_types = (
     container => {
