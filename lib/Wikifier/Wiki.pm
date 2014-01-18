@@ -379,6 +379,7 @@ sub display_page {
     $result->{content}    = $page->html;
     $result->{length}     = length $result->{content};
     $result->{title}      = $page->get('page.title');
+    $result->{author}     = $page->get('page.author');
     $result->{created}    = $page->get('page.created') if $page->get('page.created');
     $result->{generated}  = 1;
     $result->{modified}   = time2str(time);
@@ -393,6 +394,7 @@ sub display_page {
         print {$fh} encode_json({
             title      => $result->{title},
             created    => $result->{created},
+            author     => $result->{author},
             categories => $result->{categories} || []
         }), "\n";
         
@@ -403,8 +405,8 @@ sub display_page {
         
         # overwrite modified date to actual.
         $result->{modified}  = time2str((stat $cache_file)[9]);
-        
         $result->{cache_gen} = 1;
+        
     }
     
     return $result;
