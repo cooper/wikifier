@@ -14,8 +14,8 @@ use Scalar::Util 'blessed';
 
 our %block_types = (
     main => {
-        parser => \&main_parse,
-        html   => \&main_html
+        parse => \&main_parse,
+        html  => \&main_html
     }
 );
 

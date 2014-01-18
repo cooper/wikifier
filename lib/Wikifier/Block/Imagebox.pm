@@ -12,9 +12,9 @@ use Carp;
 
 our %block_types = (
     imagebox => {
-        base   => 'hash',
-        parser => \&imagebox_parse,
-        html   => \&imagebox_html
+        base  => 'hash',
+        parse => \&imagebox_parse,
+        html  => \&imagebox_html
     }
 );
 

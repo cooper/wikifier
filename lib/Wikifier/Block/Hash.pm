@@ -13,8 +13,8 @@ use Carp;
 
 our %block_types = (
     hash => {
-        init   => \&hash_init
-        parser => \&hash_parse
+        init  => \&hash_init
+        parse => \&hash_parse
     }
 );
 

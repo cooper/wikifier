@@ -14,9 +14,9 @@ use Carp;
 
 our %block_types = (
     image => {
-        base   => 'hash',
-        parser => \&image_parse,
-        html   => \&image_html
+        base  => 'hash',
+        parse => \&image_parse,
+        html  => \&image_html
     }
 );
 

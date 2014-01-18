@@ -11,7 +11,7 @@ use feature qw(switch);
 
 our %block_types = (
     container => {
-        parser => \&container_parse
+        parse => \&container_parse
     }
 );
 
