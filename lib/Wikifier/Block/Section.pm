@@ -28,32 +28,35 @@ our %block_types = (
 # in order to leave room for a footer.
 sub section_parse {
     my ($block, $page) = @_;
+    
+    # determine header level.
+    $block->{header_level} = ($block->{parent}{header_level} || 0) + 1;
 
+    # track the section count.
     $page->{c_section_n} = -1 if not defined $page->{section_n};
     $page->{section_n}   = -1 if not defined $page->{section_n};
 
     $page->{section_n}++;
-
-    print 'parse section '.$page->{section_n},"\n";
 }
 
 sub section_html {
     my ($block, $page) = (shift, @_);
     my $string = "<div class=\"wiki-section\">\n";
     $page->{c_section_n}++;
-    print 'html section '.$page->{c_section_n},"\n";
     
     # determine if this is the intro section.
     my $is_intro = !$page->{c_section_n};
     my $class    = $is_intro ? 'wiki-section-page-title' : 'wiki-section-title';
     
-    # determine the page title.
+    # determine the page title if necessary.
     my $title    = $block->{name};
        $title    = $page->get('page.title') if $is_intro && !length $title;
     
-    # if we have a title, and this type of title is enabled.
+    # if we have a title and this type of title is enabled.
     if (length $title and !($is_intro && $page->wiki_info('no_page_title'))) {
-        $string .= "    <h1 class=\"wiki-section-page-title\">$title</h1>\n";
+        my $l    = $block->{header_level};
+           $l    = 6 if $block->{header_level} > 6;
+        $string .= "    <h$l class=\"$class $class-$l\">$title</h$l>\n";
     }
    
     # append the indented HTML of each contained block.
@@ -66,8 +69,7 @@ sub section_html {
     $string .= "    <div class=\"clear\"></div>\n";
     
     # disabled </div>.
-    print "checking if disabled: C($$page{c_section_n} S($$page{section_n})\n";
-    print "yes\n" and return $string if
+    return $string if
         $page->wiki_info('enable_section_footer') &&
         $page->{c_section_n} == $page->{section_n};
     
