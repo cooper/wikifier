@@ -30,7 +30,7 @@ sub section_parse {
     my ($block, $page) = @_;
     
     # determine header level.
-    $block->{header_level} = ($block->{parent}{header_level} || 0) + 1;
+    $block->{header_level} = ($block->{parent}{header_level} || 1) + 1;
 
     # track the section count.
     $page->{c_section_n} = -1 if not defined $page->{section_n};
@@ -54,9 +54,9 @@ sub section_html {
     
     # if we have a title and this type of title is enabled.
     if (length $title and !($is_intro && $page->wiki_info('no_page_title'))) {
-        my $l    = $block->{header_level};
+        my $l    = $is_intro ? 1 : $block->{header_level};
            $l    = 6 if $block->{header_level} > 6;
-        $string .= "    <h$l class=\"$class $class-$l\">$title</h$l>\n";
+        $string .= "    <h$l class=\"$class\">$title</h$l>\n";
     }
    
     # append the indented HTML of each contained block.
