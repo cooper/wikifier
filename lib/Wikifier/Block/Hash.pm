@@ -53,7 +53,8 @@ sub hash_parse {
         
         # for each character in this string...
         my $escaped; # true if the last was escape character
-        for (split //, $item) {
+        my $i = 0;
+        for (split //, $item) { $i++;
         
             my $is_escaped; # this character is an escape
             my $char = $_;
@@ -64,7 +65,7 @@ sub hash_parse {
                 # if there is no key, give up.
                 if (!length $key) {
                     carp "no key for text value in hash-based block ($value)";
-                    return;
+                    $key = "Item $i";
                 }
                 
                 # if we're already in a value, this colon belongs to the value.
