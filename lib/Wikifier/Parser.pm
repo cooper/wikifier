@@ -206,7 +206,7 @@ sub handle_character {
             }
             
             # this could be a space between things.
-            elsif ($char eq ' ' && !length $block_type) {carp "5\n";
+            elsif ($last_char eq ' ' && !length $block_type) {carp "5\n";
                 next;
             }
             
