@@ -69,8 +69,11 @@ sub hash_parse {
                 # if we're already in a value, this colon belongs to the value.
                 continue if $in_value; # to default.
                 
-                $in_value = 1 unless $escaped;
-                $escaped  = 0;
+                # this was escaped.
+                continue if $escaped;
+                
+                # we're now inside the value.
+                $in_value = 1;
                 
             }
             
