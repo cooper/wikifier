@@ -75,7 +75,7 @@ sub hash_parse {
             
             when ("\\") {
                 continue if $escaped; # this backslash was escaped.
-                $is_escape = 1;
+                $is_escaped = 1;
             }
             
             # a semicolon indicates the termination of a pair.
