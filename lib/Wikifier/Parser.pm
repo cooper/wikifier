@@ -142,58 +142,23 @@ sub handle_character {
         
         # chop one character at a time from the end of the content.
         while (my $last_char = chop $content) { $chars_scanned++;
-            carp "$last_char\n";
-            # space. section section [block name] {
-#            if ($last_char eq ' ') {
-#                
-#                # this is space within [].
-#                if ($in_block_name || $in_block_type) {
-#                    # these are handled below, so do nothing.
-#                }
-#                
-#                # not in the block type/name.
-#                else {
-#                
-#                    # spaces between things:
-#                    # section [block name] {
-#                    #        ^            ^
-#                    # ignore them entirely.
-#                    if (!length $block_type) {
-#                        next;
-#                    }
-#                    
-#                    # space before the block type:
-#                    #  section [block name] {
-#                    # ^
-#                    # marks the end of parsing.
-#                    last;
-#            
-#                }
-#                
-#                # FIXME: in the rare situation that a file may start with a block
-#                # with no prefixing newlines or spaces, this will not work, and the
-#                # wikifier will probably output nothing.
-#                # a simple workaround could be to inject a newline before the beginning of
-#                # the file's first line during file parsing.
-#                
-#            }
             
             # ignore newlines.
             next if $last_char eq "\n";
             
             # entering block name.
             if ($last_char eq ']') {
-                $in_block_name = 1;carp "1\n";
+                $in_block_name = 1;
             }
             
             # exiting block name.
             elsif ($last_char eq '[') {
-                $in_block_name = 0;carp "2\n";
+                $in_block_name = 0;
             }
             
             # we are in the block name, so add this character to the front.
             elsif ($in_block_name) {
-                $block_name = $last_char.$block_name;carp "3\n";
+                $block_name = $last_char.$block_name;
             }
             
             # could this char be part of a block type?
@@ -201,17 +166,17 @@ sub handle_character {
             # it can, so we're probably in the block type at this point.
             # append to the block type.
             elsif ($last_char =~ m/\w|\-/) {
-                $block_type = $last_char.$block_type;carp "4\n";
+                $block_type = $last_char.$block_type;
                 next;
             }
             
             # this could be a space between things.
-            elsif ($last_char eq ' ' && !length $block_type) {carp "5\n";
+            elsif ($last_char eq ' ' && !length $block_type) {
                 next;
             }
             
             # I give up. bail!
-            else {carp "6\n";
+            else {
                 last;
             }
 
