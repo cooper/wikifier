@@ -142,7 +142,7 @@ sub handle_character {
         
         # chop one character at a time from the end of the content.
         while (my $last_char = chop $content) { $chars_scanned++;
-            
+            carp "$last_char\n";
             # space. section section [block name] {
 #            if ($last_char eq ' ') {
 #                
@@ -179,21 +179,21 @@ sub handle_character {
 #            }
             
             # ignore newlines.
-            next if $last_char eq " $last_char\n";
+            next if $last_char eq "\n";
             
             # entering block name.
             if ($last_char eq ']') {
-                $in_block_name = 1;print "1 $last_char\n";
+                $in_block_name = 1;carp "1\n";
             }
             
             # exiting block name.
             elsif ($last_char eq '[') {
-                $in_block_name = 0;print "2 $last_char\n";
+                $in_block_name = 0;carp "2\n";
             }
             
             # we are in the block name, so add this character to the front.
             elsif ($in_block_name) {
-                $block_name = $last_char.$block_name;print "3 $last_char\n";
+                $block_name = $last_char.$block_name;carp "3\n";
             }
             
             # could this char be part of a block type?
@@ -201,18 +201,18 @@ sub handle_character {
             # it can, so we're probably in the block type at this point.
             # append to the block type.
             elsif ($last_char =~ m/\w|\-/) {
-                $block_type = $last_char.$block_type;print "4 $last_char\n";
+                $block_type = $last_char.$block_type;carp "4\n";
                 next;
             }
             
             # this could be a space between things.
-            elsif ($char eq ' ' && !length $block_type) {
-                next;print "5 $last_char\n";
+            elsif ($char eq ' ' && !length $block_type) {carp "5\n";
+                next;
             }
             
             # I give up. bail!
-            else {
-                last;print "6 $last_char\n";
+            else {carp "6\n";
+                last;
             }
 
         }
