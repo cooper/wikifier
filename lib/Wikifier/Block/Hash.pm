@@ -32,6 +32,7 @@ sub hash_parse {
     # for each content item...
     ITEM: foreach my $item (@{$block->{content}}) {
         print "ITEM: $item\n";
+        
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
             print "setting $key to $value\n";

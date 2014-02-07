@@ -177,6 +177,7 @@ sub handle_character {
             
             # I give up. bail!
             else {
+                $chars_scanned--;
                 last;
             }
 
