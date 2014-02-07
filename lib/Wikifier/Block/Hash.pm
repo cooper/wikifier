@@ -31,16 +31,11 @@ sub hash_parse {
     
     # for each content item...
     ITEM: foreach my $item (@{$block->{content}}) {
-    
+        print "ITEM: $item\n";
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
-        
-            # if there is no key, give up.
-            if (!length $key) {
-                carp "no key for block value in hash-based block of type $$block{type} ($item)";
-                return;
-            }
-            
+            print "setting $key to $value\n";
+
             # set the value to the block item itself.
             $value = $values{$key} = $item;
             
