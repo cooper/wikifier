@@ -137,8 +137,8 @@ sub handle_character {
         
         # set some initial variables for the loop.
         my $content       = $current{block}{content}[-1];
-        my $block_type    = my $block_name    = q..;
-        my $in_block_name = my $in_block_type = my $chars_scanned = 0;
+        my $block_type    = my $block_name    = '';
+        my $in_block_name = my $chars_scanned = 0;
         
         # chop one character at a time from the end of the content.
         while (my $last_char = chop $content) { $chars_scanned++;
@@ -202,6 +202,11 @@ sub handle_character {
             # append to the block type.
             elsif ($last_char =~ m/\w|\-/) {
                 $block_type = $last_char.$block_type;
+                next;
+            }
+            
+            # this could be a space between things.
+            elsif ($char eq ' ' && !length $block_type) {
                 next;
             }
             
