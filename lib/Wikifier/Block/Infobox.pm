@@ -43,6 +43,11 @@ sub infobox_html {
             $value = $page->parse_formatted_text($value);
         }
         
+        # Parse formatting in the key.
+        if (defined $key_title) {
+            $key_title = $page->parse_formatted_text($key_title);
+        }
+        
         # append table row without key.
         
         if (!defined $key_title) {
