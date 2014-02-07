@@ -126,7 +126,7 @@ sub hash_parse {
                 # pretty simple stuff.
             }
             
-            $escaped = $is_escaped;
+            $escaped = $is_escape;
             print "char: %$char; escaped: $escaped\n";
             
         } # end of character loop.
