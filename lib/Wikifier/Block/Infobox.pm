@@ -26,31 +26,13 @@ sub infobox_html {
         $string .= "    <div class=\"wiki-infobox-title\">$$block{name}</div>\n";
     }
     
-    # if an image is present, display it.
-    if (my $image = $block->{hash}{-image}) {
-        my $imagehtml = $image->html(@_);
-        $imagehtml = Wikifier::Utilities::indent($imagehtml, 2);
-        $string .= "    <div class=\"wiki-infobox-image-container\">\n$imagehtml    </div>\n";
-    }
-    
     # start table.
     $string .= "    <table class=\"wiki-infobox-table\">\n";
     
     # append each pair.
     foreach my $pair (@{$block->{hash_array}}) {
         my ($key, $key_title, $value) = @$pair;
-        
-        # no key.
-        my $no_key;
-        if (!defined $key_title) {
-            $no_key = 1;
-        }
-        
-        # special pair - ignore it.
-        elsif (substr($key_title, 0, 1) eq '-') {
-            next;
-        }
-        
+
         # value is a block. generate the HTML for it.
         if (blessed $value) {
             $value = $value->html(@_);
@@ -63,7 +45,7 @@ sub infobox_html {
         
         # append table row without key.
         
-        if ($no_key) {
+        if (!defined $key_title) {
         
         $string .= <<END
 
