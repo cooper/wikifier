@@ -63,7 +63,7 @@ sub infobox_html {
         
         # append table row without key.
         
-        if (!$no_key) {
+        if ($no_key) {
         
         $string .= <<END
 
