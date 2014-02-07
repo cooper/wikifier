@@ -203,7 +203,7 @@ sub handle_character {
             }
             
             # not in block name, so it's part of the type.
-            $block_type = $last_char.$block_type;
+            $block_type = $last_char.$block_type if $last_char =~ m/\w|\-/;
             
         }
         
