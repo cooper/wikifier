@@ -137,8 +137,8 @@ sub handle_character {
         
         # set some initial variables for the loop.
         my $content       = $current{block}{content}[-1];
-        my $block_type    = my $block_name = q..;
-        my $in_block_name = my $chars_scanned = 0;
+        my $block_type    = my $block_name    = q..;
+        my $in_block_name = my $in_block_type = my $chars_scanned = 0;
         
         # chop one character at a time from the end of the content.
         while (my $last_char = chop $content) { $chars_scanned++;
@@ -150,6 +150,12 @@ sub handle_character {
                 if ($in_block_name) {
                     # append it to the block name.
                     # continue.
+                }
+                
+                # this space terminates a block type.
+                if ($in_block_type) {
+                    $in_block_type = 0;
+                    next;
                 }
                 
                 # not in the block name.
@@ -202,9 +208,16 @@ sub handle_character {
                 next;
             }
             
-            # not in block name, so it's part of the type.
-            $block_type = $last_char.$block_type if $last_char =~ m/\w|\-/;
+            # enter block type if it's alphanumeric, _, or -.
+            if (!$in_block_type && $last_char =~ m/\w|\-/) {
+                $in_block_type = 1;
+            }
             
+            # in block type, so it's part of the type.
+            if ($in_block_type) {
+                $block_type = $last_char.$block_type;
+            }
+
         }
         
         # remove the block type and name from the current block's content.
