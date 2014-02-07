@@ -179,21 +179,21 @@ sub handle_character {
 #            }
             
             # ignore newlines.
-            next if $last_char eq "\n";
+            next if $last_char eq " $last_char\n";
             
             # entering block name.
             if ($last_char eq ']') {
-                $in_block_name = 1;
+                $in_block_name = 1;print "1 $last_char\n";
             }
             
             # exiting block name.
             elsif ($last_char eq '[') {
-                $in_block_name = 0;
+                $in_block_name = 0;print "2 $last_char\n";
             }
             
             # we are in the block name, so add this character to the front.
             elsif ($in_block_name) {
-                $block_name = $last_char.$block_name;
+                $block_name = $last_char.$block_name;print "3 $last_char\n";
             }
             
             # could this char be part of a block type?
@@ -201,18 +201,18 @@ sub handle_character {
             # it can, so we're probably in the block type at this point.
             # append to the block type.
             elsif ($last_char =~ m/\w|\-/) {
-                $block_type = $last_char.$block_type;
+                $block_type = $last_char.$block_type;print "4 $last_char\n";
                 next;
             }
             
             # this could be a space between things.
             elsif ($char eq ' ' && !length $block_type) {
-                next;
+                next;print "5 $last_char\n";
             }
             
             # I give up. bail!
             else {
-                last;
+                last;print "6 $last_char\n";
             }
 
         }
