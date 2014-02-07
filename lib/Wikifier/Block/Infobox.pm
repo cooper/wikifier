@@ -39,6 +39,7 @@ sub infobox_html {
     # append each pair.
     foreach my $pair (@{$block->{hash_array}}) {
         my ($key, $key_title, $value) = @$pair;
+        print "GROUP: key($key) key_title($key_title) value($value)\n";
         
         # no key.
         my $no_key;
