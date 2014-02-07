@@ -38,10 +38,16 @@ sub infobox_html {
     
     # append each pair.
     foreach my $pair (@{$block->{hash_array}}) {
-        my ($key, $value) = @$pair;
+        my ($key, $key_title, $value) = @$pair;
+        
+        # no key.
+        my $no_key;
+        if (!defined $key_title) {
+            $no_key = 1;
+        }
         
         # special pair - ignore it.
-        if (substr($key, 0, 1) eq '-') {
+        elsif (substr($key_title, 0, 1) eq '-') {
             next;
         }
         
@@ -55,16 +61,33 @@ sub infobox_html {
             $value = $page->parse_formatted_text($value);
         }
         
-        # append table row.
+        # append table row without key.
+        
+        if (!$no_key) {
+        
         $string .= <<END
 
         <tr class="wiki-infobox-pair">
-            <td class="wiki-infobox-key">$key</td>
+            <td class="wiki-infobox-anon" colspan="2">$value</td>
+        </tr>
+        
+END
+;
+        }
+        
+        # append table row with key
+        else {
+        
+        $string .= <<END
+
+        <tr class="wiki-infobox-pair">
+            <td class="wiki-infobox-key">$key_title</td>
             <td class="wiki-infobox-value">$value</td>
         </tr>
         
 END
 ;
+        }
 
     }
     

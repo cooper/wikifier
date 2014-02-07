@@ -87,10 +87,16 @@ sub hash_parse {
             
                 # it was escaped.
                 continue if $escaped;
-            
+
                 # remove spaces from key and value.
                 $key   =~ s/(^\s*)|(\s*$)//g; my $key_title = $key;
                 $value =~ s/(^\s*)|(\s*$)//g unless blessed $value;
+
+                # no key.
+                if (!$key) {
+                    $key       = "anon_$i";
+                    $key_title = undef;
+                }
            
                 # if this key exists, rename it to the next available <name>_key_<n>.
                 while (exists $values{$key}) {
@@ -105,7 +111,7 @@ sub hash_parse {
                 
                 # store the value.
                 $values{$key} = $value;
-                push @{$block->{hash_array}}, [$key_title, $value];
+                push @{$block->{hash_array}}, [$key, $key_title, $value];
             
                 # reset status.
                 $in_value = 0;
