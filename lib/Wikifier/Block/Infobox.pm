@@ -23,7 +23,7 @@ sub infobox_html {
     
     # display the title if it exists.
     if (defined $block->{name}) {
-        $string .= "    <div class=\"wiki-infobox-title\">$$block{title}</div>\n";
+        $string .= "    <div class=\"wiki-infobox-title\">$$block{name}</div>\n";
     }
     
     # if an image is present, display it.
