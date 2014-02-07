@@ -170,7 +170,12 @@ sub read_config {
         file      => $file,
         vars_only => 1       # don't waste time parsing anything but variables
     );
-    $conf->parse or croak; # XXX: probably shouldn't croak.
+    
+    # error.
+    if (!$conf->parse) {
+        carp "failed to parse configuration";
+        return;
+    }
     
     # XXX: THIS IS STUPID I HATE IT NEED TO REMOVE IT AND MAKE IT ALL THE SAME AS CONFIG
     my %opts = (

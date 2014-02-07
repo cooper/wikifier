@@ -230,7 +230,7 @@ sub handle_character {
         
         # we cannot close the main block.
         if ($current{block} == $page->{main_block}) {
-            croak "attempted to close main block";
+            carp "attempted to close main block";
             return;
         }
         

@@ -43,7 +43,7 @@ sub imagebox_parse {
     
     # no file - this is mandatory.
     if (!length $block->{file}) {
-        croak "no file specified for imagebox";
+        carp "no file specified for imagebox";
         return;
     }
     

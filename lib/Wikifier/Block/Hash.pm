@@ -37,7 +37,7 @@ sub hash_parse {
         
             # if there is no key, give up.
             if (!length $key) {
-                croak "no key for block value in hash-based block of type $$block{type} ($item)";
+                carp "no key for block value in hash-based block of type $$block{type} ($item)";
                 return;
             }
             
@@ -52,8 +52,10 @@ sub hash_parse {
         }
         
         # for each character in this string...
+        my $escaped; # true if the last was escape character
         for (split //, $item) {
         
+            my $is_escaped; # this character is an escape
             my $char = $_;
             
             # the first colon indicates that we're beginning a value.
@@ -61,7 +63,7 @@ sub hash_parse {
                 
                 # if there is no key, give up.
                 if (!length $key) {
-                    croak "no key for text value in hash-based block ($value)";
+                    carp "no key for text value in hash-based block ($value)";
                     return;
                 }
                 
@@ -71,8 +73,16 @@ sub hash_parse {
                 $in_value = 1;
             }
             
+            when ("\\") {
+                continue if $escaped; # this backslash was escaped.
+                $is_escape = 1;
+            }
+            
             # a semicolon indicates the termination of a pair.
             when (';') {
+            
+                # it was escaped.
+                continue if $escaped;
             
                 # remove spaces from key and value.
                 $key   =~ s/(^\s*)|(\s*$)//g; my $key_title = $key;
@@ -114,6 +124,8 @@ sub hash_parse {
                 
                 # pretty simple stuff.
             }
+            
+            $escaped = $is_escaped;
             
         } # end of character loop.
 
