@@ -184,31 +184,28 @@ sub handle_character {
             # entering block name.
             if ($last_char eq ']') {
                 $in_block_name = 1;
-                next;
             }
             
             # exiting block name.
-            if ($last_char eq '[') {
+            elsif ($last_char eq '[') {
                 $in_block_name = 0;
-                next;
             }
             
             # we are in the block name, so add this character to the front.
-            if ($in_block_name) {
+            elsif ($in_block_name) {
                 $block_name = $last_char.$block_name;
-                next;
             }
             
             # could this char be part of a block type?
            
             # it can, so we're probably in the block type at this point.
             # append to the block type.
-            if ($last_char =~ m/\w|\-/) {
+            elsif ($last_char =~ m/\w|\-/) {
                 $block_type = $last_char.$block_type;
                 next;
             }
             
-            # it's not valid for a block type. bail!
+            # I give up. bail!
             else {
                 last;
             }
