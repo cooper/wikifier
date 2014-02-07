@@ -56,7 +56,7 @@ sub hash_parse {
         my $i = 0;
         for (split //, $item) { $i++;
         
-            my $is_escaped; # this character is an escape
+            my $is_escape; # this character is an escape
             my $char = $_;
             
             # the first colon indicates that we're beginning a value.
@@ -76,7 +76,7 @@ sub hash_parse {
             
             when ("\\") {
                 continue if $escaped; # this backslash was escaped.
-                $is_escaped = 1;
+                $is_escape = 1;
             }
             
             # a semicolon indicates the termination of a pair.
@@ -127,6 +127,7 @@ sub hash_parse {
             }
             
             $escaped = $is_escaped;
+            print "char: %$char; escaped: $escaped\n";
             
         } # end of character loop.
 
