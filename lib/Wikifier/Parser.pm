@@ -144,51 +144,42 @@ sub handle_character {
         while (my $last_char = chop $content) { $chars_scanned++;
             
             # space. section section [block name] {
-            if ($last_char eq ' ') {
-                
-                # this is space within [].
-                if ($in_block_name) {
-                    # append it to the block name.
-                    # continue.
-                }
-                
-                # this space terminates a block type.
-                if ($in_block_type) {
-                    $in_block_type = 0;
-                    next;
-                }
-                
-                # not in the block name.
-                else {
-                
-                    # spaces between things:
-                    # section [block name] {
-                    #        ^            ^
-                    # ignore them entirely.
-                    if (!length $block_type) {
-                        next;
-                    }
-                    
-                    # space before the block type:
-                    #  section [block name] {
-                    # ^
-                    # marks the end of parsing.
-                    last;
-            
-                }
-                
-                # FIXME: in the rare situation that a file may start with a block
-                # with no prefixing newlines or spaces, this will not work, and the
-                # wikifier will probably output nothing.
-                # a simple workaround could be to inject a newline before the beginning of
-                # the file's first line during file parsing.
-                
-            }
+#            if ($last_char eq ' ') {
+#                
+#                # this is space within [].
+#                if ($in_block_name || $in_block_type) {
+#                    # these are handled below, so do nothing.
+#                }
+#                
+#                # not in the block type/name.
+#                else {
+#                
+#                    # spaces between things:
+#                    # section [block name] {
+#                    #        ^            ^
+#                    # ignore them entirely.
+#                    if (!length $block_type) {
+#                        next;
+#                    }
+#                    
+#                    # space before the block type:
+#                    #  section [block name] {
+#                    # ^
+#                    # marks the end of parsing.
+#                    last;
+#            
+#                }
+#                
+#                # FIXME: in the rare situation that a file may start with a block
+#                # with no prefixing newlines or spaces, this will not work, and the
+#                # wikifier will probably output nothing.
+#                # a simple workaround could be to inject a newline before the beginning of
+#                # the file's first line during file parsing.
+#                
+#            }
             
             # ignore newlines.
-            if ($last_char eq "\n") {
-                next;
-            }
+            next if $last_char eq "\n";
             
             # entering block name.
             if ($last_char eq ']') {
@@ -208,14 +199,18 @@ sub handle_character {
                 next;
             }
             
-            # enter block type if it's alphanumeric, _, or -.
-            if (!$in_block_type && $last_char =~ m/\w|\-/) {
-                $in_block_type = 1;
+            # could this char be part of a block type?
+           
+            # it can, so we're probably in the block type at this point.
+            # append to the block type.
+            if ($last_char =~ m/\w|\-/) {
+                $block_type = $last_char.$block_type;
+                next;
             }
             
-            # in block type, so it's part of the type.
-            if ($in_block_type) {
-                $block_type = $last_char.$block_type;
+            # it's not valid for a block type. bail!
+            else {
+                last;
             }
 
         }
