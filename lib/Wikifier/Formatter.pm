@@ -168,7 +168,7 @@ sub parse_format_type {
         # external wiki link [!article!]
         elsif ($link_char eq '!') {
             $link_type = 'external';
-            $title     = ucfirst $page->wiki_info('external_name').q(: ).$target;
+            $title     = $page->wiki_info('external_name').q(: ).ucfirst($target);
             $target    = $page->wiki_info('external_root').q(/).safe_name($target);
         }
         
