@@ -96,11 +96,11 @@ sub hash_parse {
                 while (exists $values{$key}) {
                     my ($key_name, $key_number) = split '_key_', $key;
                     if (!defined $key_number) {
-                        $key = "${key}_key_2";
+                        $key = "${key}_2";
                         next;
                     }
                     $key_number++;
-                    $key = "${key_name}_key_$key_number";
+                    $key = "${key_name}_$key_number";
                 }
                 
                 # store the value.
