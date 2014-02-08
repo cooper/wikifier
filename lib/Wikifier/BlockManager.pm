@@ -12,7 +12,6 @@ use strict;
 use 5.010;
 
 use Carp;
-use Cwd qw(abs_path);
 
 our %block_types;
 
@@ -65,11 +64,6 @@ sub load_block {
         say "No such block file $file";
         return;
     }
-    
-    # find the absolute path.
-    # if it's a symlink, we resolve it here so that
-    # caches are not created separately for each link.
-    $file = abs_path($file) or carp "cannot resolve $file", return;
     
     # do the file.
     my $package = do $file or carp "error loading $type block module: ".($@ || $! || 'idk');

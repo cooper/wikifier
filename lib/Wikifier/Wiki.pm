@@ -19,6 +19,7 @@ use GD;                     # used for image sizing
 use HTTP::Date 'time2str';  # used for HTTP date formatting
 use Digest::MD5 'md5_hex';  # used for etags
 use Cwd 'abs_path';
+use File::Basename 'basename';
 use JSON qw(encode_json decode_json);
 use Carp;
 
@@ -315,6 +316,7 @@ sub display_page {
     
     # determine the page file name.
     my $file       = abs_path($wiki->opt('page_directory').q(/).$page_name);
+       $page_name  = basename($file);
     my $cache_file = $wiki->opt('cache_directory').q(/).$page_name.q(.cache);
     
     # file does not exist.
