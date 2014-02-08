@@ -191,6 +191,7 @@ sub read_config {
         name            => $conf->get('wiki.name'),
         variables       => $conf->get('var'),
         wiki_root       => $conf->get('wiki.root'),
+        page_root       => $conf->get('wiki.page_root'),
         image_root      => $conf->get('wiki.image_root'),
 
         external_name   => $conf->get('external.name'),
