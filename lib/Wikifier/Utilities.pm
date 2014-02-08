@@ -31,9 +31,9 @@ sub indent {
 
 # 'Some Article' -> 'Some_Article'
 sub safe_name {
-    my $string = shift;
+    my ($string, $lc) = @_;
     $string =~ s/ /_/g;
-    return $string;
+    return $lc ? lc $string : $string;
 }
 
 # 'Some_Article' -> 'Some Article'

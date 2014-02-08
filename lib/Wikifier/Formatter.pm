@@ -162,7 +162,7 @@ sub parse_format_type {
         if ($link_char eq '[') {
             $link_type = 'internal';
             $title     = $target;
-            $target    = $page->wiki_info('wiki_root').q(/).safe_name($target);
+            $target    = $page->wiki_info('wiki_root').q(/).safe_name($target, 1);
         }
         
         # external wiki link [!article!]
