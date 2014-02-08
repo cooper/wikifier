@@ -105,7 +105,7 @@ sub hash_parse {
                 
                 # store the value.
                 $values{$key} = $value;
-                push @{$block->{hash_array}}, [$key, $key_title, $value];
+                push @{$block->{hash_array}}, [$key_title, $value, $key];
             
                 # reset status.
                 $in_value = 0;
