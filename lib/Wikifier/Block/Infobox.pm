@@ -22,7 +22,7 @@ sub infobox_html {
     my $string = "<div class=\"wiki-infobox\">\n";
     
     # display the title if it exists.
-    if (defined $block->{name}) {
+    if (length $block->{name}) {
         $string .= "    <div class=\"wiki-infobox-title\">$$block{name}</div>\n";
     }
     
