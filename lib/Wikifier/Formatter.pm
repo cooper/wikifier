@@ -84,20 +84,14 @@ sub parse_formatted_text {
         # any other character.
         default {
         
-            # if this character is escaped, reinject the last char (backslash.)
-            my $append = $char;
-            if ($escaped) {
-                $append = $last_char.$char;
-            }
-        
             # if we're in the format type, append to it.
             if ($in_format) {
-                $format_type .= $append;
+                $format_type .= $char;
             }
             
             # it's any regular character, either within or outside of a format.
             else {
-                $string .= $append;
+                $string .= $char;
             }
             
         }
