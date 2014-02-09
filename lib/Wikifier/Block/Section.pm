@@ -64,7 +64,7 @@ sub section_html {
 
         # if it's not blessed, it's text.
         # sections interpret loose text as paragraphs.        
-        $item = $wikifier->create_block(
+        $item = $page->wikifier->create_block(
             parent  => $block,
             type    => 'paragraph',
             content => $item
