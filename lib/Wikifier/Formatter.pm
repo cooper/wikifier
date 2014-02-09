@@ -27,7 +27,6 @@ sub parse_formatted_text {
     my $format_type  = q();  # format name such as 'i' or '/b'
     my $escaped      = 0;    # this character was escaped.
     my $next_escaped = 0;    # the next character will be escaped.
-    my $ignored      = 0;    # this character is a parser syntax character.
     
     # parse character-by-character.
     CHAR: foreach my $char (split '', $text) {
@@ -36,10 +35,6 @@ sub parse_formatted_text {
         
         # escapes.
         when ('\\') {
-            $ignored = 1; # the master parser does not ignore this...
-                          # I'm not sure why this works this way, but it does.
-                          # It shall stay this way until I find a reason to change it.
-                          
             continue if $escaped; # this backslash was escaped.
             $next_escaped = 1;
         }
@@ -89,10 +84,9 @@ sub parse_formatted_text {
         # any other character.
         default {
         
-            # if this character is escaped and not ignored
-            # for escaping, reinject the last char (backslash.)
+            # if this character is escaped, reinject the last char (backslash.)
             my $append = $char;
-            if (!$ignored && $escaped) {
+            if ($escaped) {
                 $append = $last_char.$char;
             }
         
@@ -113,7 +107,6 @@ sub parse_formatted_text {
         # set last character and escape for next character.
         $last_char = $char;
         $escaped   = $next_escaped;
-        $ignored   = 0;
         
     }
     
