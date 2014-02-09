@@ -61,8 +61,18 @@ sub section_html {
    
     # append the indented HTML of each contained block.
     foreach my $item (@{$block->{content}}) {
-        next unless blessed $item;
+
+        # if it's not blessed, it's text.
+        # sections interpret loose text as paragraphs.        
+        $item = $wikifier->create_block(
+            parent  => $block,
+            type    => 'paragraph',
+            content => $item
+        ) if !blessed $item;
+        
+        # append the generated HTML.
         $string .= Wikifier::Utilities::indent($item->html(@_))."\n";
+        
     }
     
     # end the section.
