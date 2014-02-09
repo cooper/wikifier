@@ -67,7 +67,7 @@ sub section_html {
         $item = $page->wikifier->create_block(
             parent  => $block,
             type    => 'paragraph',
-            content => $item
+            content => [$item]
         ) if !blessed $item;
         
         # append the generated HTML.
