@@ -88,7 +88,7 @@ sub section_html {
         ) if !blessed $item;
         
         # adopt this element.
-        $el->add($item->html);
+        $el->add($item->html($page));
         
     }
 
