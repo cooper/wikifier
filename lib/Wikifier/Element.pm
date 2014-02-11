@@ -24,7 +24,7 @@ sub configure {
     $el->{classes}    ||= defined $el->{class} ? [ $el->{class} ] : [];
     $el->{attributes} ||= {};
     $el->{content}    ||= defined $el->{content} ?
-                          (ref $el->{content} ? $el->{content} : [ $el->{content} ]) : [];
+                          (ref $el->{content} eq 'ARRAY' ? $el->{content} : [ $el->{content} ]) : [];
     $el->{container}    = 1 if $el->{type} eq 'div';
     return $el;
 }
