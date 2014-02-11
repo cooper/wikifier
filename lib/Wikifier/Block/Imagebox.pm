@@ -34,6 +34,10 @@ sub imagebox_parse {
     if (!$block->{width} && !$block->{height}) {
         $block->{width} = 100;
     }
+    else {
+        $block->{width}  =~ s/px// if defined $block->{width};
+        $block->{height} =~ s/px// if defined $block->{height};
+    }
     
     # default to auto.
     $block->{width}  ||= 'auto';
@@ -48,9 +52,9 @@ sub imagebox_parse {
         return;
     }
     
-    # what should we do if a description is omitted?
+    # TODO: what should we do if a description is omitted?
     
-    # if we have an 'author' or 'license', save this reference.
+    # if we have an 'author' or 'license', save this reference. XXX: cite
     if (defined $block->{author} || defined $block->{license}) {
         my $ref = q();
 
@@ -76,30 +80,19 @@ sub imagebox_parse {
 # HTML.
 sub imagebox_html {
     my ($block, $page, $el) = @_;
-    $el->add_class('imagebox-'.$block->{align});
-    
-    # parse formatting in the image description.
-    my $description = $page->parse_formatted_text($block->{description});
-    
-    # currently only exact pixel sizes or 'auto' are supported.
-    my $height = $block->{height}; my $width = $block->{width};
-    $height =~ s/px// if defined $height;
-    $width  =~ s/px// if defined $width;
-    
-    my ($js, $h, $w, $link_address, $image_url) = q();
-    my $image_root = $page->wiki_info('image_root');
-    
-    # direct link to image.
+    my ($h, $w, $link_address, $image_url, $javascript) = '';
+    my $image_root       = $page->wiki_info('image_root');
+    my ($height, $width) = ($block->{height}, $block->{width});
     $link_address = $image_url = "$image_root/$$block{file}";
-    
-    # decide which dimension(s) were given.
-    my $given_width  = defined $width  && $width  ne 'auto' ? 1 : 0;
-    my $given_height = defined $height && $height ne 'auto' ? 1 : 0;
+    $el->add_class('imagebox-'.$block->{align});
     
     ##############
     ### SIZING ###
     ##############
-    my $javascript;
+    
+    # decide which dimension(s) were given.
+    my $given_width  = defined $width  && $width  ne 'auto' ? 1 : 0;
+    my $given_height = defined $height && $height ne 'auto' ? 1 : 0;
     
     # both dimensions were given, so we need to do no sizing.
     if ($given_width && $given_height) {
@@ -169,7 +162,7 @@ sub imagebox_html {
     my $img = $a->create_child(
         type       => 'img',
         attributes => { src => $image_url },
-        alt        => $description,
+        alt        => 'image',
         styles     => {
             width  => "${w}px",
             height => "${h}px"
@@ -185,8 +178,8 @@ sub imagebox_html {
     # description.
     my $desc = $inner->create_child(class => 'imagebox-description');
     $desc->create_child(
-        class   => 'imagebox-inner-description',
-        content => encode_entities($description)
+        class   => 'imagebox-description-inner',
+        content => encode_entities($page->parse_formatted_text($block->{description}))
     );
 
 }
