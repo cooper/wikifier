@@ -100,6 +100,7 @@ sub _parse {
 sub html {
     my $block = shift;
     my $type  = $block->{type};
+    $block->remove_blank;
     
     # create the element and add it to the parent.
     $block->{element} = Wikifier::Element->new(class => $block->{type});
