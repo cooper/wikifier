@@ -76,6 +76,7 @@ sub imagebox_parse {
 # HTML.
 sub imagebox_html {
     my ($block, $page, $el) = @_;
+    $el->add_class('imagebox-'.$block->{align});
     
     # parse formatting in the image description.
     my $description = $page->parse_formatted_text($block->{description});

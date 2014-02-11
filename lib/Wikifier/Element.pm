@@ -113,7 +113,7 @@ sub generate {
     
     # close it off.
     unless ($el->{no_close_tag}) {
-        $html .= $el->{container} ? "</$$el{type}>" : '/ >';
+        $html .= $el->{container} ? "</$$el{type}>" : ' />';
     }
     
     return "$html\n";
