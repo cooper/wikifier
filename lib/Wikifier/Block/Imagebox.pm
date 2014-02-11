@@ -179,7 +179,7 @@ sub imagebox_html {
     $img->add_attribute(onload =>
         q{this.parentElement.parentElement.style.width = }.
         q{this.offsetWidth + 'px'; this.style.width = '100%';}
-    );
+    ) if $javascript;
     
     # description.
     my $desc = $inner->create_child(class => 'imagebox-description');

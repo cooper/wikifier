@@ -50,7 +50,7 @@ sub add_class {
 
 # add an attribute.
 sub add_attribute {
-    push @{ shift->{attributes} }, shift;
+    shift->{attributes}{+shift} = shift;
 }
 
 # add style.
