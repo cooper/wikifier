@@ -14,7 +14,6 @@ use Scalar::Util 'blessed';
 
 our %block_types = (
     main => {
-        parse => \&main_parse,
         html  => \&main_html
     }
 );
@@ -35,13 +34,11 @@ sub main_parse {
 }
 
 sub main_html {
-    my ($block, $page) = @_;
-    my $string = q();
+    my ($block, $page, $el) = @_;
     foreach my $item (@{$block->{content}}) {
         next unless blessed $item;
-        $string .= $item->html($page)."\n";
+        $item->html($page);
     }
-    return $string;
 }
 
 __PACKAGE__

@@ -20,11 +20,11 @@ sub configure {
     my ($el, %opts) = @_;
     $el->{$_} = $opts{$_} foreach keys %opts;
     $el->{type}       ||= 'div';
-    $el->{classes}    ||= defined $opts{class} ? [ $opts{class} ] : [];
+    $el->{classes}    ||= defined $el->{class} ? [ $el->{class} ] : [];
     $el->{attributes} ||= {};
-    $el->{content}    ||= defined $opts{content} ?
-                          (ref $opts{content} ? $opts{content} : [ $opts{content} ]) : [];
-    $el->{inner}        = 1 if $opts{type} eq 'div';
+    $el->{content}    ||= defined $el->{content} ?
+                          (ref $el->{content} ? $el->{content} : [ $el->{content} ]) : [];
+    $el->{inner}        = 1 if $el->{type} eq 'div';
     return $el;
 }
 
