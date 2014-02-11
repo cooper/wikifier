@@ -80,7 +80,10 @@ sub generate {
     my $content;
     foreach my $child (@{ $el->{content} }) {
         $content  = '' if not defined $content;
-        $content .= "$child\n" and next if not blessed $child;
+        if (not blessed $child) {
+            $content .= Wikifier::Utilities::indent("$child\n");
+            next;
+        }
         $content .= Wikifier::Utilities::indent($child->generate);
     }
     $html .= $content if defined $content;
