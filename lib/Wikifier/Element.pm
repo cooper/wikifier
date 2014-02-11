@@ -74,6 +74,7 @@ sub generate {
         my $value = encode_entities($el->{attributes}{$attr});
         $html    .= " $attr=\"$value\"";
     }
+    $html .= ">\n";
     
     # add the inner content.
     my $content;
@@ -82,7 +83,7 @@ sub generate {
         $content .= "$child\n" and next if not blessed $child;
         $content .= Wikifier::Utilities::indent($child->generate);
     }
-    $html .= ">\n$content\n" if defined $content;
+    $html .= "$content\n" if defined $content;
     
     # close it off.
     unless ($el->{no_close_tag}) {
