@@ -111,6 +111,7 @@ sub html {
     $block->_html($type, @_);
     delete $block->{html_done};
 
+    return $block->{element};
 }
 
 # run the base's html() now instead of afterward.

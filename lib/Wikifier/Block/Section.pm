@@ -76,6 +76,22 @@ sub section_html {
         $el->add($heading);
     }
     
+    # add the contained elements.
+    foreach my $item (@{$block->{content}}) {
+
+        # if it's not blessed, it's text.
+        # sections interpret loose text as paragraphs.        
+        $item = $page->wikifier->create_block(
+            parent  => $block,
+            type    => 'paragraph',
+            content => [$item]
+        ) if !blessed $item;
+        
+        # adopt this element.
+        $el->add($item->html);
+        
+    }
+
 }
 
 sub clear_html {
