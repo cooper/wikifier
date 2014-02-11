@@ -8,6 +8,7 @@ package Wikifier::Block::Paragraph;
 use warnings;
 use strict;
 
+use Scalar::Util 'blessed';
 use HTML::Entities qw(encode_entities);
 
 our %block_types = (
