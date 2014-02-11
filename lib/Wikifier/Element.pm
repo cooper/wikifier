@@ -83,7 +83,7 @@ sub generate {
         $content .= "$child\n" and next if not blessed $child;
         $content .= Wikifier::Utilities::indent($child->generate);
     }
-    $html .= "$content\n" if defined $content;
+    $html .= $content if defined $content;
     
     # close it off.
     unless ($el->{no_close_tag}) {
