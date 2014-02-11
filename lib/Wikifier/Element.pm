@@ -6,6 +6,7 @@ package Wikifier::Element;
 use warnings;
 use strict;
 
+use Scalar::Utils qw(blessed);
 use HTML::Entities qw(encode_entities);
 
 # create a new page.
