@@ -82,11 +82,11 @@ sub generate {
     
     # add styles.
     my $styles;
-    foreach $style (keys %{ $el->{styles} }) {
+    foreach my $style (keys %{ $el->{styles} }) {
         $styles ||= '';
         $styles  .= "$style: ".$el->{styles}{$style}.q(;);
     }
-    $html .= " style=\"$styles\"" if defined $style;
+    $html .= " style=\"$styles\"" if defined $styles;
     
     # add other attributes.
     foreach my $attr (keys %{ $el->{attributes} }) {
