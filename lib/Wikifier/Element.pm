@@ -25,7 +25,7 @@ sub configure {
     $el->{attributes} ||= {};
     $el->{content}    ||= defined $el->{content} ?
                           (ref $el->{content} ? $el->{content} : [ $el->{content} ]) : [];
-    $el->{inner}        = 1 if $el->{type} eq 'div';
+    $el->{container}    = 1 if $el->{type} eq 'div';
     return $el;
 }
 
@@ -74,7 +74,7 @@ sub generate {
         my $value = encode_entities($el->{attributes}{$attr});
         $html    .= " $attr=\"$value\"";
     }
-    $html .= ">\n" if $el->{inner};
+    $html .= ">\n" if $el->{container};
     
     # add the inner content.
     my $content;
@@ -87,7 +87,7 @@ sub generate {
     
     # close it off.
     unless ($el->{no_close_tag}) {
-        $html .= $el->{inner} ? "</$$el{type}>" : '/ >';
+        $html .= $el->{container} ? "</$$el{type}>" : '/ >';
     }
     
     return "$html\n";
