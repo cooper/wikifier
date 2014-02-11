@@ -102,10 +102,7 @@ sub html {
     my $type  = $block->{type};
     
     # create the element and add it to the parent.
-    $block->{element} = Wikifier::Element->new(
-        type  => 'div',
-        class => $block->{type}
-    );
+    $block->{element} = Wikifier::Element->new(class => $block->{type});
     $block->{parent}{element}->add($block->{element})
       if $block->{parent}{element};
     

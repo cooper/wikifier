@@ -19,6 +19,7 @@ sub new {
 sub configure {
     my ($el, %opts) = @_;
     $el->{$_} = $opts{$_} foreach keys %opts;
+    $el->{type}       ||= 'div';
     $el->{classes}    ||= defined $opts{class} ? [ $opts{class} ] : [];
     $el->{attributes} ||= {};
     $el->{content}    ||= defined $opts{content} ?
