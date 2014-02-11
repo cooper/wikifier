@@ -12,7 +12,6 @@ package Wikifier::Block;
 
 use warnings;
 use strict;
-use feature qw(switch);
 
 # Required properties of blocks.
 #   
@@ -134,6 +133,7 @@ sub remove_blank {
     my $block = shift;
     my @new;
     foreach my $item (@{$block->{content}}) {
+        next if blessed $item;
         my $_item = $item; $_item =~ s/^\s*//g; $_item =~ s/\s*$//g;
         push @new, $item if length $_item;
     }
