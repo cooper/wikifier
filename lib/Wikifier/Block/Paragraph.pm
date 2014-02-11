@@ -37,7 +37,8 @@ sub paragraph_html {
         # trim.
         my @items;
         foreach my $line (split "\n", $item) {
-            push @items, Wikifier::Utilities::trim($line);
+            $line = Wikifier::Utilities::trim($line);
+            push @items, $line if length $line;
         }
         
         $el->add(encode_entities(join "\n", @items));
