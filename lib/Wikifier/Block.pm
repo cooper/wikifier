@@ -102,10 +102,10 @@ sub html {
     my $type  = $block->{type};
     $block->remove_blank;
     
-    # create the element and add it to the parent.
+    # create the element.
     $block->{element} = Wikifier::Element->new(class => $block->{type});
-    $block->{parent}{element}->add($block->{element})
-      if $block->{parent}{element};
+    #$block->{parent}{element}->add($block->{element})
+    #  if $block->{parent}{element};
     
     # generate this block.
     $block->{html_done} = {};
