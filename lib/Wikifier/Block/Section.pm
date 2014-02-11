@@ -46,9 +46,11 @@ sub section_html {
     $el->configure(clear => 1);
     
     # disable the footer if necessary.
-    my $no_footer = $page->wiki_info('enable_section_footer') &&
+    # FIXME: this doesn't work anymore because of nested sections.
+    # plus, there's going to be a final main tag anyway...
+    my $has_footer = $page->wiki_info('enable_section_footer') &&
         $page->{c_section_n} == $page->{section_n};
-    $el->configure(no_close_tag => $no_footer);
+    $el->configure(no_close_tag => $has_footer);
     
     # determine if this is the intro section.
     my $is_intro = !$page->{c_section_n};
