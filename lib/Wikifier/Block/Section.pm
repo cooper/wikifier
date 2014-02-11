@@ -12,7 +12,6 @@ use Scalar::Util 'blessed';
 
 our %block_types = (
     section => {
-        base  => 'container',
         parse => \&section_parse,
         html  => \&section_html,
         alias => 'sec'

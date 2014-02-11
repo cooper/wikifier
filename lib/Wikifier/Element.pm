@@ -11,12 +11,20 @@ use HTML::Entities qw(encode_entities);
 # create a new page.
 sub new {
     my ($class, %opts) = @_;
-    $opts{classes}    ||= defined $opts{class} ? [ $opts{class} ] : [];
-    $opts{attributes} ||= {};
-    $opts{content}    ||= defined $opts{content} ?
+    my $el = bless \%opts, $class;
+    return $el->configure;
+}
+
+# options.
+sub configure {
+    my ($el, %opts) = @_;
+    $el->{$_} = $opts{$_} foreach keys %opts;
+    $el->{classes}    ||= defined $opts{class} ? [ $opts{class} ] : [];
+    $el->{attributes} ||= {};
+    $el->{content}    ||= defined $opts{content} ?
                           (ref $opts{content} ? $opts{content} : [ $opts{content} ]) : [];
-    $opts{inner}        = 1 if $opts{type} eq 'div';
-    return bless \%opts, $class;
+    $el->{inner}        = 1 if $opts{type} eq 'div';
+    return $el;
 }
 
 # create a child and add to content.
