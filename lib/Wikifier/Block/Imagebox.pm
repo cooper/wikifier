@@ -168,7 +168,7 @@ sub imagebox_html {
     my $img = $a->create_child(
         type       => 'img',
         attributes => { src => $image_url },
-        alt        => $description
+        alt        => $description,
         styles     => {
             width  => $w,
             height => $h
