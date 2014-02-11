@@ -44,6 +44,7 @@ use Wikifier::Utilities;
 
 use Wikifier::Page;
 use Wikifier::Block;
+use Wikifier::Element;
 
 # create a new wikifier instance.
 sub new {
