@@ -111,7 +111,8 @@ sub parse {
 # returns the generated page HTML.
 sub html {
     my $page = shift;
-    return $page->{wikifier}{main_block}->html($page)->generate;
+    $page->{wikifier}{main_block}->html($page);
+    return $page->{wikifier}{main_block}{element}->generate;
 }
 
 # set a variable.
