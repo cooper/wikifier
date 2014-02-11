@@ -35,6 +35,7 @@ sub create_child {
     my $el    = shift;
     my $child = __PACKAGE__->new(@_);
     $el->add($child);
+    return $child;
 }
 
 # add a child or text node.
