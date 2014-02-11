@@ -124,6 +124,11 @@ sub html_base {
     return $html;   
 }
 
+# create an element.
+sub element {
+    return shift->{parent}{element}->create_child(@_);
+}
+
 #############
 ### OTHER ###
 #############

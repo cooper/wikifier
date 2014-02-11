@@ -19,6 +19,13 @@ sub new {
     return bless \%opts, $class;
 }
 
+# create a child and add to content.
+sub create_child {
+    my $el    = shift;
+    my $child = __PACKAGE__->new(@_);
+    push @{ $el->{content} }, $child;
+}
+
 # add a class.
 sub add_class {
     push @{ shift->{classes} }, shift;
