@@ -13,6 +13,8 @@ package Wikifier::Block;
 use warnings;
 use strict;
 
+use Scalar::Util qw(blessed);
+
 # Required properties of blocks.
 #   
 #   parent:     the parent block object. (for main block, undef)
