@@ -70,7 +70,8 @@ sub section_html {
         # create the hedding.
         my $heading = Wikifier::Element->new(
             type  => "h$l",
-            class => $class
+            class => $class,
+            inner => 1
         );
         
         $el->add($heading);

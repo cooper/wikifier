@@ -74,7 +74,7 @@ sub generate {
         my $value = encode_entities($el->{attributes}{$attr});
         $html    .= " $attr=\"$value\"";
     }
-    $html .= ">\n";
+    $html .= ">\n" if $el->{inner};
     
     # add the inner content.
     my $content;
