@@ -73,6 +73,9 @@ sub generate {
     my $el   = shift;
     my $html = "<$$el{type}";
     
+    # quickly determine if this is a container.
+    $el->{container} ||= scalar @{ $el->{content} };
+    
     # add classes.
     my $classes;
     foreach my $class (@{ $el->{classes} }) {
@@ -85,7 +88,7 @@ sub generate {
     my $styles;
     foreach my $style (keys %{ $el->{styles} }) {
         $styles ||= '';
-        $styles  .= "$style: ".$el->{styles}{$style}.q(;);
+        $styles  .= "$style: ".$el->{styles}{$style}.q(; );
     }
     $html .= " style=\"$styles\"" if defined $styles;
     
@@ -110,7 +113,7 @@ sub generate {
     
     # close it off.
     unless ($el->{no_close_tag}) {
-        $html .= $el->{container} || scalar @{ $el->{content} } ? "</$$el{type}>" : '/ >';
+        $html .= $el->{container} ? "</$$el{type}>" : '/ >';
     }
     
     return "$html\n";
