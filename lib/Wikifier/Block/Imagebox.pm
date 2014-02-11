@@ -155,7 +155,7 @@ sub imagebox_html {
     # create inner box with width restriction.
     my $inner = $el->create_child(
         class  => 'imagebox-inner',
-        styles => { width => $w }
+        styles => { width => "${w}px" }
     );
     
     # create the anchor.
@@ -170,8 +170,8 @@ sub imagebox_html {
         attributes => { src => $image_url },
         alt        => $description,
         styles     => {
-            width  => $w,
-            height => $h
+            width  => "${w}px",
+            height => "${h}px"
         }
     );
     
