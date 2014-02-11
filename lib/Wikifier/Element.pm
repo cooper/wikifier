@@ -31,6 +31,11 @@ sub configure {
 sub create_child {
     my $el    = shift;
     my $child = __PACKAGE__->new(@_);
+    $el->add($child);
+}
+
+# add a child or text node.
+sub add {
     push @{ $el->{content} }, $child;
 }
 
@@ -75,10 +80,12 @@ sub generate {
         $content .= "$child\n" and next if not blessed $child;
         $content .= Wikifier::Utilities::indent($child->generate);
     }
+    $html .= ">\n$content\n" if defined $content;
     
     # close it off.
-    if (defined $content) { $html .= ">\n$content\n</$$el{type}>"           }
-    else                  { $html .= $el->{inner} ? "</$$el{type}>" : '/ >' }
+    unless ($el->{no_close_tag}) {
+        $html .= $el->{inner} ? "</$$el{type}>" : '/ >';
+    }
     
     return "$html\n";
 }

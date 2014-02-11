@@ -8,6 +8,8 @@ package Wikifier::Block::Paragraph;
 use warnings;
 use strict;
 
+use HTML::Entities qw(encode_entities);
+
 our %block_types = (
     paragraph => {
         html  => sub { paragraph_html(0, @_) },
@@ -20,14 +22,19 @@ our %block_types = (
 );
 
 sub paragraph_html {
-    my ($clear, $block, $page) = @_;
-
-    # Parse formatting.
+    my ($clear, $block, $page, $el) = @_;
+    $el->configure(type => 'p');
+    $el->add_class('clear') if $clear;
+    
+    # parse formatting.
     my $html = Wikifier::Utilities::indent($block->{content}[0]);
     $html    = $page->parse_formatted_text($html);
-    $clear   = $clear ? 'clear ' : '';
-    
-    return "<p class=\"${clear}wiki-paragraph\">\n$html\n</p>\n";
+
+    foreach my $item (@{ $block->{content} }) {
+        next if blessed $item; # paragraphs cannot currently contain anything.
+        $el->add(encode_entities($item));
+    }
+
 }
 
 __PACKAGE__

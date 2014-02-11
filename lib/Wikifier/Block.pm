@@ -51,25 +51,34 @@ sub new {
 sub parse {
     my $block = shift;
     my $type  = $block->{type};
-    $block->{parse_done} = {};
     
-    while ($type) {
-        my $type_opts = $Wikifier::BlockManager::block_types{$type};
-        if ($type_opts->{parse} && !$block->{parse_done}{$type}) {
-            $type_opts->{parse}->($block, @_);
-            $block->{parse_done}{$type} = 1;
-        }
-        $type = $type_opts->{base};
-    }
-
+    # parse this block.
+    $block->{parse_done} = {};
+    $block->_parse($type, @_);
     delete $block->{parse_done};
+    
+    # parse child blocks.
+    foreach my $block (@{ $block->{content} }) {
+        next unless blessed $block;
+        $block->parse(@_);
+    }
+    
 }
 
 # run the base's parse() now instead of afterward.
+# this is similar to the former method of calling
+# SUPER::parse() at the beginning of a parse().
 sub parse_base {
     my $block = shift;
     my $type  = $Wikifier::BlockManager::block_types{ $block->{type} }{base};
+    $block->_parse($type, @_);
+}
+
+# do not call directly.
+sub _parse {
+    my ($block, $type) = (shift, shift);
     
+    # parse the block hereditarily.
     while ($type) {
         my $type_opts = $Wikifier::BlockManager::block_types{$type};
         if ($type_opts->{parse} && !$block->{parse_done}{$type}) {
@@ -78,55 +87,56 @@ sub parse_base {
         }
         $type = $type_opts->{base};
     }
-    
+
 }
 
 ############
 ### HTML ###
 ############
 
-# HTML result
+# HTML contents.
 sub html {
     my $block = shift;
     my $type  = $block->{type};
-    my $html  = '';
     
+    # create the element and add it to the parent.
+    $block->{element} = Wikifier::Element->new(
+        type  => 'div',
+        class => $block->{type}
+    );
+    $block->{parent}{element}->add($block->{element})
+      if $block->{parent}{element};
+    
+    # generate this block.
     $block->{html_done} = {};
-    
-    while ($type) {
-        my $type_opts = $Wikifier::BlockManager::block_types{$type};
-        if ($type_opts->{html} && !$block->{html_done}{$type}) {
-            $html = $type_opts->{html}->($block, @_);
-            $block->{html_done}{$type} = 1;
-        }
-        $type = $type_opts->{base};
-    }
-
+    $block->_html($type, @_);
     delete $block->{html_done};
-    return $html;
+
 }
 
 # run the base's html() now instead of afterward.
+# this is similar to the former method of calling
+# SUPER::html() at the beginning of a html().
 sub html_base {
     my $block = shift;
     my $type  = $Wikifier::BlockManager::block_types{ $block->{type} }{base};
-    my $html;
-    
+    $block->_html($type, @_);
+}
+
+# do not call directly.
+sub _html {
+    my ($block, $type) = (shift, shift);
+
+    # generate the block hereditarily.
     while ($type) {
         my $type_opts = $Wikifier::BlockManager::block_types{$type};
         if ($type_opts->{html} && !$block->{html_done}{$type}) {
-            $html = $type_opts->{html}->($block, @_);
+            $type_opts->{html}->($block, @_, $block->{element});
             $block->{html_done}{$type} = 1;
         }
         $type = $type_opts->{base};
     }
-    
-    return $html;   
-}
 
-# create an element.
-sub element {
-    return shift->{parent}{element}->create_child(@_);
 }
 
 #############

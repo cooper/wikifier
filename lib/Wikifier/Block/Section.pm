@@ -39,13 +39,20 @@ sub section_parse {
 }
 
 sub section_html {
-    my ($block, $page) = (shift, @_);
-    my $string = "<div class=\"wiki-section\">\n";
+    my ($block, $page, $el) = @_;
     $page->{c_section_n}++;
+    
+    # clear at end of element.
+    $el->configure(clear => 1);
+    
+    # disable the footer if necessary.
+    my $no_footer = $page->wiki_info('enable_section_footer') &&
+        $page->{c_section_n} == $page->{section_n};
+    $el->configure(no_close_tag => $no_footer);
     
     # determine if this is the intro section.
     my $is_intro = !$page->{c_section_n};
-    my $class    = $is_intro ? 'wiki-section-page-title' : 'wiki-section-title';
+    my $class    = $is_intro ? 'section-page-title' : 'section-title';
     
     # determine the page title if necessary.
     my $title    = $block->{name};
@@ -53,38 +60,19 @@ sub section_html {
     
     # if we have a title and this type of title is enabled.
     if (length $title and !($is_intro && $page->wiki_info('no_page_title'))) {
+    
+        # determine the heading level.
         my $l    = $is_intro ? 1 : $block->{header_level};
            $l    = 6 if $block->{header_level} > 6;
-        $string .= "    <h$l class=\"$class\">$title</h$l>\n";
-    }
-   
-    # append the indented HTML of each contained block.
-    foreach my $item (@{$block->{content}}) {
 
-        # if it's not blessed, it's text.
-        # sections interpret loose text as paragraphs.        
-        $item = $page->wikifier->create_block(
-            parent  => $block,
-            type    => 'paragraph',
-            content => [$item]
-        ) if !blessed $item;
+        # create the hedding.
+        my $heading = Wikifier::Element->new(
+            type  => "h$l",
+            class => $class
+        );
         
-        # append the generated HTML.
-        $string .= Wikifier::Utilities::indent($item->html(@_))."\n";
-        
+        $el->add($heading);
     }
-    
-    # end the section.
-    $string .= "    <div class=\"clear\"></div>\n";
-    
-    # disabled </div>.
-    return $string if
-        $page->wiki_info('enable_section_footer') &&
-        $page->{c_section_n} == $page->{section_n};
-    
-    $string .= "</div>\n";
-    
-    return $string;
     
 }
 
