@@ -9,6 +9,7 @@ use warnings;
 use strict;
 
 use Carp;
+use HTML::Entities qw(encode_entities);
 
 our %block_types = (
     imagebox => {
@@ -74,15 +75,10 @@ sub imagebox_parse {
 
 # HTML.
 sub imagebox_html {
-    my ($block, $page) = @_;
+    my ($block, $page, $el) = @_;
     
     # parse formatting in the image description.
     my $description = $page->parse_formatted_text($block->{description});
-    
-    # append citation if one exists.
-    if (defined(my $ref = $block->{citation})) {
-        $description .= qq{ <sup style="font-size: 75%"><a href="#wiki-ref-$ref">[$ref]</a></sup>};
-    }
     
     # currently only exact pixel sizes or 'auto' are supported.
     my $height = $block->{height}; my $width = $block->{width};
@@ -99,6 +95,11 @@ sub imagebox_html {
     my $given_width  = defined $width  && $width  ne 'auto' ? 1 : 0;
     my $given_height = defined $height && $height ne 'auto' ? 1 : 0;
     
+    ##############
+    ### SIZING ###
+    ##############
+    my $javascript;
+    
     # both dimensions were given, so we need to do no sizing.
     if ($given_width && $given_height) {
         $w =  $width.q(px);
@@ -113,7 +114,7 @@ sub imagebox_html {
     
         # inject javascript resizer if no width is given.
         if (!$given_width) {
-            $js = q{ onload="this.parentElement.parentElement.style.width = this.offsetWidth + 'px'; this.style.width = '100%';"};
+            $javascript = 1;
         }
         
         # use the image root address options to determine URL.
@@ -151,18 +152,42 @@ sub imagebox_html {
         $image_url = $url;
     }
     
-    return <<END;
-<div class="wiki-imagebox wiki-imagebox-$$block{align}">
-    <div class="wiki-imagebox-inner" style="width: ${w}px;">
-    <a href="$link_address">
-        <img src="$image_url" alt="image" style="width: ${w}px; height: ${h}px;"$js />
-    </a>
-    <div class="wiki-imagebox-description">
-        <div class="wiki-imagebox-description-inner">$description</div>
-    </div>
-    </div>
-</div>
-END
+    # create inner box with width restriction.
+    my $inner = $el->create_child(
+        class  => 'imagebox-inner',
+        styles => { width => $w }
+    );
+    
+    # create the anchor.
+    my $a = $inner->create_child(
+        type       => 'a',
+        attributes => { href => $link_address }
+    );
+    
+    # create the image.
+    my $img = $a->create_child(
+        type       => 'img',
+        attributes => { src => $image_url },
+        alt        => $description
+        styles     => {
+            width  => $w,
+            height => $h
+        }
+    );
+    
+    # insert javascript if using browser sizing. 
+    $img->add_attribute(onload =>
+        q{this.parentElement.parentElement.style.width = }.
+        q{this.offsetWidth + 'px'; this.style.width = '100%';}
+    );
+    
+    # description.
+    my $desc = $inner->create_child(class => 'imagebox-description');
+    $desc->create_child(
+        class   => 'imagebox-inner-description',
+        content => encode_entities($description)
+    );
+
 }
 
 __PACKAGE__

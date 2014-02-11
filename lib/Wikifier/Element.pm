@@ -23,6 +23,7 @@ sub configure {
     $el->{type}       ||= 'div';
     $el->{classes}    ||= defined $el->{class} ? [ $el->{class} ] : [];
     $el->{attributes} ||= {};
+    $el->{styles}     ||= {};
     $el->{content}      = defined $el->{content} ?
                           (ref $el->{content} eq 'ARRAY' ? $el->{content} : [ $el->{content} ]) : [];
     $el->{container}    = 1 if $el->{type} eq 'div';
@@ -44,6 +45,16 @@ sub add {
 # add a class.
 sub add_class {
     push @{ shift->{classes} }, shift;
+}
+
+# add an attribute.
+sub add_attribute {
+    push @{ shift->{attributes} }, shift;
+}
+
+# add style.
+sub add_style {
+    shift->{styles}{+shift} = shift;
 }
 
 # remove a class.
@@ -68,6 +79,14 @@ sub generate {
         $classes  = "wiki-$class"  if not defined $classes;
     }
     $html .= " class=\"$classes\"" if defined $classes;
+    
+    # add styles.
+    my $styles;
+    foreach $style (keys %{ $el->{styles} }) {
+        $styles ||= '';
+        $styles  .= "$style: ".$el->{styles}{$style}.q(;);
+    }
+    $html .= " style=\"$styles\"" if defined $style;
     
     # add other attributes.
     foreach my $attr (keys %{ $el->{attributes} }) {
