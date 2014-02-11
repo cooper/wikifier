@@ -33,7 +33,14 @@ sub paragraph_html {
 
     foreach my $item (@{ $block->{content} }) {
         next if blessed $item; # paragraphs cannot currently contain anything.
-        $el->add(encode_entities($item));
+        
+        # trim.
+        my @items;
+        foreach my $line (split "\n", $item) {
+            push @items, Wikifier::Utilities::trim($line);
+        }
+        
+        $el->add(encode_entities(join "\n", @items));
     }
 
 }
