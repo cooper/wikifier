@@ -9,6 +9,7 @@ use warnings;
 use strict;
 
 use Scalar::Util 'blessed';
+use HTML::Entities 'encode_entities';
 
 our %block_types = (
     infobox => {
@@ -24,7 +25,7 @@ sub infobox_html {
     if (length $block->{name}) {
         $el->create_child(
             class   => 'infobox-title',
-            content => entities_encode($block->{name})
+            content => encode_entities($block->{name})
         );
     }
     
