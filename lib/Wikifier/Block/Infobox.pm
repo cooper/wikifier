@@ -18,16 +18,21 @@ our %block_types = (
 );
 
 sub infobox_html {
-    my ($block, $page) = (shift, @_);
-    my $string = "<div class=\"wiki-infobox\">\n";
+    my ($block, $page, $el) = @_;
     
     # display the title if it exists.
     if (length $block->{name}) {
-        $string .= "    <div class=\"wiki-infobox-title\">$$block{name}</div>\n";
+        $el->create_child(
+            class   => 'infobox-title',
+            content => entities_encode($block->{name})
+        );
     }
     
     # start table.
-    $string .= "    <table class=\"wiki-infobox-table\">\n";
+    my $table = $el->create_child(
+        type  => 'table',
+        class => 'infobox-table'
+    );
     
     # append each pair.
     foreach my $pair (@{$block->{hash_array}}) {
@@ -35,7 +40,7 @@ sub infobox_html {
 
         # value is a block. generate the HTML for it.
         if (blessed $value) {
-            $value = $value->html(@_);
+            $value = $value->html($page);
         }
         
         # Parse formatting in the value.
@@ -48,38 +53,37 @@ sub infobox_html {
             $key_title = $page->parse_formatted_text($key_title);
         }
         
+        # create the row.
+        my $tr = $table->create_child(
+            type  => 'tr',
+            class => 'infobox-pair'
+        );
+        
+        # append table row with key.
+        if (defined $key_title) {
+            $tr->create_child(
+                type       => 'td',
+                class      => 'infobox-key',
+                content    => $key_title
+            );
+            $tr->create_child(
+                type       => 'td',
+                class      => 'infobox-value',
+                content    => $value
+            );
+        }
+        
         # append table row without key.
-        
-        if (!defined $key_title) {
-        
-        $string .= <<END
-
-        <tr class="wiki-infobox-pair">
-            <td class="wiki-infobox-anon" colspan="2">$value</td>
-        </tr>
-        
-END
-;
-        }
-        
-        # append table row with key
         else {
-        
-        $string .= <<END
-
-        <tr class="wiki-infobox-pair">
-            <td class="wiki-infobox-key">$key_title</td>
-            <td class="wiki-infobox-value">$value</td>
-        </tr>
-        
-END
-;
+            $tr->create_child(
+                type       => 'td',
+                class      => 'infobox-anon',
+                attributes => { colspan => 2 },
+                content    => $value
+            );
         }
 
-    }
-    
-    $string .= "    </table>\n</div>\n";
-    return $string;
+    } # pair
 }
 
 __PACKAGE__
