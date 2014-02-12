@@ -419,9 +419,10 @@ sub display_image {
     
     # if this is a retina request, calculate 
     if ($retina_request) {
-        $image_name = $1.q(.).$image_ext;
-        $width     *= 2;
-        $height    *= 2;
+        $image_wo_ext = $1;
+        $image_name   = $1.q(.).$image_ext;
+        $width       *= 2;
+        $height      *= 2;
     }
     
     # check if the file exists.
