@@ -147,7 +147,10 @@ sub image_html {
         );
         $a->create_child(
             type       => 'img',
-            attributes => { src => $image_url },
+            attributes => {
+                src => $image_url,
+                alt => 'image'
+            },
             alt        => 'image',
             styles     => {
                 width  => $w,
@@ -172,8 +175,10 @@ sub image_html {
     # create the image.
     my $img = $a->create_child(
         type       => 'img',
-        attributes => { src => $image_url },
-        alt        => 'image',
+        attributes => {
+            src => $image_url,
+            alt => 'image'
+        },
         styles     => {
             width  => $w,
             height => $h
