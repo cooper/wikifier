@@ -453,16 +453,20 @@ sub display_image {
 ### THIS IS A SCALED IMAGE ###
 ##########################################################################################
 
+    #############################
+    ### RETINA SCALE SUPPORT ####
+    #############################
+
     # split image parts.
-    $image_name =~ m/^(.+)(.+?)$/; my ($image_wo_ext, $image_ext) = ($1, $2);
+    $image_name =~ m/^(.+)\.(.+?)$/;
+    my ($image_wo_ext, $image_ext) = ($1, $2);
     
     # is this retina?
-    my $retina_request = $image_wo_ext =~ m/^(.+)[\@\_]2x$/;
+    my $retina_request = $image_wo_ext =~ m/^(.+)\_2x$/;
     my ($name_width, $name_height) = ($width, $height);
     
     # if this is a retina request, calculate 
     if ($retina_request) {
-        ($image_wo_ext, $image_ext) = ($1, $2);
         $width  *= 2;
         $height *= 2;
     }
@@ -471,20 +475,12 @@ sub display_image {
     # therefore, we will call ->display_image() in order to pregenerate a retina version.
     elsif ($wiki->opt('enable_retina_display') &&
            $wiki->opt('enable_image_pregeneration')) {
-        my $retina_file = $width.q(x).$height.q(-).$image_wo_ext.q(@2x).$image_ext;
+        my $retina_file = $width.q(x).$height.q(-).$image_wo_ext.q(_2x.).$image_ext;
         $wiki->display_image($retina_file, $width, $height, 1);
     }
     
-    # at this point, if we have no width or height, we must
-    # check the dimensions of the original image.
-    if (!$width || !$height) {
-        my $full_image      = GD::Image->new($file) or return;
-        ($width, $height)   = $full_image->getBounds();
-        undef $full_image;
-    }
-    
     my $full_name  = $retina_request
-                     ? $name_width.q(x).$name_height.q(-).$image_wo_ext.q(_2x).$image_ext
+                     ? $name_width.q(x).$name_height.q(-).$image_wo_ext.q(_2x.).$image_ext
                      : $name_width.q(x).$name_height.q(-).$image_name;
     my $cache_file = $wiki->opt('cache_directory').q(/).$full_name;
     
