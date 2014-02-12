@@ -118,7 +118,6 @@ sub new {
     # hardcoded Wikifier::Page wiki info options. (always same for Wikifier::Wiki)
     $wiki->{rounding}    = 'up';
     $wiki->{size_images} = 'server';
-    $wiki->{image_root}  = $wiki->{wiki_root}.q(/image);
     
     # image sizer callback.
     $wiki->{image_sizer} = sub {
@@ -822,7 +821,7 @@ sub _wiki_default_calc {
     # the web server, reducing the wikifier server's load when requesting
     # cached pages and their images.
     if ($page->wiki_info('enable_image_pregeneration')) {
-        my $result = $wiki->display_image($img{file}, $w, $h);
+        $wiki->display_image($img{file}, $w, $h);
         
         # we must symlink to images in cache directory.
         unlink  $page->wiki_info('cache_directory').q(/).$img{file};
