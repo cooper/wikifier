@@ -484,7 +484,7 @@ sub display_image {
     }
     
     my $full_name  = $retina_request
-                     ? $name_width.q(x).$name_height.q(-).$image_wo_ext.q(_2x).$image_ext;
+                     ? $name_width.q(x).$name_height.q(-).$image_wo_ext.q(_2x).$image_ext
                      : $name_width.q(x).$name_height.q(-).$image_name;
     my $cache_file = $wiki->opt('cache_directory').q(/).$full_name;
     
