@@ -822,10 +822,10 @@ sub _wiki_default_calc {
     # the web server, reducing the wikifier server's load when requesting
     # cached pages and their images.
     if ($page->wiki_info('enable_image_pregeneration')) {
-        my $result = $wiki->display_image($file_name, $w, $h);
+        my $result = $wiki->display_image($img{file}, $w, $h);
         
         # we must symlink to images in cache directory.
-        symlink $result->{path}, $wiki->opt('cache_directory').q(/).$file_name;
+        symlink $result->{path}, $wiki->opt('cache_directory').q(/).$img{file};
         
     }
     
