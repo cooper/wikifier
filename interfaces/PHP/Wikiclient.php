@@ -31,8 +31,8 @@ class Wikiclient {
     private function connect($n = 1) {
         $this->sock = fsockopen('unix://'.$this->path, 0, $errno, $errstr, 10);
         if (!$this->sock) {
-            $this->connect($n + 1);
             if ($n == 5) return;
+            $this->connect($n + 1);
         }
         
         // send login info
