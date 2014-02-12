@@ -18,24 +18,19 @@ our %block_types = (
 );
 
 sub history_html {
-    my ($block, $page) = @_;
-    my $string = "<div class=\"wiki-history\">\n";
-    
-    # start table.
-    $string .= "    <table class=\"wiki-history-table\">\n";
+    my ($block, $page, $el) = @_;
+    my $table = $el->create_element(
+        type  => 'table',
+        class => 'history-table'
+    );
     
     # append each pair.
     foreach my $pair (@{$block->{hash_array}}) {
         my ($key, $value) = @$pair;
         
-        # special pair - ignore it.
-        if (substr($key, 0, 1) eq '-') {
-            next;
-        }
-        
         # value is a block. generate the HTML for it.
         if (blessed $value) {
-            $value = $value->result();
+            $value = $value->html($page);
         }
         
         # Parse formatting in the value.
@@ -43,21 +38,23 @@ sub history_html {
             $value = $page->parse_formatted_text($value);
         }
         
-        # append table row.
-        $string .= <<END
-
-        <tr class="wiki-history-pair">
-            <td class="wiki-history-key">$key</td>
-            <td class="wiki-history-value">$value</td>
-        </tr>
-        
-END
-;
+        my $tr = $table->create_child(
+            type  => 'tr',
+            class => 'history-pair'
+        );
+        $tr->create_child(
+            type    => 'td',
+            class   => 'history-key',
+            content => $page->parse_formatted_text($key)
+        );
+        $tr->create_child(
+            type    => 'td',
+            class   => 'history-value',
+            content => $value
+        );
 
     }
-    
-    $string .= "    </table>\n</div>\n";
-    return $string;
+
 }
 
 __PACKAGE__
