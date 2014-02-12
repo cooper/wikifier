@@ -409,7 +409,6 @@ sub display_image {
     my ($wiki, $image_name, $width, $height, $dont_open) = @_;
     my ($result, $scaled_w, $scaled_h) = ({}, $width, $height);
     
-
     # check if the file exists.
     my $file = abs_path($wiki->opt('image_directory').q(/).$image_name);
     if (!-f $file) {
@@ -436,6 +435,10 @@ sub display_image {
     $result->{image_type}   = $ext eq 'jpg' || $ext eq 'jpeg' ? 'jpeg' : 'png';
     $result->{mime}         = $mime;
     
+##################################   
+### THIS IS A FULL-SIZED IMAGE ###
+##########################################################################################
+    
     # if no width or height are specified,
     # display the full-sized version of the image.
     if (!$width || !$height) {
@@ -446,18 +449,48 @@ sub display_image {
         return $result;
     }
     
-    # this is a smaller copy.
+##############################   
+### THIS IS A SCALED IMAGE ###
+##########################################################################################
+
+    # split image parts.
+    $image_name =~ m/^(.+)(.+?)$/; my ($image_wo_ext, $image_ext) = ($1, $2);
+    
+    # is this retina?
+    my $retina_request = $image_wo_ext =~ m/^(.+)[\@\_]2x$/;
+    my ($name_width, $name_height) = ($width, $height);
+    
+    # if this is a retina request, calculate 
+    if ($retina_request) {
+        ($image_wo_ext, $image_ext) = ($1, $2);
+        $width  *= 2;
+        $height *= 2;
+    }
+    
+    # this is not a retina request, but retina is enabled, and so is pregeneration.
+    # therefore, we will call ->display_image() in order to pregenerate a retina version.
+    elsif ($page->wiki_info('enable_retina_display') &&
+           $page->wiki_info('enable_image_pregeneration')) {
+        my $retina_file = $width.q(x).$height.q(-).$image_wo_ext.q(@2x).$img_ext;
+        $wiki->display_image($retina_file, $width, $height, 1);
+    }
     
     # at this point, if we have no width or height, we must
     # check the dimensions of the original image.
     if (!$width || !$height) {
-        my $full_image      = GD::Image->new($file) or return; # FIXME: I don't really know!
+        my $full_image      = GD::Image->new($file) or return;
         ($width, $height)   = $full_image->getBounds();
         undef $full_image;
     }
     
-    my $full_name = $width.q(x).$height.q(-).$image_name;
+    my $full_name  = $retina_request
+                     ? $name_width.q(x).$name_height.q(-).$image_wo_ext.q(_2x).$image_ext;
+                     : $name_width.q(x).$name_height.q(-).$image_name;
     my $cache_file = $wiki->opt('cache_directory').q(/).$full_name;
+    
+    #############################
+    ### FINDING CACHED IMAGE ####
+    #############################
     
     # if caching is enabled, check if this exists in cache.
     if ($wiki->opt('enable_image_caching') && -f $cache_file) {
@@ -492,9 +525,10 @@ sub display_image {
     if (!$wiki->opt('enable_image_sizing')) {
         return $wiki->display_image($result, $image_name, 0, 0);
     }
-        
-    # we have no cached copy. an image must be generated.
     
+    ##############################
+    ### GENERATION, NOT CACHED ###
+    ##############################
     
     # if we are restricting to only sizes used in the wiki, check.
     if ($wiki->opt('restrict_image_size')) {
@@ -795,7 +829,7 @@ sub _wiki_default_calc {
     # the web server, reducing the wikifier server's load when requesting
     # cached pages and their images.
     if ($page->wiki_info('enable_image_pregeneration')) {
-        $wiki->display_image($img{file}, $w, $h);
+        $wiki->display_image($img{file}, $w, $h, 1);
         
         # we must symlink to images in cache directory.
         unlink  $page->wiki_info('cache_directory').q(/).$img{file};
