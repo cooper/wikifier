@@ -415,7 +415,7 @@ sub display_image {
     
     # early retina check.
     my ($name_width, $name_height) = ($width, $height);
-    my $retina_request = $image_wo_ext =~ m/^(.+)@2x$/;
+    my $retina_request = $image_wo_ext =~ m/^(.+)\@2x$/;
     
     # if this is a retina request, calculate 
     if ($retina_request) {
