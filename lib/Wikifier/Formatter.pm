@@ -149,6 +149,7 @@ sub parse_format_type {
     }
     
     # a link in the form of [[link]], [!link!], or [$link$]
+    # also handles HTML entities [&code]
     when (/^([\!\[\$]+?)(.+)([\!\]\$]+?)$/) { # inner match should be most greedy.
     
         my ($link_char, $inner, $link_type) = (trim($1), trim($2));
@@ -178,6 +179,11 @@ sub parse_format_type {
         elsif ($link_char eq '$') {
             $link_type = 'other';
             $title     = 'External link';
+        }
+        
+        # HTML entity.
+        elsif ($link_char eq '&') {
+            return "&$text;"
         }
         
         $title = qq( title="$title") if $title;
