@@ -475,7 +475,7 @@ sub display_image {
     
     # this is not a retina request, but retina is enabled, and so is pregeneration.
     # therefore, we will call ->display_image() in order to pregenerate a retina version.
-    elsif ($wiki->opt('enable_retina_display') &&
+    elsif ($wiki->opt('enable_retina_display') && !$retina_request &&
            $wiki->opt('enable_image_pregeneration')) {
         my $retina_file = $image_wo_ext.q(_2x.).$image_ext;
         $wiki->display_image($retina_file, $width, $height, 1);
