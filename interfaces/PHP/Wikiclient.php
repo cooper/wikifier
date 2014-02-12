@@ -28,9 +28,12 @@ class Wikiclient {
     }
     
     // connect to unix listener.
-    private function connect() {
+    private function connect($n = 1) {
         $this->sock = fsockopen('unix://'.$this->path, 0, $errno, $errstr, 10);
-        if (!$this->sock) return;
+        if (!$this->sock) {
+            $this->connect($n + 1);
+            if ($n == 5) return;
+        }
         
         // send login info
         $auth = array('wiki', array(
