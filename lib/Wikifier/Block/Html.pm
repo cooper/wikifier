@@ -18,15 +18,13 @@ our %block_types = (
 );
 
 sub html_html {
-    my $block = shift;
-    my $string;
+    my ($block, $page, $el) = @_;
     
     foreach my $item (@{$block->{content}}) {
-        $string .= $item->html and next if blessed $item;
-        $string .= $item;
+        $el->add($el->html($page)) and next if blessed $item;
+        $el->add($item);
     }
     
-    return $string;
 }
 
 __PACKAGE__
