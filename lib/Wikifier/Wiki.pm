@@ -415,7 +415,7 @@ sub display_image {
     
     # early retina check.
     my ($name_width, $name_height) = ($width, $height);
-    my $retina_request = $image_wo_ext =~ m/^(.+)\_2x$/;
+    my $retina_request = $image_wo_ext =~ m/^(.+)@2x$/;
     
     # if this is a retina request, calculate 
     if ($retina_request) {
@@ -477,12 +477,12 @@ sub display_image {
     # therefore, we will call ->display_image() in order to pregenerate a retina version.
     elsif ($wiki->opt('enable_retina_display') && !$retina_request &&
            $wiki->opt('enable_image_pregeneration')) {
-        my $retina_file = $image_wo_ext.q(_2x.).$image_ext;
+        my $retina_file = $image_wo_ext.q(@2x.).$image_ext;
         $wiki->display_image($retina_file, $width, $height, 1);
     }
     
     my $full_name  = $retina_request
-                     ? $name_width.q(x).$name_height.q(-).$image_wo_ext.q(_2x.).$image_ext
+                     ? $name_width.q(x).$name_height.q(-).$image_wo_ext.q(@2x.).$image_ext
                      : $name_width.q(x).$name_height.q(-).$image_name;
     my $cache_file = $wiki->opt('cache_directory').q(/).$full_name;
     
