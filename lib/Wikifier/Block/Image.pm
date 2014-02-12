@@ -13,7 +13,6 @@ use warnings;
 use strict;
 
 use Carp;
-use HTML::Entities qw(encode_entities);
 
 our %block_types = (
     image => {
@@ -191,7 +190,7 @@ sub image_html {
     my $desc = $inner->create_child(class => 'imagebox-description');
     $desc->create_child(
         class   => 'imagebox-description-inner',
-        content => encode_entities($page->parse_formatted_text($block->{description}))
+        content => $page->parse_formatted_text($block->{description})
     );
 
 }

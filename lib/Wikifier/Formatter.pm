@@ -10,7 +10,8 @@ use warnings;
 use strict;
 use feature 'switch';
 
-use Scalar::Util ();
+use Scalar::Util   ();
+use HTML::Entities ();
 
 use Wikifier::Utilities qw(safe_name trim);
 
@@ -20,6 +21,7 @@ use Wikifier::Utilities qw(safe_name trim);
 
 sub parse_formatted_text {
     my ($wikifier, $page, $text) = @_;
+    my @items;
     my $string = q();
     
     my $last_char    = q();  # the last parsed character.
@@ -54,8 +56,14 @@ sub parse_formatted_text {
             }
 
             # we are now inside the format type.
-            $in_format = 1;
+            $in_format   = 1;
             $format_type = q();
+
+            # store the string we have so far.
+            if (defined $string) {
+                push @items, [0, $string];
+                $string = q();
+            }
             
         }
         
@@ -75,7 +83,7 @@ sub parse_formatted_text {
             
             # otherwise, the format type is ended and must now be parsed.
             else {
-                $string   .= $wikifier->parse_format_type($page, $format_type);
+                push @items, [1, $wikifier->parse_format_type($page, $format_type)];
                 $in_format = 0;
             }
             
@@ -104,7 +112,14 @@ sub parse_formatted_text {
         
     }
     
-    return $string;
+    # final string item.
+    push @items, [0, $string] if length $string;
+    
+    # join them together, adding HTML entities when necessary.
+    return join ' ', map {
+        my ($fmtd, $value) = @$_;
+        $fmtd ? $value : HTML::Entities::encode($value)
+    } @items;
 }
 
 # parses an individual format type, aka the content in [brackets].
