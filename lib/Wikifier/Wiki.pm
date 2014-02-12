@@ -137,29 +137,7 @@ sub new {
     };
     
     # we use GD for image size finding because it is already a dependency of WiWiki.
-    $wiki->{image_calc} = sub {
-        my %img = @_;
-        
-        my $file = $img{page}->wiki_info('image_directory').q(/).$img{file};
-        
-        # find the image size.
-        my $full_image      = GD::Image->new($file) or return (0, 0);
-        my ($big_w, $big_h) = $full_image->getBounds();
-        undef $full_image;
-        
-        # call the default handler with these dimensions.
-        my ($w, $h) = Wikifier::Page::_default_calculator(
-            %img,
-            big_width  => $big_w,
-            big_height => $big_h
-        );
-        
-        # store this as accepted dimensions.
-        $wiki->{allowed_dimensions}{$img{file}}{$w.q(x).$h} = 1;
-        
-        return ($w, $h);
-    
-    };
+    $wiki->{image_calc} = \&_wiki_default_calc;
     
     return $wiki;
 }
@@ -188,6 +166,7 @@ sub read_config {
         no_page_title           => !$conf->get('enable.page_titles'),
         category_post_limit     => $conf->get('enable.category_post_limit'),
         enable_section_footer   => $conf->get('enable.last_section_footer'),
+        enable_image_pregeneration => $conf->get('enable.image_pregeneration'),
 
         name            => $conf->get('wiki.name'),
         variables       => $conf->get('var'),
@@ -518,8 +497,8 @@ sub display_image {
             $result->{cached}       = 1;
             $result->{content}      = file_contents($cache_file, 1) unless $dont_open;
             $result->{modified}     = time2str($cache_modify);
-            $result->{length}       = length $result->{content};
             $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
+            $result->{length}       = -s $cache_file;
             
             return $result;
         }
@@ -814,6 +793,44 @@ sub file_contents {
     my $content = <$fh>;
     close $fh;
     return $content;
+}
+
+# default image calculator for a wiki.
+sub _wiki_default_calc {
+    my %img  = @_;
+    my $page = $img{page};
+    my $wiki = $page->{wiki};
+    my $file = $page->wiki_info('image_directory').q(/).$img{file};
+    
+    # find the image size.
+    my $full_image      = GD::Image->new($file) or return (0, 0);
+    my ($big_w, $big_h) = $full_image->getBounds();
+    undef $full_image;
+    
+    # call the default handler with these dimensions.
+    my ($w, $h) = Wikifier::Page::_default_calculator(
+        %img,
+        big_width  => $big_w,
+        big_height => $big_h
+    );
+    
+    # store these as accepted dimensions.
+    $wiki->{allowed_dimensions}{$img{file}}{$w.q(x).$h} = 1;
+    
+    # pregenerate if necessary.
+    # this allows the direct use of the cache directory as served from
+    # the web server, reducing the wikifier server's load when requesting
+    # cached pages and their images.
+    if ($page->wiki_info('enable_image_pregeneration')) {
+        my $result = $wiki->display_image($file_name, $w, $h);
+        
+        # we must symlink to images in cache directory.
+        symlink $result->{path}, $wiki->opt('cache_directory').q(/).$file_name;
+        
+    }
+    
+    return ($w, $h);
+
 }
 
 1
