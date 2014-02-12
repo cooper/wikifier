@@ -406,18 +406,9 @@ sub display_page {
 
 # Displays an image of the supplied dimensions.
 sub display_image {
-    my ($wiki, $image_name, $width, $height, $dont_open) = @_; my $result = {};
-    my ($retina, $scaled_w, $scaled_h) = (0, $width, $height);
+    my ($wiki, $image_name, $width, $height, $dont_open) = @_;
+    my ($result, $scaled_w, $scaled_h) = ({}, $width, $height);
     
-    # retina image. double its dimensions.
-    if ($wiki->opt('enable_retina_display') && $image_name =~ m/^(.+)[\@\_]2x(.+?)$/) {
-        $image_name = $1.$2;
-        $scaled_w   = $width;
-        $scaled_h   = $height;
-        $width     *= 2;
-        $height    *= 2;
-        $retina     = 1;
-    }
 
     # check if the file exists.
     my $file = abs_path($wiki->opt('image_directory').q(/).$image_name);
@@ -447,7 +438,7 @@ sub display_image {
     
     # if no width or height are specified,
     # display the full-sized version of the image.
-    if (!$retina and !$width || !$height) {
+    if (!$width || !$height) {
         $result->{content}      = file_contents($file, 1) unless $dont_open;
         $result->{modified}     = time2str($stat[9]);
         $result->{length}       = $stat[7];
@@ -463,13 +454,6 @@ sub display_image {
         my $full_image      = GD::Image->new($file) or return; # FIXME: I don't really know!
         ($width, $height)   = $full_image->getBounds();
         undef $full_image;
-        
-        # if retina, double.
-        if ($retina) {
-            $width  *= 2;
-            $height *= 2;
-        }
-        
     }
     
     my $full_name = $width.q(x).$height.q(-).$image_name;
@@ -520,16 +504,6 @@ sub display_image {
             return $result;
         }
     }
-    
-    # otherwise, ensure that the images aren't enormous. XXX: remove this, ha.
-    else {
-        if ($width > 1500 || $height > 1500) {
-            $result->{type}  = 'not found';
-            $result->{error} = 'that is way bigger than an image on a wiki should be.'; # FIXME: just remove this nonsense already
-            return $result;
-        }
-    }
-    
     
     GD::Image->trueColor(1);
     my $full_image = GD::Image->new($file);
