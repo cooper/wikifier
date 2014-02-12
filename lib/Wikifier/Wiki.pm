@@ -157,7 +157,7 @@ sub read_config {
     
     # XXX: THIS IS STUPID I HATE IT NEED TO REMOVE IT AND MAKE IT ALL THE SAME AS CONFIG
     
-    $wiki->{enable_image_caching} = 1;
+    $wiki->{'enable.image_caching'} = 1;
 
     return 1;
 }
@@ -167,7 +167,7 @@ sub opt {
     my ($wiki, $opt) = @_;
     return $wiki->{$opt} if exists $wiki->{$opt};
     my $v = $wiki->{conf}->get($opt);
-    return $Wikifier::Page::wiki_defaults{$opt};
+    return defined $v ? $v : $Wikifier::Page::wiki_defaults{$opt};
 }
 
 #############   This is Wikifier's built in URI handler. If you wish to implement your own
