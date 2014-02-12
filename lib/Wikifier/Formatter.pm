@@ -116,7 +116,7 @@ sub parse_formatted_text {
     push @items, [0, $string] if length $string;
     
     # join them together, adding HTML entities when necessary.
-    return join ' ', map {
+    return join '', map {
         my ($fmtd, $value) = @$_;
         $fmtd ? $value : HTML::Entities::encode($value)
     } @items;

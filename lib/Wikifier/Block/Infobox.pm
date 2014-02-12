@@ -25,7 +25,7 @@ sub infobox_html {
     if (length $block->{name}) {
         $el->create_child(
             class   => 'infobox-title',
-            content => encode_entities($block->{name})
+            content => $page->parse_formatted_text($block->{name})
         );
     }
     
