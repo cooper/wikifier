@@ -409,6 +409,21 @@ sub display_image {
     my ($wiki, $image_name, $width, $height, $dont_open) = @_;
     my ($result, $scaled_w, $scaled_h) = ({}, $width, $height);
     
+    # split image parts.
+    $image_name =~ m/^(.+)\.(.+?)$/;
+    my ($image_wo_ext, $image_ext) = ($1, $2);
+    
+    # early retina check.
+    my ($name_width, $name_height) = ($width, $height);
+    my $retina_request = $image_wo_ext =~ m/^(.+)\_2x$/;
+    
+    # if this is a retina request, calculate 
+    if ($retina_request) {
+        $image_name = $1;
+        $width     *= 2;
+        $height    *= 2;
+    }
+    
     # check if the file exists.
     my $file = abs_path($wiki->opt('image_directory').q(/).$image_name);
     if (!-f $file) {
@@ -456,20 +471,6 @@ sub display_image {
     #############################
     ### RETINA SCALE SUPPORT ####
     #############################
-
-    # split image parts.
-    $image_name =~ m/^(.+)\.(.+?)$/;
-    my ($image_wo_ext, $image_ext) = ($1, $2);
-    
-    # is this retina?
-    my $retina_request = $image_wo_ext =~ m/^(.+)\_2x$/;
-    my ($name_width, $name_height) = ($width, $height);
-    
-    # if this is a retina request, calculate 
-    if ($retina_request) {
-        $width  *= 2;
-        $height *= 2;
-    }
     
     # this is not a retina request, but retina is enabled, and so is pregeneration.
     # therefore, we will call ->display_image() in order to pregenerate a retina version.
