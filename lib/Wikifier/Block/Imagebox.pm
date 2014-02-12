@@ -27,7 +27,7 @@ sub imagebox_parse {
     
     $block->{$_} = $block->{hash}{$_} foreach qw(
         description file width height
-        align author license
+        align float author license
     );
     
     # no width or height specified; default to 100 width.
@@ -43,8 +43,8 @@ sub imagebox_parse {
     $block->{width}  ||= 'auto';
     $block->{height} ||= 'auto';
     
-    # no alignment; default to right.
-    $block->{align} ||= 'right';
+    # no float; default to right.
+    $block->{float} ||= $block->{align} || 'right';
     
     # no file - this is mandatory.
     if (!length $block->{file}) {
@@ -80,11 +80,13 @@ sub imagebox_parse {
 # HTML.
 sub imagebox_html {
     my ($block, $page, $el) = @_;
-    my ($h, $w, $link_address, $image_url, $javascript) = '';
-    my $image_root       = $page->wiki_info('image_root');
-    my ($height, $width) = ($block->{height}, $block->{width});
-    $link_address = $image_url = "$image_root/$$block{file}";
-    $el->add_class('imagebox-'.$block->{align});
+    my ($w, $h, $link_address, $image_url, $image_root, $javascript, $height, $width);
+    
+    ($height, $width) = ($block->{height}, $block->{width});
+    $image_root       = $page->wiki_info('image_root');
+    $link_address     = $image_url = "$image_root/$$block{file}";
+    
+    $el->add_class('imagebox-'.$block->{float});
     
     ##############
     ### SIZING ###
@@ -144,12 +146,17 @@ sub imagebox_html {
         );
     
         $image_url = $url;
+        ($w, $h)   = ($w.q(px), $h.q(px));
     }
+    
+    ############
+    ### HTML ###
+    ############
     
     # create inner box with width restriction.
     my $inner = $el->create_child(
         class  => 'imagebox-inner',
-        styles => { width => "${w}px" }
+        styles => { width => $w }
     );
     
     # create the anchor.
@@ -164,8 +171,8 @@ sub imagebox_html {
         attributes => { src => $image_url },
         alt        => 'image',
         styles     => {
-            width  => "${w}px",
-            height => "${h}px"
+            width  => $w,
+            height => $h
         }
     );
     

@@ -97,7 +97,8 @@ sub section_html {
 }
 
 sub clear_html {
-    return '<div class="clear"></div>';
+    my ($block, $page, $el) = @_;
+    $el->add_class('clear');
 }
 
 __PACKAGE__
