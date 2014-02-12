@@ -825,7 +825,9 @@ sub _wiki_default_calc {
         my $result = $wiki->display_image($img{file}, $w, $h);
         
         # we must symlink to images in cache directory.
-        symlink $result->{path}, $wiki->opt('cache_directory').q(/).$img{file};
+        unlink  $img{file};
+        symlink $page->wiki_info('image_root').q(/).$img{file},
+                $page->wiki_info('cache_directory').q(/).$img{file};
         
     }
     
