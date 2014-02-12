@@ -16,9 +16,12 @@ our %block_types = (
 );
 
 sub code_html {
-    my ($block, $page) = @_;
-    my $code = $block->{content}[0];
-    return "<pre class=\"wiki-code\">$code</pre>\n";
+    my ($block, $page, $el) = @_;
+    $el->configure(
+        type    => 'pre',
+        class   => 'code',
+        content => $page->parse_formatted_text($block->{content}[0])
+    );
 }
 
 1
