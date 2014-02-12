@@ -65,17 +65,17 @@ use feature qw(switch);
 #
 
 our %wiki_defaults = (
-    name            => 'Wiki',
-    image_directory => './files',
-    image_address   => '/files',  # relative to HTTP root.
-    wiki_root       => '',        # AKA "/"
-    variables       => {},
-    size_images     => 'javascript',
-    image_sizer     => undef,
-    external_name   => 'Wikipedia',
-    external_root   => 'http://en.wikipedia.org/wiki',
-    rounding        => 'normal',
-    image_calc      => \&_default_calculator
+    'wiki.name'         => 'Wiki',
+    'dir.image'         => './files',
+    'wiki.image_root'   => '/files',  # relative to HTTP root.
+    'wiki.root'         => '',        # AKA "/"
+    'image.size_method' => 'javascript',
+    'image.sizer'       => undef,
+    'external.name'     => 'Wikipedia',
+    'external.root'     => 'http://en.wikipedia.org/wiki',
+    'image.rounding'    => 'normal',
+    'image.calc'        => \&_default_calculator,
+    'var'               => {}
 );
 
 # create a new page.
@@ -157,7 +157,7 @@ sub parse_formatted_text {
 }
 
 # returns a wiki option or the default.
-sub wiki_info {
+sub wiki_opt {
     my ($page, $var) = @_;
     return $page->{wiki}{$var} if defined $page->{wiki}{$var};
     return $wiki_defaults{$var};
@@ -179,7 +179,7 @@ sub _default_calculator {
     # use Image::Size to determine the dimensions.
     if (!$w || !$h) {
         require Image::Size;
-        my $dir = $img{page}->wiki_info('image_directory');
+        my $dir = $img{page}->wiki_opt('dir.image');
         ($w, $h) = Image::Size::imgsize("$dir/$img{file}");
     }
 
@@ -206,7 +206,7 @@ sub _default_calculator {
 # round dimension according to setting.
 sub image_round {
     my ($page, $size) = @_;
-    my $round = $page->wiki_info('rounding');
+    my $round = $page->wiki_opt('image.rounding');
     return int($size + 0.5 ) if $round eq 'normal';
     return int($size + 0.99) if $round eq 'up';
     return int($size       ) if $round eq 'down';

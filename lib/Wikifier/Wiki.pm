@@ -124,7 +124,7 @@ sub new {
         my %img = @_;
         
         # full-sized image.
-        if (!$wiki->opt('enable_image_sizing') || !$img{width} || !$img{height} ||
+        if (!$wiki->opt('enable.image_sizing') || !$img{width} || !$img{height} ||
             $img{width} eq 'auto' || $img{height} eq 'auto') {
             
             return $wiki->{image_root}.q(/).$img{file};
@@ -144,7 +144,7 @@ sub new {
 # read options from a configuration page file.
 sub read_config {
     my ($wiki, $file) = @_;
-    my $conf = Wikifier::Page->new(
+    my $conf = $wiki->{conf} = Wikifier::Page->new(
         file      => $file,
         vars_only => 1       # don't waste time parsing anything but variables
     );
@@ -156,34 +156,9 @@ sub read_config {
     }
     
     # XXX: THIS IS STUPID I HATE IT NEED TO REMOVE IT AND MAKE IT ALL THE SAME AS CONFIG
-    my %opts = (
-        enable_page_caching     => $conf->get('enable.cache.page'),
-        enable_image_sizing     => 1, # XXX: should this even be an option?
-        enable_image_caching    => $conf->get('enable.cache.image'),
-        enable_retina_display   => $conf->get('enable.retina_display'),
-        restrict_image_size     => $conf->get('enable.image_size_restrictor'),
-        no_page_title           => !$conf->get('enable.page_titles'),
-        category_post_limit     => $conf->get('enable.category_post_limit'),
-        enable_section_footer   => $conf->get('enable.last_section_footer'),
-        enable_image_pregeneration => $conf->get('enable.image_pregeneration'),
-
-        name            => $conf->get('wiki.name'),
-        variables       => $conf->get('var'),
-        wiki_root       => $conf->get('wiki.root'),
-        page_root       => $conf->get('wiki.page_root'),
-        image_root      => $conf->get('wiki.image_root'),
-
-        external_name   => $conf->get('external.name'),
-        external_root   => $conf->get('external.root'),
-        
-        image_directory => $conf->get('dir.image'),
-        cache_directory => $conf->get('dir.cache'),
-        page_directory  => $conf->get('dir.page'),
-        wkfr_directory  => $conf->get('dir.wikifier'),
-        cat_directory   => $conf->get('dir.category')
-    );
     
-    $wiki->{$_} = $opts{$_} foreach keys %opts;
+    $wiki->{enable_image_caching} = 1;
+
     return 1;
 }
 
@@ -191,6 +166,7 @@ sub read_config {
 sub opt {
     my ($wiki, $opt) = @_;
     return $wiki->{$opt} if exists $wiki->{$opt};
+    my $v = $wiki->{conf}->get($opt);
     return $Wikifier::Page::wiki_defaults{$opt};
 }
 
@@ -293,9 +269,9 @@ sub display_page {
     }
     
     # determine the page file name.
-    my $file       = abs_path($wiki->opt('page_directory').q(/).$page_name);
+    my $file       = abs_path($wiki->opt('dir.page').q(/).$page_name);
        $page_name  = basename($file);
-    my $cache_file = $wiki->opt('cache_directory').q(/).$page_name.q(.cache);
+    my $cache_file = $wiki->opt('dir.cache').q(/).$page_name.q(.cache);
     
     # file does not exist.
     if (!-f $file) {
@@ -311,7 +287,7 @@ sub display_page {
     
     # caching is enabled, so let's check for a cached copy.
     
-    if ($wiki->opt('enable_page_caching') && -f $cache_file) {
+    if ($wiki->opt('enable.cache.page') && -f $cache_file) {
         my ($page_modify, $cache_modify) = ((stat $file)[9], (stat $cache_file)[9]);
     
         # the page's file is more recent than the cache file.
@@ -374,7 +350,7 @@ sub display_page {
     $result->{categories} = $page->{categories} if $page->{categories};
     
     # caching is enabled, so let's save this for later.
-    if ($wiki->opt('enable_page_caching')) {
+    if ($wiki->opt('enable.cache.page')) {
     
         open my $fh, '>', $cache_file;
         
@@ -426,7 +402,7 @@ sub display_image {
     }
     
     # check if the file exists.
-    my $file = abs_path($wiki->opt('image_directory').q(/).$image_name);
+    my $file = abs_path($wiki->opt('dir.image').q(/).$image_name);
     if (!-f $file) {
         $result->{type}  = 'not found';
         $result->{error} = "Image '$image_name' does not exist.";
@@ -475,8 +451,8 @@ sub display_image {
     
     # this is not a retina request, but retina is enabled, and so is pregeneration.
     # therefore, we will call ->display_image() in order to pregenerate a retina version.
-    elsif ($wiki->opt('enable_retina_display') && !$retina_request &&
-           $wiki->opt('enable_image_pregeneration')) {
+    elsif ($wiki->opt('enable.retina_display') && !$retina_request &&
+           $wiki->opt('enable.image_pregeneration')) {
         my $retina_file = $image_wo_ext.q(@2x.).$image_ext;
         $wiki->display_image($retina_file, $width, $height, 1);
     }
@@ -484,14 +460,14 @@ sub display_image {
     my $full_name  = $retina_request
                      ? $name_width.q(x).$name_height.q(-).$image_wo_ext.q(@2x.).$image_ext
                      : $name_width.q(x).$name_height.q(-).$image_name;
-    my $cache_file = $wiki->opt('cache_directory').q(/).$full_name;
+    my $cache_file = $wiki->opt('dir.cache').q(/).$full_name;
     
     #############################
     ### FINDING CACHED IMAGE ####
     #############################
     
     # if caching is enabled, check if this exists in cache.
-    if ($wiki->opt('enable_image_caching') && -f $cache_file) {
+    if ($wiki->opt('enable.cache.image') && -f $cache_file) {
         my ($image_modify, $cache_modify) = ((stat $file)[9], (stat $cache_file)[9]);
         
         # the image's file is more recent than the cache file.
@@ -520,7 +496,7 @@ sub display_image {
     }
     
     # if image generation is disabled, we must supply the full-sized image data.
-    if (!$wiki->opt('enable_image_sizing')) {
+    if (!$wiki->opt('enable.cache.image')) {
         return $wiki->display_image($result, $image_name, 0, 0);
     }
     
@@ -529,7 +505,7 @@ sub display_image {
     ##############################
     
     # if we are restricting to only sizes used in the wiki, check.
-    if ($wiki->opt('restrict_image_size')) {
+    if ($wiki->opt('enable.image_size_restrictor')) {
         if (!$wiki->{allowed_dimensions}{$image_name}{$scaled_w.q(x).$scaled_h}) {
             $result->{type}  = 'not found';
             $result->{error} = "Image '$image_name' does not exist in these dimensions.";
@@ -552,9 +528,9 @@ sub display_image {
     );
     
     # create JPEG or PNG data.
-    my $use = $wiki->opt('force_image_type') || $result->{image_type};
+    my $use = $wiki->opt('image.force_type') || $result->{image_type};
     if ($use eq 'jpeg') {
-        my $compression = $wiki->opt('force_jpeg_quality') || 100;
+        my $compression = $wiki->opt('image.force_jpeg_quality') || 100;
         $result->{content} = $image->jpeg($compression);
     }
     else {
@@ -569,7 +545,7 @@ sub display_image {
     $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
     
     # caching is enabled, so let's save this for later.
-    if ($wiki->opt('enable_image_caching')) {
+    if ($wiki->opt('enable.cache.image')) {
     
         open my $fh, '>', $cache_file;
         print {$fh} $result->{content};
@@ -725,7 +701,7 @@ sub cat_get_pages {
         my $page_data = $p;
         
         # determine the page file name.
-        my $page_path = abs_path($wiki->opt('page_directory').q(/).$page_name);
+        my $page_path = abs_path($wiki->opt('dir.page').q(/).$page_name);
         
         # page no longer exists.
         if (!-f $page_path) {
@@ -805,7 +781,7 @@ sub _wiki_default_calc {
     my %img  = @_;
     my $page = $img{page};
     my $wiki = $page->{wiki};
-    my $file = $page->wiki_info('image_directory').q(/).$img{file};
+    my $file = $page->wiki_opt('dir.image').q(/).$img{file};
     
     # find the image size.
     my $full_image      = GD::Image->new($file) or return (0, 0);
@@ -826,13 +802,13 @@ sub _wiki_default_calc {
     # this allows the direct use of the cache directory as served from
     # the web server, reducing the wikifier server's load when requesting
     # cached pages and their images.
-    if ($page->wiki_info('enable_image_pregeneration')) {
+    if ($page->wiki_opt('enable.image_pregeneration')) {
         $wiki->display_image($img{file}, $w, $h, 1);
         
         # we must symlink to images in cache directory.
-        unlink  $page->wiki_info('cache_directory').q(/).$img{file};
-        symlink $page->wiki_info('image_directory').q(/).$img{file},
-                $page->wiki_info('cache_directory').q(/).$img{file};
+        unlink  $page->wiki_opt('dir.cache').q(/).$img{file};
+        symlink $page->wiki_opt('dir.image').q(/).$img{file},
+                $page->wiki_opt('dir.cache').q(/).$img{file};
         
     }
     

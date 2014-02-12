@@ -169,14 +169,14 @@ sub parse_format_type {
         if ($link_char eq '[') {
             $link_type = 'internal';
             $title     = ucfirst $target;
-            $target    = $page->wiki_info('page_root').q(/).safe_name($target, 1);
+            $target    = $page->wiki_opt('wiki.page_root').q(/).safe_name($target, 1);
         }
         
         # external wiki link [!article!]
         elsif ($link_char eq '!') {
             $link_type = 'external';
-            $title     = $page->wiki_info('external_name').q(: ).ucfirst($target);
-            $target    = $page->wiki_info('external_root').q(/).safe_name($target);
+            $title     = $page->wiki_opt('external.name').q(: ).ucfirst($target);
+            $target    = $page->wiki_opt('external.root').q(/).safe_name($target);
         }
         
         # other non-wiki link [$url$]

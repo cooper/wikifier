@@ -69,7 +69,7 @@ sub image_html {
     my ($w, $h, $link_address, $image_url, $image_root, $javascript, $height, $width);
     
     ($height, $width) = ($block->{height}, $block->{width});
-    $image_root       = $page->wiki_info('image_root');
+    $image_root       = $page->wiki_opt('wiki.image_root');
     $link_address     = $image_url = "$image_root/$$block{file}";
     
     $el->add_class('imagebox-'.$block->{float}) if $box;
@@ -92,7 +92,7 @@ sub image_html {
     # - uses full-size images directly and uses javascript to size imageboxes.
     # - this voids the validity as XHTML 1.0 Strict.
     # - causes slight flash on page load (when images are scaled.)
-    elsif (lc $page->wiki_info('size_images') eq 'javascript') {
+    elsif (lc $page->wiki_opt('image.size_method') eq 'javascript') {
     
         # inject javascript resizer if no width is given.
         if (!$given_width) {
@@ -113,10 +113,10 @@ sub image_html {
     # - eliminates flash on page load.
     # - faster (since image files are smaller.)
     # - require read access to local image directory.
-    elsif (lc $page->wiki_info('size_images') eq 'server') {
+    elsif (lc $page->wiki_opt('image.size_method') eq 'server') {
     
         # find the resized dimensions.
-        ($w, $h) = $page->wiki_info('image_calc')->(
+        ($w, $h) = $page->wiki_opt('image.calc')->(
             file   => $block->{file},
             height => $height,
             width  => $width,
@@ -124,7 +124,7 @@ sub image_html {
         );
         
         # call the image_sizer.
-        my $url = $page->wiki_info('image_sizer')->(
+        my $url = $page->wiki_opt('image.sizer')->(
             file   => $block->{file},
             height => $h,
             width  => $w,

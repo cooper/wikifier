@@ -48,7 +48,7 @@ sub section_html {
     # disable the footer if necessary.
     # FIXME: this doesn't work anymore because of nested sections.
     # plus, there's going to be a final main tag anyway...
-    my $has_footer = $page->wiki_info('enable_section_footer') &&
+    my $has_footer = $page->wiki_opt('enable.last_section_footer') &&
         $page->{c_section_n} == $page->{section_n};
     $el->configure(no_close_tag => $has_footer);
     
@@ -61,7 +61,7 @@ sub section_html {
        $title    = $page->get('page.title') if $is_intro && !length $title;
     
     # if we have a title and this type of title is enabled.
-    if (length $title and !($is_intro && $page->wiki_info('no_page_title'))) {
+    if (length $title and !($is_intro && !$page->wiki_opt('enable.page_titles'))) {
     
         # determine the heading level.
         my $l    = $is_intro ? 1 : $block->{header_level};
