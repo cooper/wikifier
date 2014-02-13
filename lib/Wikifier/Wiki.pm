@@ -116,27 +116,28 @@ sub new {
     $wiki->{wikifier} ||= Wikifier->new();
     
     # hardcoded Wikifier::Page wiki info options. (always same for Wikifier::Wiki)
-    $wiki->{rounding}    = 'up';
-    $wiki->{size_images} = 'server';
-    
+    $wiki->{'image.rounding'}       = 'up';
+    $wiki->{'image.size_method'}    = 'server';
+    $wiki->{'enable.image_sizing'}  = 1;
+
     # image sizer callback.
-    $wiki->{image_sizer} = sub {
+    $wiki->{'image.sizer'} = sub {
         my %img = @_;
         
         # full-sized image.
         if (!$wiki->opt('enable.image_sizing') || !$img{width} || !$img{height} ||
             $img{width} eq 'auto' || $img{height} eq 'auto') {
             
-            return $wiki->{image_root}.q(/).$img{file};
+            return $wiki->opt('wiki.image_root').q(/).$img{file};
         }
         
         # scaled image.
-        return $wiki->{image_root}.q(/).$img{width}.q(x).$img{height}.q(-).$img{file};
+        return $wiki->opt('wiki.image_root').q(/).$img{width}.q(x).$img{height}.q(-).$img{file};
         
     };
     
     # we use GD for image size finding because it is already a dependency of WiWiki.
-    $wiki->{image_calc} = \&_wiki_default_calc;
+    $wiki->{'image.calc'} = \&_wiki_default_calc;
     
     return $wiki;
 }
@@ -155,10 +156,6 @@ sub read_config {
         return;
     }
     
-    # XXX: THIS IS STUPID I HATE IT NEED TO REMOVE IT AND MAKE IT ALL THE SAME AS CONFIG
-    
-    $wiki->{'enable.image_caching'} = 1;
-
     return 1;
 }
 
@@ -597,7 +594,7 @@ sub display_category_posts {
     #$result->{pages} = \@pages_in_order;
     
     # order into PAGES of pages. wow.
-    my $limit = $wiki->{category_post_limit};
+    my $limit = $wiki->opt('enable.category_post_limit');
     my $n = 1;
     while (@pages_in_order) {
         $result->{pages}{$n} ||= [];
@@ -624,7 +621,7 @@ sub check_categories {
 # add a page to a category if it is not in it already.
 sub cat_add_page {
     my ($wiki, $page, $category) = @_;
-    my $cat_file = $wiki->{cat_directory}.q(/).$category.q(.cat);
+    my $cat_file = $wiki->opt('dir.cat').q(/).$category.q(.cat);
     my $time = time;
     
     # fetch page infos.
@@ -687,7 +684,7 @@ sub cat_get_pages {
     # is no longer in the category, it should be removed from the cat file.
     
     # this category does not exist.
-    my $cat_file = $wiki->{cat_directory}.q(/).$category.q(.cat);
+    my $cat_file = $wiki->opt('dir.cat').q(/).$category.q(.cat);
     return unless -f $cat_file;
     
     # it exists; let's see what's inside.
