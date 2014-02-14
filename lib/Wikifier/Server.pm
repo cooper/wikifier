@@ -46,6 +46,7 @@ sub start {
     
     # create Wikifier::Wiki instances.
     create_wikis();
+    pregenerate();
 
     # run forever.
     $loop->run;
@@ -86,13 +87,19 @@ sub handle_data {
 # create Wikifier::Wiki instances.
 sub create_wikis {
     my $w = $conf->get('server.wiki');
-    my %wikis = %{ $w && ref $w eq 'HASH' ? $w : {} };
+    my %wikis = $w && ref $w eq 'HASH' ? %$w : {};
     foreach my $name (keys %wikis) {
         my $wiki = Wikifier::Wiki->new(config_file => $conf->get("server.wiki.$name.config"));
         say "Error with wiki configuration for '$name'" and next unless $wiki;
         say "Initialized '$name' wiki";
         $wiki{$name} = $wiki;
     }
+}
+
+# if pregeneration is enabled, do so.
+sub pregenerate {
+    return unless $conf->get('server.enable.pregeneration');
+    
 }
 
 1

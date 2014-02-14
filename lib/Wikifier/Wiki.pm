@@ -15,90 +15,15 @@ use warnings;
 use strict;
 use feature qw(switch);
 
-use GD;                     # used for image sizing
-use HTTP::Date 'time2str';  # used for HTTP date formatting
-use Digest::MD5 'md5_hex';  # used for etags
-use Cwd 'abs_path';
-use File::Basename 'basename';
-use JSON qw(encode_json decode_json);
+use GD;                                 # image sizing
+use HTTP::Date 'time2str';              # HTTP date formatting
+use Digest::MD5 'md5_hex';              # etags
+use Cwd 'abs_path';                     # resolving symlinks
+use File::Basename 'basename';          # determining object names
+use JSON qw(encode_json decode_json);   # caching and storing
 use Carp;
 
 use Wikifier;
-
-##############################
-### Wikifier::Wiki options ###
-##############################
-#
-#   enable_page_caching:    true if you wish to enable wiki page caching.
-#
-#   enable_image_sizing:    true if you wish to enable image sizing.
-#                           note: if you are using image sizing, the 'image_root' option
-#                           below will be ignored as the Wikifier will generate image URLs.
-#
-#   enable_image_caching:   true if you wish for sized images to be cached.
-#
-#   force_image_type:       you can specify 'jpeg' or 'png' if you prefer for images to
-#                           always be generated in one of these formats. by default, PNG
-#                           images generate PNG images, and JPEG images generate JPEG
-#                           images compressed with the highest possible quality.
-#
-#   force_jpeg_quality:     if you set 'force_image_type' to 'jpeg', this option forces
-#                           JPEG images to be compressed with this quality. (range: 1-100)
-#
-#   enable_retina_display:  enable if you wish to support high-resolution image generation
-#                           for clear images on Apple's Retina display technology.
-#
-#   restrict_image_size:    restrict image generation to dimensions used in the wiki.
-#                
-#           
-##############################
-### Wikifier::Page options ###
-##############################
-#
-#
-#   name:               simple name of the wiki, such as "NoTrollPlzNet Library."
-#
-#   variables:          a hash reference of global wiki variables.
-#
-#   external_name:      the string name of the external wiki (i.e. Wikipedia)
-#
-#   no_page_title:      true if page titles should not be included in resulting HTML
-#
-#
-#   === HTTP address roots ===
-#
-#       wiki_root:          HTTP address of wiki root (typically relative to /)
-#
-#       external_root:      HTTP address of external wiki root (defaults to English Wikipedia)
-#
-#
-#   === Directories on the filesystem (ABSOLUTE DIRECTORIES, not relative) ===
-#
-#       page_directory:     local directory containing page files.
-#
-#       image_directory:    local directory containing wiki images.
-#
-#       cache_directory:    local directory for storing cached pages and images. (writable)
-#
-#       wkfr_directory:     local directory of wikifier repository.
-#
-#       cat_directory:      local directory containing category files.
-#
-#
-#   === Provided automatically by Wikifier::Wiki (always the same when using ::Wiki) ===
-#
-#       size_images:        either 'javascript' or 'server' (see below)
-#
-#       image_sizer:        a code reference returning URL to resized image (see below)
-#
-#       rounding:           'normal', 'up', or 'down' for how dimensions should be rounded.
-#
-#       image_root:         HTTP address of file directory, such as http://example.com/files .
-#
-#       image_calc:         code returning dimensions of a resized image
-#
-#
-##############################
 
 # create a new wiki object.
 sub new {
