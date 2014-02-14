@@ -339,9 +339,6 @@ sub display_page {
     $result->{type}       = 'page';
     $result->{content}    = $page->html;
     $result->{length}     = length $result->{content};
-    $result->{title}      = $page->get('page.title');
-    $result->{author}     = $page->get('page.author');
-    $result->{created}    = $page->get('page.created') if $page->get('page.created');
     $result->{generated}  = 1;
     $result->{modified}   = time2str(time);
     $result->{categories} = $page->{categories} if $page->{categories};
@@ -353,9 +350,7 @@ sub display_page {
         
         # save prefixing data.
         print {$fh} encode_json({
-            title      => $result->{title},
-            created    => $result->{created},
-            author     => $result->{author},
+            %{ $page->get('page') },
             categories => $result->{categories} || []
         }), "\n";
         
