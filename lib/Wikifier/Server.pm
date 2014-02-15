@@ -141,7 +141,7 @@ sub gen_wiki {
         
     }
     
-    say "Done generating '$$wiki{name}'"';
+    say "Done generating '$$wiki{name}'";
 }
 
 1
