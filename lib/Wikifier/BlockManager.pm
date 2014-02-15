@@ -49,12 +49,12 @@ sub load_block {
     
     # does the file exist?
     if (!-f $file && !-l $file) {
-        Wikifier::l "No such block file $file";
+        Wikifier::l("No such block file $file");
         return;
     }
     
     # do the file.
-    my $package = do $file or Wikifier::l "Error loading $type block module: ".($@ || $! || 'idk');
+    my $package = do $file or Wikifier::l("Error loading $type block module: ".($@ || $! || 'idk'));
     return unless $package;
     
     # fetch blocks.

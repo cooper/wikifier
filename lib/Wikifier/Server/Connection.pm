@@ -29,7 +29,7 @@ sub close {
     $connection->{closed} = 1;
     my $stream = delete $connection->{stream};
     delete $stream->{connection};
-    Wikifier::l 'Closing connection '.$connection->{id};
+    Wikifier::l('Closing connection '.$connection->{id});
     $stream->close;
 }
 
@@ -37,7 +37,7 @@ sub close {
 sub error {
     my ($connection, $error) = @_;
     $connection->send(error => { reason => $error });
-    Wikifier::l "Connection error '$error' $$connection{id}";
+    Wikifier::l("Connection error '$error' $$connection{id}");
     $connection->close;
 }
 
@@ -80,7 +80,7 @@ sub handle {
     
     # if the 'close' option exists, close the connection afterward.
     if ($msg->{close}) {
-        Wikifier::l "Connection $$connection{id} requested close";
+        Wikifier::l("Connection $$connection{id} requested close");
         $connection->close;
     }
     

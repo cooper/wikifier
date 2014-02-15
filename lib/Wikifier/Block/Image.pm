@@ -54,7 +54,7 @@ sub image_parse {
     
     # no file - this is mandatory.
     if (!length $block->{file}) {
-        Wikifier::l "No file specified for image";
+        Wikifier::l("No file specified for image");
         return;
     }
     

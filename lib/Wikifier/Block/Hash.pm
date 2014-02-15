@@ -55,7 +55,7 @@ sub hash_parse {
                 
                 # if there is no key, give up.
                 if (!length $key) {
-                    Wikifier::l "No key for text value in hash-based block ($value)";
+                    Wikifier::l("No key for text value in hash-based block ($value)");
                     $key = "Item $i";
                 }
                 

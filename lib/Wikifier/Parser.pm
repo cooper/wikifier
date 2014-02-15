@@ -27,12 +27,12 @@ sub parse {
     
     # no file given.
     if (!defined $file) {
-        Wikifier::l "no file specified for parsing.";
+        Wikifier::l("No file specified for parsing.");
         return;
     }
     
     # open the file.
-    open my $fh, '<', $file or Wikifier::l "couldn't read '$file': $!";
+    open my $fh, '<', $file or Wikifier::l("Couldn't read '$file': $!");
     
     # read it line-by-line.
     while (my $line = <$fh>) {
@@ -204,7 +204,7 @@ sub handle_character {
         
         # we cannot close the main block.
         if ($current{block} == $page->{main_block}) {
-            Wikifier::l "attempted to close main block";
+            Wikifier::l("Attempted to close main block");
             return;
         }
         

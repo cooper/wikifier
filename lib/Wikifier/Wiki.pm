@@ -75,7 +75,7 @@ sub read_config {
     
     # error.
     if (!$conf->parse) {
-        Wikifier::l "failed to parse configuration";
+        Wikifier::l("Failed to parse configuration");
         return;
     }
     
