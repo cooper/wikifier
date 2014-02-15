@@ -274,6 +274,7 @@ sub display_page {
         # save prefixing data.
         print {$fh} encode_json({
             %{ $page->get('page') || {} },
+            images     => @{ $page->{images} || [] }
             categories => $result->{categories} || []
         }), "\n";
         
@@ -753,7 +754,7 @@ sub _wiki_default_calc {
     );
     
     # store these as accepted dimensions.
-    $wiki->{allowed_dimensions}{$img{file}}{$w.q(x).$h} = 1;
+    $wiki->{allowed_dimensions}{ $img{file} }{ $w.q(x).$h } = 1;
     
     # pregenerate if necessary.
     # this allows the direct use of the cache directory as served from

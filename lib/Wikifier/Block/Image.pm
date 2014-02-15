@@ -128,6 +128,9 @@ sub image_html {
             width  => $w,
             page   => $page
         );
+        
+        # remember that we use this image.
+        push @{ $page->{images} ||= [] }, [$file, $w, $h];
     
         $image_url = $url;
         ($w, $h)   = ($w.q(px), $h.q(px));
