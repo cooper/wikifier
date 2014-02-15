@@ -46,7 +46,7 @@ use Wikifier::Page;
 use Wikifier::Block;
 use Wikifier::Element;
 
-our $indent;
+our $indent = 0;
 
 # create a new wikifier instance.
 sub new {
