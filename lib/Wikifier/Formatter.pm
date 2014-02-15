@@ -133,11 +133,13 @@ sub parse_format_type {
     when ('i') { return '<span style="font-style: italic;">'            }
     when ('b') { return '<span style="font-weight: bold;">'             }
     when ('s') { return '<span style="text-decoration: line-through;">' }
+    when ('^') { return '<sup>'                                         }
     when (['/s', '/b', '/i']) { return '</span>' }
     
     # inline quote.
     when ( 'q') { return '"<span style="font-style: italic;">'  }
     when ('/q') { return '</span>"'                             }
+    when ('/^') { return '</sup>'                               }
     
     # new line.
     when (['nl', 'br']) { return '<br />' }
