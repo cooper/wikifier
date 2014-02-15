@@ -577,7 +577,7 @@ sub cat_add_page {
         }
         
         $final_pages{ $page->{name} } = $page_data;
-        $cat->{pages} = \@final_pages;
+        $cat->{pages} = \%final_pages;
         
         open my $fh, '>', $cat_file; # XXX: what if this errors out?
         print {$fh} JSON->new->pretty(1)->encode($cat);
@@ -620,9 +620,8 @@ sub cat_get_pages {
     
     # check each page's modification date.
     my ($time, $changed, @final_pages) = time;
-    PAGE: foreach my $p (@{ $cat->{pages} || [] }) {
-        my $page_name = $p->{page};
-        my $page_data = $p;
+    PAGE: foreach my $page_name (%{ $cat->{pages} || {} }) {
+        my $page_data = my $p = $cat->{pages}{$page_name};
         
         # determine the page file name.
         my $page_path = abs_path($wiki->opt('dir.page').q(/).$page_name);
