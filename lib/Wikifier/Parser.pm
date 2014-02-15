@@ -27,12 +27,12 @@ sub parse {
     
     # no file given.
     if (!defined $file) {
-        croak "no file specified for parsing.";
+        Wikifier::l "no file specified for parsing.";
         return;
     }
     
     # open the file.
-    open my $fh, '<', $file or croak "couldn't read '$file': $!";
+    open my $fh, '<', $file or Wikifier::l "couldn't read '$file': $!";
     
     # read it line-by-line.
     while (my $line = <$fh>) {
