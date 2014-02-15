@@ -275,7 +275,7 @@ sub display_page {
         
         # save prefixing data.
         print {$fh} encode_json({
-            %{ $page->get('page') },
+            %{ $page->get('page') || {} },
             categories => $result->{categories} || []
         }), "\n";
         
