@@ -58,7 +58,7 @@ sub section_html {
     my $has_footer = $page->wiki_opt('enable.last_section_footer') &&
                      $page->{wikifier}{main_block}{content}[-1] == $block;
     $el->configure(no_close_tag => $has_footer);
-    
+
     # determine the page title if necessary.
     my $title    = $block->{name};
        $title    = $page->get('page.title') if $is_intro && !length $title;

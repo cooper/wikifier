@@ -40,7 +40,7 @@ sub create_child {
 
 # add a child or text node.
 sub add {
-    my ($el, $child);
+    my ($el, $child) = @_;
     $child->{parent} = $el;
     push @{ $el->{content} }, $child;
 }
