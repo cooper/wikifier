@@ -130,7 +130,7 @@ sub image_html {
         );
         
         # remember that we use this image.
-        push @{ $page->{images} ||= [] }, [$file, $w, $h];
+        push @{ $page->{images} ||= [] }, [$block->{file}, $w, $h];
     
         $image_url = $url;
         ($w, $h)   = ($w.q(px), $h.q(px));
