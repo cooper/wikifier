@@ -12,8 +12,6 @@ package Wikifier::Block::Image;
 use warnings;
 use strict;
 
-use Carp;
-
 our %block_types = (
     image => {
         base  => 'hash',
@@ -56,7 +54,7 @@ sub image_parse {
     
     # no file - this is mandatory.
     if (!length $block->{file}) {
-        carp "no file specified for image";
+        Wikifier::l "No file specified for image";
         return;
     }
     

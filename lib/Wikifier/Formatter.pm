@@ -8,7 +8,7 @@ package Wikifier::Formatter;
 
 use warnings;
 use strict;
-use feature 'switch';
+use 5.010;
 
 use Scalar::Util   ();
 use HTML::Entities ();

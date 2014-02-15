@@ -13,7 +13,6 @@ package Wikifier::Wiki;
 
 use warnings;
 use strict;
-use feature qw(switch);
 
 use GD;                                 # image sizing
 use HTTP::Date 'time2str';              # HTTP date formatting
@@ -21,7 +20,6 @@ use Digest::MD5 'md5_hex';              # etags
 use Cwd 'abs_path';                     # resolving symlinks
 use File::Basename 'basename';          # determining object names
 use JSON qw(encode_json decode_json);   # caching and storing
-use Carp;
 
 use Wikifier;
 
@@ -77,7 +75,7 @@ sub read_config {
     
     # error.
     if (!$conf->parse) {
-        carp "failed to parse configuration";
+        Wikifier::l "failed to parse configuration";
         return;
     }
     
@@ -673,7 +671,7 @@ sub cat_get_pages {
         close $fh;
     }
     
-    # FIXME: We need to delete categories when they become empty.
+    # TODO: We need to delete categories when they become empty.
     
     return wantarray ? (\@final_pages, $cat->{title}) : \@final_pages;
 }

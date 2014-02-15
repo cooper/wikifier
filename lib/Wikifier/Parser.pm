@@ -11,9 +11,8 @@ package Wikifier::Parser;
 
 use warnings;
 use strict;
-use feature 'switch';
+use 5.010;
 
-use Carp;
 use Scalar::Util 'blessed';
 
 use Wikifier::Utilities qw(trim);
@@ -196,7 +195,6 @@ sub handle_character {
             name   => $block_name
         );
        
-            
     }
     
     # right bracket indicates the closing of a block.
@@ -206,7 +204,7 @@ sub handle_character {
         
         # we cannot close the main block.
         if ($current{block} == $page->{main_block}) {
-            carp "attempted to close main block";
+            Wikifier::l "attempted to close main block";
             return;
         }
         

@@ -11,22 +11,10 @@ use warnings;
 use strict;
 use 5.010;
 
-use Carp;
-
 our %block_types;
 
 sub create_block {
     my ($wikifier, %opts) = @_;
-    
-    # check for required options.
-    # XXX: I don't think this is ever called directly.
-    #      Is there even a change that options are missing?
-    my @required = qw(parent type);
-    foreach my $requirement (@required) {
-        my ($pkg, $file, $line) = caller;
-        carp "create_block(): missing option $requirement ($pkg line $line)"
-        unless exists $opts{$requirement};
-    }
     my $type = $opts{type};
     
     # if this block type doesn't exist, try loading its module.
@@ -61,12 +49,12 @@ sub load_block {
     
     # does the file exist?
     if (!-f $file && !-l $file) {
-        say "No such block file $file";
+        Wikifier::l "No such block file $file";
         return;
     }
     
     # do the file.
-    my $package = do $file or carp "error loading $type block module: ".($@ || $! || 'idk');
+    my $package = do $file or Wikifier::l "Error loading $type block module: ".($@ || $! || 'idk');
     return unless $package;
     
     # fetch blocks.

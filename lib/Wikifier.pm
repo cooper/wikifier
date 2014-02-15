@@ -34,7 +34,7 @@ package Wikifier;
 
 use warnings;
 use strict;
-use feature qw(switch);
+use 5.010;
 use parent qw(Wikifier::Parser Wikifier::BlockManager Wikifier::Formatter);
 
 use Wikifier::Parser;
@@ -46,11 +46,35 @@ use Wikifier::Page;
 use Wikifier::Block;
 use Wikifier::Element;
 
+our $indent;
+
 # create a new wikifier instance.
 sub new {
     my ($class, %opts) = @_;
     my $wikifier = bless \%opts, $class;
     return $wikifier;
 }
+
+# log.
+sub l($) {
+    my $str = shift;
+    $str = "  $str" for 0 .. $indent;
+    say $str;
+}
+
+# log and then indent.
+sub lindent($) {
+    l(shift);
+    indent();
+}
+
+# go back and then log.
+sub lback($) {
+    back();
+    l(shift);
+}
+
+sub indent () { $indent++ }
+sub back   () { $indent-- }
 
 1

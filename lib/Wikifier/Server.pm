@@ -4,7 +4,6 @@ package Wikifier::Server;
 
 use warnings;
 use strict;
-use feature 'say';
 
 use IO::Async::Loop;
 use IO::Async::File;
@@ -40,7 +39,7 @@ sub start {
 
     # begin listening.
     $listener->listen(handle => $socket);
-    say 'Listening on '.$path;
+    Wikifier::l 'Listening on '.$path;
 
     # set up handlers.
     Wikifier::Server::Handlers::initialize();
@@ -59,7 +58,7 @@ sub handle_stream {
     my (undef, $stream) = @_;
    
     $stream->{connection} = Wikifier::Server::Connection->new($stream);
-    say "New connection $$stream{connection}{id}";
+    Wikifier::l "New connection $$stream{connection}{id}";
     
     # configure the stream.
     $stream->configure(
@@ -89,13 +88,17 @@ sub handle_data {
 sub create_wikis {
     my $w = $conf->get('server.wiki');
     my %wikis = $w && ref $w eq 'HASH' ? %$w : {};
+    Wikifier::lindent 'Initializing Wikifier::Wikis';
+    
     foreach my $name (keys %wikis) {
         my $wiki = Wikifier::Wiki->new(config_file => $conf->get("server.wiki.$name.config"));
-        say "Error with wiki configuration for '$name'" and next unless $wiki;
-        say "Initialized '$name' wiki";
+        Wikifier::l "Error with wiki configuration for '$name'" and next unless $wiki;
+        Wikifier::l "Initialized '$name' wiki";
         $wiki{$name}  = $wiki;
         $wiki->{name} = $name;
     }
+    
+    Wikifier::lback 'Done initializing';
 }
 
 # if pregeneration is enabled, do so.
@@ -120,8 +123,8 @@ sub gen_wiki {
         $loop->add($file);
     }
 
-    say "Checking for pages to generate in '$$wiki{name}'";
-
+    Wikifier::lindent "Checking for pages to generate in '$$wiki{name}'";
+    
     foreach my $page_name ($wiki->all_pages) {
         my $page_file  = "$page_dir/$page_name";
         my $cache_file = "$cache_dir/$page_name.cache";
@@ -136,12 +139,12 @@ sub gen_wiki {
         }
         
         # page is not cached or has changed since cache time.
-        say "Generating page '$page_name'";
+        Wikifier::l "Generating page '$page_name'";
         $wiki->display_page($page_name);
         
     }
     
-    say "Done generating '$$wiki{name}'";
+    Wikifier::lback "Done generating '$$wiki{name}'";
 }
 
 1

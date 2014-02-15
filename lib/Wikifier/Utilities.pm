@@ -6,7 +6,6 @@ package Wikifier::Utilities;
 
 use warnings;
 use strict;
-use feature 'switch';
 
 sub import {
     my $package = caller;

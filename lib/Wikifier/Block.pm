@@ -13,7 +13,7 @@ package Wikifier::Block;
 use warnings;
 use strict;
 
-use Scalar::Util qw(blessed);
+use Scalar::Util qw(blessed weaken);
 
 # Required properties of blocks.
 #   
@@ -33,7 +33,7 @@ use Scalar::Util qw(blessed);
 # Required arguments:
 #   parent:     the parent block. (for main block, undef)
 #   type:       the name of the block, such as 'imagebox', 'paragraph', etc.
-#   wikifier:   the wikifier object. (FIXME: looping references)
+#   wikifier:   the wikifier object.
 #
 # For subclasses, the type is provided automatically.
 # This should rarely be used directly; use $wikifier->create_block($parent, $type).
@@ -42,7 +42,12 @@ sub new {
     my ($class, %opts) = @_;
     $opts{content} ||= [];
     $opts{type} = lc $opts{type};
-    return bless \%opts, $class;
+    my $block = bless \%opts, $class;
+    
+    # weaken reference to wikifier.
+    weaken($block->{wikifier}) if $block->{wikifier};
+    
+    return $block;
 }
 
 #############

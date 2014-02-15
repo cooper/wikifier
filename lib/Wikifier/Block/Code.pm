@@ -7,7 +7,6 @@ package Wikifier::Block::Code;
 
 use warnings;
 use strict;
-use feature qw(switch);
 
 our %block_types = (
     code => {

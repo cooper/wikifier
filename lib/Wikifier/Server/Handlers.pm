@@ -4,7 +4,6 @@ package Wikifier::Server::Handlers;
 
 use warnings;
 use strict;
-use feature qw(say switch);
 
 use Digest::SHA 'sha1_hex';
 
@@ -37,7 +36,7 @@ sub handle_wiki {
     $connection->{wiki_name}     = $name;
     $connection->{wiki}          = $Wikifier::Server::wiki{$name};
     
-    say "Successful authentication for '$name' by $$connection{id}";
+    Wikifier::l "Successful authentication for '$name' by $$connection{id}";
     
 }
 
@@ -46,7 +45,7 @@ sub handle_page {
     my ($connection, $msg) = _required(@_, 'name') or return;
     my $result = $connection->{wiki}->display_page($msg->{name}, 1);
     $connection->send('page', $result);
-    say "Page '$$msg{name}' requested by $$connection{id}";
+    Wikifier::l "Page '$$msg{name}' requested by $$connection{id}";
 }
 
 # image request.
@@ -60,7 +59,7 @@ sub handle_image {
     );
     delete $result->{content};
     $connection->send('image', $result);
-    say "Image '$$msg{name}' requested by $$connection{id}";
+    Wikifier::l "Image '$$msg{name}' requested by $$connection{id}";
 }
 
 # category posts.
@@ -68,7 +67,7 @@ sub handle_catposts {
     my ($connection, $msg) = _required(@_, 'name') or return;
     my $result = $connection->{wiki}->display_category_posts($msg->{name});
     $connection->send('catposts', $result);
-    say "Category posts for '$$msg{name}' requested by $$connection{id}";
+    Wikifier::l "Category posts for '$$msg{name}' requested by $$connection{id}";
 }
 
 # check for all required things.

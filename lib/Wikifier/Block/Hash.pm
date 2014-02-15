@@ -7,10 +7,9 @@ package Wikifier::Block::Hash;
 
 use warnings;
 use strict;
-use feature 'switch';
+use 5.010;
 
 use Scalar::Util 'blessed';
-use Carp;
 
 our %block_types = (
     hash => {
@@ -56,7 +55,7 @@ sub hash_parse {
                 
                 # if there is no key, give up.
                 if (!length $key) {
-                    carp "no key for text value in hash-based block ($value)";
+                    Wikifier::l "No key for text value in hash-based block ($value)";
                     $key = "Item $i";
                 }
                 

@@ -8,7 +8,6 @@ package Wikifier::Page;
 
 use warnings;
 use strict;
-use feature qw(switch);
 
 # wiki info.
 #   name:               simple name of the wiki, such as "NoTrollPlzNet Library."
