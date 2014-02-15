@@ -99,25 +99,26 @@ sub create_wikis {
 # if pregeneration is enabled, do so.
 sub pregenerate {
     return unless $conf->get('server.enable.pregeneration');
-    say 'Checking for pages to generate';
     WIKI: foreach my $wiki (values %wiki) {
-    PAGE: foreach my $page_name ($wiki->all_pages) {
-        my $cache_file = $wiki->opt('dir.cache').q(/).$page_name;
-        
-        # determine modification times.
-        my $page_modified  = (stat $page_name )[9];
-        my $cache_modified = (stat $cache_file)[9] if $cache_file;
-        
-        # cached copy is newer; skip this page.
-        if ($page_modified && $cache_modified) {
-            next PAGE if $cache_modified >= $page_modified;
+    say "Checking for pages to generate in '$wiki{name}'";
+        PAGE: foreach my $page_name ($wiki->all_pages) {
+            my $cache_file = $wiki->opt('dir.cache').q(/).$page_name.q(.cache);
+            
+            # determine modification times.
+            my $page_modified  = (stat $page_name )[9];
+            my $cache_modified = (stat $cache_file)[9] if $cache_file;
+            
+            # cached copy is newer; skip this page.
+            if ($page_modified && $cache_modified) {
+                next PAGE if $cache_modified >= $page_modified;
+            }
+            
+            # page is not cached or has changed since cache time.
+            say "Generating page '$page_name'";
+            $wiki->display_page($page_name);
+            
         }
-        
-        # page is not cached or has changed since cache time.
-        say "Generating page '$page_name'";
-        $wiki->display_page($page_name);
-        
-    } }
+    }
     say 'Done generating';
 }
 
