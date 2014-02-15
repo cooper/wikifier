@@ -530,12 +530,13 @@ sub display_category_posts {
 # deal with categories after parsing a page.
 sub check_categories {
     my ($wiki, $page) = @_;
-    my $cats = $page->get('category');
-    return if !$cats || ref $cats ne 'HASH';
-    
+
     # actual categories.
-    $page->{categories} = [keys %$cats];
-    $wiki->cat_add_page($page, $_) foreach keys %$cats;
+    my $cats = $page->get('category');
+    if ($cats && ref $cats eq 'HASH') {
+        $page->{categories} = [keys %$cats];
+        $wiki->cat_add_page($page, $_) foreach keys %$cats;
+    }
     
     # image categories.
     $wiki->cat_add_page($page, "image-$_") foreach keys %{ $page->{images} || {} };
