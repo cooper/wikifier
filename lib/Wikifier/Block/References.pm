@@ -18,7 +18,6 @@ package Wikifier::Block::References;
 use warnings;
 use strict;
 use feature qw(switch);
-use parent 'Wikifier::Block::Hash';
 
 use Scalar::Util 'blessed';
 
