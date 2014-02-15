@@ -562,6 +562,11 @@ sub cat_add_page {
         }
     }
     
+    # this is an image category, so include the dimensions.
+    if ($category =~ m/^image-(.+)$/) {
+        $page_data->{dimensions} = $page->{images}{$1};
+    }
+    
     # first, check if the category exists yet.
     if (-f $cat_file) {
         my $cat = eval { decode_json(file_contents($cat_file)) };
