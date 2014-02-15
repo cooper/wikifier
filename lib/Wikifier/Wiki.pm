@@ -486,8 +486,8 @@ sub display_image {
 # displays a pages from a category in a blog-like form.
 sub display_category_posts {
     my ($wiki, $category, $page_n) = @_; my $result = {};
-    my ($page_names, $title) = $wiki->cat_get_pages($category);
-    if (!$page_names) {
+    my ($pages, $title) = $wiki->cat_get_pages($category);
+    if (!$pages) {
         $result->{error} = "Category '$category' does not exist.";
         $result->{type}  = 'not found';
         return $result;
@@ -498,12 +498,14 @@ sub display_category_posts {
     $result->{title}    = $title if defined $title;
     
     my (%times, %reses);
-    foreach my $page_data (@$page_names) {
+    foreach my $page_name (keys %$pages) {
+        my $page_data = $pages{$page_name};
         my $res  = $wiki->display_page($page_data->{page});
         my $time = $res->{page} ? $res->{page}->get('page.created')
                    : $res->{created} || 0;
-        $times{ $page_data->{page} } = $time || 0;
-        $reses{ $page_data->{page} } = $res;
+        
+        $times{$page_name} = $time || 0;
+        $reses{$page_name} = $res;
     }
     
     # order with newest first.
@@ -686,7 +688,7 @@ sub cat_get_pages {
     
     # TODO: We need to delete categories when they become empty.
     
-    return wantarray ? ([values %final_pages], $cat->{title}) : [values %final_pages];
+    return wantarray ? (\%final_pages, $cat->{title}) : \%final_pages;
 }
 
 ##################
