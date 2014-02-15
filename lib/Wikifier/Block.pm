@@ -90,6 +90,7 @@ sub _parse {
         my $type_opts = $Wikifier::BlockManager::block_types{$type};
         if ($type_opts->{parse} && !$block->{parse_done}{$type}) {
             $type_opts->{parse}->($block, @_);
+            print "calling {parse} on $$block{type}: $block, (@_)\n";
             $block->{parse_done}{$type} = 1;
         }
         $type = $type_opts->{base};
