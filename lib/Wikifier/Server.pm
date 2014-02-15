@@ -10,6 +10,7 @@ use IO::Async::Loop;
 use IO::Async::Listener;
 use IO::Socket::UNIX;
 use JSON qw(encode_json decode_json);
+use File::Basename 'basename';
 use Cwd 'abs_path';
 
 use Wikifier::Wiki;
@@ -108,10 +109,11 @@ sub pregenerate {
         my $page_file  = abs_path($wiki->opt('dir.page').q(/).$page_name);
         my $cache_file = abs_path($wiki->opt('dir.cache').q(/).$page_file.q(.cache));
         next PAGE if !$page_file; # couldn't resolve symlink.
+        $page_name = basename($page_file);
         
         # determine modification times.
         my $page_modified  = (stat $page_file )[9];
-        my $cache_modified = (stat $cache_file)[9];
+        my $cache_modified = (stat $cache_file)[9] if $cache_file;
         
         # cached copy is newer; skip this page.
         if ($page_modified && $cache_modified) {
@@ -119,8 +121,8 @@ sub pregenerate {
         }
         
         # page is not cached or has changed since cache time.
-        say "Generating page '$page_file'";
-        $wiki->display_page($page_file);
+        say "Generating page '$page_name'";
+        $wiki->display_page($page_name);
         
     } }
     say 'Done generating';
