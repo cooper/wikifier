@@ -761,7 +761,7 @@ sub _wiki_default_calc {
     # cached pages and their images.
     if ($page->wiki_opt('enable.image_pregeneration')) {
         my $res = $wiki->display_image($img{file}, $w, $h, 1);
-        Wikifier::l("Pregenerated image '$$res{file}'") if $res->{cache_gen};
+        Wikifier::l("Pregenerated image '$$res{file}' at ${w}x${h}") if $res->{cache_gen};
         
         # we must symlink to images in cache directory.
         unlink  $page->wiki_opt('dir.cache').q(/).$img{file};
