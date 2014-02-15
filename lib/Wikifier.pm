@@ -58,7 +58,7 @@ sub new {
 # log.
 sub l($) {
     my $str = shift;
-    $str = ('  ' x $indent).q( -).$str;
+    $str = ('   ' x $indent).q(- ).$str if $indent;
     say $str;
 }
 
