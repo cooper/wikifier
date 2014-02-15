@@ -26,6 +26,7 @@ use Scalar::Util 'blessed';
 # in other words, this should not be used for anything relating to a specific page. It is
 # intended to be used for registering block and formatting types to the Wikifier object.
 sub register {
+    return;
     my $wikifier = shift;
     
     # register references{}
@@ -172,4 +173,4 @@ END
     return $string;
 }
 
-1
+__PACKAGE__
