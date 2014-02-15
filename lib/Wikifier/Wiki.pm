@@ -539,6 +539,7 @@ sub check_categories {
     }
     
     # image categories.
+    return unless $wiki->opt('enable.image_tracking');
     $wiki->cat_add_page($page, "image-$_") foreach keys %{ $page->{images} || {} };
 
 }
@@ -660,7 +661,12 @@ sub cat_get_pages {
             }
             
             # page is no longer member of category.
-            next PAGE unless $page->get("category.$category");
+            if ($category =~ m/^image-(.+)/) {
+                next PAGE unless exists $page->{images}{$1};
+            }
+            else {
+                next PAGE unless $page->get("category.$category");
+            }
             
         }
         
