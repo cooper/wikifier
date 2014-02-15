@@ -541,7 +541,7 @@ sub check_categories {
 # add a page to a category if it is not in it already.
 sub cat_add_page {
     my ($wiki, $page, $category) = @_;
-    my $cat_file = $wiki->opt('dir.cat').q(/).$category.q(.cat);
+    my $cat_file = $wiki->opt('dir.category').q(/).$category.q(.cat);
     my $time = time;
     
     # fetch page infos.
@@ -604,7 +604,7 @@ sub cat_get_pages {
     # is no longer in the category, it should be removed from the cat file.
     
     # this category does not exist.
-    my $cat_file = $wiki->opt('dir.cat').q(/).$category.q(.cat);
+    my $cat_file = $wiki->opt('dir.category').q(/).$category.q(.cat);
     return unless -f $cat_file;
     
     # it exists; let's see what's inside.
@@ -689,7 +689,7 @@ sub all_pages {
 
 # an array of file names in category directory.
 sub all_categories {
-    return files_in_dir(shift->opt('dir.cat'), 'cat');
+    return files_in_dir(shift->opt('dir.category'), 'cat');
 }
 
 #####################
