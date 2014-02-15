@@ -532,9 +532,14 @@ sub check_categories {
     my ($wiki, $page) = @_;
     my $cats = $page->get('category');
     return if !$cats || ref $cats ne 'HASH';
-    $page->{categories} = [keys %$cats];
     
+    # actual categories.
+    $page->{categories} = [keys %$cats];
     $wiki->cat_add_page($page, $_) foreach keys %$cats;
+    
+    # image categories.
+    $wiki->cat_add_page($page, "image-$_") foreach keys %{ $page->{images} || {} };
+
 }
 
 # add a page to a category if it is not in it already.
@@ -747,6 +752,8 @@ sub _wiki_default_calc {
     undef $full_image;
     
     # call the default handler with these dimensions.
+    # TODO: rather than requiring the extra dependency Image::Size,
+    # why not just use GD for WiWiki's image size calculator?
     my ($w, $h) = Wikifier::Page::_default_calculator(
         %img,
         big_width  => $big_w,
