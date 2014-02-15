@@ -58,7 +58,7 @@ sub new {
 # log.
 sub l($) {
     my $str = shift;
-    $str = "  $str" for 1 .. $indent;
+    $str = "  - $str" for 1 .. $indent;
     say $str;
 }
 
