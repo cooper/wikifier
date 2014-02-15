@@ -619,7 +619,7 @@ sub cat_get_pages {
     return if !$cat || ref $cat ne 'HASH'; # an error or something happened.
     
     # check each page's modification date.
-    my ($time, $changed, @final_pages) = time;
+    my ($time, $changed, %final_pages) = time;
     PAGE: foreach my $page_name (%{ $cat->{pages} || {} }) {
         my $page_data = my $p = $cat->{pages}{$page_name};
         
@@ -671,14 +671,14 @@ sub cat_get_pages {
         }
         
         # nothing has changed. this one made it.
-        push @final_pages, $page_data;
+        $final_pages{$page_name} = $page_data;
         
     }
     
     # it looks like something has changed. we need to update the cat file.
     if ($changed) {
         $cat->{updated} = $time;
-        $cat->{pages}   = \@final_pages;
+        $cat->{pages}   = \%final_pages;
         open my $fh, '>', $cat_file; # XXX: what if this errors out?
         print {$fh} JSON->new->pretty(1)->encode($cat);
         close $fh;
@@ -686,7 +686,7 @@ sub cat_get_pages {
     
     # TODO: We need to delete categories when they become empty.
     
-    return wantarray ? (\@final_pages, $cat->{title}) : \@final_pages;
+    return wantarray ? ([values %final_pages], $cat->{title}) : [values %final_pages];
 }
 
 ##################
