@@ -678,9 +678,31 @@ sub cat_get_pages {
     return wantarray ? (\@final_pages, $cat->{title}) : \@final_pages;
 }
 
+##################
+### WIKI FILES ###
+##################
+
+# an array of file names in page directory.
+sub all_pages {
+    return files_in_dir(shift->opt('dir.page'));
+}
+
+# an array of file names in category directory.
+sub all_categories {
+    return files_in_dir(shift->opt('dir.cat'));
+}
+
 #####################
 ### MISCELLANEOUS ###
 #####################
+
+sub files_in_dir {
+    my $dir = shift;
+    opendir my $dh, $dir or die "cannot open dir $dir: $!";
+    my @file = readdir $dh;
+    closedir $dh;
+    return @file;
+}
 
 # returns entire contents of a file.
 sub file_contents {

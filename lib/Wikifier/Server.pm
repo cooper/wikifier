@@ -10,6 +10,7 @@ use IO::Async::Loop;
 use IO::Async::Listener;
 use IO::Socket::UNIX;
 use JSON qw(encode_json decode_json);
+use Cwd 'abs_path';
 
 use Wikifier::Wiki;
 use Wikifier::Server::Connection;
@@ -99,7 +100,30 @@ sub create_wikis {
 # if pregeneration is enabled, do so.
 sub pregenerate {
     return unless $conf->get('server.enable.pregeneration');
-    
+    say 'Checking for pages to generate';
+    WIKI: foreach my $wiki (values %wiki) {
+    PAGE: foreach my $page_name ($wiki->all_pages) {
+        
+        # resolve symlinks.
+        my $page_file  = abs_path($wiki->opt('dir.page').q(/).$page_name);
+        my $cache_file = abs_path($wiki->opt('dir.cache').q(/).$page_file.q(.cache));
+        next PAGE if !$page_file; # couldn't resolve symlink.
+        
+        # determine modification times.
+        my $page_modified  = (stat $page_file )[9];
+        my $cache_modified = (stat $cache_file)[9];
+        
+        # cached copy is newer; skip this page.
+        if ($page_modified && $cache_modified) {
+            next PAGE if $cache_modified >= $page_modified;
+        }
+        
+        # page is not cached or has changed since cache time.
+        say "Generating page '$page_file'";
+        $wiki->display_page($page_file);
+        
+    } }
+    say 'Done generating';
 }
 
 1
