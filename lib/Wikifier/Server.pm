@@ -104,7 +104,7 @@ sub pregenerate {
     say 'Checking for pages to generate';
     WIKI: foreach my $wiki (values %wiki) {
     PAGE: foreach my $page_name ($wiki->all_pages) {
-        my $cache_file = $wiki->opt('dir.cache').q(/).$page_file;
+        my $cache_file = $wiki->opt('dir.cache').q(/).page_name;
         
         # determine modification times.
         my $page_modified  = (stat $page_name )[9];
