@@ -7,6 +7,7 @@ use strict;
 use feature 'say';
 
 use IO::Async::Loop;
+use IO::Async::File;
 use IO::Async::Listener;
 use IO::Socket::UNIX;
 use JSON qw(encode_json decode_json);
@@ -15,7 +16,7 @@ use Wikifier::Wiki;
 use Wikifier::Server::Connection;
 use Wikifier::Server::Handlers;
 
-our ($loop, $conf, %wiki);
+our ($loop, $conf, %wiki, %files);
 
 # start the server.
 sub start {
@@ -100,32 +101,46 @@ sub create_wikis {
 # if pregeneration is enabled, do so.
 sub pregenerate {
     return unless $conf->get('server.enable.pregeneration');
-    WIKI: foreach my $wiki (values %wiki) {
-    
-        my $page_dir  = $wiki->opt('dir.page');
-        my $cache_dir = $wiki->opt('dir.cache');
-    
-        say "Checking for pages to generate in '$$wiki{name}'";
-    
-        PAGE: foreach my $page_name ($wiki->all_pages) {
-            my $page_file  = "$page_dir/$page_name";
-            my $cache_file = "$cache_dir/$page_name.cache";
-            
-            # determine modification times.
-            my $page_modified  = (stat $page_file )[9];
-            my $cache_modified = (stat $cache_file)[9] if $cache_file;
-            
-            # cached copy is newer; skip this page.
-            if ($page_modified && $cache_modified) {
-                next PAGE if $cache_modified >= $page_modified;
-            }
-            
-            # page is not cached or has changed since cache time.
-            say "Generating page '$page_name'";
-            $wiki->display_page($page_name);
-            
-        }
+    foreach my $wiki (values %wiki) {
+        gen_wiki($wiki);
     }
+}
+
+sub gen_wiki {
+    my $wiki = shift;
+    my $page_dir  = $wiki->opt('dir.page');
+    my $cache_dir = $wiki->opt('dir.cache');
+
+    # create a file monitor.
+    if (!$files{ $wiki->{name} }) {
+        my $file = $files{ $wiki->{name} } = IO::Async::File->new(
+            filename => $page_dir,
+            on_mtime_changed => sub { gen_wiki($wiki) }
+        );
+        $loop->add($file);
+    }
+
+    say "Checking for pages to generate in '$$wiki{name}'";
+
+    foreach my $page_name ($wiki->all_pages) {
+        my $page_file  = "$page_dir/$page_name";
+        my $cache_file = "$cache_dir/$page_name.cache";
+        
+        # determine modification times.
+        my $page_modified  = (stat $page_file )[9];
+        my $cache_modified = (stat $cache_file)[9] if $cache_file;
+        
+        # cached copy is newer; skip this page.
+        if ($page_modified && $cache_modified) {
+            next if $cache_modified >= $page_modified;
+        }
+        
+        # page is not cached or has changed since cache time.
+        say "Generating page '$page_name'";
+        $wiki->display_page($page_name);
+        
+    }
+    
     say 'Done generating';
 }
 
