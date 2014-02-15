@@ -92,7 +92,8 @@ sub create_wikis {
         my $wiki = Wikifier::Wiki->new(config_file => $conf->get("server.wiki.$name.config"));
         say "Error with wiki configuration for '$name'" and next unless $wiki;
         say "Initialized '$name' wiki";
-        $wiki{$name} = $wiki;
+        $wiki{$name}  = $wiki;
+        $wiki->{name} = $name;
     }
 }
 
@@ -100,7 +101,7 @@ sub create_wikis {
 sub pregenerate {
     return unless $conf->get('server.enable.pregeneration');
     WIKI: foreach my $wiki (values %wiki) {
-    say "Checking for pages to generate in '$wiki{name}'";
+    say "Checking for pages to generate in '$$wiki{name}'";
         PAGE: foreach my $page_name ($wiki->all_pages) {
             my $cache_file = $wiki->opt('dir.cache').q(/).$page_name.q(.cache);
             
