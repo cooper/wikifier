@@ -571,7 +571,7 @@ sub cat_add_page {
         
         # remove from the category if it's there already.
         my %final_pages;
-        foreach my $p_name (keys %{ $cat->{pages} }) {
+        foreach my $p_name (keys %{ $cat->{pages} || {} }) {
             next if $p_name eq $page->{name};
             $final_pages{$p_name} = $cat->{pages}{$p_name};
         }
