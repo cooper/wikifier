@@ -699,7 +699,7 @@ sub all_categories {
 # resolves symlinks only counts each file once.
 sub files_in_dir {
     my ($dir, $ext) = @_;
-    opendir my $dh, $dir or Wikifier::l("Cannot open dir $dir: $!") and return;
+    opendir my $dh, $dir or Wikifier::l("Cannot open dir '$dir': $!") and return;
     my %files;
     while (my $file = readdir $dh) {
         
@@ -727,7 +727,7 @@ sub files_in_dir {
 sub file_contents {
     my ($file, $binary) = @_;
     local $/ = undef;
-    open my $fh, '<', $file;
+    open my $fh, '<', $file or Wikifier::l("Cannot open file '$file': $!") and return;;
     binmode $fh if $binary;
     my $content = <$fh>;
     close $fh;
