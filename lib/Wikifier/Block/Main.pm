@@ -24,12 +24,6 @@ sub main_parse {
     # filter out blank items.
     $block->remove_blank();
     
-    # parse each item.
-    foreach my $item (@{$block->{content}}) {
-        next unless blessed $item;
-        $item->parse(@_);
-    }
-    
     return 1;
 }
 
