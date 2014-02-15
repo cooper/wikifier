@@ -58,7 +58,7 @@ sub section_html {
     my $has_footer = $page->wiki_opt('enable.last_section_footer') &&
                      $page->{wikifier}{main_block}{content}[-1] == $block;
     $el->{parent}->configure(no_close_tag => $has_footer);
-    $el->configure(no_close_tag => $has_footer);
+    $block->{parent}{element}->configure(no_close_tag => $has_footer);
     
     # determine the page title if necessary.
     my $title    = $block->{name};
