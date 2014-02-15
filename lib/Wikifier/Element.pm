@@ -40,7 +40,9 @@ sub create_child {
 
 # add a child or text node.
 sub add {
-    push @{ shift->{content} }, shift;
+    my ($el, $child);
+    $child->{parent} = $el;
+    push @{ $el->{content} }, $child;
 }
 
 # add a class.
