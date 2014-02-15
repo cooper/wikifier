@@ -226,7 +226,7 @@ sub display_page {
             
             # fetch the prefixing data.
             my $cache_data = file_contents($cache_file);
-            my @data = split /\n/, $cache_data;
+            my @data = split /\n\n/, $cache_data, 2;
             
             # decode.
             my $jdata = eval { decode_json(shift @data) } || {};
@@ -236,7 +236,7 @@ sub display_page {
             
             # set HTTP data.
             
-            $result->{content} .= join "\n", @data;
+            $result->{content} .= shift @data;
             $result->{cached}   = 1;
             $result->{modified} = $time;
             $result->{length}   = length $result->{content};
@@ -272,11 +272,11 @@ sub display_page {
         open my $fh, '>', $cache_file;
         
         # save prefixing data.
-        print {$fh} encode_json({
+        print {$fh} JSON->new->pretty(1)->encode({
             %{ $page->get('page') || {} },
-            images     => $page->{images} || {},
+            images     => $page->{images}       || {},
             categories => $result->{categories} || []
-        }), "\n";
+        }), "\n\n";
         
         # save the content.
         print {$fh} $result->{content};
