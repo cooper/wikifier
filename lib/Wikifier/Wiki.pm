@@ -551,13 +551,10 @@ sub cat_add_page {
     
     # fetch page infos.
     my $p_vars = $page->get('page');
-    my $page_data = {
-        page    => $page->{name},
-        asof    => $time
-    };
+    my $page_data = { asof => $time };
     if (ref $p_vars eq 'HASH') {
         foreach my $var (keys %$p_vars) {
-            next if $var eq 'page' || $var eq 'asof';
+            next if $var eq 'asof';
             $page_data->{$var} = $p_vars->{$var};
         }
     }
@@ -573,13 +570,13 @@ sub cat_add_page {
         return if !$cat || ref $cat ne 'HASH'; # an error or something happened.
         
         # remove from the category if it's there already.
-        my @final_pages;
-        foreach my $p (@{ $cat->{pages} }) {
-            next if $p->{page} eq $page->{name};
-            push @final_pages, $p;
+        my %final_pages;
+        foreach my $p_name (keys %{ $cat->{pages} }) {
+            next if $p_name eq $page->{name};
+            $final_pages{$p_name} = $cat->{pages}{$p_name};
         }
         
-        push @final_pages, $page_data;
+        $final_pages{ $page->{name} } = $page_data;
         $cat->{pages} = \@final_pages;
         
         open my $fh, '>', $cat_file; # XXX: what if this errors out?
@@ -595,7 +592,7 @@ sub cat_add_page {
     print {$fh} JSON->new->pretty(1)->encode({
         category   => $category,
         created    => $time,
-        pages      => [ $page_data ]
+        pages      => [ { $page->{name} => $page_data } ]
     });
     
     # save the content.
@@ -666,7 +663,7 @@ sub cat_get_pages {
             
             # page is no longer member of category.
             if ($category =~ m/^image-(.+)/) {
-                next PAGE unless exists $page->{images}{$1};
+                next PAGE unless defined $page->{images}{$1};
             }
             else {
                 next PAGE unless $page->get("category.$category");
