@@ -58,7 +58,7 @@ sub new {
 sub parse {
     my $block = shift;
     my $type  = $block->{type};
-    print "\@_ in parse(): @_\n";
+    print "\@_ in parse() of $type: @_\n";
     # parse this block.
     $block->{parse_done} = {};
     $block->_parse($type, @_);
