@@ -31,6 +31,9 @@ sub image_parse {
     my ($block, $page) = (shift, @_);
     $block->parse_base(@_); # call hash parse.
     
+    my ($w, $h);
+    
+    # get values from hash.
     $block->{$_} = $block->{hash}{$_} foreach qw(
         description file width height
         align float author license
@@ -45,10 +48,6 @@ sub image_parse {
         $block->{height} =~ s/px// if defined $block->{height};
     }
     
-    # default to auto.
-    $block->{width}  ||= 'auto';
-    $block->{height} ||= 'auto';
-    
     # no float; default to right.
     $block->{float} ||= $block->{align} || 'right';
     
@@ -58,32 +57,20 @@ sub image_parse {
         return;
     }
     
-    return 1;
-}
-
-# HTML.
-sub image_html {
-    my ($box, $block, $page, $el) = @_;
-    my ($w, $h, $link_address, $image_url, $image_root, $javascript, $height, $width);
-    
-    ($height, $width) = ($block->{height}, $block->{width});
-    $image_root       = $page->wiki_opt('wiki.image_root');
-    $link_address     = $image_url = "$image_root/$$block{file}";
-    
-    $el->add_class('imagebox-'.$block->{float}) if $box;
+    $block->{image_root} = $page->wiki_opt('wiki.image_root');
     
     ##############
     ### SIZING ###
     ##############
     
     # decide which dimension(s) were given.
-    my $given_width  = defined $width  && $width  ne 'auto' ? 1 : 0;
-    my $given_height = defined $height && $height ne 'auto' ? 1 : 0;
+    my $given_width  = defined $block->{width}  ? 1 : 0;
+    my $given_height = defined $block->{height} ? 1 : 0;
     
     # both dimensions were given, so we need to do no sizing.
     if ($given_width && $given_height) {
-        $w =  $width.q(px);
-        $h = $height.q(px);
+        $w = $block->{width} .q(px);
+        $h = $block->{height}.q(px);
     }
     
     # use javascript image sizing
@@ -94,16 +81,16 @@ sub image_html {
     
         # inject javascript resizer if no width is given.
         if (!$given_width) {
-            $javascript = 1;
+            $block->{javascript} = 1;
         }
         
         # use the image root address options to determine URL.
         
         # width and height dummies will be overriden by JavaScript.
-        $w = $given_width  ? $width  : '200px';
-        $h = $given_height ? $height : 'auto';
+        $w = $given_width  ? $block->{width}  : '200px';
+        $h = $given_height ? $block->{height} : 'auto';
         
-        $image_url = "$image_root/$$block{file}";
+        $block->{image_url} = "$$block{image_root}/$$block{file}";
     }
     
     # use server-side image sizing.
@@ -116,8 +103,8 @@ sub image_html {
         # find the resized dimensions.
         ($w, $h) = $page->wiki_opt('image.calc')->(
             file   => $block->{file},
-            height => $height,
-            width  => $width,
+            height => $block->{height},
+            width  => $block->{width},
             page   => $page
         );
         
@@ -132,9 +119,28 @@ sub image_html {
         # remember that we use this image.
         push @{ $page->{images}{ $block->{file} } ||= [] }, $w + 0, $h + 0;
     
-        $image_url = $url;
+        $block->{image_url} = $url;
         ($w, $h)   = ($w.q(px), $h.q(px));
     }
+    
+    # any dimensions still not set = auto.
+    $block->{width}  = $w // $block->{width} .q(px) // 'auto';
+    $block->{height} = $h // $block->{height}.q(px) // 'auto';
+    
+    return 1;
+}
+
+# HTML.
+sub image_html {
+    my ($box, $block, $page, $el) = @_;
+
+    # add the appropriate float class.
+    $el->add_class('imagebox-'.$block->{float}) if $box;
+    
+    # fetch things we determined in image_parse().
+ my ($height,          $width,          $image_root,          $image_url         ) =
+    ($block->{height}, $block->{width}, $block->{image_root}, $block->{image_url});
+    my $link_address     = $image_url = "$image_root/$$block{file}";
     
     ############
     ### HTML ###
@@ -154,8 +160,8 @@ sub image_html {
             },
             alt        => 'image',
             styles     => {
-                width  => $w,
-                height => $h
+                width  => $width,
+                height => $height
             }
         );
         return;
@@ -164,7 +170,7 @@ sub image_html {
     # create inner box with width restriction.
     my $inner = $el->create_child(
         class  => 'imagebox-inner',
-        styles => { width => $w }
+        styles => { width => $width }
     );
     
     # create the anchor.
@@ -181,8 +187,8 @@ sub image_html {
             alt => 'image'
         },
         styles     => {
-            width  => $w,
-            height => $h
+            width  => $width,
+            height => $height
         }
     );
     
@@ -190,7 +196,7 @@ sub image_html {
     $img->add_attribute(onload =>
         q{this.parentElement.parentElement.style.width = }.
         q{this.offsetWidth + 'px'; this.style.width = '100%';}
-    ) if $javascript;
+    ) if $block->{javascript};
     
     # description.
     my $desc = $inner->create_child(class => 'imagebox-description');
