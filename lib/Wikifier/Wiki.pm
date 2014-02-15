@@ -696,12 +696,25 @@ sub all_categories {
 ### MISCELLANEOUS ###
 #####################
 
+# files in directory.
+# resolves symlinks only counts each file once.
 sub files_in_dir {
     my $dir = shift;
     opendir my $dh, $dir or die "cannot open dir $dir: $!";
-    my @file = readdir $dh;
+    my %files;
+    while (my $file = readdir $dh) {
+        
+        # resolve symlinks.
+        my $file = abs_path($wiki->opt('dir.page').q(/).$file);
+        next if !$file; # couldn't resolve symlink.
+        
+        # already got this one.
+        next if $files{$file};
+        
+        $files{$file} = 1;
+    }
     closedir $dh;
-    return @file;
+    return keys %files;
 }
 
 # returns entire contents of a file.

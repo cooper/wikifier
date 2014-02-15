@@ -104,15 +104,10 @@ sub pregenerate {
     say 'Checking for pages to generate';
     WIKI: foreach my $wiki (values %wiki) {
     PAGE: foreach my $page_name ($wiki->all_pages) {
-        
-        # resolve symlinks.
-        my $page_file  = abs_path($wiki->opt('dir.page').q(/).$page_name);
-        my $cache_file = abs_path($wiki->opt('dir.cache').q(/).$page_file.q(.cache));
-        next PAGE if !$page_file; # couldn't resolve symlink.
-        $page_name = basename($page_file);
+        my $cache_file = $wiki->opt('dir.cache').q(/).$page_file;
         
         # determine modification times.
-        my $page_modified  = (stat $page_file )[9];
+        my $page_modified  = (stat $page_name )[9];
         my $cache_modified = (stat $cache_file)[9] if $cache_file;
         
         # cached copy is newer; skip this page.
