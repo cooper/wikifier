@@ -101,12 +101,18 @@ sub create_wikis {
 sub pregenerate {
     return unless $conf->get('server.enable.pregeneration');
     WIKI: foreach my $wiki (values %wiki) {
-    say "Checking for pages to generate in '$$wiki{name}'";
+    
+        my $page_dir  = $wiki->opt('dir.page');
+        my $cache_dir = $wiki->opt('dir.cache');
+    
+        say "Checking for pages to generate in '$$wiki{name}'";
+    
         PAGE: foreach my $page_name ($wiki->all_pages) {
-            my $cache_file = $wiki->opt('dir.cache').q(/).$page_name.q(.cache);
+            my $page_file  = "$page_dir/$page_name";
+            my $cache_file = "$cache_dir/$page_name.cache";
             
             # determine modification times.
-            my $page_modified  = (stat $page_name )[9];
+            my $page_modified  = (stat $page_file )[9];
             my $cache_modified = (stat $cache_file)[9] if $cache_file;
             
             # cached copy is newer; skip this page.
