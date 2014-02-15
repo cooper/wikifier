@@ -139,8 +139,9 @@ sub gen_wiki {
         }
         
         # page is not cached or has changed since cache time.
-        Wikifier::l("Generating page '$page_name'");
+        Wikifier::lindent("Generating page '$page_name'");
         $wiki->display_page($page_name);
+        Wikifier::back();
         
     }
     

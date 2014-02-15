@@ -37,7 +37,6 @@ sub handle_wiki {
     $connection->{wiki}          = $Wikifier::Server::wiki{$name};
     
     Wikifier::l("Successful authentication for '$name' by $$connection{id}");
-    
 }
 
 # page request.
@@ -51,6 +50,7 @@ sub handle_page {
 # image request.
 sub handle_image {
     my ($connection, $msg) = _required(@_, 'name') or return;
+    Wikifier::lindent("Image '$$msg{name}' requested by $$connection{id}");
     my $result = $connection->{wiki}->display_image(
         $msg->{name}, 
         $msg->{width}  || 0,
@@ -58,16 +58,17 @@ sub handle_image {
         1
     );
     delete $result->{content};
+    Wikifier::back();
     $connection->send('image', $result);
-    Wikifier::l("Image '$$msg{name}' requested by $$connection{id}");
 }
 
 # category posts.
 sub handle_catposts {
     my ($connection, $msg) = _required(@_, 'name') or return;
+    Wikifier::lindent("Category posts for '$$msg{name}' requested by $$connection{id}");
     my $result = $connection->{wiki}->display_category_posts($msg->{name});
+    Wikifier::back();
     $connection->send('catposts', $result);
-    Wikifier::l("Category posts for '$$msg{name}' requested by $$connection{id}");
 }
 
 # check for all required things.
