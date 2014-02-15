@@ -10,8 +10,6 @@ use IO::Async::Loop;
 use IO::Async::Listener;
 use IO::Socket::UNIX;
 use JSON qw(encode_json decode_json);
-use File::Basename 'basename';
-use Cwd 'abs_path';
 
 use Wikifier::Wiki;
 use Wikifier::Server::Connection;

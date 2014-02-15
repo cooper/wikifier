@@ -707,6 +707,7 @@ sub files_in_dir {
         # resolve symlinks.
         my $file = abs_path($dir.q(/).$file);
         next if !$file; # couldn't resolve symlink.
+        $file = basename($file);
         
         # already got this one.
         next if $files{$file};
