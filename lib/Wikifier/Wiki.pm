@@ -705,7 +705,7 @@ sub files_in_dir {
     while (my $file = readdir $dh) {
         
         # resolve symlinks.
-        my $file = abs_path($wiki->opt('dir.page').q(/).$file);
+        my $file = abs_path($dir.q(/).$file);
         next if !$file; # couldn't resolve symlink.
         
         # already got this one.
