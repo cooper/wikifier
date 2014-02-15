@@ -684,12 +684,12 @@ sub cat_get_pages {
 
 # an array of file names in page directory.
 sub all_pages {
-    return files_in_dir(shift->opt('dir.page'));
+    return files_in_dir(shift->opt('dir.page'), 'page');
 }
 
 # an array of file names in category directory.
 sub all_categories {
-    return files_in_dir(shift->opt('dir.cat'));
+    return files_in_dir(shift->opt('dir.cat'), 'cat');
 }
 
 #####################
@@ -699,10 +699,16 @@ sub all_categories {
 # files in directory.
 # resolves symlinks only counts each file once.
 sub files_in_dir {
-    my $dir = shift;
+    my ($dir, $ext) = @_;
     opendir my $dh, $dir or die "cannot open dir $dir: $!";
     my %files;
     while (my $file = readdir $dh) {
+        
+        # skip hidden files.
+        next if substr($file, 0, 1) eq '.';
+        
+        # skip files without desired extension.
+        next if $ext && $file !~ m/.+\.$ext$/;
         
         # resolve symlinks.
         my $file = abs_path($dir.q(/).$file);
