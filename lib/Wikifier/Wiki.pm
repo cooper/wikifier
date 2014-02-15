@@ -222,7 +222,7 @@ sub display_page {
         else {
             my $time = time2str($cache_modify);
             $result->{type}     = 'page';
-            $result->{content}  = "<!-- cached page dated $time -->\n";
+            $result->{content}  = "<!-- cached page dated $time -->\n\n";
             
             # fetch the prefixing data.
             my $cache_data = file_contents($cache_file);
@@ -276,7 +276,7 @@ sub display_page {
             %{ $page->get('page') || {} },
             images     => $page->{images}       || {},
             categories => $result->{categories} || []
-        }), "\n\n";
+        }), "\n";
         
         # save the content.
         print {$fh} $result->{content};
