@@ -140,7 +140,7 @@ sub image_html {
     # fetch things we determined in image_parse().
  my ($height,          $width,          $image_root,          $image_url         ) =
     ($block->{height}, $block->{width}, $block->{image_root}, $block->{image_url});
-    my $link_address     = $image_url = "$image_root/$$block{file}";
+    my $link_address = "$image_root/$$block{file}";
     
     ############
     ### HTML ###
