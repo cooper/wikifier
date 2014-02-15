@@ -19,7 +19,7 @@ our %block_types = (
 
 sub history_html {
     my ($block, $page, $el) = @_;
-    my $table = $el->create_element(
+    my $table = $el->create_child(
         type  => 'table',
         class => 'history-table'
     );
