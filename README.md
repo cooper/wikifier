@@ -2,11 +2,11 @@
 
 Wikifier is a wiki software suite. It consists of several packages.
 
-# Language
+## Language
 
 The Wikifier's unique language is designed specifically for easy legibility.
 
-## Blocks
+### Blocks
 
 The fundamental component of the wikifier language is the block. Each block belongs to a
 specific, and each type provides a different function. For example, infobox{} displays a
@@ -16,7 +16,7 @@ a caption and link to a full-sized image.
 Many blocks may contain text as well as other blocks. Each block may handle the data
 inside of it differently.
 
-### Syntax
+#### Syntax
 
 Blocks can have names: Some do, and some don't. Each block type may use this name for
 different purposes. For example, section blocks use the title to display a header over
@@ -60,7 +60,7 @@ section [Statistics] {
 }
 ```
 
-# Packages
+## Packages
 
 The most basic package is Wikifier. It provides the minimal functionality for parsing
 and handling wiki language source files. The package is divided into several subpackages:
@@ -73,19 +73,19 @@ and handling wiki language source files. The package is divided into several sub
 The Wikifier package alone does not provide many functions. It is not intended to be used
 directly. Instead, a Wikifier::Page or Wikifier::Wiki should be utilized.
 
-## Wikifier::Page
+### Wikifier::Page
 
 Wikifier::Page is the most basic functional interface to the Wikifier. As the name
 suggests, a Wikifier::Page object represents a single page of a wiki. Wikifier::Page
 utilizes the Wikifier package to generate HTML.
 
-## Wikifier::Wiki
+### Wikifier::Wiki
 
 Wikifier::Wiki is an optional component of Wikifier. Wikifier::Page is designed to be
 completely independent of Wikifier::Wiki. This class provides a full wiki manager. It
 features image generation, category management, and other components of many wikis.
 
-## Wikifier::Server
+### Wikifier::Server
 
 In the past, Wikifier::Wikis were used directly by Perl modules of web servers. However,
 Wikifier::Server provides a new mechanism for web servers to utilize Wikifier whether
