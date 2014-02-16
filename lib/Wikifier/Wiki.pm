@@ -562,8 +562,10 @@ sub cat_add_page {
     }
     
     # open the category file.
-    if (!open my $fh, '>', $cat_file) {
-        Wikifier::l("Cannot open '$file': $!");
+    # return if there are errors.
+    my $fh;
+    if (!open $fh, '>', $cat_file) {
+        Wikifier::l("Cannot open '$cat_file': $!");
         return;
     }
     
@@ -686,12 +688,17 @@ sub cat_get_pages {
     
         # no, there are still page(s) in it.
         # update the file.
+        
         $cat->{updated} = $time;
         $cat->{pages}   = \%final_pages;
-        if (!open my $fh, '>', $cat_file) {
-            Wikifier::l("Cannot open '$file': $!");
+        
+        # unable to open.
+        my $fh;
+        if (!open $fh, '>', $cat_file) {
+            Wikifier::l("Cannot open '$cat_file': $!");
             return;
         }
+        
         print {$fh} JSON->new->pretty(1)->encode($cat);
         close $fh;
         
