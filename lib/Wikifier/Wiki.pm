@@ -563,14 +563,14 @@ sub cat_add_page {
     
     # open the category file.
     # return if there are errors.
-    my $fh;
+    my ($file_exists, $fh) = -f $cat_file;
     if (!open $fh, '>', $cat_file) {
         Wikifier::l("Cannot open '$cat_file': $!");
         return;
     }
     
     # first, check if the category exists yet.
-    if (-f $cat_file) {
+    if ($file_exists) {
         my $cat = eval { decode_json(file_contents($cat_file)) };
         
         # JSON error or the value is not a hash.
