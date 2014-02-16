@@ -745,14 +745,12 @@ sub _wiki_default_calc {
     my $wiki = $page->{wiki};
     my $file = $page->wiki_opt('dir.image').q(/).$img{file};
     
-    # find the image size.
+    # find the image size using GD.
     my $full_image      = GD::Image->new($file) or return (0, 0);
     my ($big_w, $big_h) = $full_image->getBounds();
     undef $full_image;
     
     # call the default handler with these dimensions.
-    # TODO: rather than requiring the extra dependency Image::Size,
-    # why not just use GD for WiWiki's image size calculator?
     my ($w, $h) = Wikifier::Page::_default_calculator(
         %img,
         big_width  => $big_w,

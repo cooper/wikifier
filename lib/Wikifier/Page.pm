@@ -126,6 +126,7 @@ sub _default_calculator {
     
     # gotta do it the hard way.
     # use Image::Size to determine the dimensions.
+    # note: these are provided by GD in WiWiki.
     if (!$w || !$h) {
         require Image::Size;
         my $dir = $img{page}->wiki_opt('dir.image');
