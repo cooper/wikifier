@@ -57,6 +57,7 @@ sub new {
 # log.
 sub l($) {
     my $str = shift;
+    chomp $str;
     $str = ('    ' x $indent).$str;
     say $str;
 }
