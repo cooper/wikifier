@@ -1,6 +1,8 @@
 # Wikifier
 
-Wikifier is a wiki software suite. It consists of several packages.
+Wikifier is a wiki software suite. It consists of several packages that each provide
+different levels of functionality. Wikifier is designed to be extensible and independent
+of any web server.
 
 ## Language
 
