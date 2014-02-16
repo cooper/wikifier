@@ -9,67 +9,16 @@ package Wikifier::Page;
 use warnings;
 use strict;
 
-# wiki info.
-#   name:               simple name of the wiki, such as "NoTrollPlzNet Library."
-#   image_directory:    local directory containing wiki media files and images.
-#   image_address:      HTTP address of file directory, such as http://example.com/files .
-#   wiki_root:          HTTP address of wiki root (typically relative to /)
-#   variables:          a hash reference of global wiki variables.
-#   size_images:        either 'javascript' or 'server' (see below)
-#   image_sizer:        a code reference returning URL to resized image (see below)
-#   external_name:      name of external wiki (defaults to Wikipedia)
-#   external_root:      HTTP address of external wiki root (defaults to en.wikipedia.org)
-#   rounding:           'normal', 'up', or 'down' for how dimensions should be rounded.
-#   image_calc:         code returning dimensions of a resized image
-#
-
-# Image sizing with a server:
-#
-# The wikifier can make use of server-side image sizers using the image_sizer wiki option.
-# This allows you to provide a code reference which takes several options as arguments
-# and returns the full or relative URL to an image scaled in accordance of the options.
-#
-# This also requires that the 'image_directory' setting is correctly set to a readable
-# local filesystem directory containing the images. This is used to determine the image's
-# actual dimensions beforehand, eliminating the need for JavaScript imagebox sizing.
-#
-# To use server sizing, set 'size_images' to 'server' and 'image_sizer' to your handler.
-#
-# The options (passed as pure hash) provided to image_sizer code include:
-#   file:   the name of the image file.
-#   width:  the desired  width, in pixels, of the image or 'auto' if not provided.
-#   height: the desired height, in pixels, of the image or 'auto' if not provided.
-#
-# The returned URL will be used directly as the value of the 'src' attribute of the image.
-#
-# An example handler may look like this:
-#
-# my $handler = sub {
-#   my %opts = shift;
-#   return "http://mywebsite.com/image/$opts{file}?height=$opts{height}&width=$opts{width}";
-# }
-#
-# A possible return value might be:
-# http://mywebsite.com/image/Rosetta_Stone.png?height=auto&width=200
-#
-
-# Image sizing without a server:
-# 
-# Although not recommended, the wikifier can directly insert entire images and scale them
-# using HTML and JavaScript. This causes pages to take longer to load (due to larger
-# image file sizes) and also voids XHTML 1.0 Strict validity.
-# 
-# If server sizing is not an option, set wiki option 'size_images' to 'javascript' and
-# do not provide an 'image_sizer' option.
-#
-
+# default options.
 our %wiki_defaults = (
     'name'              => 'Wiki',
-    'dir.image'         => './files',
-    'root.image'        => '/files',  # relative to HTTP root.
-    'root.wiki'         => '',        # AKA "/"
+    'dir.image'         => 'images',
+    'dir.page'          => 'pages',
+    'dir.cache'         => 'cache',
+    'root.image'        => '/images',   # relative to HTTP root.
+    'root.page'         => '',          # AKA "/"
+    'root.wiki'         => '',          # AKA "/"
     'image.size_method' => 'javascript',
-    'image.sizer'       => undef,
     'external.name'     => 'Wikipedia',
     'external.root'     => 'http://en.wikipedia.org/wiki',
     'image.rounding'    => 'normal',

@@ -68,7 +68,7 @@ sub section_html {
     # if we have a title and this type of title is enabled.
     if (length $title and !($is_intro && !$page->wiki_opt('enable.page_titles'))) {
 
-        # create the hedding.
+        # create the heading.
         my $heading = Wikifier::Element->new(
             type      => "h$l",
             class     => $class,

@@ -41,14 +41,13 @@ sub new {
     # hardcoded Wikifier::Page wiki info options. (always same for Wikifier::Wiki)
     $wiki->{'image.rounding'}       = 'up';
     $wiki->{'image.size_method'}    = 'server';
-    $wiki->{'image.enable.sizing'}  = 1;
 
     # image sizer callback.
     $wiki->{'image.sizer'} = sub {
         my %img = @_;
         
         # full-sized image.
-        if (!$wiki->opt('image.enable.sizing') || !$img{width} || !$img{height} ||
+        if (!$img{width} || !$img{height} ||
             $img{width} eq 'auto' || $img{height} eq 'auto') {
             
             return $wiki->opt('root.image').q(/).$img{file};
