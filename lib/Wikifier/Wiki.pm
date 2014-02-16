@@ -575,7 +575,8 @@ sub cat_add_page {
         
         # JSON error or the value is not a hash.
         if (!$cat || ref $cat ne 'HASH') {
-            Wikifier::l("Error parsing JSON category '$cat_file'");
+            Wikifier::l("Error parsing JSON category '$cat_file': $@");
+            close $fh;
             return;
         }
         
