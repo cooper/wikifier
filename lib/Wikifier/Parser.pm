@@ -153,7 +153,7 @@ sub handle_character {
             
             # exiting block name.
             elsif ($last_char eq '[') {
-                next unless $in_block_name--;
+                next if !--$in_block_name;
                 # if it was 1 or more, we're still in it.
             }
             
