@@ -38,7 +38,8 @@ sub new {
     my $wikifier = $opts{wikifier};
     
     # create the page's main block.
-    my $main_block = $opts{main_block} = $wikifier->{main_block} = $wikifier->create_block(
+    my $main_block = $opts{main_block} =
+    $wikifier->{main_block} = $wikifier->create_block(
         type   => 'main',
         parent => undef     # main block has no parent.
     );

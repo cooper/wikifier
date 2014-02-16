@@ -23,6 +23,7 @@ use JSON qw(encode_json decode_json);   # caching and storing
 
 use Wikifier;
 
+# default options.
 our %wiki_defaults = (
     'image.enable.restriction'  => 1,
     'enable.cache.image'        => 1,
