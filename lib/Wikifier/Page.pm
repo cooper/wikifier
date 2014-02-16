@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#
 # Copyright (c) 2014, Mitchell Cooper
 #
 # Wikifier::Page provides an objective interface to a wiki page or article. It implements

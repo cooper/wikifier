@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#
 # Copyright (c) 2014, Mitchell Cooper
 #
 # Wikifier::Block represents a parsing block, such a section, paragraph, infobox, etc.

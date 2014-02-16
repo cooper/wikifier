@@ -1,6 +1,8 @@
 #!/usr/bin/perl
+#
 # Copyright (c) 2013 Mitchell Cooper
-# don't expect this to be pretty because it's just for testing
+# don't expect this to be pretty because it's just for testing dude
+#
 
 use warnings;
 use strict;

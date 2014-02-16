@@ -1,7 +1,11 @@
-#!/usr/bin/perl
+#
 # Copyright (c) 2014, Mitchell Cooper
 #
 # This class represents a wiki language manager.
+#
+# Typically, this class is not accessed directly. It is used indirectly via a
+# Wikifier::Wiki or Wikifier::Page.
+#
 # The same Wikifier instance may be used for several pages. However, the Wikifier object
 # should not be used for a wiki implementation. For example, an HTTPd module which manages
 # an entire wiki site would do so by using a Wikifier::Wiki. This Wikifier::Wiki might
@@ -23,12 +27,7 @@
 #   Parser:         parses a wiki language file, separating it into individual blocks.
 #   Formatter:      parses text formatting such as [b] and [i] formatting.
 #   BlockManager:   manages creation of block objects, loading of block classes, etc.
-#
-# Additionally, this class formerly provided several utilities used throughout the
-# Wikifier. Now, these utilities are provided by Wikifier::Utilities.
-#
-# Typically, this class is not accessed directly. It is used indirectly via a
-# Wikifier::Wiki or Wikifier::Page. The Wikifier class is for internal use only.
+#   Utilities:      provides convenience methods used throughout the Wikifier software
 #
 package Wikifier;
 

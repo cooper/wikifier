@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#
 # Copyright (c) 2014, Mitchell Cooper
 #
 # sections are containers for paragraphs, image boxes, etc., each with a title.

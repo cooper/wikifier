@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#
 # Copyright (c) 2014, Mitchell Cooper
 #
 # paragraph blocks represent a paragraph of text.

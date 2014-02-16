@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#
 # Copyright (c) 2014, Mitchell Cooper
 #
 # hash provides a subclass for key:value-based blocks.

@@ -1,6 +1,4 @@
-#!/usr/bin/perl
 # Copyright (c) 2014, Mitchell Cooper
-#
 package Wikifier::Element;
 
 use warnings;

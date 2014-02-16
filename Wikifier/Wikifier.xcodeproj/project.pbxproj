@@ -8,6 +8,8 @@
 
 /* Begin PBXFileReference section */
 		A7A5ECB618B070B300EA4CA0 /* configuration */ = {isa = PBXFileReference; lastKnownFileType = text; name = configuration; path = ../configuration; sourceTree = "<group>"; };
+		A7A5ECB718B160BA00EA4CA0 /* wikiclient */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = wikiclient; path = ../wikiclient; sourceTree = "<group>"; };
+		A7A5ECB818B160BA00EA4CA0 /* wikiserver */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = wikiserver; path = ../wikiserver; sourceTree = "<group>"; };
 		A7A67A1D18AC3B9C00427886 /* Wikiclient.php */ = {isa = PBXFileReference; lastKnownFileType = text.script.php; path = Wikiclient.php; sourceTree = "<group>"; };
 		A7A67A2218AC3B9C00427886 /* Code.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Code.pm; sourceTree = "<group>"; };
 		A7A67A2318AC3B9C00427886 /* Hash.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Hash.pm; sourceTree = "<group>"; };
@@ -35,10 +37,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		A7A5ECB918B160C200EA4CA0 /* Executables */ = {
+			isa = PBXGroup;
+			children = (
+				A7A5ECB718B160BA00EA4CA0 /* wikiclient */,
+				A7A5ECB818B160BA00EA4CA0 /* wikiserver */,
+			);
+			name = Executables;
+			sourceTree = "<group>";
+		};
 		A7A67A1418AC3B7E00427886 = {
 			isa = PBXGroup;
 			children = (
 				A7A67A1E18AC3B9C00427886 /* Wikifier */,
+				A7A5ECB918B160C200EA4CA0 /* Executables */,
 				A7A67A1B18AC3B9B00427886 /* Interfaces */,
 				A7A67A4118AC3BB300427886 /* Configuration */,
 			);
