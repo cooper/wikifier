@@ -10,6 +10,7 @@
 		A7A5ECB618B070B300EA4CA0 /* configuration */ = {isa = PBXFileReference; lastKnownFileType = text; name = configuration; path = ../configuration; sourceTree = "<group>"; };
 		A7A5ECB718B160BA00EA4CA0 /* wikiclient */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = wikiclient; path = ../wikiclient; sourceTree = "<group>"; };
 		A7A5ECB818B160BA00EA4CA0 /* wikiserver */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = wikiserver; path = ../wikiserver; sourceTree = "<group>"; };
+		A7A5ECBB18B1621000EA4CA0 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		A7A67A1D18AC3B9C00427886 /* Wikiclient.php */ = {isa = PBXFileReference; lastKnownFileType = text.script.php; path = Wikiclient.php; sourceTree = "<group>"; };
 		A7A67A2218AC3B9C00427886 /* Code.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Code.pm; sourceTree = "<group>"; };
 		A7A67A2318AC3B9C00427886 /* Hash.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Hash.pm; sourceTree = "<group>"; };
@@ -46,6 +47,16 @@
 			name = Executables;
 			sourceTree = "<group>";
 		};
+		A7A5ECBA18B161A400EA4CA0 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				A7A5ECBB18B1621000EA4CA0 /* README.md */,
+				A7A5ECB618B070B300EA4CA0 /* configuration */,
+			);
+			name = Documentation;
+			path = ../lib;
+			sourceTree = "<group>";
+		};
 		A7A67A1418AC3B7E00427886 = {
 			isa = PBXGroup;
 			children = (
@@ -53,6 +64,7 @@
 				A7A5ECB918B160C200EA4CA0 /* Executables */,
 				A7A67A1B18AC3B9B00427886 /* Interfaces */,
 				A7A67A4118AC3BB300427886 /* Configuration */,
+				A7A5ECBA18B161A400EA4CA0 /* Documentation */,
 			);
 			sourceTree = "<group>";
 		};
@@ -125,7 +137,6 @@
 			children = (
 				A7A67A3F18AC3B9C00427886 /* wiki.example.conf */,
 				A7A67A4018AC3B9C00427886 /* wikiserver.example.conf */,
-				A7A5ECB618B070B300EA4CA0 /* configuration */,
 			);
 			name = Configuration;
 			sourceTree = "<group>";
