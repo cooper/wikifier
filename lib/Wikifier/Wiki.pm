@@ -572,7 +572,12 @@ sub cat_add_page {
     # first, check if the category exists yet.
     if (-f $cat_file) {
         my $cat = eval { decode_json(file_contents($cat_file)) };
-        return if !$cat || ref $cat ne 'HASH'; # an error or something happened.
+        
+        # JSON error or the value is not a hash.
+        if (!$cat || ref $cat ne 'HASH') {
+            Wikifier::l("Error parsing JSON category '$cat_file'");
+            return;
+        }
         
         # update information for this page,
         # or add it if it is not there already.
@@ -591,9 +596,8 @@ sub cat_add_page {
         pages      => { $page->{name} => $page_data }
     });
     
-    # save the content.
     close $fh;
-    
+    return 1;
 }
 
 # returns the names of the pages in the given category.
