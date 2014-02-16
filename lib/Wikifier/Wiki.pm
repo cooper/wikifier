@@ -500,7 +500,7 @@ sub display_category_posts {
     my (%times, %reses);
     foreach my $page_name (keys %$pages) {
         my $page_data = $pages->{$page_name};
-        my $res  = $wiki->display_page($page_data->{page});
+        my $res  = $wiki->display_page($page_name);
         my $time = $res->{page} ? $res->{page}->get('page.created')
                    : $res->{created} || 0;
         
