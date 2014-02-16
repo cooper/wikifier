@@ -72,11 +72,11 @@ sub section_html {
         my $heading = Wikifier::Element->new(
             type      => "h$l",
             class     => $class,
-            content   => $title,
+            content   => $page->parse_formatted_text($title),
             container => 1
         );
         
-        $el->add($page->parse_formatted_text($heading));
+        $el->add($heading);
     }
     
     # add the contained elements.
