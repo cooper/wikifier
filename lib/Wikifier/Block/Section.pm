@@ -76,7 +76,7 @@ sub section_html {
             container => 1
         );
         
-        $el->add($heading);
+        $el->add($page->parse_formatted_text($heading));
     }
     
     # add the contained elements.
