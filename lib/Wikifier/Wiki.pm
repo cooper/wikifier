@@ -564,7 +564,7 @@ sub cat_add_page {
     # open the category file.
     # return if there are errors.
     my $fh;
-    if (!open $fh, '>', $cat_file) {
+    unless (open $fh, '>', $cat_file) {
         Wikifier::l("Cannot open '$cat_file': $!");
         return;
     }
@@ -694,7 +694,7 @@ sub cat_get_pages {
         
         # unable to open.
         my $fh;
-        if (!open $fh, '>', $cat_file) {
+        unless (open $fh, '>', $cat_file) {
             Wikifier::l("Cannot open '$cat_file': $!");
             return;
         }
