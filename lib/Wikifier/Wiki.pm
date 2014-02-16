@@ -621,9 +621,8 @@ sub cat_get_pages {
     # JSON error or the value is not a hash.
     if (!$cat || ref $cat ne 'HASH') {
         Wikifier::l("Error parsing JSON category '$cat_file': $@");
-        close $fh;
         return;
-    }    return if !$cat || ref $cat ne 'HASH'; # an error or something happened.
+    }
 
     # check each page's modification date.
     my ($time, $changed, %final_pages) = time;
