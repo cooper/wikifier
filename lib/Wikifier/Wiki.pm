@@ -570,6 +570,8 @@ sub cat_add_page {
         return;
     }
     
+    print "$file\nopened yes\nexists $file_exists\n";
+    
     # first, check if the category exists yet.
     if ($file_exists) {
         my $cat = eval { decode_json(file_contents($cat_file)) };
