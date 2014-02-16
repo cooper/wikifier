@@ -594,12 +594,13 @@ sub cat_add_page {
     }
     
     # the category does not yet exist.
-    print {$fh} JSON->new->pretty(1)->encode({
+    my $f = JSON->new->pretty(1)->encode({
         category   => $category,
         created    => $time,
         pages      => { $page->{name} => $page_data }
     });
-    
+    print {$fh} $f;
+    print "wrote: $f";
     close $fh;
     return 1;
 }
