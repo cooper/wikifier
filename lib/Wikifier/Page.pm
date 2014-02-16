@@ -64,10 +64,10 @@ use strict;
 #
 
 our %wiki_defaults = (
-    'wiki.name'         => 'Wiki',
+    'name'              => 'Wiki',
     'dir.image'         => './files',
-    'wiki.image_root'   => '/files',  # relative to HTTP root.
-    'wiki.root'         => '',        # AKA "/"
+    'root.image'        => '/files',  # relative to HTTP root.
+    'root.wiki'         => '',        # AKA "/"
     'image.size_method' => 'javascript',
     'image.sizer'       => undef,
     'external.name'     => 'Wikipedia',

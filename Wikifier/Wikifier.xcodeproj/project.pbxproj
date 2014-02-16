@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		A7A5ECB618B070B300EA4CA0 /* configuration */ = {isa = PBXFileReference; lastKnownFileType = text; name = configuration; path = ../configuration; sourceTree = "<group>"; };
 		A7A67A1D18AC3B9C00427886 /* Wikiclient.php */ = {isa = PBXFileReference; lastKnownFileType = text.script.php; path = Wikiclient.php; sourceTree = "<group>"; };
 		A7A67A2218AC3B9C00427886 /* Code.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Code.pm; sourceTree = "<group>"; };
 		A7A67A2318AC3B9C00427886 /* Hash.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Hash.pm; sourceTree = "<group>"; };
@@ -112,6 +113,7 @@
 			children = (
 				A7A67A3F18AC3B9C00427886 /* wiki.example.conf */,
 				A7A67A4018AC3B9C00427886 /* wikiserver.example.conf */,
+				A7A5ECB618B070B300EA4CA0 /* configuration */,
 			);
 			name = Configuration;
 			sourceTree = "<group>";

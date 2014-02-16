@@ -1,0 +1,33 @@
+wiki.name           -> name
+
+wiki.root           -> root.wiki
+wiki.page_root      -> root.page
+wiki.image_root     -> root.image
+
+external.name
+external.root
+
+image.size_method
+image.calc
+image.sizer
+image.rounding
+image.force_type                -> image.type
+image.force_jpeg_quality        -> image.quality
+enable.retina_display           -> image.enable.retina
+enable.image_pregeneration      -> image.enable.pregeneration
+enable.image_tracking           -> image.enable.tracking
+enable.image_sizing             -> image.enable.sizing
+enable.image_size_restrictor    -> image.enable.restriction
+
+dir.page
+dir.cache
+dir.image
+dir.category
+
+enable.cache.image
+enable.cache.page
+
+enable.page_titles
+enable.last_section_footer
+
+enable.category_post_limit

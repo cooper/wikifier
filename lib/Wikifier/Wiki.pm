@@ -41,21 +41,21 @@ sub new {
     # hardcoded Wikifier::Page wiki info options. (always same for Wikifier::Wiki)
     $wiki->{'image.rounding'}       = 'up';
     $wiki->{'image.size_method'}    = 'server';
-    $wiki->{'enable.image_sizing'}  = 1;
+    $wiki->{'image.enable.sizing'}  = 1;
 
     # image sizer callback.
     $wiki->{'image.sizer'} = sub {
         my %img = @_;
         
         # full-sized image.
-        if (!$wiki->opt('enable.image_sizing') || !$img{width} || !$img{height} ||
+        if (!$wiki->opt('image.enable.sizing') || !$img{width} || !$img{height} ||
             $img{width} eq 'auto' || $img{height} eq 'auto') {
             
-            return $wiki->opt('wiki.image_root').q(/).$img{file};
+            return $wiki->opt('root.image').q(/).$img{file};
         }
         
         # scaled image.
-        return $wiki->opt('wiki.image_root').q(/).$img{width}.q(x).$img{height}.q(-).$img{file};
+        return $wiki->opt('root.image').q(/).$img{width}.q(x).$img{height}.q(-).$img{file};
         
     };
     
@@ -366,8 +366,8 @@ sub display_image {
     
     # this is not a retina request, but retina is enabled, and so is pregeneration.
     # therefore, we will call ->display_image() in order to pregenerate a retina version.
-    elsif ($wiki->opt('enable.retina_display') && !$retina_request &&
-           $wiki->opt('enable.image_pregeneration')) {
+    elsif ($wiki->opt('image.enable.retina') && !$retina_request &&
+           $wiki->opt('image.enable.pregeneration')) {
         my $retina_file = $image_wo_ext.q(@2x.).$image_ext;
         $wiki->display_image($retina_file, $width, $height, 1);
     }
@@ -420,7 +420,7 @@ sub display_image {
     ##############################
     
     # if we are restricting to only sizes used in the wiki, check.
-    if ($wiki->opt('enable.image_size_restrictor')) {
+    if ($wiki->opt('image.enable.restriction')) {
         if (!$wiki->{allowed_dimensions}{$image_name}{$scaled_w.q(x).$scaled_h}) {
             $result->{type}  = 'not found';
             $result->{error} = "Image '$image_name' does not exist in these dimensions.";
@@ -443,9 +443,9 @@ sub display_image {
     );
     
     # create JPEG or PNG data.
-    my $use = $wiki->opt('image.force_type') || $result->{image_type};
+    my $use = $wiki->opt('image.type') || $result->{image_type};
     if ($use eq 'jpeg') {
-        my $compression = $wiki->opt('image.force_jpeg_quality') || 100;
+        my $compression = $wiki->opt('image.quality') || 100;
         $result->{content} = $image->jpeg($compression);
     }
     else {
@@ -514,7 +514,7 @@ sub display_category_posts {
     #$result->{pages} = \@pages_in_order;
     
     # order into PAGES of pages. wow.
-    my $limit = $wiki->opt('enable.category_post_limit');
+    my $limit = $wiki->opt('enable.category_post_limit') || 'inf';
     my $n = 1;
     while (@pages_in_order) {
         $result->{pages}{$n} ||= [];
@@ -540,7 +540,7 @@ sub check_categories {
     }
     
     # image categories.
-    return unless $wiki->opt('enable.image_tracking');
+    return unless $wiki->opt('image.enable.tracking');
     $wiki->cat_add_page($page, "image-$_") foreach keys %{ $page->{images} || {} };
 
 }
@@ -776,7 +776,7 @@ sub _wiki_default_calc {
     # this allows the direct use of the cache directory as served from
     # the web server, reducing the wikifier server's load when requesting
     # cached pages and their images.
-    if ($page->wiki_opt('enable.image_pregeneration')) {
+    if ($page->wiki_opt('image.enable.pregeneration')) {
         my $res = $wiki->display_image($img{file}, $w, $h, 1);
         Wikifier::l("Pregenerated image '$$res{file}' at ${w}x${h}") if $res->{cache_gen};
         

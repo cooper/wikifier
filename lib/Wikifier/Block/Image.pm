@@ -57,7 +57,7 @@ sub image_parse {
         return;
     }
     
-    $block->{image_root} = $page->wiki_opt('wiki.image_root');
+    $block->{image_root} = $page->wiki_opt('root.image');
     
     ##############
     ### SIZING ###
