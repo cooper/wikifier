@@ -564,7 +564,7 @@ sub cat_add_page {
     # open the category file.
     # return if there are errors.
     my $fh;
-    if (!open($fh, '>', $cat_file)) {
+    if (!open $fh, '>', $cat_file) {
         Wikifier::l("Cannot open '$cat_file': $!");
         return;
     }
@@ -574,15 +574,9 @@ sub cat_add_page {
         my $cat = eval { decode_json(file_contents($cat_file)) };
         return if !$cat || ref $cat ne 'HASH'; # an error or something happened.
         
-        # remove from the category if it's there already.
-        my %final_pages;
-        foreach my $p_name (keys %{ $cat->{pages} || {} }) {
-            next if $p_name eq $page->{name};
-            $final_pages{$p_name} = $cat->{pages}{$p_name};
-        }
-        
-        $final_pages{ $page->{name} } = $page_data;
-        $cat->{pages} = \%final_pages;
+        # update information for this page,
+        # or add it if it is not there already.
+        $cat->{pages}{ $page->{name} } = $page_data;
         
         print {$fh} JSON->new->pretty(1)->encode($cat);
         close $fh;
@@ -694,7 +688,7 @@ sub cat_get_pages {
         
         # unable to open.
         my $fh;
-        if (!open($fh, '>', $cat_file)) {
+        if (!open $fh, '>', $cat_file) {
             Wikifier::l("Cannot open '$cat_file': $!");
             return;
         }
