@@ -158,7 +158,12 @@ sub display {
         return $wiki->display_page($page_name);
     }
     
-    return {}; # FIXME
+    # not sure.
+    return {
+        type  => 'not found',
+        error => 'Unsure how to handle this request'
+    };
+    
 }
 
 #############
@@ -556,6 +561,12 @@ sub cat_add_page {
         $page_data->{dimensions} = $page->{images}{$1};
     }
     
+    # open the category file.
+    if (!open my $fh, '>', $cat_file) {
+        Wikifier::l("Cannot open '$file': $!");
+        return;
+    }
+    
     # first, check if the category exists yet.
     if (-f $cat_file) {
         my $cat = eval { decode_json(file_contents($cat_file)) };
@@ -571,7 +582,6 @@ sub cat_add_page {
         $final_pages{ $page->{name} } = $page_data;
         $cat->{pages} = \%final_pages;
         
-        open my $fh, '>', $cat_file; # XXX: what if this errors out?
         print {$fh} JSON->new->pretty(1)->encode($cat);
         close $fh;
         
@@ -579,8 +589,6 @@ sub cat_add_page {
     }
     
     # the category does not yet exist.
-    open my $fh, '>', $cat_file; # XXX: what if this errors out?
-    
     print {$fh} JSON->new->pretty(1)->encode({
         category   => $category,
         created    => $time,
@@ -669,14 +677,25 @@ sub cat_get_pages {
     
     # it looks like something has changed. we need to update the cat file.
     if ($changed) {
+    
+        # is this category now empty?
+        if (!scalar keys %final_pages) {
+            unlink $cat_file;
+            return;
+        }
+    
+        # no, there are still page(s) in it.
+        # update the file.
         $cat->{updated} = $time;
         $cat->{pages}   = \%final_pages;
-        open my $fh, '>', $cat_file; # XXX: what if this errors out?
+        if (!open my $fh, '>', $cat_file) {
+            Wikifier::l("Cannot open '$file': $!");
+            return;
+        }
         print {$fh} JSON->new->pretty(1)->encode($cat);
         close $fh;
+        
     }
-    
-    # TODO: We need to delete categories when they become empty.
     
     return wantarray ? (\%final_pages, $cat->{title}) : \%final_pages;
 }
