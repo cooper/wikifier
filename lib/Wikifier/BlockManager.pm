@@ -54,14 +54,15 @@ sub load_block {
     }
     
     # do the file.
-    my $package = do $file or Wikifier::l("Error loading $type block module: ".($@ || $! || 'idk'));
+    my $package = do $file
+        or Wikifier::l("Error loading $type block module: ".($@ || $! || 'but idk why'));
     return unless $package;
     
     # fetch blocks.
     my %blocks;
     {
         no strict 'refs';
-        %blocks = %{qq(${package}::block_types)};
+        %blocks = %{ qq(${package}::block_types) };
     }
 
     # register blocks.

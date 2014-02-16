@@ -27,9 +27,7 @@ sub start {
 
     # if a file already exists and is a socket, I assume we should delete it.
     my $path = $conf->get('server.socket.path');
-    if ($path && -S $path) {
-        unlink $path;
-    }
+    unlink $path if $path && -S $path;
 
     # create the socket.
     my $socket = IO::Socket::UNIX->new(
@@ -78,9 +76,11 @@ sub handle_stream {
 sub handle_data {
     my ($stream, $buffref, $eof) = @_;
     while ($$buffref =~ s/^(.*?)\n//) {
+    
         # handle the data ($1)
         return unless $stream->{connection}; # might be closed.
         $stream->{connection}->handle($1);
+        
     }
 }
 
@@ -91,11 +91,20 @@ sub create_wikis {
     Wikifier::lindent('Initializing Wikifier::Wiki instances');
     
     foreach my $name (keys %wikis) {
-        my $wiki = Wikifier::Wiki->new(config_file => $conf->get("server.wiki.$name.config"));
+    
+        # load the wiki.
+        my $wiki = Wikifier::Wiki->new(
+            config_file => $conf->get("server.wiki.$name.config")
+        );
+        
+        # it failed.
         Wikifier::l("Error with wiki configuration for '$name'") and next unless $wiki;
+        
+        # it succeeded.
         Wikifier::l("Initialized '$name' wiki");
         $wiki{$name}  = $wiki;
         $wiki->{name} = $name;
+        
     }
     
     Wikifier::lback('Done initializing');
@@ -104,9 +113,7 @@ sub create_wikis {
 # if pregeneration is enabled, do so.
 sub pregenerate {
     return unless $conf->get('server.enable.pregeneration');
-    foreach my $wiki (values %wiki) {
-        gen_wiki($wiki);
-    }
+    gen_wiki($_) foreach values %wiki;
 }
 
 sub gen_wiki {
