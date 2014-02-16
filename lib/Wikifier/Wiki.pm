@@ -563,8 +563,9 @@ sub cat_add_page {
     
     # open the category file.
     # return if there are errors.
+    my $fh;
     my $file_exists = -f $cat_file;
-    if (!open my $fh, '>', $cat_file) {
+    if (!open $fh, '>', $cat_file) {
         Wikifier::l("Cannot open '$cat_file': $!");
         return;
     }
