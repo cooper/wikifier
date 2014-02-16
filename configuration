@@ -10,8 +10,8 @@ root.wiki                       Default: '' (i.e. /)
 root.page                       Default: '' (i.e. /)
 root.image                      Default: /images
 
-    HTTP roots. These are typically relative. For example, /images, images,
-    article, /wiki/article, etc. Do not include the trailing slash.
+    HTTP roots. These are typically relative. For example, /images, images, article,
+    /wiki/article, etc. Do not include the trailing slash.
     
 dir.page                        Default: pages
 dir.cache                       Default: cache
@@ -24,8 +24,8 @@ dir.category                    Default: categories
 external.name                   Default: Wikipedia
 external.root                   Default: http://en.wikipedia.org/wiki
 
-    External wiki information. This is used for External wiki links in the form
-    of [! article !].
+    External wiki information. This is used for External wiki links in the form of
+    [! article !].
 
     name = the name to be displayed in link tooltips.
     root = the HTTP root for articles.
@@ -36,13 +36,13 @@ enable.page_titles              Default: disabled
 
 enable.last_section_footer      Default: disabled
 
-    If enabled, the closing </div> tags will be omitted from the final section
-    and wiki block. This allows a footer to be injected before closing them off.
+    If enabled, the closing </div> tags will be omitted from the final section and wiki
+    block. This allows a footer to be injected before closing them off.
 
 enable.category_post_limit      Default: limitless
 
-    If enabled, Wikifier::Wiki's ->display_category_posts() will only display
-    the specified number of pages on a single result page.
+    If enabled, Wikifier::Wiki's ->display_category_posts() will only display the
+    specified number of pages on a single result page.
 
 
 image.size_method               Default (Page): javascript
@@ -56,9 +56,9 @@ image.size_method               Default (Page): javascript
 image.calc                      Default (Page): built in, uses Image::Size
                                 Default (Wiki): built in, uses GD
 
-    A code reference that calculates a missing dimension of an image. This is
-    sometimes provided by a greater software. For example, Wikifier::Wiki
-    provides its own image.calc.
+    A code reference that calculates a missing dimension of an image. This is sometimes
+    provided by a greater software. For example, Wikifier::Wiki provides its own
+    image.calc.
     
     This is utilized only when image.size_method is 'server.'
 
@@ -66,9 +66,8 @@ image.calc                      Default (Page): built in, uses Image::Size
 
 image.rounding                  Default: normal
 
-    The desired rounding method used when determining image dimensions. Used by
-    the default image.calc. If a custom image.calc is provided, this will not be
-    utilized.
+    The desired rounding method used when determining image dimensions. Used by the
+    default image.calc. If a custom image.calc is provided, this will not be utilized.
 
     'normal' = round up from .5 or more, down for less
     'up'     = always round up
@@ -77,9 +76,9 @@ image.rounding                  Default: normal
 image.sizer                     Default (Page): nothing
                                 Default (Wiki): built in
 
-    A code references that returns the URL to a sized version of an image. After
-    using image.calc to find the dimensions of an image, image.sizer is called
-    to generate a URL for the image at those dimensions.
+    A code references that returns the URL to a sized version of an image. After using
+    image.calc to find the dimensions of an image, image.sizer is called to generate a URL
+    for the image at those dimensions.
     
     If using image.size_method 'server', image.sizer must be provided
     (unless using Wikifier::Wiki, which provides its own).
@@ -91,46 +90,46 @@ Wikifier::Wiki options
 
 image.type                      Default: png
 
-    The desired file type for generated images. This is used by Wikifier::Wiki
-    when generating images of different dimensions. All resulting images will be
-    in this format, regardless of their original format.
+    The desired file type for generated images. This is used by Wikifier::Wiki when
+    generating images of different dimensions. All resulting images will be in this
+    format, regardless of their original format.
 
     'png'  = larger, lossless compression format
     'jpeg' = smaller, lossy compression format
 
 image.quality                   Default: 100
 
-    The desired quality of generated images. This is only utilized if image.type
-    is set to jpeg.
+    The desired quality of generated images. This is only utilized if image.type is set to
+    jpeg.
 
 image.enable.retina             Default: enabled
 
-    Enable retina display support. Wikifier::Wiki will interpret and properly
-    handle @2x versions of images.
+    Enable retina display support. Wikifier::Wiki will interpret and properly handle @2x
+    versions of images.
 
 image.enable.pregeneration      Default: disabled
 
-    Enable pregeneration of images. Images will be generated as pages that
-    require them are generated. This contrasts from the default behavior in
-    which images are generated as they are requested.
+    Enable pregeneration of images. Images will be generated as pages that require them
+    are generated. This contrasts from the default behavior in which images are generated
+    as they are requested.
 
-    The advantage of this option is that it allows images to be served directly
-    by a web server without summoning any Wikifier software, decreasing the page
-    load time. The disadvantage is slower page generation time.
+    The advantage of this option is that it allows images to be served directly by a web
+    server without summoning any Wikifier software, decreasing the page load time. The
+    disadvantage is slower page generation time.
     
     Requires:
         enable.cache.image
 
 image.enable.tracking           Default: disabled
 
-    If enabled, Wikifier::Wiki will create page categories that track image
-    usage. This is particularly useful for a Wikifier::Server feature that
-    allows images and pages to be generated as they are modified.
+    If enabled, Wikifier::Wiki will create page categories that track image usage. This is
+    particularly useful for a Wikifier::Server feature that allows images and pages to be
+    generated as they are modified.
 
 image.enable.restriction        Default: enabled
 
-    If enabled, Wikifier::Wiki will only generate images in dimensions used by
-    pages on the wiki. This prevents useless resource usage and abuse.
+    If enabled, Wikifier::Wiki will only generate images in dimensions used by pages on
+    the wiki. This prevents useless resource usage and abuse.
 
 enable.cache.image              Default: enabled
 
@@ -157,9 +156,9 @@ server.socket.path              Default: none
 
 server.enable.pregeneration Default: disabled
 
-    If enabled, the Wikifier::Server will generate all pages upon the first
-    start. It will then monitor all page files and regenerate them as soon as
-    they are modified, greatly reducing the first page load time.
+    If enabled, the Wikifier::Server will generate all pages upon the first start. It will
+    then monitor all page files and regenerate them as soon as they are modified, greatly
+    reducing the first page load time.
     
     Requires:
         enable.cache.page
