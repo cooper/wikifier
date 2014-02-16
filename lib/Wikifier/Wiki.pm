@@ -617,8 +617,14 @@ sub cat_get_pages {
     
     # it exists; let's see what's inside.
     my $cat = eval { decode_json(file_contents($cat_file)) };
-    return if !$cat || ref $cat ne 'HASH'; # an error or something happened.
     
+    # JSON error or the value is not a hash.
+    if (!$cat || ref $cat ne 'HASH') {
+        Wikifier::l("Error parsing JSON category '$cat_file': $@");
+        close $fh;
+        return;
+    }    return if !$cat || ref $cat ne 'HASH'; # an error or something happened.
+
     # check each page's modification date.
     my ($time, $changed, %final_pages) = time;
     PAGE: foreach my $page_name (%{ $cat->{pages} || {} }) {
