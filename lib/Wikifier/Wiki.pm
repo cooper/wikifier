@@ -783,6 +783,8 @@ sub _wiki_default_calc {
 # default image sizer for a wiki.
 sub _wiki_default_sizer {
     my %img = @_;
+    my $page = $img{page};
+    my $wiki = $page->{wiki};
     
     # full-sized image.
     if (!$img{width} || !$img{height} ||
