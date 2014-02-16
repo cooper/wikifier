@@ -570,7 +570,7 @@ sub cat_add_page {
         return;
     }
     
-    print "$cat_file\nopened yes\nexists $file_exists\n";
+    print "$cat_file\nopened yes\nexists ".($file_exists ? 'exists' : 'no')."\n";
     
     # first, check if the category exists yet.
     if ($file_exists) {
