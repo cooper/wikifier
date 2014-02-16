@@ -147,12 +147,12 @@ sub handle_character {
             
             # entering block name.
             if ($last_char eq ']') {
-                continue if $in_block_name++;
+                next unless $in_block_name++;
             }
             
             # exiting block name.
             elsif ($last_char eq '[') {
-                continue unless $in_block_name--;
+                next if $in_block_name--;
             }
             
             # we are in the block name, so add this character to the front.
