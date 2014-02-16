@@ -64,6 +64,16 @@ image.calc                  Default: built in, uses Image::Size (Page)
 
     Returns (width, height)
 
+image.rounding              Default: normal
+
+    The desired rounding method used when determining image
+    dimensions. Used by the default image.calc. If a custom
+    image.calc is provided, this will not be utilized.
+
+    'normal' = round up from .5 or more, down for less
+    'up'     = always round up
+    'down'   = always round down
+
 image.sizer                 Default: nothing  (Page)
                             Default: built in (Wiki)
 
@@ -80,16 +90,6 @@ image.sizer                 Default: nothing  (Page)
 Wikifier::Wiki options
 ------------------------------------------------------------------
 
-image.rounding              Default: normal
-
-    The desired rounding method used when determining image
-    dimensions. Used by the default image.calc. If a custom
-    image.calc is provided, this will not be utilized.
-
-    'normal' = round up from .5 or more, down for less
-    'up'     = always round up
-    'down'   = always round down
-
 image.type                  Default: png
 
     The desired file type for generated images. This is used by
@@ -105,7 +105,7 @@ image.quality               Default: 100
     The desired quality of generated images. This is only utilized
     if image.type is set to jpeg.
 
-image.enable.retina         Default: disabled
+image.enable.retina         Default: enabled
 
     Enable retina display support. Wikifier::Wiki will interpret
     and properly handle @2x versions of images.
@@ -121,6 +121,9 @@ image.enable.pregeneration  Default: disabled
     served directly by a web server without summoning any Wikifier
     software, decreasing the page load time. The disadvantage is
     slower page generation time.
+    
+    Requires:
+        enable.cache.image
 
 image.enable.tracking       Default: disabled
 
@@ -129,20 +132,52 @@ image.enable.tracking       Default: disabled
     Wikifier::Server feature that allows images and pages to be
     generated as they are modified.
 
-image.enable.restriction    Default: disabled
+image.enable.restriction    Default: enabled
 
     If enabled, Wikifier::Wiki will only generate images in
     dimensions used by pages on the wiki. This prevents
     useless resource usage and abuse.
 
-enable.cache.image          Default: disabled
+enable.cache.image          Default: enabled
 
     Enable caching of generated images.
+
     Required for:
+        image.enable.pregeneration
+        image.enable.restriction
 
-    image.enable.pregeneration
-    image.enable.restriction
-
-enable.cache.page           Default: disabled
+enable.cache.page           Default: enabled
 
     Enable caching of generated pages.
+    
+Wikifier::Server options
+------------------------------------------------------------------
+
+server.socket.type          Default: unix
+    
+    The socket domain to use for listening.
+    Currently, only UNIX is supported.
+
+server.socket.path          Default: none
+
+    The path of a UNIX socket to listen on.
+
+server.enable.pregeneration Default: disabled
+
+    If enabled, the Wikifier::Server will generate all
+    pages upon the first start. It will then monitor all
+    page files and regenerate them as soon as they are
+    modified, greatly reducing the first page load time.
+    
+    Requires:
+        enable.cache.page
+
+server.wiki.<name>.config   Default: none
+
+    The path to a configuration file for the wiki by
+    the name of <wiki>.
+
+server.wiki.<name>.password Default: none
+
+    The authentication password for the wiki by the
+    name of <wiki>.

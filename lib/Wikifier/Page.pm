@@ -107,7 +107,8 @@ sub parse_formatted_text {
 # returns a wiki option or the default.
 sub wiki_opt {
     my ($page, $var) = @_;
-    return $page->{wiki}->opt($var);
+    return $page->{wiki}->opt($var) if $page->{wiki};
+    return $wiki_defaults{$var};
 }
 
 # default image dimension calculator. requires Image::Size.

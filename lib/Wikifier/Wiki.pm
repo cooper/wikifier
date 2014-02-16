@@ -23,6 +23,17 @@ use JSON qw(encode_json decode_json);   # caching and storing
 
 use Wikifier;
 
+our %wiki_defaults = (
+    'image.enable.restriction'  => 1,
+    'enable.cache.image'        => 1,
+    'enable.cache.page'         => 1,
+    'enable.enable.retina'      => 1,
+    'image.rounding'            => 'up',
+    'image.size_method'         => 'server',
+    'image.sizer'               => \&_wiki_default_sizer,
+    'image.calc'                => \&_wiki_default_calc
+);
+
 # create a new wiki object.
 sub new {
     my ($class, %opts) = @_;
@@ -37,29 +48,6 @@ sub new {
     # create the Wiki's Wikifier instance.
     # using the same wikifier instance over and over makes parsing much faster.
     $wiki->{wikifier} ||= Wikifier->new();
-    
-    # hardcoded Wikifier::Page wiki info options. (always same for Wikifier::Wiki)
-    $wiki->{'image.rounding'}       = 'up';
-    $wiki->{'image.size_method'}    = 'server';
-
-    # image sizer callback.
-    $wiki->{'image.sizer'} = sub {
-        my %img = @_;
-        
-        # full-sized image.
-        if (!$img{width} || !$img{height} ||
-            $img{width} eq 'auto' || $img{height} eq 'auto') {
-            
-            return $wiki->opt('root.image').q(/).$img{file};
-        }
-        
-        # scaled image.
-        return $wiki->opt('root.image').q(/).$img{width}.q(x).$img{height}.q(-).$img{file};
-        
-    };
-    
-    # we use GD for image size finding because it is already a dependency of WiWiki.
-    $wiki->{'image.calc'} = \&_wiki_default_calc;
     
     return $wiki;
 }
@@ -86,7 +74,9 @@ sub opt {
     my ($wiki, $opt) = @_;
     return $wiki->{$opt} if exists $wiki->{$opt};
     my $v = $wiki->{conf}->get($opt);
-    return defined $v ? $v : $Wikifier::Page::wiki_defaults{$opt};
+    return defined $v ? $v :
+        $wiki_defaults{$opt} //
+        $Wikifier::Page::wiki_defaults{$opt};
 }
 
 #############   This is Wikifier's built in URI handler. If you wish to implement your own
@@ -789,5 +779,22 @@ sub _wiki_default_calc {
     return ($w, $h);
 
 }
+
+# default image sizer for a wiki.
+sub _wiki_default_sizer {
+    my %img = @_;
+    
+    # full-sized image.
+    if (!$img{width} || !$img{height} ||
+        $img{width} eq 'auto' || $img{height} eq 'auto') {
+        
+        return $wiki->opt('root.image').q(/).$img{file};
+    }
+    
+    # scaled image.
+    return $wiki->opt('root.image').q(/).$img{width}.q(x).$img{height}.q(-).$img{file};
+    
+}
+
 
 1
