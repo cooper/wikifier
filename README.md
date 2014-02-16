@@ -11,18 +11,18 @@ The Wikifier's unique language is designed specifically for easy legibility.
 ### Blocks
 
 The fundamental component of the wikifier language is the block. Each block belongs to a
-specific, and each type provides a different function. For example, infobox{} displays a
-table of information associated with an article. imagebox{} displays an image preview with
-a caption and link to a full-sized image.
+specific type, and each type provides a different function. For example, infobox{}
+displays a table of information associated with an article. imagebox{} displays an image
+preview with a caption and link to a full-sized image.
   
 Many blocks may contain text as well as other blocks. Each block may handle the data
 inside of it differently.
 
 #### Syntax
 
-Blocks can have names: Some do, and some don't. Each block type may use this name for
-different purposes. For example, section blocks use the title to display a header over
-the section. Infoboxes use the title to display a title along the top of the box. The
+Blocks can have names: Some do, and some don't. Each block type may use its name for a
+different purpose. For example, section blocks use the name to display a title header over
+the section. Infoboxes use the name to display a title along the top of the box. The
 syntax for blocks is as follows.
   
 
@@ -33,6 +33,8 @@ blocktype {
     ...
 }
 ```
+
+Example
 
 ```
 imagebox {
@@ -50,6 +52,8 @@ blocktype [block name] {
     ...
 }
 ```
+
+Example
 
 ```
 section [Statistics] {
