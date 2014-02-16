@@ -156,7 +156,7 @@ sub handle_character {
             }
             
             # we are in the block name, so add this character to the front.
-            elsif ($in_block_name) {
+            if ($in_block_name) {
                 $block_name = $last_char.$block_name;
             }
             
