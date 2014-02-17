@@ -359,14 +359,17 @@ sub display_image {
     ### RETINA SCALE SUPPORT ####
     #############################
     
+    # note: retina image name is handled above in "early retina check."
+    
     # this is not a retina request, but retina is enabled, and so is pregeneration.
     # therefore, we will call ->display_image() in order to pregenerate a retina version.
-    elsif ($wiki->opt('image.enable.retina') && !$retina_request &&
+    if ($wiki->opt('image.enable.retina') && !$retina_request &&
            $wiki->opt('image.enable.pregeneration')) {
         my $retina_file = $image_wo_ext.q(@2x.).$image_ext;
         $wiki->display_image($retina_file, $width, $height, 1);
     }
     
+    # determine the full file name of the image.
     my $full_name  = $retina_request
                      ? $name_width.q(x).$name_height.q(-).$image_wo_ext.q(@2x.).$image_ext
                      : $name_width.q(x).$name_height.q(-).$image_name;
@@ -416,7 +419,7 @@ sub display_image {
     
     # if we are restricting to only sizes used in the wiki, check.
     if ($wiki->opt('image.enable.restriction')) {
-        if (!$wiki->{allowed_dimensions}{$image_name}{$scaled_w.q(x).$scaled_h}) {
+        if (!$wiki->{allowed_dimensions}{$image_name}{ $scaled_w.q(x).$scaled_h }) {
             $result->{type}  = 'not found';
             $result->{error} = "Image '$image_name' does not exist in these dimensions.";
             return $result;
@@ -660,13 +663,10 @@ sub cat_get_pages {
             
             # update data.
             my $p_vars = $page->get('page');
-            $page_data = {
-                page    => $page_name,
-                asof    => $time
-            };
+            $page_data = { asof => $time };
             if (ref $p_vars eq 'HASH') {
                 foreach my $var (keys %$p_vars) {
-                    next if $var eq 'page' || $var eq 'asof';
+                    next if $var eq 'asof';
                     $page_data->{$var} = $p_vars->{$var};
                 }
             }
@@ -766,7 +766,7 @@ sub files_in_dir {
 sub file_contents {
     my ($file, $binary) = @_;
     local $/ = undef;
-    open my $fh, '<', $file or Wikifier::l("Cannot open file '$file': $!") and return;;
+    open my $fh, '<', $file or Wikifier::l("Cannot open file '$file': $!") and return;
     binmode $fh if $binary;
     my $content = <$fh>;
     close $fh;
