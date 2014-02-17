@@ -543,8 +543,8 @@ sub check_categories {
 # add a page to a category if it is not in it already.
 sub cat_add_page {
     my ($wiki, $page, $category) = @_;
+    my ($time, $fh) = time;
     my $cat_file = $wiki->opt('dir.category').q(/).$category.q(.cat);
-    my $time = time;
     
     # fetch page infos.
     my $p_vars = $page->get('page');
@@ -561,19 +561,8 @@ sub cat_add_page {
         $page_data->{dimensions} = $page->{images}{$1};
     }
     
-    # open the category file.
-    # return if there are errors.
-    my $fh;
-    my $file_exists = -f $cat_file;
-    if (!open $fh, '>', $cat_file) {
-        Wikifier::l("Cannot open '$cat_file': $!");
-        return;
-    }
-    
-    print "$cat_file\nopened yes\nexists ".($file_exists ? 'exists' : 'no')."\n";
-    
     # first, check if the category exists yet.
-    if ($file_exists) {
+    if (-f $cat_file) {
         my $cat = eval { decode_json(file_contents($cat_file)) };
         
         # JSON error or the value is not a hash.
@@ -587,20 +576,32 @@ sub cat_add_page {
         # or add it if it is not there already.
         $cat->{pages}{ $page->{name} } = $page_data;
         
+        # open the file or log error.
+        if (!open $fh, '>', $cat_file) {
+            Wikifier::l("Cannot open '$cat_file': $!");
+            return;
+        }
+        
+        # print the resulting JSON.
         print {$fh} JSON->new->pretty(1)->encode($cat);
         close $fh;
         
         return 1;
     }
     
+    # open file or error.
+    if (!open $fh, '>', $cat_file) {
+        Wikifier::l("Cannot open '$cat_file': $!");
+        return;
+    }
+    
     # the category does not yet exist.
-    my $f = JSON->new->pretty(1)->encode({
+    print {$fh} JSON->new->pretty(1)->encode({
         category   => $category,
         created    => $time,
         pages      => { $page->{name} => $page_data }
     });
-    print {$fh} $f;
-    print "wrote: $f";
+    
     close $fh;
     return 1;
 }
