@@ -16,9 +16,10 @@ our %block_types;
 sub create_block {
     my ($wikifier, %opts) = @_;
     my $type = $opts{type};
+    my $dir  = _dir(\%opts);
     
     # if this block type doesn't exist, try loading its module.
-    $wikifier->load_block($type, _dir(\%opts)) if !$block_types{$type};
+    $wikifier->load_block($type, $dir) if !$block_types{$type};
 
     # if it still doesn't exist, make a dummy.
     return Wikifier::Block->new(
@@ -35,7 +36,7 @@ sub create_block {
     }
     
     # call init sub.
-    my $block = Wikifier::Block->new(%opts);
+    my $block = Wikifier::Block->new(%opts, wdir => $dir);
     $block_types{$type}{init}->($block) if $block_types{$type}{init};
     
     return $block;
@@ -86,8 +87,8 @@ sub load_block {
 # find the wikifier directory.
 sub _dir {
     my $b = shift;
-    while ($b) {
-        return $b->{dir} if $b->{dir};
+    while (ref $b) {
+        return $b->{wdir} if $b->{wdir};
         $b = $b->{parent};
     }
     return q(.); # fallback.
