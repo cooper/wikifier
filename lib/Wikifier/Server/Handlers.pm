@@ -18,7 +18,7 @@ sub handle_wiki {
     my $name = (split /\./, $msg->{name})[0];
     
     # ensure that this wiki is configured on this server.
-    if (!$conf->get("server.wiki.$name") || !$Wikifier::Server::wiki{$name}) {
+    if (!$conf->get("server.wiki.$name") || !$Wikifier::Server::wikis{$name}) {
         $connection->error("Wiki '$name' not configured on this server");
         return;
     }
@@ -33,7 +33,7 @@ sub handle_wiki {
     # authentication succeeded.
     $connection->{authenticated} = 1;
     $connection->{wiki_name}     = $name;
-    $connection->{wiki}          = $Wikifier::Server::wiki{$name};
+    $connection->{wiki}          = $Wikifier::Server::wikis{$name};
     
     Wikifier::l("Successful authentication for '$name' by $$connection{id}");
 }

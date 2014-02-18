@@ -86,10 +86,10 @@ sub handle_data {
 # create Wikifier::Wiki instances.
 sub create_wikis {
     my $w = $conf->get('server.wiki');
-    my %wikis = $w && ref $w eq 'HASH' ? %$w : {};
+    my %confwikis = $w && ref $w eq 'HASH' ? %$w : {};
     Wikifier::lindent('Initializing Wikifier::Wiki instances');
     
-    foreach my $name (keys %wikis) {
+    foreach my $name (keys %confwikis) {
 
         Wikifier::lindent("Initializing '$name' wiki");
     
@@ -115,7 +115,7 @@ sub create_wikis {
 # if pregeneration is enabled, do so.
 sub pregenerate {
     return unless $conf->get('server.enable.pregeneration');
-    gen_wiki($_) foreach values %wiki;
+    gen_wiki($_) foreach values %wikis;
 }
 
 sub gen_wiki {
