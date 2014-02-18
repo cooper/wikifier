@@ -38,6 +38,9 @@ sub new {
     $opts{wikifier} ||= Wikifier->new();
     my $wikifier = $opts{wikifier};
     
+    # create the page.
+    my $page = bless \%opts, $class;
+    
     # create the page's main block.
     my $main_block = $opts{main_block} =
     $wikifier->{main_block} = $wikifier->create_block(
@@ -46,7 +49,7 @@ sub new {
         parent => undef     # main block has no parent.
     );
     
-    return bless \%opts, $class;
+    return $page;
 }
 
 # parses the file.
