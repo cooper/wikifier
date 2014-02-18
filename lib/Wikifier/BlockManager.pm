@@ -77,7 +77,8 @@ sub load_block {
         }
         
         # if this depends on a base, load it.
-        $wikifier->load_block($blocks{$block_type}{base}) if $blocks{$block_type}{base};
+        $wikifier->load_block($blocks{$block_type}{base}, $dir)
+          if $blocks{$block_type}{base};
         
     }
 
