@@ -14,7 +14,7 @@ use Wikifier::Wiki;
 use Wikifier::Server::Connection;
 use Wikifier::Server::Handlers;
 
-our ($loop, $conf, %wiki, %files);
+our ($loop, $conf, %wikis, %files);
 
 # start the server.
 sub start {
@@ -102,7 +102,7 @@ sub create_wikis {
         Wikifier::l("Error in wiki configuration") and next unless $wiki;
         
         # it succeeded.
-        $wiki{$name}  = $wiki;
+        $wikis{$name} = $wiki;
         $wiki->{name} = $name;
         
         Wikifier::back();
@@ -132,7 +132,7 @@ sub gen_wiki {
         $loop->add($file);
     }
 
-    Wikifier::lindent("Checking for pages to generate in '$$wiki{name}'");
+    Wikifier::lindent("Checking for pages to generate in '$$wikis{name}'");
     
     foreach my $page_name ($wiki->all_pages) {
         my $page_file  = "$page_dir/$page_name";
@@ -154,7 +154,7 @@ sub gen_wiki {
         
     }
     
-    Wikifier::lback("Done generating '$$wiki{name}'");
+    Wikifier::lback("Done generating '$$wikis{name}'");
 }
 
 1
