@@ -66,12 +66,13 @@ sub handle_stream {
     Wikifier::l("New connection $$stream{connection}{id}");
     
     # configure the stream.
+    my $close = sub { shift->{connection}->close };
     $stream->configure(
         on_read         => \&handle_data,
-        on_write_eof    => sub { shift->{connection}->close },
-        on_read_eof     => sub { shift->{connection}->close },
-        on_read_error   => sub { shift->{connection}->close },
-        on_write_error  => sub { shift->{connection}->close }
+        on_write_eof    => $close,
+        on_read_eof     => $close,
+        on_read_error   => $close,
+        on_write_error  => $close,
     );
     
     # add the stream to the loop.
@@ -140,7 +141,7 @@ sub gen_wiki {
         $loop->add($file);
     }
 
-    Wikifier::lindent("[$$wiki{name}] Checking for pages to generate");
+    Wikifier::lindent("Checking [$$wiki{name}]");
     
     foreach my $page_name ($wiki->all_pages) {
         my $page_file  = "$page_dir/$page_name";
@@ -162,7 +163,7 @@ sub gen_wiki {
         
     }
     
-    Wikifier::lback("[$$wiki{name}] Done");
+    Wikifier::lback("Done [$$wiki{name}]");
 }
 
 1
