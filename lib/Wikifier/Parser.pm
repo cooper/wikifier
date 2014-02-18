@@ -56,7 +56,7 @@ sub parse {
 
 # parse a single line.
 sub handle_line {
-    my ($wikifier, $line, $page, @rest) = @_;
+    my ($wikifier, $line, $page, $last, $current) = @_;
     
     # illegal regex filters out variable declaration.
     if ($line =~ m/^\s*\@([\w\.]+):\s*(.+);\s*$/) {
@@ -73,8 +73,10 @@ sub handle_line {
     # only parsing variables.
     return 1 if $page->{vars_only};
     
-    # pass on to main parser.
-    $wikifier->handle_character($_, $page, @rest) foreach (split(//, $line), "\n");
+    # pass on to character parser.
+    foreach my $char (split(//, $line), "\n") {
+        ($current, $last) = $wikifier->handle_character($char, $page, $current, $last);
+    }
     
     return 1;
 }
@@ -299,7 +301,7 @@ sub handle_character {
     ### do not do anything below that depends on $current{escaped} ###
     ###   because it has already been modified for the next char   ###
     
-    return 1;
+    return (\%current, \%last);
 }
 
 1
