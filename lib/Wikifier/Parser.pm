@@ -93,7 +93,7 @@ sub handle_line {
 
 
 # parse a single character.
-# note: never return from this method; instead goto AFTER.
+# note: never return from this method; instead last from for loop.
 sub handle_character {
     my ($wikifier, $page, $char) = @_;
     
@@ -104,17 +104,15 @@ sub handle_character {
     # set current character.
     $current{char} = $char;
     
-    foreach ($char) {
+    for ($char) {
     
     # inside a comment.
-    next if $current{in_comment};
+    last if $current{in_comment};
     
     # comment entrance and closure.
     when ($_ eq '*' && $last{char} eq '/') { $current{in_comment} = 1    }
     when ($_ eq '/' && $last{char} eq '*') { delete $current{in_comment} }
-    
-    when ($current{in_comment}) {
-    
+        
     # space. terminates a word.
     # delete the current word, setting its value to the last word.
     when (' ') {
