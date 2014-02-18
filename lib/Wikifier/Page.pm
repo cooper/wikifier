@@ -54,8 +54,8 @@ sub new {
 # parses the file.
 sub parse {
     my $page = shift;
-    
-    Wikifier::lindent("Parse()");
+
+    Wikifier::lindent("Parse     $$page{name}");
     my $res = $page->wikifier->parse($page, $page->{file});
     Wikifier::back();
     
@@ -65,12 +65,11 @@ sub parse {
 # returns the generated page HTML.
 sub html {
     my $page = shift;
-    
-    Wikifier::lindent("HTML()");
+    Wikifier::lindent("HTML      $$page{name}");
     $page->{wikifier}{main_block}->html($page);
     Wikifier::back();
     
-    Wikifier::lindent("Generate()");
+    Wikifier::lindent("Generate  $$page{name}");
     my $res = $page->{wikifier}{main_block}{element}->generate;
     Wikifier::back();
     

@@ -58,6 +58,7 @@ sub read_config {
     my ($wiki, $file) = @_;
     my $conf = $wiki->{conf} = Wikifier::Page->new(
         file      => $file,
+        name      => 'configuration',
         vars_only => 1       # don't waste time parsing anything but variables
     );
     
