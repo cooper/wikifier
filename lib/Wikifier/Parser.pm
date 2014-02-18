@@ -192,7 +192,8 @@ sub handle_character {
         #
         # note: it is very likely that a single space will remain, but this will later
         # ..... be trimmed out by a further cleanup.
-        substr($current->{block}{content}[-1], 0, -$chars_scanned);
+        $current->{block}{content}[-1] =
+            substr($current->{block}{content}[-1], 0, -$chars_scanned);
         
         # create the new block.
         $current->{block} = $wikifier->create_block(
