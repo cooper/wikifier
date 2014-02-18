@@ -22,10 +22,10 @@ sub start {
     Wikifier::lindent('Initializing Wikifier::Server');
     
     # load configuration.
-    $conf = Wikifier::Page->new(
+    ($conf = Wikifier::Page->new(
         file => $conf_file,
         name => 'server configuration'
-    ) or die "Error in configuration\n";
+    ) or die "Error in configuration\n")->parse;
 
     # create a new listener and add it to the loop.
     my $listener = IO::Async::Listener->new(on_stream => \&handle_stream);
