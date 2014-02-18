@@ -24,7 +24,7 @@ sub start {
     # load configuration.
     ($conf = Wikifier::Page->new(
         file => $conf_file,
-        name => 'server configuration'
+        name => $conf_file
     ) or die "Error in configuration\n")->parse;
 
     # create a new listener and add it to the loop.
