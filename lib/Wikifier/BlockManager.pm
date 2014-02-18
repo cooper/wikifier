@@ -50,13 +50,13 @@ sub load_block {
     
     # does the file exist?
     if (!-f $file && !-l $file) {
-        Wikifier::l("Block \$type{} does not exist");
+        Wikifier::l("Block ${type}{} does not exist");
         return;
     }
     
     # do the file.
     my $package = do $file
-        or Wikifier::l("Error loading $type\{} block: ".($@ || $! || 'but idk why'));
+        or Wikifier::l("Error loading ${type}{} block: ".($@ || $! || 'but idk why'));
     return unless $package;
     
     # fetch blocks.
