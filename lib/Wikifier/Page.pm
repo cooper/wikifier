@@ -42,8 +42,7 @@ sub new {
     my $page = bless \%opts, $class;
     
     # create the page's main block.
-    my $main_block = $opts{main_block} =
-    $wikifier->{main_block} = $wikifier->create_block(
+    $page->{main_block} = $wikifier->{main_block} = $wikifier->create_block(
         dir    => $page->wiki_opt('dir.wikifier'),
         type   => 'main',
         parent => undef     # main block has no parent.
