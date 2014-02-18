@@ -15,7 +15,7 @@ use 5.010;
 
 use Scalar::Util 'blessed';
 
-use Wikifier::Utilities qw(trim);
+use Wikifier::Utilities 'trim';
 
 ###############
 ### PARSING ###
@@ -36,12 +36,10 @@ sub parse {
     
     # read it line-by-line.
     while (my $line = <$fh>) {
-        next unless $line;      # empty line.
-        $line =~ s/\/\*(.*)\*\///g; # REALLY ILLEGAL REMOVAL OF COMMENTS.
-        $line =~ s/[\r\n\0]//g; # remove returns and newlines.
-        $line =~ s/^\s*//g;     # remove leading whitespace.
-        $line =~ s/\s*$//g;     # remove trailing whitespace.
-        next unless $line;      # line empty after removing unwanted characters.
+        next unless length $line;   # empty line.
+        $line =~ s/[\r\n\0]//g;     # remove returns and newlines.
+        $line = trim($line);        # remove prefixing and suffixing whitespace.
+        next unless length $line;   # line empty after removing unwanted characters.
         $wikifier->handle_line($page, $line) or last;
     }
     
@@ -52,9 +50,7 @@ sub parse {
     delete $wikifier->{parse_current};
     delete $wikifier->{parse_last};
     
-    # success.
-    return 1; # return the page object.
-    
+    return 1;
 }
 
 # parse a single line.
@@ -76,13 +72,9 @@ sub handle_line {
     # only parsing variables.
     return 1 if $page->{vars_only};
     
-    # illegal regex for __END__
-    if ($line =~ m/^\s*__END__\s*$/) {
-        return;
-    }
-    
     # pass on to main parser.
     $wikifier->handle_character($page, $_) foreach (split(//, $line), "\n");
+    
     return 1;
 }
 
@@ -112,7 +104,16 @@ sub handle_character {
     # set current character.
     $current{char} = $char;
     
-    given ($char) {
+    foreach ($char) {
+    
+    # inside a comment.
+    next if $current{in_comment};
+    
+    # comment entrance and closure.
+    when ($_ eq '*' && $last{char} eq '/') { $current{in_comment} = 1    }
+    when ($_ eq '/' && $last{char} eq '*') { delete $current{in_comment} }
+    
+    when ($current{in_comment}) {
     
     # space. terminates a word.
     # delete the current word, setting its value to the last word.
