@@ -44,10 +44,6 @@ sub new {
         parent => undef     # main block has no parent.
     );
     
-    # initial parser hashes.
-    $wikifier->{parse_current} = { block => $main_block };
-    $wikifier->{parse_last}    = { block => undef       };
-    
     return bless \%opts, $class;
 }
 

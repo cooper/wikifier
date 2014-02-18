@@ -34,28 +34,29 @@ sub parse {
     # open the file.
     open my $fh, '<', $file or Wikifier::l("Couldn't read '$file': $!");
     
+    # set initial parse info.
+    my $current = { block => $main_block };
+    my $last    = { block => undef       };
+    
     # read it line-by-line.
     while (my $line = <$fh>) {
         next unless length $line;   # empty line.
         $line =~ s/[\r\n\0]//g;     # remove returns and newlines.
         $line = trim($line);        # remove prefixing and suffixing whitespace.
         next unless length $line;   # line empty after removing unwanted characters.
-        $wikifier->handle_line($page, $line) or last;
+        
+        $wikifier->handle_line($line, $page, $current, $last) or last;
     }
     
     # run ->parse on children.
     $page->{main_block}->parse($page);
-    
-    # clear parsing-related options.
-    delete $wikifier->{parse_current};
-    delete $wikifier->{parse_last};
     
     return 1;
 }
 
 # parse a single line.
 sub handle_line {
-    my ($wikifier, $page, $line) = @_;
+    my ($wikifier, $line, $page, @rest) = @_;
     
     # illegal regex filters out variable declaration.
     if ($line =~ m/^\s*\@([\w\.]+):\s*(.+);\s*$/) {
@@ -73,7 +74,7 @@ sub handle_line {
     return 1 if $page->{vars_only};
     
     # pass on to main parser.
-    $wikifier->handle_character($page, $_) foreach (split(//, $line), "\n");
+    $wikifier->handle_character($_, $page, @rest) foreach (split(//, $line), "\n");
     
     return 1;
 }
@@ -95,11 +96,8 @@ sub handle_line {
 # parse a single character.
 # note: never return from this method; instead last from for loop.
 sub handle_character {
-    my ($wikifier, $page, $char) = @_;
-    
-    # extract parsing hashes.
-    my %current = %{$wikifier->{parse_current}};
-    my %last    = %{$wikifier->{parse_last}};
+    my ($wikifier, $char, $page, $current, $last) = @_;
+    my (%current, %last) = (%$current, %$last);
 
     # set current character.
     $current{char} = $char;
@@ -301,10 +299,7 @@ sub handle_character {
     ### do not do anything below that depends on $current{escaped} ###
     ###   because it has already been modified for the next char   ###
     
-    # replace parsing hashes.
-    $wikifier->{parse_current} = \%current;
-    $wikifier->{parse_last}    = \%last;
-    
+    return 1;
 }
 
 1
