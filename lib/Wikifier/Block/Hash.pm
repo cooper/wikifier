@@ -87,7 +87,7 @@ sub hash_parse {
                     $key_title = undef;
                 }
            
-                # if this key exists, rename it to the next available <name>_key_<n>.
+                # if this key exists, rename it to the next available <key>_key_<n>.
                 while (exists $values{$key}) {
                     my ($key_name, $key_number) = split '_key_', $key;
                     if (!defined $key_number) {
@@ -95,7 +95,7 @@ sub hash_parse {
                         next;
                     }
                     $key_number++;
-                    $key = "${key_name}_$key_number";
+                    $key = "${key_name}_${key_number}";
                 }
                 
                 # store the value.

@@ -36,7 +36,7 @@ use Scalar::Util qw(blessed weaken);
 #   wikifier:   the wikifier object.
 #
 # For subclasses, the type is provided automatically.
-# This should rarely be used directly; use $wikifier->create_block($parent, $type).
+# This should rarely be used directly; use $wikifier->create_block().
 #
 sub new {
     my ($class, %opts) = @_;

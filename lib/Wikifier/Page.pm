@@ -12,6 +12,7 @@ use strict;
 # default options.
 our %wiki_defaults = (
     'name'              => 'Wiki',
+    'dir.wikifier'      => '.',
     'dir.image'         => 'images',
     'dir.page'          => 'pages',
     'dir.cache'         => 'cache',
@@ -40,6 +41,7 @@ sub new {
     # create the page's main block.
     my $main_block = $opts{main_block} =
     $wikifier->{main_block} = $wikifier->create_block(
+        dir    => $page->wiki_opt('dir.wikifier'),
         type   => 'main',
         parent => undef     # main block has no parent.
     );
