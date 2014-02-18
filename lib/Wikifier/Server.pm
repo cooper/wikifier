@@ -132,7 +132,7 @@ sub gen_wiki {
         $loop->add($file);
     }
 
-    Wikifier::lindent("Checking for pages to generate in '$$wikis{name}'");
+    Wikifier::lindent("Checking for pages to generate in '$$wiki{name}'");
     
     foreach my $page_name ($wiki->all_pages) {
         my $page_file  = "$page_dir/$page_name";
@@ -154,7 +154,7 @@ sub gen_wiki {
         
     }
     
-    Wikifier::lback("Done generating '$$wikis{name}'");
+    Wikifier::lback("Done generating '$$wiki{name}'");
 }
 
 1
