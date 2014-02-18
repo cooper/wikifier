@@ -29,7 +29,7 @@ sub main_parse {
 
 sub main_html {
     my ($block, $page, $el) = @_;
-    foreach my $item (@{$block->{content}}) {
+    foreach my $item (@{ $block->{content} }) {
         next unless blessed $item;
         $el->add($item->html($page));
     }

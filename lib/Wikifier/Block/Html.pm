@@ -19,7 +19,7 @@ our %block_types = (
 sub html_html {
     my ($block, $page, $el) = @_;
     
-    foreach my $item (@{$block->{content}}) {
+    foreach my $item (@{ $block->{content} }) {
         $el->add($el->html($page)) and next if blessed $item;
         $el->add($item);
     }

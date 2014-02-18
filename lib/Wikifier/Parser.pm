@@ -188,10 +188,12 @@ sub handle_character {
 
         }
         
+        #
         # remove the block type and name from the current block's content.
         #
         # note: it is very likely that a single space will remain, but this will later
-        # ..... be trimmed out by a further cleanup.
+        # be trimmed out by a further cleanup.
+        #
         $current->{block}{content}[-1] =
             substr($current->{block}{content}[-1], 0, -$chars_scanned);
         

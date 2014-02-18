@@ -29,7 +29,7 @@ sub hash_parse {
     my ($key, $value, $in_value, %values) = (q.., q..);
     
     # for each content item...
-    ITEM: foreach my $item (@{$block->{content}}) {
+    ITEM: foreach my $item (@{ $block->{content} }) {
         
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
@@ -100,7 +100,7 @@ sub hash_parse {
                 
                 # store the value.
                 $values{$key} = $value;
-                push @{$block->{hash_array}}, [$key_title, $value, $key];
+                push @{ $block->{hash_array} }, [$key_title, $value, $key];
             
                 # reset status.
                 $in_value = 0;
@@ -131,7 +131,7 @@ sub hash_parse {
     } # end of item loop.
     
     # append/overwrite values found in this parser.
-    my %hash = $block->{hash} ? %{$block->{hash}} : ();
+    my %hash = $block->{hash} ? %{ $block->{hash} } : ();
     @hash{ keys %values } = values %values;
     
     # reassign the hash.

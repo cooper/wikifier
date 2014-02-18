@@ -36,7 +36,7 @@ sub infobox_html {
     );
     
     # append each pair.
-    foreach my $pair (@{$block->{hash_array}}) {
+    foreach my $pair (@{ $block->{hash_array} }) {
         my ($key_title, $value, $key) = @$pair;
 
         # value is a block. generate the HTML for it.
