@@ -90,6 +90,8 @@ sub create_wikis {
     Wikifier::lindent('Initializing Wikifier::Wiki instances');
     
     foreach my $name (keys %wikis) {
+
+        Wikifier::lindent("Initializing '$name' wiki");
     
         # load the wiki.
         my $wiki = Wikifier::Wiki->new(
@@ -97,12 +99,13 @@ sub create_wikis {
         );
         
         # it failed.
-        Wikifier::l("Error with wiki configuration for '$name'") and next unless $wiki;
+        Wikifier::l("Error in wiki configuration") and next unless $wiki;
         
         # it succeeded.
-        Wikifier::l("Initialized '$name' wiki");
         $wiki{$name}  = $wiki;
         $wiki->{name} = $name;
+        
+        Wikifier::back();
         
     }
     
