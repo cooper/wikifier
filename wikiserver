@@ -11,7 +11,10 @@ use Wikifier::Server;
 
 # read the configuration page.
 die "Please provide the configuration file as the first argument\n" unless @ARGV;
-(my $conf = Wikifier::Page->new(file => shift @ARGV))->parse or die "Configuration error\n";
+(my $conf = Wikifier::Page->new(
+    file => shift @ARGV),
+    name => 'server configuration'
+)->parse or die "Configuration error\n";
 
 # create a loop.
 my $loop = IO::Async::Loop->new;
