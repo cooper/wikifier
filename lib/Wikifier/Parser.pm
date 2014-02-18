@@ -110,8 +110,16 @@ sub handle_character {
     last if $current{in_comment};
     
     # comment entrance and closure.
-    when ($_ eq '*' && $last{char} eq '/') { $current{in_comment} = 1    }
-    when ($_ eq '/' && $last{char} eq '*') { delete $current{in_comment} }
+    if (defined $last{char} and $char eq '*' || $char eq '/') {
+        if ($char eq '*' && $last{char} eq '/') {
+            $current{in_comment} = 1;
+            last;
+        }
+        if ($char eq '/' && $last{char} eq '*') {
+            delete $current{in_comment};
+            last;
+        }
+    }
         
     # space. terminates a word.
     # delete the current word, setting its value to the last word.
