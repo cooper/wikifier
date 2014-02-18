@@ -18,7 +18,14 @@ our ($loop, $conf, %wikis, %files);
 
 # start the server.
 sub start {
-    ($loop, $conf) = @_;
+    ($loop, my $conf_file) = @_;
+    Wikifier::lindent('Initializing Wikifier::Server');
+    
+    # load configuration.
+    $conf = Wikifier::Page->new(
+        file => $conf_file,
+        name => 'server configuration'
+    ) or die "Error in configuration\n";
 
     # create a new listener and add it to the loop.
     my $listener = IO::Async::Listener->new(on_stream => \&handle_stream);
@@ -36,7 +43,8 @@ sub start {
 
     # begin listening.
     $listener->listen(handle => $socket);
-    Wikifier::l('Listening on '.$path);
+    Wikifier::l("Listen    $path");
+    Wikifier::back();
 
     # set up handlers.
     Wikifier::Server::Handlers::initialize();
