@@ -35,8 +35,8 @@ sub parse {
     open my $fh, '<', $file or Wikifier::l("Couldn't read '$file': $!");
     
     # set initial parse info.
-    my $current = { block => $main_block };
-    my $last    = { block => undef       };
+    my $current = { block => $wikifier->{main_block} };
+    my $last    = {};
     
     # read it line-by-line.
     while (my $line = <$fh>) {
