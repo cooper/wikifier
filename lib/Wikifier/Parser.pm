@@ -99,6 +99,10 @@ sub handle_line {
 # note: never return from this method; instead last from for loop.
 sub handle_character {
     my ($wikifier, $char, $page, $current, $last) = @_;
+    
+    # it's possible for these to be false only if an error occured
+    # in the parsing of the previous character.
+    return unless $current && $last;
     my (%current, %last) = (%$current, %$last);
 
     # set current character.
@@ -214,7 +218,7 @@ sub handle_character {
         # we cannot close the main block.
         if ($current{block} == $page->{main_block}) {
             Wikifier::l("Attempted to close main block");
-            return;
+            return; #this is the only place we can return.
         }
         
         # close the block, returning to its parent.
