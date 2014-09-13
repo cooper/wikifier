@@ -394,7 +394,7 @@ sub display_image {
     if ($wiki->opt('image.enable.retina') && !$image{retina} &&
            $wiki->opt('image.enable.pregeneration')) {
         my $retina_file = $image{name_wo_ext}.q(@2x.).$image{ext};
-        $wiki->generate_image($retina_file, $width, $height);
+        $wiki->generate_image($retina_file);
     }
     
     # determine the full file name of the image.
