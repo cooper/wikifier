@@ -287,13 +287,13 @@ sub display_page {
 #
 sub parse_image_name {
     my ($wiki, $image_name) = @_;
-    my ($width, $height, $file_name) = (0, 0, $image_name);
+    my ($width, $height) = (0, 0);
     print "parse_image_name(): $image_name = ";
     # height and width were given, so it's a resized image.
     if ($image_name =~ m/^(\d+)x(\d+)-(.+)$/) {
-        ($width, $height, $file_name) = ($1, $2, $3);
+        ($width, $height, $image_name) = ($1, $2, $3);
     }
-    print "n($file_name) w($width) h($height)\n";
+    print "n($image_name) w($width) h($height)\n";
     # split image parts.
     my ($image_wo_ext, $image_ext) = ($image_name =~ m/^(.+)\.(.+?)$/);
     
