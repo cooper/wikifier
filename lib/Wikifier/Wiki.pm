@@ -294,7 +294,7 @@ sub display_page {
 # Displays an image of the supplied dimensions.
 sub display_image {
     my ($wiki, $image_name, $width, $height, $dont_open) = @_;
-    my ($result, $scaled_w, $scaled_h) = ({}, $width, $height);
+    my $result = {};
     
     # split image parts.
     $image_name =~ m/^(.+)\.(.+?)$/;
@@ -338,9 +338,9 @@ sub display_image {
     $result->{image_type}   = $ext eq 'jpg' || $ext eq 'jpeg' ? 'jpeg' : 'png';
     $result->{mime}         = $mime;
     
-##################################   
-### THIS IS A FULL-SIZED IMAGE ###
-##########################################################################################
+    ##################################   
+    ### THIS IS A FULL-SIZED IMAGE ###
+    ######################################################################################
     
     # if no width or height are specified,
     # display the full-sized version of the image.
@@ -352,22 +352,23 @@ sub display_image {
         return $result;
     }
     
-##############################   
-### THIS IS A SCALED IMAGE ###
-##########################################################################################
+    ##############################   
+    ### THIS IS A SCALED IMAGE ###
+    ######################################################################################
 
-    #############################
-    ### RETINA SCALE SUPPORT ####
-    #############################
+    #============================#
+    #=== Retina scale support ===#
+    #============================#
     
     # note: retina image name is handled above in "early retina check."
     
+    # hack:
     # this is not a retina request, but retina is enabled, and so is pregeneration.
     # therefore, we will call ->display_image() in order to pregenerate a retina version.
     if ($wiki->opt('image.enable.retina') && !$retina_request &&
            $wiki->opt('image.enable.pregeneration')) {
         my $retina_file = $image_wo_ext.q(@2x.).$image_ext;
-        $wiki->display_image($retina_file, $width, $height, 1);
+        $wiki->generate_image($retina_file, $width, $height);
     }
     
     # determine the full file name of the image.
@@ -376,9 +377,9 @@ sub display_image {
                      : $name_width.q(x).$name_height.q(-).$image_name;
     my $cache_file = $wiki->opt('dir.cache').q(/).$full_name;
     
-    #############################
-    ### FINDING CACHED IMAGE ####
-    #############################
+    #============================#
+    #=== Finding cached image ===#
+    #============================#
     
     # if caching is enabled, check if this exists in cache.
     if ($wiki->opt('enable.cache.image') && -f $cache_file) {
@@ -414,21 +415,71 @@ sub display_image {
         return $wiki->display_image($result, $image_name, 0, 0);
     }
     
-    ##############################
-    ### GENERATION, NOT CACHED ###
-    ##############################
+    #==========================#
+    #=== Generate the image ===#
+    #==========================#
+    
+    $wiki->generate_image($image_name, $full_name, $width, $height, $result);
+    
+    delete $result->{content} if $dont_open;
+    return $result;
+}
+
+# generate an image of a certain size.
+#
+# $image_name   image name with extension, e.g. HelloWorld.png
+# $full_name    full image name, e.g. HelloWorld-500x200_2x.png
+# $width        the width requested
+# $height       the height requested
+# $result       hash reference representing the result of the request
+#
+# $result is to be passed only from an existing display_image() request.
+# if this is called from outside of a request, do not specify $result.
+#
+sub generate_image {
+    my ($wiki, $image_name, $full_name, $width, $height, $result) = @_;
+    
+    # no result hash reference; create one with default values.
+    $result ||= do {
+        
+        # check if the file exists.
+        my $file = abs_path($wiki->opt('dir.image').q(/).$image_name);
+        if (!-f $file) {
+            return {
+                type  => 'not found',
+                error => "Image '$image_name' does not exist."
+            }
+        }
+                
+        # determine image short name, extension, and mime type.
+        my ($name, $ext) = ($image_name =~ m/(.+)\.(.+)/);
+        my $mime = $ext eq 'png' ? 'image/png' : 'image/jpeg';
+    
+        # base $result
+        {
+            type          => 'image',
+            file          => $image_name,
+            path          => $file,
+            fullsize_path => $file,
+            cache_path    => $wiki->opt('dir.cache').q(/).$full_name,
+            image_type    => $ext eq 'jpg' || $ext eq 'jpeg' ? 'jpeg' : 'png',
+            mime          => $mime
+        }
+    };
+    
     
     # if we are restricting to only sizes used in the wiki, check.
     if ($wiki->opt('image.enable.restriction')) {
-        if (!$wiki->{allowed_dimensions}{$image_name}{ $scaled_w.q(x).$scaled_h }) {
+        if (!$wiki->{allowed_dimensions}{$image_name}{ $width.q(x).$height }) {
             $result->{type}  = 'not found';
             $result->{error} = "Image '$image_name' does not exist in these dimensions.";
             return $result;
         }
     }
     
+    # create GD instance with this full size image.
     GD::Image->trueColor(1);
-    my $full_image = GD::Image->new($file);
+    my $full_image = GD::Image->new($result->{fullsize_path});
 
     # create resized image.
     my $image = GD::Image->new($width, $height);
@@ -459,6 +510,7 @@ sub display_image {
     $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
     
     # caching is enabled, so let's save this for later.
+    my $cache_file = $result->{cache_path};
     if ($wiki->opt('enable.cache.image')) {
     
         open my $fh, '>', $cache_file;
@@ -473,8 +525,7 @@ sub display_image {
         $result->{etag}       = q(").md5_hex($image_name.$result->{modified}).q(");
         
     }
-    
-    delete $result->{content} if $dont_open;
+
     return $result;
 }
 

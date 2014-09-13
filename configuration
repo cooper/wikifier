@@ -114,8 +114,10 @@ image.enable.pregeneration      Default: disabled
     as they are requested.
 
     The advantage of this option is that it allows images to be served directly by a web
-    server without summoning any Wikifier software, decreasing the page load time. The
-    disadvantage is slower page generation time.
+    server without summoning any Wikifier software, decreasing the page load time.
+    
+    The disadvantage is slower page generation time if new images have been added since
+    the last generation time.
     
     Requires:
         enable.cache.image

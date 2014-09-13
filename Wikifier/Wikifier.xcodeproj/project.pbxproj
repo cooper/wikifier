@@ -21,20 +21,21 @@
 		A7A67A2918AC3B9C00427886 /* Main.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Main.pm; sourceTree = "<group>"; };
 		A7A67A2D18AC3B9C00427886 /* Paragraph.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Paragraph.pm; sourceTree = "<group>"; };
 		A7A67A3018AC3B9C00427886 /* Section.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Section.pm; sourceTree = "<group>"; };
-		A7A67A3118AC3B9C00427886 /* Block.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = Block.pm; path = /Users/cooper879/Projects/wikifier/lib/Wikifier/Block.pm; sourceTree = "<absolute>"; };
-		A7A67A3218AC3B9C00427886 /* BlockManager.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = BlockManager.pm; path = /Users/cooper879/Projects/wikifier/lib/Wikifier/BlockManager.pm; sourceTree = "<absolute>"; };
 		A7A67A3318AC3B9C00427886 /* Element.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = Element.pm; path = Wikifier/Element.pm; sourceTree = "<group>"; };
 		A7A67A3418AC3B9C00427886 /* Formatter.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = Formatter.pm; path = Wikifier/Formatter.pm; sourceTree = "<group>"; };
 		A7A67A3618AC3B9C00427886 /* Page.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = Page.pm; path = Wikifier/Page.pm; sourceTree = "<group>"; };
 		A7A67A3718AC3B9C00427886 /* Parser.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = Parser.pm; path = Wikifier/Parser.pm; sourceTree = "<group>"; };
 		A7A67A3918AC3B9C00427886 /* Connection.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Connection.pm; sourceTree = "<group>"; };
 		A7A67A3A18AC3B9C00427886 /* Handlers.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Handlers.pm; sourceTree = "<group>"; };
-		A7A67A3B18AC3B9C00427886 /* Server.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = Server.pm; path = /Users/cooper879/Projects/wikifier/lib/Wikifier/Server.pm; sourceTree = "<absolute>"; };
 		A7A67A3C18AC3B9C00427886 /* Utilities.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = Utilities.pm; path = Wikifier/Utilities.pm; sourceTree = "<group>"; };
 		A7A67A3D18AC3B9C00427886 /* Wiki.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = Wiki.pm; path = Wikifier/Wiki.pm; sourceTree = "<group>"; };
 		A7A67A3E18AC3B9C00427886 /* Wikifier.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Wikifier.pm; sourceTree = "<group>"; };
 		A7A67A3F18AC3B9C00427886 /* wiki.example.conf */ = {isa = PBXFileReference; lastKnownFileType = text; name = wiki.example.conf; path = ../wiki.example.conf; sourceTree = "<group>"; };
 		A7A67A4018AC3B9C00427886 /* wikiserver.example.conf */ = {isa = PBXFileReference; lastKnownFileType = text; name = wikiserver.example.conf; path = ../wikiserver.example.conf; sourceTree = "<group>"; };
+		BCBD245319C3B9F6000D6FD1 /* Block.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = Block.pm; path = Wikifier/Block.pm; sourceTree = "<group>"; };
+		BCBD245419C3B9F6000D6FD1 /* BlockManager.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = BlockManager.pm; path = Wikifier/BlockManager.pm; sourceTree = "<group>"; };
+		BCBD245619C3BB78000D6FD1 /* Wikirequest.php */ = {isa = PBXFileReference; lastKnownFileType = text.script.php; path = Wikirequest.php; sourceTree = "<group>"; };
+		BCD0E62D19C3C6DA00465BCC /* Server.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = Server.pm; path = ../Server.pm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -81,6 +82,7 @@
 			isa = PBXGroup;
 			children = (
 				A7A67A1D18AC3B9C00427886 /* Wikiclient.php */,
+				BCBD245619C3BB78000D6FD1 /* Wikirequest.php */,
 			);
 			path = PHP;
 			sourceTree = "<group>";
@@ -95,6 +97,8 @@
 				A7A67A3418AC3B9C00427886 /* Formatter.pm */,
 				A7A67A3C18AC3B9C00427886 /* Utilities.pm */,
 				A7A67A3318AC3B9C00427886 /* Element.pm */,
+				BCBD245319C3B9F6000D6FD1 /* Block.pm */,
+				BCBD245419C3B9F6000D6FD1 /* BlockManager.pm */,
 				A7A67A2018AC3B9C00427886 /* Blocks */,
 				A7A67A3818AC3B9C00427886 /* Server */,
 			);
@@ -105,8 +109,6 @@
 		A7A67A2018AC3B9C00427886 /* Blocks */ = {
 			isa = PBXGroup;
 			children = (
-				A7A67A3118AC3B9C00427886 /* Block.pm */,
-				A7A67A3218AC3B9C00427886 /* BlockManager.pm */,
 				A7A67A2218AC3B9C00427886 /* Code.pm */,
 				A7A67A2318AC3B9C00427886 /* Hash.pm */,
 				A7A67A2418AC3B9C00427886 /* History.pm */,
@@ -124,7 +126,7 @@
 		A7A67A3818AC3B9C00427886 /* Server */ = {
 			isa = PBXGroup;
 			children = (
-				A7A67A3B18AC3B9C00427886 /* Server.pm */,
+				BCD0E62D19C3C6DA00465BCC /* Server.pm */,
 				A7A67A3918AC3B9C00427886 /* Connection.pm */,
 				A7A67A3A18AC3B9C00427886 /* Handlers.pm */,
 			);
@@ -147,7 +149,7 @@
 		A7A67A1518AC3B7E00427886 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0600;
 			};
 			buildConfigurationList = A7A67A1818AC3B7E00427886 /* Build configuration list for PBXProject "Wikifier" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -168,6 +170,7 @@
 		A7A67A1918AC3B7E00427886 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
 		};
