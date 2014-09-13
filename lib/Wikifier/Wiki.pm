@@ -60,7 +60,6 @@ sub read_config {
     my $conf = $wiki->{conf} = Wikifier::Page->new(
         file      => $file,
         name      => $file,
-        wiki      => $wiki,
         wikifier  => $wiki->{wikifier}
     );
     
