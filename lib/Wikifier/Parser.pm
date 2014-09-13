@@ -70,6 +70,9 @@ sub handle_line {
         return 1;
     }
         
+    # only parsing variables.
+    return 1 if $page->{vars_only};
+        
     # pass on to main parser.
     $wikifier->handle_character($_, $page, @rest) foreach (split(//, $line), "\n");
     

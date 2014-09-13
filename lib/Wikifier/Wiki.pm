@@ -60,7 +60,8 @@ sub read_config {
     my $conf = $wiki->{conf} = Wikifier::Page->new(
         file      => $file,
         name      => $file,
-        wikifier  => $wiki->{wikifier}
+        wikifier  => $wiki->{wikifier},
+        vars_only => 1
     );
     
     # error.
@@ -757,7 +758,8 @@ sub cat_get_pages {
             my $page = Wikifier::Page->new(
                 name      => $page_name,
                 file      => $page_path,
-                wikifier  => $wiki->{wikifier}
+                wikifier  => $wiki->{wikifier},
+                vars_only => 1
             );
             $page->parse;
             
