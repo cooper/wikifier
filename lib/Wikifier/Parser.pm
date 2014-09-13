@@ -71,7 +71,7 @@ sub handle_line {
     }
     
     # only parsing variables.
-    return 1 if $page->{vars_only};
+    return 1 if $page->{vars_only} && !$page->get('continue');
     
     # pass on to main parser.
     $wikifier->handle_character($_, $page, @rest) foreach (split(//, $line), "\n");
