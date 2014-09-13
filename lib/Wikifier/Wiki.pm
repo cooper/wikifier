@@ -450,6 +450,9 @@ sub generate_image {
     $_image   = $wiki->parse_image_name($_image) unless ref $_image eq 'HASH';
     my %image = %$_image; 
     
+    use Data::Dumper;
+    print Dumper $_image,"\n";
+    
     # an error occurred.
     if ($image{error}) {
         return {
