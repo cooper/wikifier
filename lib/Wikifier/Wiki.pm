@@ -575,6 +575,9 @@ sub generate_image {
         }
         
     }
+    
+    my $scale_str = $image{retina} ? ' (@2x)' : '';
+    Wikifier::l("Generated image '$$res{file}' at ${width}x${height}$scale_str");
 
     return $result;
 }
@@ -903,9 +906,7 @@ sub _wiki_default_calc {
     # cached pages and their images.
     if ($page->wiki_opt('image.enable.pregeneration')) {
         my $res = $wiki->display_image([ $img{file}, $w, $h ], 1);
-        Wikifier::l("Pregenerated image '$$res{file}' at ${w}x${h}") if $res->{cache_gen};
-        Wikifier::l("Error while generating $img{file}: $$res{error}") if $res->{error};
-        
+    
         # we must symlink to images in cache directory.
         my ($image_dir, $cache_dir) = (
             $page->wiki_opt('dir.image'),
