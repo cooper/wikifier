@@ -564,7 +564,7 @@ sub generate_image {
         if ($image{retina}) {
             my $scale_path = $wiki->opt('dir.cache').q(/).
                 $image{width} . q(x) . $image{height} . q(-) .
-                $image{name_wo_ext} . $image{ext}
+                $image{name_wo_ext} . $image{ext};
             symlink $scale_path, $result->{cache_path};
         }
         
