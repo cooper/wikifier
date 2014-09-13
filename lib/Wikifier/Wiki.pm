@@ -296,6 +296,7 @@ sub parse_image_name {
     print "n($image_name) w($width) h($height)\n";
     # split image parts.
     my ($image_wo_ext, $image_ext) = ($image_name =~ m/^(.+)\.(.+?)$/);
+    my $image_name_s = $image_name;
     
     # if this is a retina request; calculate 2x scaling.
     my ($scaled_width, $scaled_height) = ($width, $height);
@@ -309,14 +310,8 @@ sub parse_image_name {
     
     my $full_name    = $image_name;
     my $full_name_ne = $image_wo_ext;
-       $full_name    = "${width}x${height}-${image_name}"   if $width || $height;
+       $full_name    = "${width}x${height}-${image_name_s}" if $width || $height;
        $full_name_ne = "${width}x${height}-${image_wo_ext}" if $width || $height;
-    
-    # retina full name needs @2x for caching name.
-    if ($retina_request) {
-        $full_name    .= '@2x';
-        $full_name_ne .= '@2x';
-    }
 
     # check if the file exists.
     my $image_path = abs_path($wiki->opt('dir.image').q(/).$image_name);
