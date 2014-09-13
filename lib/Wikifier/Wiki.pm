@@ -305,7 +305,9 @@ sub parse_image_name {
         $width       *= 2;
         $height      *= 2;
     }
-    my $full_name = "${width}x${height}-${image_name}" if $width || $height;
+    
+    my $full_name = $image_name;
+    $full_name = "${width}x${height}-${image_name}" if $width || $height;
 
     # check if the file exists.
     my $image_path = abs_path($wiki->opt('dir.image').q(/).$image_name);
@@ -329,7 +331,7 @@ sub parse_image_name {
 sub display_image {
     my ($wiki, $image_name, $dont_open) = @_;    
     my $result = {};
-    
+    print "display_image(@_)\n";
     # if $image_name is an array ref, it's given in [ name, width, height ].
     if (ref $image_name eq 'ARRAY') {
         my ($name, $w, $h) = @$image_name;
