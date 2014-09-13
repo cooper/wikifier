@@ -18,7 +18,7 @@ use GD;                                 # image sizing
 use HTTP::Date 'time2str';              # HTTP date formatting
 use Digest::MD5 'md5_hex';              # etags
 use Cwd 'abs_path';                     # resolving symlinks
-use File::Spec 'abs2rel';               # simplifying symlinks
+use File::Spec ();                      # simplifying symlinks
 use File::Basename 'basename';          # determining object names
 use JSON qw(encode_json decode_json);   # caching and storing
 
@@ -911,7 +911,8 @@ sub _wiki_default_calc {
             $page->wiki_opt('dir.cache')
         );
         unlink  "$cache_dir/$img{file}";
-        symlink abs2rel($image_dir, $cache_dir).q(/).$img{file}, "$cache_dir/$img{file}";
+        symlink File::Spec->abs2rel($image_dir, $cache_dir).q(/).$img{file},
+                "$cache_dir/$img{file}";
         
     }
     
