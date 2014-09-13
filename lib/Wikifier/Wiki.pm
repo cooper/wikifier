@@ -336,12 +336,13 @@ sub display_image {
         $image_name = "${w}x${h}-$name";
     }
     
-    print "display_image: name($image_name) w($width) h($height) do($dont_open)\n";
     # parse the image name.
     my %image   = %{ $wiki->parse_image_name($image_name) };
     $image_name = $image{name};
     my $width   = $image{width};
     my $height  = $image{height};
+
+    print "display_image: name($image_name) w($width) h($height) do($dont_open)\n";
     
     # an error occurred.
     if ($image{error}) {
