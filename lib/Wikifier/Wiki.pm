@@ -501,7 +501,7 @@ sub generate_image {
     
     
     # if we are restricting to only sizes used in the wiki, check.
-    my ($width, $height) = ($image{width}, $image{height});
+    my ($width, $height) = ($image{s_width}, $image{s_height});
     if (0) { #($wiki->opt('image.enable.restriction')) {
         if (!$wiki->{allowed_dimensions}{ $image{name} }{ $width.q(x).$height }) {
             $result->{type}  = 'not found';
@@ -519,7 +519,11 @@ sub generate_image {
     };
 
     # create resized image.
-    my $image = GD::Image->new($width, $height);
+    my $image = GD::Image->new($width, $height) or do {
+        $result->{type}  = 'not found';
+        $result->{error} = "Couldn't create an empty image";
+        return $result;
+    };
     $image->saveAlpha(1);
     $image->alphaBlending(0);
     $image->copyResampled($full_image,
