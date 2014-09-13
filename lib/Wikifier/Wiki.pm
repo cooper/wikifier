@@ -305,7 +305,7 @@ sub parse_image_name {
         $width       *= 2;
         $height      *= 2;
     }
-    my $full_name = "${width}x${height}-${image_name}";
+    my $full_name = "${width}x${height}-${image_name}" if $width || $height;
 
     # check if the file exists.
     my $image_path = abs_path($wiki->opt('dir.image').q(/).$image_name);
@@ -327,14 +327,21 @@ sub parse_image_name {
 
 # Displays an image of the supplied dimensions.
 sub display_image {
-    my ($wiki, $image_name, $width, $height, $dont_open) = @_;
+    my ($wiki, $image_name $dont_open) = @_;    
     my $result = {};
+    
+    # if $image_name is an array ref, it's given in [ name, width, height ].
+    if (ref $image_name eq 'ARRAY') {
+        my ($name, $w, $h) = @$image_name;
+        $image_name = "${w}x${h}-$name";
+    }
+    
     print "display_image: name($image_name) w($width) h($height) do($dont_open)\n";
     # parse the image name.
     my %image   = %{ $wiki->parse_image_name($image_name) };
     $image_name = $image{name};
-    $width    ||= $image{width};
-    $height   ||= $image{height};
+    my $width   = $image{width};
+    my $height  = $image{height};
     
     # an error occurred.
     if ($image{error}) {
@@ -428,7 +435,9 @@ sub display_image {
     
     # if image generation is disabled, we must supply the full-sized image data.
     if (!$wiki->opt('enable.cache.image')) {
-        return $wiki->display_image($result, $image_name, 0, 0);
+        # FIXME: this!
+        #return $wiki->display_image($result, $image_name, 0, 0);
+        return;
     }
     
     #==========================#
@@ -865,7 +874,7 @@ sub _wiki_default_calc {
     # the web server, reducing the wikifier server's load when requesting
     # cached pages and their images.
     if ($page->wiki_opt('image.enable.pregeneration')) {
-        my $res = $wiki->display_image($img{file}, $w, $h, 1);
+        my $res = $wiki->display_image([ $img{file}, $w, $h ], 1);
         Wikifier::l("Pregenerated image '$$res{file}' at ${w}x${h}") if $res->{cache_gen};
         Wikifier::l("Error while generating $img{file}: $$res{error}") if $res->{error};
         

@@ -51,9 +51,7 @@ sub handle_image {
     my ($connection, $msg) = _required(@_, 'name') or return;
     Wikifier::lindent("Image '$$msg{name}' requested by $$connection{id}");
     my $result = $connection->{wiki}->display_image(
-        $msg->{name}, 
-        $msg->{width}  || 0,
-        $msg->{height} || 0,
+        [ $msg->{name}, $msg->{width} || 0, $msg->{height} || 0 ],
         1
     );
     delete $result->{content};
