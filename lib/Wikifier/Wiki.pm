@@ -309,7 +309,7 @@ sub parse_image_name {
     my $full_name    = $image_name;
     my $full_name_ne = $image_wo_ext;
        $full_name    = "${width}x${height}-${image_name}"   if $width || $height;
-       $full_name_ne = "${width}x${height}-${image_no_ext}" if $width || $height;
+       $full_name_ne = "${width}x${height}-${image_wo_ext}" if $width || $height;
 
     # check if the file exists.
     my $image_path = abs_path($wiki->opt('dir.image').q(/).$image_name);
