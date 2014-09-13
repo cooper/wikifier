@@ -402,7 +402,8 @@ sub display_image {
     # determine the full file name of the image.
     # this may have doubled sizes for retina.
     my $cache_file = $wiki->opt('dir.cache').q(/).$image{full_name};
-    
+    $result->{cache_path} = $cache_file;
+
     #============================#
     #=== Finding cached image ===#
     #============================#
@@ -424,7 +425,6 @@ sub display_image {
             
             # set HTTP data.
             $result->{path}         = $cache_file;
-            $result->{cache_path}   = $cache_file;
             $result->{cached}       = 1;
             $result->{content}      = file_contents($cache_file, 1) unless $dont_open;
             $result->{modified}     = time2str($cache_modify);
@@ -481,7 +481,7 @@ sub generate_image {
             file          => $image{name},
             path          => $image{path},
             fullsize_path => $image{path},
-            cache_path    => $image{full_name},
+            cache_path    => $wiki->opt('dir.cache').q(/).$image{full_name},
             image_type    => $ext eq 'jpg' || $ext eq 'jpeg' ? 'jpeg' : 'png',
             mime          => $mime
         }
@@ -531,7 +531,7 @@ sub generate_image {
     $result->{etag}         = q(").md5_hex($image{name}.$result->{modified}).q(");
     
     # caching is enabled, so let's save this for later.
-    my $cache_file = $result->{cache_path} ||= $wiki->opt('dir.cache').q(/).$image{name};
+    my $cache_file = $result->{cache_path};
     if ($wiki->opt('enable.cache.image')) {
     
         open my $fh, '>', $cache_file;
@@ -540,7 +540,6 @@ sub generate_image {
         
         # overwrite modified date to actual.
         $result->{path}       = $cache_file;
-        $result->{cache_path} = $cache_file;
         $result->{modified}   = time2str((stat $cache_file)[9]);
         $result->{cache_gen}  = 1;
         $result->{etag}       = q(").md5_hex($image{name}.$result->{modified}).q(");
