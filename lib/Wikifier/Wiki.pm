@@ -565,7 +565,7 @@ sub generate_image {
             my $scale_path = $wiki->opt('dir.cache').q(/).
                 $image{r_width} . q(x) . $image{r_height} . q(-) .
                 $image{name_wo_ext} . q(@2x.) . $image{ext};
-            symlink $scale_path, $result->{cache_path};
+            symlink $cache_file, $scale_path;
         }
         
     }
