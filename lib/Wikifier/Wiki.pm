@@ -288,12 +288,12 @@ sub display_page {
 sub parse_image_name {
     my ($wiki, $image_name) = @_;
     my ($width, $height) = (0, 0);
-    print "parse_image_name(): $image_name = ";
+
     # height and width were given, so it's a resized image.
     if ($image_name =~ m/^(\d+)x(\d+)-(.+)$/) {
         ($width, $height, $image_name) = ($1, $2, $3);
     }
-    print "n($image_name) w($width) h($height)\n";
+
     # split image parts.
     my ($image_wo_ext, $image_ext) = ($image_name =~ m/^(.+)\.(.+?)$/);
     my $image_name_s = $image_name;
@@ -310,7 +310,7 @@ sub parse_image_name {
     
     my $full_name    = $image_name;
     my $full_name_ne = $image_wo_ext;
-       $full_name    = "${width}x${height}-${image_name_s}" if $width || $height;
+       $full_name    = "${width}x${height}-${image_name}"   if $width || $height;
        $full_name_ne = "${width}x${height}-${image_wo_ext}" if $width || $height;
 
     # check if the file exists.
@@ -320,17 +320,18 @@ sub parse_image_name {
     }
 
     return {
-        name        => $image_name,     # image name with extension, no dimensions
-        name_wo_ext => $image_wo_ext,   # image name without extension
+        name        => $image_name,     # image name with extension,      no dimensions
+        name_wo_ext => $image_wo_ext,   # image name without extension,   no dimensions
+        name_scale  => $image_name_s,   # image name possibly with scale, no dimensions
         ext         => $image_ext,      # image extension
-        full_name   => $full_name,      # image name with extension & dimensions & scale
+        full_name   => $full_name,      # image name with extension & dimensions
         f_name_ne   => $full_name_ne,   # image name with dimensions, no extension
         big_path    => $image_path,     # path to the full size image
         width       => $width,          # actual width,  not scaled
         height      => $height,         # actual height, not scaled
         s_width     => $scaled_width,   # possibly scaled width
         s_height    => $scaled_height,  # possibly scaled height
-        retina      => $retina_request  # true if @2x and dimensions scaled
+        retina      => $retina_request, # true if @2x and dimensions scaled
     };
 }
 
@@ -338,7 +339,7 @@ sub parse_image_name {
 sub display_image {
     my ($wiki, $image_name, $dont_open) = @_;    
     my $result = {};
-    print "display_image(@_)\n";
+
     # if $image_name is an array ref, it's given in [ name, width, height ].
     if (ref $image_name eq 'ARRAY') {
         my ($name, $w, $h) = @$image_name;
@@ -357,9 +358,7 @@ sub display_image {
         $result->{error} = $image{error};
         return $result;
     }
-    
-    print "display_image: name($image_name) w($width) h($height) do($dont_open)\n";
-    
+        
     # image name and full path.
     $result->{type} = 'image';
     $result->{file} = $image_name;
@@ -469,9 +468,6 @@ sub generate_image {
     $_image   = $wiki->parse_image_name($_image) unless ref $_image eq 'HASH';
     my %image = %$_image; 
     
-    use Data::Dumper;
-    print Dumper $_image;
-    
     # an error occurred.
     if ($image{error}) {
         return {
@@ -563,6 +559,14 @@ sub generate_image {
         $result->{modified}   = time2str((stat $cache_file)[9]);
         $result->{cache_gen}  = 1;
         $result->{etag}       = q(").md5_hex($image{name}.$result->{modified}).q(");
+        
+        # if this image is available in more than 1 scale, symlink.
+        if ($image{retina}) {
+            my $scale_path = $wiki->opt('dir.cache').q(/).
+                $image{width} . q(x) . $image{height} . q(-) .
+                $image{name_wo_ext} . $image{ext}
+            symlink $scale_path, $result->{cache_path};
+        }
         
     }
 
