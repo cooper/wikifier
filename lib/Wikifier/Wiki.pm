@@ -458,7 +458,7 @@ sub display_image {
 sub generate_image {
     my ($wiki, $_image, $result) = @_;
     $_image   = $wiki->parse_image_name($_image) unless ref $_image eq 'HASH';
-    my $image = %$_image; 
+    my %image = %$_image; 
     
     # an error occurred.
     if ($image{error}) {
