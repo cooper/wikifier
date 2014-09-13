@@ -325,7 +325,7 @@ sub parse_image_name {
         return { error => "Image '$image_name' does not exist." };
     }
 
-    return my %opts = (
+    return {
         name        => $image_name,     # image name with extension, no dimensions
         name_wo_ext => $image_wo_ext,   # image name without extension
         ext         => $image_ext,      # image extension
@@ -334,7 +334,7 @@ sub parse_image_name {
         width       => $width,          # actual width,  may have been scaled
         height      => $height,         # actual height, may have been scaled
         retina      => $retina_request  # true if @2x and dimensions scaled
-    );
+    };
 }
 
 # Displays an image of the supplied dimensions.
@@ -343,7 +343,7 @@ sub display_image {
     my $result = {};
     
     # parse the image name.
-    my %image = $wiki->parse_image_name($image_name);
+    my %image = %{ $wiki->parse_image_name($image_name) };
     $image_name = $image{name};
     
     # an error occurred.
@@ -457,10 +457,8 @@ sub display_image {
 #
 sub generate_image {
     my ($wiki, $_image, $result) = @_;
-    
-    my %image;
-    if (ref $_image eq 'HASH') { %image = %$_image   }
-    else { %image = $wiki->parse_image_name($_image) }
+    $_image   = $wiki->parse_image_name($_image) unless ref $_image eq 'HASH';
+    my $image = %$_image; 
     
     # an error occurred.
     if ($image{error}) {
