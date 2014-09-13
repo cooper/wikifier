@@ -8,6 +8,7 @@ package Wikifier::Page;
 
 use warnings;
 use strict;
+use Scalar::Util 'blessed';
 
 # default options.
 our %wiki_defaults = (
@@ -120,7 +121,7 @@ sub parse_formatted_text {
 # returns a wiki option or the default.
 sub wiki_opt {
     my ($page, $var) = @_;
-    return $page->{wiki}->opt($var) if $page->{wiki};
+    return $page->{wiki}->opt($var) if blessed $page->{wiki};
     return $wiki_defaults{$var};
 }
 
