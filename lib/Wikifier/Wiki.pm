@@ -462,6 +462,14 @@ sub generate_image {
     if (ref $_image eq 'HASH') { %image = %$_image   }
     else { %image = $wiki->parse_image_name($_image) }
     
+    # an error occurred.
+    if ($image{error}) {
+        return {
+            type  => 'not found',
+            error => $image{error}
+        }
+    };
+    
     # no result hash reference; create one with default values.
     $result ||= do {
 
