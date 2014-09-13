@@ -487,8 +487,8 @@ sub generate_image {
         {
             type          => 'image',
             file          => $image{name},
-            path          => $image{path},
-            fullsize_path => $image{path},
+            path          => $image{path} || $image{big_path},
+            fullsize_path => $image{big_path},
             cache_path    => $wiki->opt('dir.cache').q(/).$image{full_name},
             image_type    => $ext eq 'jpg' || $ext eq 'jpeg' ? 'jpeg' : 'png',
             mime          => $mime
@@ -508,7 +508,11 @@ sub generate_image {
     
     # create GD instance with this full size image.
     GD::Image->trueColor(1);
-    my $full_image = GD::Image->new($result->{fullsize_path});
+    my $full_image = GD::Image->new($result->{fullsize_path}) or do {
+        $result->{type}  = 'not found';
+        $result->{error} = "Couldn't handle image $$result{fullsize_path}";
+        return $result;
+    };
 
     # create resized image.
     my $image = GD::Image->new($width, $height);
