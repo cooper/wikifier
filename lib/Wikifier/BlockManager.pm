@@ -81,7 +81,7 @@ sub load_block {
           if $blocks{$block_type}{base};
           
           
-        Wikifier::l("Loaded block ${type}{}");
+        Wikifier::l("Loaded block ${block_type}{}");
     }
 
     return 1;
