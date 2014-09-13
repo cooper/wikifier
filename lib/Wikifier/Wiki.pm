@@ -306,8 +306,10 @@ sub parse_image_name {
         $height      *= 2;
     }
     
-    my $full_name = $image_name;
-    $full_name = "${width}x${height}-${image_name}" if $width || $height;
+    my $full_name    = $image_name;
+    my $full_name_ne = $image_wo_ext;
+       $full_name    = "${width}x${height}-${image_name}"   if $width || $height;
+       $full_name_ne = "${width}x${height}-${image_no_ext}" if $width || $height;
 
     # check if the file exists.
     my $image_path = abs_path($wiki->opt('dir.image').q(/).$image_name);
@@ -320,6 +322,7 @@ sub parse_image_name {
         name_wo_ext => $image_wo_ext,   # image name without extension
         ext         => $image_ext,      # image extension
         full_name   => $full_name,      # image name with extension & dimensions
+        f_name_ne   => $full_name_ne,   # image name with dimensions, no extension
         big_path    => $image_path,     # path to the full size image
         width       => $width,          # actual width,  may have been scaled
         height      => $height,         # actual height, may have been scaled
@@ -395,7 +398,7 @@ sub display_image {
     # therefore, we will call ->generate_image() in order to pregenerate a retina version.
     if ($wiki->opt('image.enable.retina') && !$image{retina} &&
            $wiki->opt('image.enable.pregeneration')) {
-        my $retina_file = $image{name_wo_ext}.q(@2x.).$image{ext};
+        my $retina_file = $image{f_name_ne}.q(@2x.).$image{ext};
         $wiki->generate_image($retina_file);
     }
     
