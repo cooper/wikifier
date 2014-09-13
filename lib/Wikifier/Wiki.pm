@@ -14,7 +14,7 @@ package Wikifier::Wiki;
 use warnings;
 use strict;
 
-use GD;                                 # image sizing
+#use GD;                                 # image sizing
 use HTTP::Date 'time2str';              # HTTP date formatting
 use Digest::MD5 'md5_hex';              # etags
 use Cwd 'abs_path';                     # resolving symlinks
@@ -291,61 +291,89 @@ sub display_page {
 ### IMAGES ###
 ##############
 
-# Displays an image of the supplied dimensions.
-sub display_image {
-    my ($wiki, $image_name, $width, $height, $dont_open) = @_;
-    my $result = {};
-    
+# parse an image name such as:
+#
+#   250x250-some_pic.png
+#   250x250-some_pic\@2x.png (w/o slash)
+#   some_pic.png
+#
+sub parse_image_name {
+    my ($wiki, $image_name) = @_;
+    my ($width, $height, $file_name) = (0, 0, $image_name);
+
+    # height and width were given, so it's a resized image.
+    if ($image_name =~ m/^(\d+)x(\d+)-(.+)$/) {
+        ($width, $height, $file_name) = ($1, $2, $3);
+    }
+
     # split image parts.
-    $image_name =~ m/^(.+)\.(.+?)$/;
-    my ($image_wo_ext, $image_ext) = ($1, $2);
+    my ($image_wo_ext, $image_ext) = ($image_name =~ m/^(.+)\.(.+?)$/);
     
-    # early retina check.
-    my ($name_width, $name_height) = ($width, $height);
-    my $retina_request = $image_wo_ext =~ m/^(.+)\@2x$/;
-    
-    # if this is a retina request, calculate 
+    # if this is a retina request; calculate 2x scaling.
+    my $retina_request = $image_name =~ m/^(.+)\@2x$/;
     if ($retina_request) {
         $image_wo_ext = $1;
         $image_name   = $1.q(.).$image_ext;
         $width       *= 2;
         $height      *= 2;
     }
-    
+    my $full_name = "${width}x${height}-${image_name}";
+
     # check if the file exists.
-    my $file = abs_path($wiki->opt('dir.image').q(/).$image_name);
-    if (!-f $file) {
-        $result->{type}  = 'not found';
-        $result->{error} = "Image '$image_name' does not exist.";
+    my $image_path = abs_path($wiki->opt('dir.image').q(/).$image_name);
+    if (!-f $image_path) {
+        return { error => "Image '$image_name' does not exist." };
+    }
+
+    return my %opts = (
+        name        => $image_name,     # image name with extension, no dimensions
+        name_wo_ext => $image_wo_ext,   # image name without extension
+        ext         => $image_ext,      # image extension
+        full_name   => $full_name,      # image name with extension & dimensions
+        big_path    => $image_path,     # path to the full size image
+        width       => $width,          # actual width,  may have been scaled
+        height      => $height,         # actual height, may have been scaled
+        retina      => $retina_request  # true if @2x and dimensions scaled
+    );
+}
+
+# Displays an image of the supplied dimensions.
+sub display_image {
+    my ($wiki, $image_name, $width, $height, $dont_open) = @_;
+    my $result = {};
+    
+    # parse the image name.
+    my %image = $wiki->parse_image_name($image_name);
+    $image_name = $image{name};
+    
+    # an error occurred.
+    if ($image{error}) {
+        $result->{type} = 'not found';
+        $result->{error} = $image{error};
         return $result;
     }
-    
-    # stat for full-size image.
-    my @stat = stat $file;
     
     # image name and full path.
     $result->{type} = 'image';
     $result->{file} = $image_name;
-    $result->{path} = $file;
-    $result->{fullsize_path} = $file;
+    $result->{path} = $result->{fullsize_path} = $image{big_path};
     
-    # determine image short name, extension, and mime type.
-    $image_name      =~ m/(.+)\.(.+)/;
-    my ($name, $ext) = ($1, $2);
-    my $mime         = $ext eq 'png' ? 'image/png' : 'image/jpeg';
-
     # image type and mime type.    
-    $result->{image_type}   = $ext eq 'jpg' || $ext eq 'jpeg' ? 'jpeg' : 'png';
-    $result->{mime}         = $mime;
+    $result->{image_type} = $image{ext} eq 'jpg' ||
+                            $image{ext} eq 'jpeg' ? 'jpeg' : 'png';
+    $result->{mime} = $image{ext} eq 'png' ? 'image/png' : 'image/jpeg';
     
     ##################################   
     ### THIS IS A FULL-SIZED IMAGE ###
     ######################################################################################
     
+    # stat for full-size image.
+    my @stat = stat $image{big_path};
+    
     # if no width or height are specified,
     # display the full-sized version of the image.
     if (!$width || !$height) {
-        $result->{content}      = file_contents($file, 1) unless $dont_open;
+        $result->{content}      = file_contents($image{big_path}, 1) unless $dont_open;
         $result->{modified}     = time2str($stat[9]);
         $result->{length}       = $stat[7];
         $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
@@ -364,18 +392,16 @@ sub display_image {
     
     # hack:
     # this is not a retina request, but retina is enabled, and so is pregeneration.
-    # therefore, we will call ->display_image() in order to pregenerate a retina version.
-    if ($wiki->opt('image.enable.retina') && !$retina_request &&
+    # therefore, we will call ->generate_image() in order to pregenerate a retina version.
+    if ($wiki->opt('image.enable.retina') && !$image{retina} &&
            $wiki->opt('image.enable.pregeneration')) {
-        my $retina_file = $image_wo_ext.q(@2x.).$image_ext;
+        my $retina_file = $image{name_wo_ext}.q(@2x.).$image{ext};
         $wiki->generate_image($retina_file, $width, $height);
     }
     
     # determine the full file name of the image.
-    my $full_name  = $retina_request
-                     ? $name_width.q(x).$name_height.q(-).$image_wo_ext.q(@2x.).$image_ext
-                     : $name_width.q(x).$name_height.q(-).$image_name;
-    my $cache_file = $wiki->opt('dir.cache').q(/).$full_name;
+    # this may have doubled sizes for retina.
+    my $cache_file = $wiki->opt('dir.cache').q(/).$image{full_name};
     
     #============================#
     #=== Finding cached image ===#
@@ -383,7 +409,7 @@ sub display_image {
     
     # if caching is enabled, check if this exists in cache.
     if ($wiki->opt('enable.cache.image') && -f $cache_file) {
-        my ($image_modify, $cache_modify) = ((stat $file)[9], (stat $cache_file)[9]);
+        my ($image_modify, $cache_modify) = ($stat[9], (stat $cache_file)[9]);
         
         # the image's file is more recent than the cache file.
         if ($image_modify > $cache_modify) {
@@ -418,8 +444,7 @@ sub display_image {
     #==========================#
     #=== Generate the image ===#
     #==========================#
-    
-    $wiki->generate_image($image_name, $full_name, $width, $height, $result);
+    $wiki->generate_image(\%image, $result);
     
     delete $result->{content} if $dont_open;
     return $result;
@@ -427,41 +452,30 @@ sub display_image {
 
 # generate an image of a certain size.
 #
-# $image_name   image name with extension, e.g. HelloWorld.png
-# $full_name    full image name, e.g. HelloWorld-500x200_2x.png
-# $width        the width requested
-# $height       the height requested
-# $result       hash reference representing the result of the request
-#
 # $result is to be passed only from an existing display_image() request.
 # if this is called from outside of a request, do not specify $result.
 #
 sub generate_image {
-    my ($wiki, $image_name, $full_name, $width, $height, $result) = @_;
+    my ($wiki, $_image, $result) = @_;
+    
+    my %image;
+    if (ref $_image eq 'HASH') { %image = %$_image   }
+    else { %image = $wiki->parse_image_name($_image) }
     
     # no result hash reference; create one with default values.
     $result ||= do {
-        
-        # check if the file exists.
-        my $file = abs_path($wiki->opt('dir.image').q(/).$image_name);
-        if (!-f $file) {
-            return {
-                type  => 'not found',
-                error => "Image '$image_name' does not exist."
-            }
-        }
-                
+
         # determine image short name, extension, and mime type.
-        my ($name, $ext) = ($image_name =~ m/(.+)\.(.+)/);
+        my ($name, $ext) = ($image{name} =~ m/(.+)\.(.+)/);
         my $mime = $ext eq 'png' ? 'image/png' : 'image/jpeg';
     
         # base $result
         {
             type          => 'image',
-            file          => $image_name,
-            path          => $file,
-            fullsize_path => $file,
-            cache_path    => $wiki->opt('dir.cache').q(/).$full_name,
+            file          => $image{name},
+            path          => $image{path},
+            fullsize_path => $image{path},
+            cache_path    => $image{full_name},
             image_type    => $ext eq 'jpg' || $ext eq 'jpeg' ? 'jpeg' : 'png',
             mime          => $mime
         }
@@ -469,10 +483,11 @@ sub generate_image {
     
     
     # if we are restricting to only sizes used in the wiki, check.
+    my ($width, $height) = ($image{width}, $image{height});
     if ($wiki->opt('image.enable.restriction')) {
-        if (!$wiki->{allowed_dimensions}{$image_name}{ $width.q(x).$height }) {
+        if (!$wiki->{allowed_dimensions}{ $image{name} }{ $width.q(x).$height }) {
             $result->{type}  = 'not found';
-            $result->{error} = "Image '$image_name' does not exist in these dimensions.";
+            $result->{error} = "Image '$image{name}' does not exist in these dimensions.";
             return $result;
         }
     }
@@ -507,10 +522,10 @@ sub generate_image {
     $result->{generated}    = 1;
     $result->{modified}     = time2str(time);
     $result->{length}       = length $result->{content};
-    $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
+    $result->{etag}         = q(").md5_hex($image{name}.$result->{modified}).q(");
     
     # caching is enabled, so let's save this for later.
-    my $cache_file = $result->{cache_path} ||= $wiki->opt('dir.cache').q(/).$full_name;
+    my $cache_file = $result->{cache_path} ||= $wiki->opt('dir.cache').q(/).$image{name};
     if ($wiki->opt('enable.cache.image')) {
     
         open my $fh, '>', $cache_file;
@@ -522,7 +537,7 @@ sub generate_image {
         $result->{cache_path} = $cache_file;
         $result->{modified}   = time2str((stat $cache_file)[9]);
         $result->{cache_gen}  = 1;
-        $result->{etag}       = q(").md5_hex($image_name.$result->{modified}).q(");
+        $result->{etag}       = q(").md5_hex($image{name}.$result->{modified}).q(");
         
     }
 

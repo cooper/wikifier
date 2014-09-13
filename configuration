@@ -132,7 +132,7 @@ image.enable.restriction        Default: enabled
 
     If enabled, Wikifier::Wiki will only generate images in dimensions used by pages on
     the wiki. This prevents useless resource usage and abuse.
-
+    
 enable.cache.image              Default: enabled
 
     Enable caching of generated images.
