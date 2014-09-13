@@ -298,18 +298,25 @@ sub parse_image_name {
     my ($image_wo_ext, $image_ext) = ($image_name =~ m/^(.+)\.(.+?)$/);
     
     # if this is a retina request; calculate 2x scaling.
+    my ($scaled_width, $scaled_height) = ($width, $height);
     my $retina_request = $image_wo_ext =~ m/^(.+)\@2x$/;
     if ($retina_request) {
-        $image_wo_ext = $1;
-        $image_name   = $1.q(.).$image_ext;
-        $width       *= 2;
-        $height      *= 2;
+        $image_wo_ext   = $1;
+        $image_name     = $1.q(.).$image_ext;
+        $scaled_width  *= 2;
+        $scaled_height *= 2;
     }
     
     my $full_name    = $image_name;
     my $full_name_ne = $image_wo_ext;
        $full_name    = "${width}x${height}-${image_name}"   if $width || $height;
        $full_name_ne = "${width}x${height}-${image_wo_ext}" if $width || $height;
+    
+    # retina full name needs @2x for caching name.
+    if ($retina_request) {
+        $full_name    .= '@2x';
+        $full_name_ne .= '@2x';
+    }
 
     # check if the file exists.
     my $image_path = abs_path($wiki->opt('dir.image').q(/).$image_name);
@@ -321,11 +328,13 @@ sub parse_image_name {
         name        => $image_name,     # image name with extension, no dimensions
         name_wo_ext => $image_wo_ext,   # image name without extension
         ext         => $image_ext,      # image extension
-        full_name   => $full_name,      # image name with extension & dimensions
+        full_name   => $full_name,      # image name with extension & dimensions & scale
         f_name_ne   => $full_name_ne,   # image name with dimensions, no extension
         big_path    => $image_path,     # path to the full size image
-        width       => $width,          # actual width,  may have been scaled
-        height      => $height,         # actual height, may have been scaled
+        width       => $width,          # actual width,  not scaled
+        height      => $height,         # actual height, not scaled
+        s_width     => $scaled_width,   # possibly scaled width
+        s_height    => $scaled_height,  # possibly scaled height
         retina      => $retina_request  # true if @2x and dimensions scaled
     };
 }
