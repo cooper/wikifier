@@ -41,15 +41,15 @@ sub new {
     my ($class, %opts) = @_;
     my $wiki = bless \%opts, $class;
     
+    # create the Wiki's Wikifier instance.
+    # using the same wikifier instance over and over makes parsing much faster.
+    $wiki->{wikifier} ||= Wikifier->new();
+    
     # if there were no provided options, assume we're reading from /etc/wikifier.conf.
     $wiki->read_config('/etc/wikifier.conf') if not scalar keys %opts;
     
     # if a config file is provided, use it.
     $wiki->read_config($opts{config_file}) if defined $opts{config_file};
-    
-    # create the Wiki's Wikifier instance.
-    # using the same wikifier instance over and over makes parsing much faster.
-    $wiki->{wikifier} ||= Wikifier->new();
     
     return $wiki;
 }
@@ -59,7 +59,9 @@ sub read_config {
     my ($wiki, $file) = @_;
     my $conf = $wiki->{conf} = Wikifier::Page->new(
         file      => $file,
-        name      => $file
+        name      => $file,
+        wiki      => $wiki,
+        wikifier  => $wiki->{wikifier}
     );
     
     # error.
