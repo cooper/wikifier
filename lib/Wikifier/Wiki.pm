@@ -510,7 +510,7 @@ sub generate_image {
     $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
     
     # caching is enabled, so let's save this for later.
-    my $cache_file = $result->{cache_path};
+    my $cache_file = $result->{cache_path} ||= $wiki->opt('dir.cache').q(/).$full_name;
     if ($wiki->opt('enable.cache.image')) {
     
         open my $fh, '>', $cache_file;
