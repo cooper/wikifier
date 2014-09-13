@@ -14,7 +14,7 @@ package Wikifier::Wiki;
 use warnings;
 use strict;
 
-#use GD;                                 # image sizing
+use GD;                                 # image sizing
 use HTTP::Date 'time2str';              # HTTP date formatting
 use Digest::MD5 'md5_hex';              # etags
 use Cwd 'abs_path';                     # resolving symlinks
