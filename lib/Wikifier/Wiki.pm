@@ -18,6 +18,7 @@ use GD;                                 # image sizing
 use HTTP::Date 'time2str';              # HTTP date formatting
 use Digest::MD5 'md5_hex';              # etags
 use Cwd 'abs_path';                     # resolving symlinks
+use File::Spec 'abs2rel';               # simplifying symlinks
 use File::Basename 'basename';          # determining object names
 use JSON qw(encode_json decode_json);   # caching and storing
 
@@ -566,6 +567,10 @@ sub generate_image {
                 $image{r_width} . q(x) . $image{r_height} . q(-) .
                 $image{name_wo_ext} . q(@2x.) . $image{ext};
             symlink $image{full_name}, $scale_path;
+            
+            # note: using full_name rather than $cache_file
+            # results in a relative rather than absolute symlink.
+        
         }
         
     }
@@ -901,9 +906,12 @@ sub _wiki_default_calc {
         Wikifier::l("Error while generating $img{file}: $$res{error}") if $res->{error};
         
         # we must symlink to images in cache directory.
-        unlink  $page->wiki_opt('dir.cache').q(/).$img{file};
-        symlink $page->wiki_opt('dir.image').q(/).$img{file},
-                $page->wiki_opt('dir.cache').q(/).$img{file};
+        my ($image_dir, $cache_dir) = (
+            $page->wiki_opt('dir.image'),
+            $page->wiki_opt('dir.cache')
+        );
+        unlink  "$cache_dir/$img{file}";
+        symlink abs2rel($image_dir, $cache_dir).q(/).$img{file}, "$cache_dir/$img{file}";
         
     }
     
