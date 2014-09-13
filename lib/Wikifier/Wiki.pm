@@ -329,7 +329,7 @@ sub parse_image_name {
 sub display_image {
     my ($wiki, $image_name, $width, $height, $dont_open) = @_;
     my $result = {};
-    
+    print "display_image: name($image_name) w($width) h($height) do($dont_open)\n";
     # parse the image name.
     my %image   = %{ $wiki->parse_image_name($image_name) };
     $image_name = $image{name};
@@ -451,7 +451,7 @@ sub generate_image {
     my %image = %$_image; 
     
     use Data::Dumper;
-    print Dumper $_image,"\n";
+    print Dumper $_image;
     
     # an error occurred.
     if ($image{error}) {
