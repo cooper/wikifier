@@ -139,19 +139,7 @@ sub display {
     
     # it's an image.
     if ($page_name =~ m|^image/(.+)$|) {
-        my ($image_name, $width, $height, $file_name) = $1;
-        
-        # height and width were given, so it's a resized image.
-        if ($image_name =~ m/^(\d+)x(\d+)-(.+)$/) {
-            ($width, $height, $file_name) = ($1, $2, $3);
-        }
-        
-        # only file name was given, so the full sized image is desired.
-        else {
-            ($width, $height, $file_name) = (0, 0, $image_name);
-        }
-    
-        return $wiki->display_image($file_name, $width, $height);
+        return $wiki->display_image($1);
     }
     
     # it's a wiki page.
@@ -343,8 +331,10 @@ sub display_image {
     my $result = {};
     
     # parse the image name.
-    my %image = %{ $wiki->parse_image_name($image_name) };
+    my %image   = %{ $wiki->parse_image_name($image_name) };
     $image_name = $image{name};
+    $width    ||= $image{width};
+    $height   ||= $image{height};
     
     # an error occurred.
     if ($image{error}) {
