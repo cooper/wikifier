@@ -299,13 +299,13 @@ sub parse_image_name {
     my $image_name_s = $image_name;
     
     # if this is a retina request; calculate 2x scaling.
-    my ($scaled_width, $scaled_height) = ($width, $height);
+    my ($real_width, $real_height) = ($width, $height);
     my $retina_request = $image_wo_ext =~ m/^(.+)\@2x$/;
     if ($retina_request) {
-        $image_wo_ext   = $1;
-        $image_name     = $1.q(.).$image_ext;
-        $scaled_width  *= 2;
-        $scaled_height *= 2;
+        $image_wo_ext = $1;
+        $image_name   = $1.q(.).$image_ext;
+        $width  *= 2;
+        $height *= 2;
     }
     
     my $full_name    = $image_name;
@@ -327,11 +327,11 @@ sub parse_image_name {
         full_name   => $full_name,      # image name with extension & dimensions
         f_name_ne   => $full_name_ne,   # image name with dimensions, no extension
         big_path    => $image_path,     # path to the full size image
-        width       => $width,          # actual width,  not scaled
-        height      => $height,         # actual height, not scaled
-        s_width     => $scaled_width,   # possibly scaled width
-        s_height    => $scaled_height,  # possibly scaled height
-        retina      => $retina_request, # true if @2x and dimensions scaled
+        width       => $width,          # possibly scaled width
+        height      => $height,         # possibly scaled height
+        r_width     => $real_width,     # width without retina scaling
+        r_height    => $real_height,    # height without retina scaling
+        retina      => $retina_request  # true if @2x and dimensions scaled
     };
 }
 
@@ -497,7 +497,7 @@ sub generate_image {
     
     
     # if we are restricting to only sizes used in the wiki, check.
-    my ($width, $height) = ($image{s_width}, $image{s_height});
+    my ($width, $height) = ($image{width}, $image{height});
     if (0) { #($wiki->opt('image.enable.restriction')) {
         if (!$wiki->{allowed_dimensions}{ $image{name} }{ $width.q(x).$height }) {
             $result->{type}  = 'not found';
@@ -563,8 +563,8 @@ sub generate_image {
         # if this image is available in more than 1 scale, symlink.
         if ($image{retina}) {
             my $scale_path = $wiki->opt('dir.cache').q(/).
-                $image{width} . q(x) . $image{height} . q(-) .
-                $image{name_wo_ext} . $image{ext};
+                $image{r_width} . q(x) . $image{r_height} . q(-) .
+                $image{name_wo_ext} . q(@2x.) . $image{ext};
             symlink $scale_path, $result->{cache_path};
         }
         
