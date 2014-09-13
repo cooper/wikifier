@@ -327,7 +327,7 @@ sub parse_image_name {
 
 # Displays an image of the supplied dimensions.
 sub display_image {
-    my ($wiki, $image_name $dont_open) = @_;    
+    my ($wiki, $image_name, $dont_open) = @_;    
     my $result = {};
     
     # if $image_name is an array ref, it's given in [ name, width, height ].
