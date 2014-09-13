@@ -490,7 +490,7 @@ sub generate_image {
     
     # if we are restricting to only sizes used in the wiki, check.
     my ($width, $height) = ($image{width}, $image{height});
-    if ($wiki->opt('image.enable.restriction')) {
+    if (0) { #($wiki->opt('image.enable.restriction')) {
         if (!$wiki->{allowed_dimensions}{ $image{name} }{ $width.q(x).$height }) {
             $result->{type}  = 'not found';
             $result->{error} = "Image '$image{name}' does not exist in these dimensions.";
