@@ -298,7 +298,7 @@ sub parse_image_name {
     my ($image_wo_ext, $image_ext) = ($image_name =~ m/^(.+)\.(.+?)$/);
     
     # if this is a retina request; calculate 2x scaling.
-    my $retina_request = $image_name =~ m/^(.+)\@2x$/;
+    my $retina_request = $image_wo_ext =~ m/^(.+)\@2x$/;
     if ($retina_request) {
         $image_wo_ext = $1;
         $image_name   = $1.q(.).$image_ext;
@@ -341,15 +341,15 @@ sub display_image {
     $image_name = $image{name};
     my $width   = $image{width};
     my $height  = $image{height};
-
-    print "display_image: name($image_name) w($width) h($height) do($dont_open)\n";
-    
+        
     # an error occurred.
     if ($image{error}) {
         $result->{type} = 'not found';
         $result->{error} = $image{error};
         return $result;
     }
+    
+    print "display_image: name($image_name) w($width) h($height) do($dont_open)\n";
     
     # image name and full path.
     $result->{type} = 'image';
