@@ -577,7 +577,7 @@ sub generate_image {
     }
     
     my $scale_str = $image{retina} ? ' (@2x)' : '';
-    Wikifier::l("Generated image '$$res{file}' at ${width}x${height}$scale_str");
+    Wikifier::l("Generated image '$image{name}' at ${width}x${height}$scale_str");
 
     return $result;
 }
