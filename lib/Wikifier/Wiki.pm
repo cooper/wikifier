@@ -611,7 +611,7 @@ sub generate_image {
 
 # symlink an image to its scaled version
 sub symlink_scaled {
-    my ($wiki, %image) = (shift, %{ shift });
+    my ($wiki, %image) = (shift, %{ +shift });
     return unless $image{retina};
     my $scale_path = sprintf '%s/%dx%d-%s@%dx.%s',
         $wiki->opt('dir.cache'),
