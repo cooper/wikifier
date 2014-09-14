@@ -455,6 +455,9 @@ sub _display_image {
             $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
             $result->{length}       = -s $cache_file;
             
+            # symlink scaled version if necessary.
+            $wiki->symlink_scaled(\%image) if $image{retina};
+
             return $result;
         }
         
@@ -561,7 +564,7 @@ sub generate_image {
         0, 0,
         0, 0,
         $width, $height,
-        $full_image->getBounds
+        ($fi_width, $fi_height)
     );
     
     # create JPEG or PNG data.
@@ -596,20 +599,7 @@ sub generate_image {
         $result->{etag}       = q(").md5_hex($image{name}.$result->{modified}).q(");
         
         # if this image is available in more than 1 scale, symlink.
-        if ($image{retina}) {
-            my $scale_path = sprintf '%s/%dx%d-%s@%dx.%s',
-                $wiki->opt('dir.cache'),
-                $image{r_width},
-                $image{r_height},
-                $image{name_wo_ext},
-                $image{retina},
-                $image{ext};
-            symlink $image{full_name}, $scale_path;
-            
-            # note: using full_name rather than $cache_file
-            # results in a relative rather than absolute symlink.
-        
-        }
+        $wiki->symlink_scaled(\%image) if $image{retina};
         
     }
     
@@ -617,6 +607,24 @@ sub generate_image {
     Wikifier::l("Generated image '$image{name}' at ${width}x${height}$scale_str");
 
     return $result;
+}
+
+# symlink an image to its scaled version
+sub symlink_scaled {
+    my ($wiki, %image) = (shift, %{ shift });
+    return unless $image{retina};
+    my $scale_path = sprintf '%s/%dx%d-%s@%dx.%s',
+        $wiki->opt('dir.cache'),
+        $image{r_width},
+        $image{r_height},
+        $image{name_wo_ext},
+        $image{retina},
+        $image{ext};
+    return 1 if -e $scale_path;
+    symlink $image{full_name}, $scale_path;
+    
+    # note: using full_name rather than $cache_file
+    # results in a relative rather than absolute symlink.
 }
 
 ##################
