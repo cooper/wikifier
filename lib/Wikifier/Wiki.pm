@@ -452,9 +452,7 @@ sub display_image {
     
     # if image generation is disabled, we must supply the full-sized image data.
     if (!$wiki->opt('enable.cache.image')) {
-        # FIXME: this!
-        #return $wiki->display_image($result, $image_name, 0, 0);
-        return;
+        return $wiki->display_image($result, $image_name, 0, 0);
     }
     
     #==========================#
@@ -535,8 +533,8 @@ sub generate_image {
     if ($width >= $fi_width && $height >= $fi_height) {
         $result->{use_fullsize} = 1;
         Wikifier::l(
-            "Not generating $image{name} ${width}x${height}".
-            ">= original (${fi_width}x${fi_height})"
+            "Skipped '$image{name}' ${width}x${height}".
+            " >= ${fi_width}x${fi_height}"
         );
         return $result;
     }
