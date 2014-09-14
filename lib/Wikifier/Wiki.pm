@@ -409,7 +409,7 @@ sub display_image {
         foreach (@scales) {
             next if $_ == 1;
             my $retina_file = "$image{f_name_ne}\@${_}x.$image{ext}";
-            $wiki->generate_image($retina_file);
+            $wiki->display_image($retina_file, 1);
         }
     }
     
