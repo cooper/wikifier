@@ -309,8 +309,8 @@ sub parse_image_name {
         $image_wo_ext   = $1;
         $retina_request = $2;
         $image_name     = $1.q(.).$image_ext;
-        $width  *= 2;
-        $height *= 2;
+        $width  *= $retina_request;
+        $height *= $retina_request;
     }
     
     my $full_name    = $image_name;
