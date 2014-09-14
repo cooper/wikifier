@@ -165,6 +165,11 @@ sub display {
 
 # Displays a page.
 sub display_page {
+    my $result = _display_page(@_);
+    Wikifier::l("Error for '$_[1]' display: $$result{error}") if $result->{error};
+    return $result;
+}
+sub _display_page {
     my ($wiki, $page_name) = @_; my $result = {};
     
     # replace spaces with _ and lowercase.
@@ -342,6 +347,11 @@ sub parse_image_name {
 
 # Displays an image of the supplied dimensions.
 sub display_image {
+    my $result = _display_image(@_);
+    Wikifier::l("Error for '$image{name}' display: $$result{error}") if $result->{error};
+    return $result;
+}
+sub _display_image {
     my ($wiki, $image_name, $dont_open) = @_;    
     my $result = {};
 
@@ -468,7 +478,6 @@ sub display_image {
         $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
     }
     
-    Wikifier::l("Error for '$image{name}' display: $$result{error}") if $result->{error};
     delete $result->{content} if $dont_open;
     return $result;
 }
