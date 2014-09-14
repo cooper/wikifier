@@ -468,6 +468,7 @@ sub display_image {
         $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
     }
     
+    Wikifier::l("Error for '$image{name}' display: $$result{error}") if $result->{error};
     delete $result->{content} if $dont_open;
     return $result;
 }
@@ -494,9 +495,9 @@ sub generate_image {
     $result ||= do {
 
         # determine image short name, extension, and mime type.
-        my ($name, $ext) = ($image{name} =~ m/(.+)\.(.+)/);
-        my $mime = $ext eq 'png' ? 'image/png' : 'image/jpeg';
-    
+        my $mime = $image{ext} eq 'png' ? 'image/png' : 'image/jpeg';
+        my $type = $mime eq 'image/png' ? 'png' : 'jpeg';
+        
         # base $result
         {
             type          => 'image',
@@ -504,7 +505,7 @@ sub generate_image {
             path          => $image{path} || $image{big_path},
             fullsize_path => $image{big_path},
             cache_path    => $wiki->opt('dir.cache').q(/).$image{full_name},
-            image_type    => $ext eq 'jpg' || $ext eq 'jpeg' ? 'jpeg' : 'png',
+            image_type    => $type,
             mime          => $mime
         }
     };
