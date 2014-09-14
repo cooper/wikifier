@@ -348,7 +348,7 @@ sub parse_image_name {
 # Displays an image of the supplied dimensions.
 sub display_image {
     my $result = _display_image(@_);
-    Wikifier::l("Error for '$image{name}' display: $$result{error}") if $result->{error};
+    Wikifier::l("Error for '$_[1]' display: $$result{error}") if $result->{error};
     return $result;
 }
 sub _display_image {
