@@ -100,10 +100,12 @@ sub opt {
 #  Takes an image in the form of:
 #    image/[imagename].png
 #    image/[width]x[height]-[imagename].png
+#    image/[width]x[height]-[imagename]@[scale].png
 #
 #  For example:
 #    image/flower.png
 #    image/400x200-flower.png
+#    image/400x200-flower\@2x.png (w/o slash)
 #
 # Returns
 # -------
@@ -302,10 +304,11 @@ sub parse_image_name {
     
     # if this is a retina request; calculate 2x scaling.
     my ($real_width, $real_height) = ($width, $height);
-    my $retina_request = $image_wo_ext =~ m/^(.+)\@2x$/;
-    if ($retina_request) {
-        $image_wo_ext = $1;
-        $image_name   = $1.q(.).$image_ext;
+    my $retina_request;
+    if ($image_wo_ext =~ m/^(.+)\@(\d+)x$/) {
+        $image_wo_ext   = $1;
+        $retina_request = $2;
+        $image_name     = $1.q(.).$image_ext;
         $width  *= 2;
         $height *= 2;
     }
@@ -333,7 +336,7 @@ sub parse_image_name {
         height      => $height,         # possibly scaled height
         r_width     => $real_width,     # width without retina scaling
         r_height    => $real_height,    # height without retina scaling
-        retina      => $retina_request  # true if @2x and dimensions scaled
+        retina      => $retina_request  # if scaled for retina, the scale (e.g. 2, 3)
     };
 }
 
@@ -401,10 +404,13 @@ sub display_image {
     # hack:
     # this is not a retina request, but retina is enabled, and so is pregeneration.
     # therefore, we will call ->generate_image() in order to pregenerate a retina version.
-    if ($wiki->opt('image.enable.retina') && !$image{retina} &&
-           $wiki->opt('image.enable.pregeneration')) {
-        my $retina_file = $image{f_name_ne}.q(@2x.).$image{ext};
-        $wiki->generate_image($retina_file);
+    my @scales = split ',', ($wiki->opt('image.enable.retina') || '');
+    if (@scales && !$image{retina} && $wiki->opt('image.enable.pregeneration')) {
+        foreach (@scales) {
+            next if $_ == 1;
+            my $retina_file = "$image{f_name_ne}\@${_}x.$image{ext}";
+            $wiki->generate_image($retina_file);
+        }
     }
     
     # determine the full file name of the image.
@@ -500,13 +506,13 @@ sub generate_image {
     
     # if we are restricting to only sizes used in the wiki, check.
     my ($width, $height) = ($image{width}, $image{height});
-    if (0) { #($wiki->opt('image.enable.restriction')) {
-        if (!$wiki->{allowed_dimensions}{ $image{name} }{ $width.q(x).$height }) {
-            $result->{type}  = 'not found';
-            $result->{error} = "Image '$image{name}' does not exist in these dimensions.";
-            return $result;
-        }
-    }
+#    if ($wiki->opt('image.enable.restriction')) {
+#        if (!$wiki->{allowed_dimensions}{ $image{name} }{ $width.q(x).$height }) {
+#            $result->{type}  = 'not found';
+#            $result->{error} = "Image '$image{name}' does not exist in these dimensions.";
+#            return $result;
+#        }
+#    }
     
     # create GD instance with this full size image.
     GD::Image->trueColor(1);
@@ -564,9 +570,13 @@ sub generate_image {
         
         # if this image is available in more than 1 scale, symlink.
         if ($image{retina}) {
-            my $scale_path = $wiki->opt('dir.cache').q(/).
-                $image{r_width} . q(x) . $image{r_height} . q(-) .
-                $image{name_wo_ext} . q(@2x.) . $image{ext};
+            my $scale_path = sprintf '%s/%dx%d-%s@%dx.%s',
+                $wiki->opt('dir.cache'),
+                $image{r_width},
+                $image{r_height},
+                $image{name_wo_ext},
+                $image{retina},
+                $image{ext};
             symlink $image{full_name}, $scale_path;
             
             # note: using full_name rather than $cache_file
@@ -576,7 +586,7 @@ sub generate_image {
         
     }
     
-    my $scale_str = $image{retina} ? ' (@2x)' : '';
+    my $scale_str = $image{retina} ? " (\@$image{retina}x)" : '';
     Wikifier::l("Generated image '$image{name}' at ${width}x${height}$scale_str");
 
     return $result;
