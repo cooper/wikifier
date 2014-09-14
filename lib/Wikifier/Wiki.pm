@@ -463,7 +463,7 @@ sub display_image {
     $wiki->generate_image(\%image, $result);
     
     # the generator says to use the full-sized image.
-    if ($result->{use_fullsize}) {
+    if (delete $result->{use_fullsize}) {
         $result->{content}      = file_contents($image{big_path}, 1) unless $dont_open;
         $result->{modified}     = time2str($stat[9]);
         $result->{length}       = $stat[7];
@@ -534,6 +534,7 @@ sub generate_image {
     # the request is to generate an image the same or larger than the original.
     if ($width >= $fi_width && $height >= $fi_height) {
         $result->{use_fullsize} = 1;
+        Wikifier::l("$image{name} ${width}x${height} >= original (${fi_width}x${fi_height}");
         return $result;
     }
 
