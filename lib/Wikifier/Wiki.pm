@@ -534,7 +534,10 @@ sub generate_image {
     # the request is to generate an image the same or larger than the original.
     if ($width >= $fi_width && $height >= $fi_height) {
         $result->{use_fullsize} = 1;
-        Wikifier::l("$image{name} ${width}x${height} >= original (${fi_width}x${fi_height}");
+        Wikifier::l(
+            "Not generating $image{name} ${width}x${height}".
+            ">= original (${fi_width}x${fi_height})"
+        );
         return $result;
     }
 
