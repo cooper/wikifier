@@ -462,6 +462,14 @@ sub display_image {
     #==========================#
     $wiki->generate_image(\%image, $result);
     
+    # the generator says to use the full-sized image.
+    if ($result->{use_fullsize}) {
+        $result->{content}      = file_contents($image{big_path}, 1) unless $dont_open;
+        $result->{modified}     = time2str($stat[9]);
+        $result->{length}       = $stat[7];
+        $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
+    }
+    
     delete $result->{content} if $dont_open;
     return $result;
 }
@@ -521,6 +529,13 @@ sub generate_image {
         $result->{error} = "Couldn't handle image $$result{fullsize_path}";
         return $result;
     };
+    my ($fi_width, $fi_height) = $full_image->getBounds();
+
+    # the request is to generate an image the same or larger than the original.
+    if ($width >= $fi_width && $height >= $fi_height) {
+        $result->{use_fullsize} = 1;
+        return $result;
+    }
 
     # create resized image.
     my $image = GD::Image->new($width, $height) or do {
