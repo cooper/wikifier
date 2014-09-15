@@ -197,6 +197,14 @@ sub handle_character {
         $current->{block}{content}[-1] =
             substr($current->{block}{content}[-1], 0, -$chars_scanned);
         
+        # if the block type starts with $, it's a model.
+        my $first = \substr($block_type, 0, 1);
+        if ($$first eq '$') {
+            $$first = '';
+            $block_name = $block_type;
+            $block_type = 'model';
+        }
+        
         # create the new block.
         $current->{block} = $wikifier->create_block(
             parent => $current->{block},
