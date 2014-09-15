@@ -33,7 +33,7 @@
 		A7A67A3F18AC3B9C00427886 /* wiki.example.conf */ = {isa = PBXFileReference; lastKnownFileType = text; name = wiki.example.conf; path = ../wiki.example.conf; sourceTree = "<group>"; };
 		A7A67A4018AC3B9C00427886 /* wikiserver.example.conf */ = {isa = PBXFileReference; lastKnownFileType = text; name = wikiserver.example.conf; path = ../wikiserver.example.conf; sourceTree = "<group>"; };
 		BC0BB17219C621A400CDC378 /* Invisible.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Invisible.pm; sourceTree = "<group>"; };
-		BC4330B919C7884B000470EA /* Template.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Template.pm; sourceTree = "<group>"; };
+		BC4330B919C7884B000470EA /* Model.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Model.pm; sourceTree = "<group>"; };
 		BCBD245319C3B9F6000D6FD1 /* Block.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = Block.pm; path = Wikifier/Block.pm; sourceTree = "<group>"; };
 		BCBD245419C3B9F6000D6FD1 /* BlockManager.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = BlockManager.pm; path = Wikifier/BlockManager.pm; sourceTree = "<group>"; };
 		BCBD245619C3BB78000D6FD1 /* Wikirequest.php */ = {isa = PBXFileReference; lastKnownFileType = text.script.php; path = Wikirequest.php; sourceTree = "<group>"; };
@@ -121,7 +121,7 @@
 				A7A67A2D18AC3B9C00427886 /* Paragraph.pm */,
 				A7A67A3018AC3B9C00427886 /* Section.pm */,
 				BC0BB17219C621A400CDC378 /* Invisible.pm */,
-				BC4330B919C7884B000470EA /* Template.pm */,
+				BC4330B919C7884B000470EA /* Model.pm */,
 			);
 			name = Blocks;
 			path = Wikifier/Block;

@@ -170,7 +170,7 @@ sub handle_character {
            
             # it can, so we're probably in the block type at this point.
             # append to the block type.
-            elsif ($last_char =~ m/\w|\-/) {
+            elsif ($last_char =~ m/\w|\-|\$/) {
                 $block_type = $last_char.$block_type;
                 next;
             }

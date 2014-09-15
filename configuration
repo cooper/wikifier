@@ -17,6 +17,7 @@ dir.page                        Default: pages
 dir.cache                       Default: cache
 dir.image                       Default: images
 dir.category                    Default: categories
+dir.model                       Default: models
 
     Directories on the filesystem without trailing slashes. For example,
     /home/wiki/pages, cache, etc.
