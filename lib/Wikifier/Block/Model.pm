@@ -47,7 +47,7 @@ sub model_html {
     $main_el->remove_class('main');
     
     # inject it into $el.
-    $el->add($main_el->generate)
+    $el->add($model->html);
     
 }
 
