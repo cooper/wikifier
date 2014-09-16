@@ -61,7 +61,7 @@ sub parse_formatted_text {
 
             # store the string we have so far.
             if (defined $string) {
-                push @items, [0, $string];
+                push @items, [ $no_html_entities, $string ];
                 $string = q();
             }
             
