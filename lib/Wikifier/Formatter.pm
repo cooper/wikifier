@@ -151,7 +151,7 @@ sub parse_format_type {
     when ($_ =~ /^%([\w.]+)$/ && !$careful) {
         my $var = $page->get($1);
         return defined $var ?
-            $wiki->parse_formatted_text($page, $var, 0, 1) :
+            $wikifier->parse_formatted_text($page, $var, 0, 1) :
             '<span style="color: red; font-weight: bold;">(null)</span>';
     }
     
