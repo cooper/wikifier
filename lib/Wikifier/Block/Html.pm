@@ -11,8 +11,8 @@ use strict;
 use Scalar::Util 'blessed';
 
 our %block_types = (
-    html   => { html => sub { html_html(0, @_) },
-    format => { html => sub { html_html(1, @_) }
+    html   => { html => sub { html_html(0, @_) } },
+    format => { html => sub { html_html(1, @_) } }
 );
 
 sub html_html {
