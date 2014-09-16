@@ -19,7 +19,7 @@ sub html_html {
     my ($format, $block, $page, $el) = @_;
     foreach my $item (@{ $block->{content} }) {
         $item = $el->html($page) if blessed $item;
-        $item = $page->parse_formatted_text($item) if $format;
+        $item = $page->parse_formatted_text($item, 1) if $format;
         $el->add($item);
     }
 }

@@ -115,8 +115,8 @@ sub _get_hash {
 
 # returns HTML for formatting.
 sub parse_formatted_text {
-    my ($page, $text) = @_;
-    return $page->wikifier->parse_formatted_text($page, $text);
+    my ($page, $text, $no_html_entities) = @_;
+    return $page->wikifier->parse_formatted_text($page, $text, $no_html_entities);
 }
 
 # returns a wiki option or the default.

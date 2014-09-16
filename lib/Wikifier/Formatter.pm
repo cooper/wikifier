@@ -20,7 +20,7 @@ use Wikifier::Utilities qw(safe_name trim);
 ######################
 
 sub parse_formatted_text {
-    my ($wikifier, $page, $text) = @_;
+    my ($wikifier, $page, $text, $no_html_entities) = @_;
     my @items;
     my $string = q();
     
@@ -113,7 +113,7 @@ sub parse_formatted_text {
     }
     
     # final string item.
-    push @items, [0, $string] if length $string;
+    push @items, [ $no_html_entities, $string] if length $string;
     
     # join them together, adding HTML entities when necessary.
     return join '', map {
