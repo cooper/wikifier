@@ -11,19 +11,17 @@ use strict;
 use Scalar::Util 'blessed';
 
 our %block_types = (
-    html => {
-        html  => \&html_html
-    }
+    html   => { html => sub { html_html(0, @_) },
+    format => { html => sub { html_html(1, @_) }
 );
 
 sub html_html {
-    my ($block, $page, $el) = @_;
-    
+    my ($format, $block, $page, $el) = @_;
     foreach my $item (@{ $block->{content} }) {
-        $el->add($el->html($page)) and next if blessed $item;
+        $item = $el->html($page) if blessed $item;
+        $item = $page->parse_formatted_text($item) if $format;
         $el->add($item);
     }
-    
 }
 
 __PACKAGE__
