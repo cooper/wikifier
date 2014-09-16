@@ -42,15 +42,9 @@ sub model_parse {
 sub model_html {
     my ($block, $page, $el) = @_;
     my $model   = $block->{model} or return;
-    my $main_el = $model->{wikifier}{main_block}{element} or return;
-    
-    # inject it into $el.
-    $main_el->remove_class('main');
-    $main_el->add_class('model');
-    $main_el->add_class("model-$$model{model_name}");
-    
+    $el->add_class('model');
+    $el->add_class("model-$$model{model_name}");
     $el->add($model->html);
-    
 }
 
 __PACKAGE__
