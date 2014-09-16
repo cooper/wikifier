@@ -20,7 +20,7 @@ use Wikifier::Utilities qw(safe_name trim);
 ######################
 
 sub parse_formatted_text {
-    my ($wikifier, $page, $text, $no_html_entities) = @_;
+    my ($wikifier, $page, $text, $no_html_entities, $careful) = @_;
     my @items;
     my $string = q();
     
@@ -83,7 +83,10 @@ sub parse_formatted_text {
             
             # otherwise, the format type is ended and must now be parsed.
             else {
-                push @items, [1, $wikifier->parse_format_type($page, $format_type)];
+                push @items, [
+                    1,
+                    $wikifier->parse_format_type($page, $format_type, $careful)
+                ];
                 $in_format = 0;
             }
             
@@ -125,7 +128,7 @@ sub parse_formatted_text {
 # parses an individual format type, aka the content in [brackets].
 # for example, 'i' for italic. returns the string generated from it.
 sub parse_format_type {
-    my ($wikifier, $page, $type) = @_;
+    my ($wikifier, $page, $type, $careful) = @_;
     
     given ($type) {
     
@@ -144,10 +147,19 @@ sub parse_format_type {
     # new line.
     when (['nl', 'br']) { return '<br />' }
     
+    # interporable variable.
+    when ($_ =~ /^%([\w.]+)$/ && !$careful) {
+        my $var = $page->get($1);
+        return defined $var ?
+            $wiki->parse_formatted_text($page, $var, 0, 1) :
+            '<span style="color: red; font-weight: bold;">(null)</span>';
+    }
+    
     # variable.
     when (/^@([\w.]+)$/) {
         my $var = $page->get($1);
-        return defined $var ? $var : '<span style="color: red; font-weight: bold;">(null)</span>';
+        return defined $var ? $var :
+        '<span style="color: red; font-weight: bold;">(null)</span>';
     }
     
     # html entity.

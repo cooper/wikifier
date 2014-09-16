@@ -42,7 +42,6 @@ sub model_parse {
 sub model_html {
     my ($block, $page, $el) = @_;
     my $model   = $block->{model} or return;
-    $el->add_class('model');
     $el->add_class("model-$$model{model_name}");
     $el->add($model->html);
 }
