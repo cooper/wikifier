@@ -32,6 +32,9 @@ sub model_parse {
         wikifier  => $page->wikifier
     );
     
+    # set @m.* variables.
+    $model->set(m => $block->{hash});
+    
     # parse the page.
     $model->parse;
     
