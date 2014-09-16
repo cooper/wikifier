@@ -45,10 +45,9 @@ sub model_html {
     my $main_block = $model->{wikifier}{main_block} or return;
 
     # generate the objective DOM.
-    $main_block->html($model);
+    my $main_el = $main_block->html($model) or return;
     
     # add the main page element to our element.
-    my $main_el = $model->{wikifier}{main_block}{element} or return;
     $main_el->remove_class('main');
     $el->add_class("model-$$model{model_name}");
     $el->add($main_el);
