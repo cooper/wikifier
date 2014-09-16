@@ -30,10 +30,8 @@ sub model_parse {
         name      => "$name.page",
         mode_name => $name,
         wikifier  => $page->wikifier
+        variables => { m => $block->{hash} }
     );
-    
-    # set @m.* variables.
-    $model->set(m => $block->{hash});
     
     # parse the page.
     $model->parse;
