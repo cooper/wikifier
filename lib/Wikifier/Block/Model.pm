@@ -30,6 +30,7 @@ sub model_parse {
         name       => "$name.page",
         model_name => $name,
         wikifier   => $page->wikifier,
+        wiki       => $page->{wiki}, # (might not exist)
         variables  => { m => $block->{hash} }
     );
     
