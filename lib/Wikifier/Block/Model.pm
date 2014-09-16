@@ -45,11 +45,9 @@ sub model_html {
     
     # change the class from 'main' to 'model'
     $main_el->remove_class('main');
-    $main_el->add_class('model');
-    $main_el->add_class("model-$$model{model_name}");
     
     # inject it into $el.
-    %$el = %$main_el;
+    $el->add($main_el->generate)
     
 }
 
