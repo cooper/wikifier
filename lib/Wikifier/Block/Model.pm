@@ -26,11 +26,11 @@ sub model_parse {
     my $name  = Wikifier::Utilities::safe_name($block->{name});
     my $path  = Cwd::abs_path($page->wiki_opt('dir.model').q(/)."$name.page");
     my $model = $block->{model} = Wikifier::Page->new(
-        file      => $path,
-        name      => "$name.page",
-        mode_name => $name,
-        wikifier  => $page->wikifier,
-        variables => { m => $block->{hash} }
+        file       => $path,
+        name       => "$name.page",
+        model_name => $name,
+        wikifier   => $page->wikifier,
+        variables  => { m => $block->{hash} }
     );
     
     # parse the page.
@@ -43,10 +43,11 @@ sub model_html {
     my $model   = $block->{model} or return;
     my $main_el = $model->{wikifier}{main_block}{element} or return;
     
-    # change the class from 'main' to 'model'
-    $main_el->remove_class('main');
-    
     # inject it into $el.
+    $main_el->remove_class('main');
+    $main_el->add_class('model');
+    $main_el->add_class("model-$$model{model_name}");
+    
     $el->add($model->html);
     
 }
