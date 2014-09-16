@@ -29,8 +29,7 @@ sub model_parse {
         file      => $path,
         name      => "$name.page",
         mode_name => $name,
-        wikifier  => $page->wikifier,
-        vars_only => 1
+        wikifier  => $page->wikifier
     );
     
     # parse the page.
@@ -41,7 +40,7 @@ sub model_parse {
 sub model_html {
     my ($block, $page, $el) = @_;
     my $model   = $block->{model} or return;
-    my $main_el = $model->{wikifier}{main_block}{element};
+    my $main_el = $model->{wikifier}{main_block}{element} or return;
     
     # change the class from 'main' to 'model'
     $main_el->remove_class('main');
