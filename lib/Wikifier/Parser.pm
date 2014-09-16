@@ -225,9 +225,35 @@ sub handle_character {
             return;
         }
         
+        # this is an if statement.
+        my @add_contents;
+        if ($current->{block}{type} eq 'if') {
+            my $conditional = $current->{block}{name};
+            
+            # variable.
+            if ($conditional =~ /^@([\w.]+)$/) {
+                my $conditional = $page->get($1);
+            }
+            
+            # add everything from within the if block IF conditional is true.
+            @add_contents = @{ $current->{block}{content} } if $conditional;
+            $current->{conditional} = !!$conditional;
+            
+        }
+        
+        # this is an else statement, and the conditional was false.
+        elsif ($current->{block}{type} eq 'else' && !$current->{conditional}) {
+            @add_contents = @{ $current->{block}{content} };
+        }
+        
+        # normal block. add the block itself.
+        else {
+            @add_contents = $current->{block};
+        }
+        
         # close the block, returning to its parent.
         $current->{block}{closed} = 1;
-        push @{ $current->{block}{parent}{content} }, $current->{block};
+        push @{ $current->{block}{parent}{content} }, @add_contents;
         $current->{block} = $current->{block}{parent};
         
     }

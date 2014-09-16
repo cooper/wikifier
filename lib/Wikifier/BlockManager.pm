@@ -11,7 +11,10 @@ use warnings;
 use strict;
 use 5.010;
 
-our %block_types;
+our %block_types = (
+    if   => {},
+    else => {}
+);
 
 sub create_block {
     my ($wikifier, %opts) = @_;
