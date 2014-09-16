@@ -41,9 +41,18 @@ sub model_parse {
 
 sub model_html {
     my ($block, $page, $el) = @_;
-    my $model   = $block->{model} or return;
+    my $model      = $block->{model} or return;
+    my $main_block = $model->{wikifier}{main_block} or return;
+
+    # generate the objective DOM.
+    $main_block->html($page);
+    
+    # add the main page element to our element.
+    my $main_el = $model->{wikifier}{main_block}{element} or return;
+    $main_el->remove_class('main');
     $el->add_class("model-$$model{model_name}");
-    $el->add($model->html);
+    $el->add($main_el);
+    
 }
 
 __PACKAGE__

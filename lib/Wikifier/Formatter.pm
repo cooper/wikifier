@@ -18,7 +18,10 @@ use Wikifier::Utilities qw(safe_name trim);
 ######################
 ### FORMAT PARSING ###
 ######################
-
+#
+# $careful prevents recursion
+# don't use it directly
+#
 sub parse_formatted_text {
     my ($wikifier, $page, $text, $no_html_entities, $careful) = @_;
     my @items;
@@ -151,15 +154,13 @@ sub parse_format_type {
     when ($_ =~ /^%([\w.]+)$/ && !$careful) {
         my $var = $page->get($1);
         return defined $var ?
-            $wikifier->parse_formatted_text($page, $var, 0, 1) :
-            '<span style="color: red; font-weight: bold;">(null)</span>';
+            $wikifier->parse_formatted_text($page, $var, 0, 1) : '(null)';
     }
     
     # variable.
     when (/^@([\w.]+)$/) {
         my $var = $page->get($1);
-        return defined $var ? $var :
-        '<span style="color: red; font-weight: bold;">(null)</span>';
+        return defined $var ? $var : '(null)';
     }
     
     # html entity.
