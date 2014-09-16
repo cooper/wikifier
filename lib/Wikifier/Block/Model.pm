@@ -17,10 +17,10 @@ our %block_types = (
 );
 
 sub model_parse {
-    my ($block, $page) = @_;
+    my ($block, $page) = (shift, @_);
     
     # parse the hash.
-    $block->parse_base(@_[1..$#_]);
+    $block->parse_base(@_);
 
     # create a page.
     my $name  = Wikifier::Utilities::safe_name($block->{name});
