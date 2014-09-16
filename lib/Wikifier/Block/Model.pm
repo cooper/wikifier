@@ -29,7 +29,7 @@ sub model_parse {
         file      => $path,
         name      => "$name.page",
         mode_name => $name,
-        wikifier  => $page->wikifier
+        wikifier  => $page->wikifier,
         variables => { m => $block->{hash} }
     );
     
