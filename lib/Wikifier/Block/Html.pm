@@ -20,6 +20,7 @@ sub html_html {
     foreach my $item (@{ $block->{content} }) {
         if (blessed $item) {
             $item = $item->html($page);
+        }
         elsif ($format) {
             $item = $page->parse_formatted_text($item, 1);
         }
