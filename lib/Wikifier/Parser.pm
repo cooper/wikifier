@@ -232,7 +232,7 @@ sub handle_character {
             
             # variable.
             if ($conditional =~ /^@([\w.]+)$/) {
-                my $conditional = $page->get($1);
+                $conditional = $page->get($1);
             }
             
             # add everything from within the if block IF conditional is true.
