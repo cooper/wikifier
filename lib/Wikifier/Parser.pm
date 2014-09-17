@@ -241,9 +241,13 @@ sub handle_character {
             
         }
         
-        # this is an else statement, and the conditional was false.
-        elsif ($current->{block}{type} eq 'else' && !$current->{conditional}) {
-            @add_contents = @{ $current->{block}{content} };
+        # this is an else statement.
+        elsif ($current->{block}{type} eq 'else' && !) {
+        
+            # the conditional was false. add the contents of the else.
+            @add_contents = @{ $current->{block}{content} }
+                unless $current->{conditional};
+                
         }
         
         # normal block. add the block itself.
