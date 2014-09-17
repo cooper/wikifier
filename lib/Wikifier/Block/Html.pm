@@ -18,7 +18,11 @@ our %block_types = (
 sub html_html {
     my ($format, $block, $page, $el) = @_;
     foreach my $item (@{ $block->{content} }) {
-        $item = $page->parse_formatted_text($item, 1) if !blessed $item && $format;
+        if (blessed $item) {
+            $item = $item->html($page);
+        elsif ($format) {
+            $item = $page->parse_formatted_text($item, 1);
+        }
         $el->add($item);
     }
 }
