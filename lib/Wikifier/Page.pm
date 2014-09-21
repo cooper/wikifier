@@ -162,7 +162,7 @@ sub _default_calculator {
     
     # height was given; calculate width.
     if ($height) {
-        $scale_factor = $h / $height;
+        $scale_factor = $big_h / $height;
         $final_w = $img{page}->image_round($big_w / $scale_factor);
         $final_h = $img{height};
     }
