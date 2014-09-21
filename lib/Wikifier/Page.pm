@@ -142,15 +142,14 @@ sub _default_calculator {
         my $dir = $img{page}->wiki_opt('dir.image');
         ($big_w, $big_h) = Image::Size::imgsize("$dir/$img{file}");
     }
-
-    # now we must find the scaling factor.
-    my $scale_factor;
     
     # neither dimensions were given. use the full size.
     if (!$width && !$height) {
         return ($big_w, $big_h);
     }
     
+    # now we must find the scaling factor.
+    my $scale_factor;
     my ($final_w, $final_h);
     
     # width was given; calculate height.
@@ -161,7 +160,7 @@ sub _default_calculator {
     }
     
     # height was given; calculate width.
-    if ($height) {
+    elsif ($height) {
         $scale_factor = $big_h / $height;
         $final_w = $img{page}->image_round($big_w / $scale_factor);
         $final_h = $img{height};
