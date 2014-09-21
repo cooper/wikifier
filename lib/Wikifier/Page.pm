@@ -145,7 +145,7 @@ sub _default_calculator {
     
     # neither dimensions were given. use the full size.
     if (!$width && !$height) {
-        return ($big_w, $big_h);
+        return ($big_w, $big_h, 1);
     }
     
     # now we must find the scaling factor.

@@ -935,7 +935,7 @@ sub _wiki_default_calc {
     my ($big_w, $big_h) = $full_image->getBounds();
     undef $full_image;
     
-    # call the default handler with these dimensions.
+    # call the default handler with these full dimensions.
     my ($w, $h) = Wikifier::Page::_default_calculator(
         %img,
         big_width  => $big_w,

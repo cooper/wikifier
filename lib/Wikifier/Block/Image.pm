@@ -100,7 +100,7 @@ sub image_parse {
     elsif (lc $page->wiki_opt('image.size_method') eq 'server') {
     
         # find the resized dimensions.
-        ($w, $h) = $page->wiki_opt('image.calc')->(
+        ($w, $h, $full_size) = $page->wiki_opt('image.calc')->(
             file   => $block->{file},
             height => $block->{height},
             width  => $block->{width},
@@ -110,8 +110,8 @@ sub image_parse {
         # call the image_sizer.
         my $url = $page->wiki_opt('image.sizer')->(
             file   => $block->{file},
-            height => $h,
-            width  => $w,
+            height => $full_size ? 0 : $h,
+            width  => $full_size ? 0 : $w,
             page   => $page
         );
         
