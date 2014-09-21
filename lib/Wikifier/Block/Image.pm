@@ -39,13 +39,16 @@ sub image_parse {
         align float author license
     );
     
-    # no width or height specified; default to 100 width.
+    # force numeric value.
+    $block->{width}  =~ s/px// if length $block->{width};
+    $block->{height} =~ s/px// if length $block->{height};
+    $block->{width}  += 0;
+    $block->{height} += 0;
+    
+    # no width or height specified; fall back to full dimensions.
     if (!$block->{width} && !$block->{height}) {
-        $block->{width} = 100;
-    }
-    else {
-        $block->{width}  =~ s/px// if defined $block->{width};
-        $block->{height} =~ s/px// if defined $block->{height};
+        $block->{width}  =
+        $block->{height} = 0;
     }
     
     # no float; default to right.
@@ -63,14 +66,10 @@ sub image_parse {
     ### SIZING ###
     ##############
     
-    # decide which dimension(s) were given.
-    my $given_width  = defined $block->{width}  ? 1 : 0;
-    my $given_height = defined $block->{height} ? 1 : 0;
-    
     # both dimensions were given, so we need to do no sizing.
-    if ($given_width && $given_height) {
-        $w = $block->{width} .q(px);
-        $h = $block->{height}.q(px);
+    if ($block->{width} && $block->{height}) {
+        $w = $block->{width};
+        $h = $block->{height};
     }
     
     # use javascript image sizing
@@ -87,8 +86,8 @@ sub image_parse {
         # use the image root address options to determine URL.
         
         # width and height dummies will be overriden by JavaScript.
-        $w = $given_width  ? $block->{width}  : '200px';
-        $h = $given_height ? $block->{height} : 'auto';
+        $w = $given_width  ? $block->{width}  : 200;
+        $h = $given_height ? $block->{height} : 0; # zero means auto
         
         $block->{image_url} = "$$block{image_root}/$$block{file}";
     }
@@ -120,12 +119,11 @@ sub image_parse {
         push @{ $page->{images}{ $block->{file} } ||= [] }, $w + 0, $h + 0;
     
         $block->{image_url} = $url;
-        ($w, $h)   = ($w.q(px), $h.q(px));
     }
     
     # any dimensions still not set = auto.
-    $block->{width}  = $w // $block->{width} .q(px) // 'auto';
-    $block->{height} = $h // $block->{height}.q(px) // 'auto';
+    $block->{width}  = $w ? "${w}px" : 'auto';
+    $block->{height} = $h ? "${h}px" : 'auto';
     
     return 1;
 }

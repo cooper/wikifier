@@ -10,29 +10,29 @@
 	<string>Wikifier</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>BEAE1E39-6625-49DC-8719-D5DCFF03469B</key>
+		<key>BEE2374EEAE5F658B444429835BDDA7CA22210A1</key>
 		<string>https://github.com/cooper/wikifier.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>Wikifier/Wikifier.xcodeproj/project.xcworkspace</string>
+	<string>Wikifier/Wikifier.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>BEAE1E39-6625-49DC-8719-D5DCFF03469B</key>
+		<key>BEE2374EEAE5F658B444429835BDDA7CA22210A1</key>
 		<string>../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/cooper/wikifier.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>BEAE1E39-6625-49DC-8719-D5DCFF03469B</string>
+	<string>BEE2374EEAE5F658B444429835BDDA7CA22210A1</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>BEAE1E39-6625-49DC-8719-D5DCFF03469B</string>
+			<string>BEE2374EEAE5F658B444429835BDDA7CA22210A1</string>
 			<key>IDESourceControlWCCName</key>
 			<string>wikifier</string>
 		</dict>
