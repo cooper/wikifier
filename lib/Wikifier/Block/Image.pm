@@ -79,15 +79,15 @@ sub image_parse {
     elsif (lc $page->wiki_opt('image.size_method') eq 'javascript') {
     
         # inject javascript resizer if no width is given.
-        if (!$given_width) {
+        if (!$block->{width}) {
             $block->{javascript} = 1;
         }
         
         # use the image root address options to determine URL.
         
         # width and height dummies will be overriden by JavaScript.
-        $w = $given_width  ? $block->{width}  : 200;
-        $h = $given_height ? $block->{height} : 0; # zero means auto
+        $w = $block->{width} || 200;    # width default 200
+        $h = $block->{height};          # zero means auto
         
         $block->{image_url} = "$$block{image_root}/$$block{file}";
     }
