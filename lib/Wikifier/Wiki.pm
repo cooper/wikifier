@@ -938,6 +938,8 @@ sub _wiki_default_calc {
     # call the default handler with these dimensions.
     my ($w, $h) = Wikifier::Page::_default_calculator(
         %img,
+        width      => $img{width}  || $big_w,
+        height     => $img{height} || $big_h,
         big_width  => $big_w,
         big_height => $big_h
     );

@@ -131,40 +131,43 @@ sub _default_calculator {
     my %img = @_;
     my ($width, $height) = ($img{width}, $img{height});
     
-    # decide which dimension(s) were given.
-    my $given_width  = defined $width  && $width  ne 'auto' ? 1 : 0;
-    my $given_height = defined $height && $height ne 'auto' ? 1 : 0;
-    
     # maybe these were found for us already.
-    my ($w, $h) = ($img{big_width}, $img{big_height});
+    my ($big_w, $big_h) = ($img{big_width}, $img{big_height});
     
     # gotta do it the hard way.
     # use Image::Size to determine the dimensions.
     # note: these are provided by GD in WiWiki.
-    if (!$w || !$h) {
+    if (!$big_w || !$big_h) {
         require Image::Size;
         my $dir = $img{page}->wiki_opt('dir.image');
-        ($w, $h) = Image::Size::imgsize("$dir/$img{file}");
+        ($big_w, $big_h) = Image::Size::imgsize("$dir/$img{file}");
     }
 
     # now we must find the scaling factor.
     my $scale_factor;
     
+    # neither dimensions were given. use the full size.
+    if (!$width && !$height) {
+        return ($big_w, $big_h);
+    }
+    
+    my ($final_w, $final_h);
+    
     # width was given; calculate height.
-    if ($given_width) {
-        $scale_factor = $w / $width;
-        $w = $img{width};
-        $h = $img{page}->image_round($h / $scale_factor);
+    if ($width) {
+        $scale_factor = $big_w / $width;
+        $final_w = $img{width};
+        $final_h = $img{page}->image_round($big_h / $scale_factor);
     }
     
     # height was given; calculate width.
-    if ($given_height) {
+    if ($height) {
         $scale_factor = $h / $height;
-        $w = $img{page}->image_round($w / $scale_factor);
-        $h = $img{height};
+        $final_w = $img{page}->image_round($big_w / $scale_factor);
+        $final_h = $img{height};
     }
 
-    return ($w, $h);
+    return ($final_w, $final_h);
 }
 
 # round dimension according to setting.
