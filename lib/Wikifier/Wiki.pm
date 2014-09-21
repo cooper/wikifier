@@ -936,7 +936,7 @@ sub _wiki_default_calc {
     undef $full_image;
     
     # call the default handler with these full dimensions.
-    my ($w, $h) = Wikifier::Page::_default_calculator(
+    my ($w, $h, $full_size) = Wikifier::Page::_default_calculator(
         %img,
         big_width  => $big_w,
         big_height => $big_h
@@ -963,7 +963,7 @@ sub _wiki_default_calc {
         
     }
     
-    return ($w, $h);
+    return ($w, $h, $full_size);
 
 }
 
@@ -974,9 +974,7 @@ sub _wiki_default_sizer {
     my $wiki = $page->{wiki};
     
     # full-sized image.
-    if (!$img{width} || !$img{height} ||
-        $img{width} eq 'auto' || $img{height} eq 'auto') {
-        
+    if (!$img{width} || !$img{height}) {
         return $wiki->opt('root.image').q(/).$img{file};
     }
     
