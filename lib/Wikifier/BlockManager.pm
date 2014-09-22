@@ -49,6 +49,7 @@ sub create_block {
 sub load_block {
     my ($wikifier, $type, $dir) = @_;
     return 1 if $block_types{$type};
+    return 1 unless length $type;
     my $file = "$dir/lib/Wikifier/Block/".ucfirst(lc $type).q(.pm);
     
     # does the file exist?
