@@ -123,8 +123,8 @@ sub image_parse {
     }
     
     # any dimensions still not set = auto.
-    $block->{width}  = $w ? "${w}px" : 'auto';
-    $block->{height} = $h ? "${h}px" : 'auto';
+    $block->{width}  = $w ? "${w}px" : $block->{default_width}  || 'auto';
+    $block->{height} = $h ? "${h}px" : $block->{default_height} || 'auto';
     
     return 1;
 }

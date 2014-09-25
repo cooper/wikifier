@@ -22,18 +22,10 @@ sub infobox_parse {
     $block->parse_base(@_); # call hash parse.
     
     # search for image{}.
+    # apply default width.
     foreach my $item (@{ $block->{content} }) {
-        next unless blessed $item;
-        next unless $item->isa('Wikifier::Block');
-        next unless $item->{type} eq 'image';
-        
-        # parse the image ahead of time.
-        $item->parse(@_);
-        
-        # found one. does it have a width?
-        # if not, fall back to 270px.
-        $item->{width} = '270px' if $item->{width} eq 'auto';
-        
+        next unless blessed $item && $item->{type} eq 'image';
+        $item->{default_width} = '270px';
     }
     
 }
