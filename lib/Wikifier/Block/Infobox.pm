@@ -11,12 +11,29 @@ use strict;
 use Scalar::Util 'blessed';
 use HTML::Entities 'encode_entities';
 
-our %block_types = (
-    infobox => {
-        base => 'hash',
-        html => \&infobox_html
+our %block_types = (infobox => {
+    base  => 'hash',
+    parse => \&infobox_parse,
+    html  => \&infobox_html
+});
+
+sub infobox_parse {
+    my ($block, $page) = (shift, @_);
+    $block->parse_base(@_); # call hash parse.
+    
+    # search for image{}.
+    foreach my $item (@{ $block->{content} }) {
+        next unless blessed $item;
+        next unless $item->isa('Wikifier::Block');
+        next unless $item->{type} eq 'image';
+        
+        # found one. does it have a width?
+        # if not, fall back to 270px.
+        $item->{width} = '270px' if $item->{width} eq 'auto';
+        
     }
-);
+    
+}
 
 sub infobox_html {
     my ($block, $page, $el) = @_;
@@ -50,7 +67,7 @@ sub infobox_html {
         }
         
         # Parse formatting in the key.
-        if (defined $key_title) {
+        if (length $key_title) {
             $key_title = $page->parse_formatted_text($key_title);
         }
         
@@ -61,7 +78,7 @@ sub infobox_html {
         );
         
         # append table row with key.
-        if (defined $key_title) {
+        if (length $key_title) {
             $tr->create_child(
                 type       => 'td',
                 class      => 'infobox-key',
