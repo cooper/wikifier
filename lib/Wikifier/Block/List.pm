@@ -44,16 +44,12 @@ sub list_parse {
         for (split //, $item) { $i++;
             my $char = $_;
             
-            if ($char eq "\\") {
-                continue if $escaped; # this backslash was escaped.
+            if ($char eq "\\" && !$escaped) {
                 $escaped = 1;
             }
             
             # a semicolon indicates the termination of a pair.
-            elsif ($char eq ';') {
-                
-                # it was escaped.
-                continue if $escaped;
+            elsif ($char eq ';' && !$escaped) {
                 
                 # remove spaces from value.
                 $value =~ s/(^\s*)|(\s*$)//g unless blessed $value;
