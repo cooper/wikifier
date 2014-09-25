@@ -39,6 +39,11 @@ sub image_parse {
         align float author license
     );
     
+    # default values set by something.
+    # these of course are not guaranteed to be existent.
+    $block->{width}  ||= $block->{default_width};
+    $block->{height} ||= $block->{default_height};
+    
     # force numeric value.
     $block->{width}  =~ s/px// if length $block->{width};
     $block->{height} =~ s/px// if length $block->{height};
@@ -123,8 +128,8 @@ sub image_parse {
     }
     
     # any dimensions still not set = auto.
-    $block->{width}  = $w ? "${w}px" : $block->{default_width}  || 'auto';
-    $block->{height} = $h ? "${h}px" : $block->{default_height} || 'auto';
+    $block->{width}  = $w ? "${w}px" : 'auto';
+    $block->{height} = $h ? "${h}px" : 'auto';
     
     return 1;
 }
