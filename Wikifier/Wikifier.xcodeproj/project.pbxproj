@@ -38,6 +38,7 @@
 		BCBD245419C3B9F6000D6FD1 /* BlockManager.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = BlockManager.pm; path = Wikifier/BlockManager.pm; sourceTree = "<group>"; };
 		BCBD245619C3BB78000D6FD1 /* Wikirequest.php */ = {isa = PBXFileReference; lastKnownFileType = text.script.php; path = Wikirequest.php; sourceTree = "<group>"; };
 		BCD0E62D19C3C6DA00465BCC /* Server.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = Server.pm; path = ../Server.pm; sourceTree = "<group>"; };
+		BCFD26D619D3ADAA004C80D5 /* List.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = List.pm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -122,6 +123,7 @@
 				A7A67A3018AC3B9C00427886 /* Section.pm */,
 				BC0BB17219C621A400CDC378 /* Invisible.pm */,
 				BC4330B919C7884B000470EA /* Model.pm */,
+				BCFD26D619D3ADAA004C80D5 /* List.pm */,
 			);
 			name = Blocks;
 			path = Wikifier/Block;
