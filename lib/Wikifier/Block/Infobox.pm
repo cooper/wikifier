@@ -27,6 +27,9 @@ sub infobox_parse {
         next unless $item->isa('Wikifier::Block');
         next unless $item->{type} eq 'image';
         
+        # parse the image ahead of time.
+        $item->parse(@_);
+        
         # found one. does it have a width?
         # if not, fall back to 270px.
         $item->{width} = '270px' if $item->{width} eq 'auto';
