@@ -158,7 +158,7 @@ our %colors = (
     YellowGreen             => '#9ACD32'
 );
 
-%colors = map { $_ => lc $colors{$_} } keys %colors;
+%colors = map { lc $_ => $colors{$_} } keys %colors;
 
 ######################
 ### FORMAT PARSING ###
@@ -360,8 +360,8 @@ sub parse_format_type {
     }
     
     # colors.
-    when (exists $colors{ lc $type }) {
-        my $color = $colors{ lc $type };
+    when (exists $colors{ +lc }) {
+        my $color = $colors{ +lc };
         return "<span style=\"color: $color;\">";
     }
     
