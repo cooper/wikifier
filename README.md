@@ -28,43 +28,35 @@ syntax for blocks is as follows.
 
 **Nameless blocks**
 
-```
-blocktype {
-    ...
-}
-```
+    blocktype {
+        ...
+    }
 
 Example
 
-```
-imagebox {
-    description: [[Foxy]], supreme librarian;
-    align: left;
-    file: foxy2.png;
-    width: 100px;
-}
-```
+    imagebox {
+        description: [[Foxy]], supreme librarian;
+        align: left;
+        file: foxy2.png;
+        width: 100px;
+    }
 
 **Named blocks**
 
-```
-blocktype [block name] {
-    ...
-}
-```
+    blocktype [block name] {
+        ...
+    }
 
 Example
 
-```
-section [Statistics] {
+    section [Statistics] {
 
-    paragraph {
-        NoTrollPlzNet Library's online division currently hosts
-        [b][@stats.site.articles][/b] articles.
+        paragraph {
+            NoTrollPlzNet Library's online division currently hosts
+            [b][@stats.site.articles][/b] articles.
+        }
+
     }
-
-}
-```
 
 ## Packages
 
@@ -121,3 +113,83 @@ parser one or more additional times.
 
 5. __Formatting parser__: many block parsers make use of a formatting parser afterwards,
 the one which converts text formatting such as [b] and [i] to bold and italic text, etc.
+
+## Styling
+
+Wikifier provides a simple solution to styling with CSS from within the wiki language.
+Rules can be added to specific blocks and/or children of specific blocks, and selectors
+like classes and block types can also narrow down the matched elements.
+
+### Rules for one block
+
+    imagebox {
+        file:   some-image.png;
+        width:  500px;
+        style {
+            padding: 5px;
+            background-color: red;
+        }
+    }
+
+### Rules for a block's children
+
+All children 
+
+    section {
+
+        style [*] {
+            margin: 50px;
+        }
+
+        p {
+            First paragraph. First paragraph. First paragraph. First paragraph. 
+            First paragraph. First paragraph. First paragraph. First paragraph. 
+        }
+
+        p {
+            Second paragraph. Second paragraph. Second paragraph.
+            Second paragraph. Second paragraph. Second paragraph.
+        }
+
+    }
+
+
+Children matching a class
+
+    section {
+
+        style [.padded] {
+            padding: 50px;
+        }
+
+        p {
+            First paragraph. First paragraph. First paragraph. First paragraph. 
+            First paragraph. First paragraph. First paragraph. First paragraph. 
+        }
+
+        p.padded {
+            Second paragraph. Second paragraph. Second paragraph.
+            Second paragraph. Second paragraph. Second paragraph.
+        }
+
+    }
+
+All children plus the parent
+
+    section {
+
+        style [this, *] {
+            margin: 50px;
+        }
+
+        p {
+            First paragraph. First paragraph. First paragraph. First paragraph. 
+            First paragraph. First paragraph. First paragraph. First paragraph. 
+        }
+
+        p {
+            Second paragraph. Second paragraph. Second paragraph.
+            Second paragraph. Second paragraph. Second paragraph.
+        }
+
+    }

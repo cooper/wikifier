@@ -103,10 +103,14 @@ image.quality                   Default: 100
     The desired quality of generated images. This is only utilized if image.type is set to
     jpeg.
 
-image.enable.retina             Default: enabled
+image.enable.retina             Default: enabled for @2x
 
     Enable retina display support. Wikifier::Wiki will interpret and properly handle @2x
     versions of images.
+
+    This option can also take a comma-separated list of scales, such as
+        @image.enable.retina: 2,3;
+    to support @2x and @3x scaling both.
 
 image.enable.pregeneration      Default: disabled
 
