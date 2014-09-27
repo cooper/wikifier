@@ -67,7 +67,7 @@ sub style_html {
     my @apply;
     
     # if we're applying to main, add that.
-    push @apply, [ $el->{id} ];
+    push @apply, [ $el->{parent}{id} ];
     
     # add other things, if any.
     foreach my $item ($style{apply_to}) {
@@ -75,7 +75,7 @@ sub style_html {
         push @apply, $item;
     }
     
-    $style{main_el}  = $el->{id};
+    $style{main_el}  = $el->{parent}{id};
     $style{apply_to} = \@apply;
     
     use Data::Dumper;
