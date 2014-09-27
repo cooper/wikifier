@@ -27,10 +27,12 @@ sub configure {
     $el->{ids}        ||= \%identifiers;
     
     # create an ID.
-    my $it = $el->{classes}[0] || 'generic';
-    my $id = $el->{ids}{$it}++;
-    $el->{id} = "$it-$id";
-    push @{ $el->{classes} }, $el->{id};
+    if (!length $el->{id}) {
+        my $it = $el->{classes}[0] || 'generic';
+        my $id = $el->{ids}{$it}++;
+        $el->{id} = "$it-$id";
+        push @{ $el->{classes} }, $el->{id};
+    }
     
     # content must an array of items.
     $el->{content} //= [];
