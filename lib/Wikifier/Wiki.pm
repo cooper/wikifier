@@ -678,7 +678,7 @@ sub display_category_posts {
             push @{ $result->{pages}{$n} }, $page;
             
             # add the CSS.
-            ($result->{all_css} || = '') .= $page->{css} if length $page->{css};
+            ($result->{all_css} ||= '') .= $page->{css} if length $page->{css};
             
         }
         $n++;
