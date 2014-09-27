@@ -255,6 +255,7 @@ sub _display_page {
     $result->{type}       = 'page';
     $result->{content}    = $page->html;
     $result->{css}        = $page->css;
+    $result->{all_css}    = $result->{css};
     $result->{length}     = length $result->{content};
     $result->{generated}  = 1;
     $result->{modified}   = time2str(time);
@@ -661,7 +662,6 @@ sub display_category_posts {
     # order with newest first.
     my @pages_in_order = sort { $times{$b} cmp $times{$a} } keys %times;
     @pages_in_order    = map  { $reses{$_} } @pages_in_order;
-    #$result->{pages} = \@pages_in_order;
     
     # order into PAGES of pages. wow.
     my $limit = $wiki->opt('enable.category_post_limit') || 'inf';
@@ -669,8 +669,17 @@ sub display_category_posts {
     while (@pages_in_order) {
         $result->{pages}{$n} ||= [];
         for (1..$limit) {
-            last unless @pages_in_order; # no more
-            push @{ $result->{pages}{$n} }, shift @pages_in_order;
+            
+            # there are no more pages.
+            last unless @pages_in_order;
+            
+            # add the next page.
+            my $page = shift @pages_in_order;
+            push @{ $result->{pages}{$n} }, $page;
+            
+            # add the CSS.
+            ($result->{all_css} || = '') .= $page->{css} if length $page->{css};
+            
         }
         $n++;
     }
