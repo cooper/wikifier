@@ -76,7 +76,7 @@ sub style_html {
         push @apply, $item;
     }
     
-    $style{main_el}  = $main_el;
+    $style{main_el}  = $main_el->{id};
     $style{apply_to} = \@apply;
     
     use Data::Dumper;
