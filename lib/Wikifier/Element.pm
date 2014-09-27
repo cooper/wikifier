@@ -31,7 +31,6 @@ sub configure {
         my $it = $el->{classes}[0] || 'generic';
         my $id = $el->{ids}{$it}++;
         $el->{id} = "$it-$id";
-        push @{ $el->{classes} }, $el->{id};
     }
     
     # content must an array of items.
@@ -92,6 +91,7 @@ sub generate {
     
     # add classes.
     my $classes;
+    push @{ $el->{classes} }, $el->{id};
     foreach my $class (@{ $el->{classes} }) {
         $classes .= " wiki-$class" if     defined $classes;
         $classes  = "wiki-$class"  if not defined $classes;
