@@ -119,6 +119,13 @@ sub html {
     $block->{html_done} = {};
     $block->_html($type, @_);
     delete $block->{html_done};
+    
+    # do child blocks that haven't been done.
+    foreach my $block (@{ $block->{content} }) {
+        next unless blessed $block;
+        next if $block->{called_html};
+        $block->html(@_);
+    }
 
     return $block->{element};
 }
@@ -144,6 +151,7 @@ sub _html {
             $block->{html_done}{$type} = 1;
         }
         $type = $type_opts->{base};
+        $block->{called_html}++;
     }
 
 }
