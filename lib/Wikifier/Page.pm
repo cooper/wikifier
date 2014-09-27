@@ -96,7 +96,15 @@ sub _css_apply_string {
     #   ['section', '.someClass'],
     #   ['section', '.someClass.someOther']
     # ] etc.
-    return join ', ', map { $page->_css_set_string(@$_) } @sets;
+    return join ', ', map {
+        my $string = $page->_css_set_string(@$_);
+        my $start  = substr $string, 0, 10;
+        if (!$start || $start ne '.wiki-main') {
+            my $id  = $page->{wikifier}{main_block}{element}{id};
+            $string = ".wiki-$id $string";
+        }
+        $string
+    } @sets;
 }
 
 sub _css_set_string {
@@ -106,8 +114,7 @@ sub _css_set_string {
 
 sub _css_item_string {
     my ($page, @chars) = @_;
-    my $string = '';
-    my ($in_class, $in_el_type);
+    my ($string, $in_class, $in_el_type) = '';
     foreach my $char (@chars) {
         
         # we're starting a class.
