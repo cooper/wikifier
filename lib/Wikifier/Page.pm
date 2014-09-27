@@ -114,7 +114,7 @@ sub _css_item_string {
         if ($char eq '.') {
             $in_class++;
             $string .= '.wiki-class-';
-            next CHAR;
+            next;
         }
         
         # we're in neither a class nor an element type.
