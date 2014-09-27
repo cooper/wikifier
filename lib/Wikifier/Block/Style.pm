@@ -10,7 +10,8 @@ use Scalar::Util 'blessed';
 
 our %block_types = (style => {
     base   => 'hash',
-    parse  => \&style_parse
+    parse  => \&style_parse,
+    html   => \&style_html
 });
 
 sub style_parse {
