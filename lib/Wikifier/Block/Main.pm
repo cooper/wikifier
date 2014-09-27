@@ -31,10 +31,8 @@ sub main_parse {
 sub main_html {
     my ($block, $page, $el) = @_;
     
-    # generate a better ID if there's a title.
-    if (length $page->{title}) {
-        $el->{id} = 'main-'.time.substr(md5_hex($page->{title}), 0, 5);
-    }
+    # generate a better ID.
+    $el->{id} = 'main-'.time.substr(md5_hex($page->{file}), 0, 5);
     
     foreach my $item (@{ $block->{content} }) {
         next unless blessed $item;
