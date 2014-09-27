@@ -78,6 +78,15 @@ sub html {
     return $res;
 }
 
+# returns the generated page CSS.
+sub css {
+    my $page = shift;
+    return unless $page->{styles};
+    foreach my $rule_set (@{ $page->{styles} }) {
+        
+    }
+}
+
 # set a variable.
 sub set {
     my ($page, $var, $value) = @_;

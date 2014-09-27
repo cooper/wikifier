@@ -48,7 +48,7 @@ sub style_parse {
             # ex: p
             # ex: p.something
             # ex: .something.somethingelse
-            push @{ $style{apply_to} }, split /\./, $matcher;
+            push @{ $style{apply_to} }, [ split /\./, $matcher ];
             
         }
     }
@@ -81,6 +81,8 @@ sub style_html {
     
     use Data::Dumper;
     print Dumper \%style;
+    
+    push @{ $page->{styles} ||= [] }, \%style;
 }
 
 __PACKAGE__
