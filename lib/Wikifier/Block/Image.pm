@@ -153,10 +153,12 @@ sub image_html {
     # this is not an image box; it's just an image.
     if (!$box) {
         my $a = $el->create_child(
+            class      => 'image-a',
             type       => 'a',
             attributes => { href => $link_address }
         );
         $a->create_child(
+            class      => 'image-img',
             type       => 'img',
             attributes => {
                 src => $image_url,
@@ -179,12 +181,14 @@ sub image_html {
     
     # create the anchor.
     my $a = $inner->create_child(
+        class      => 'imagebox-a',
         type       => 'a',
         attributes => { href => $link_address }
     );
     
     # create the image.
     my $img = $a->create_child(
+        class      => 'imagebox-img',
         type       => 'img',
         attributes => {
             src => $image_url,
