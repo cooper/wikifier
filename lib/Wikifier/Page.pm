@@ -82,10 +82,18 @@ sub html {
 sub css {
     my $page = shift;
     return unless $page->{styles};
+    my $string = '';
     foreach my $rule_set (@{ $page->{styles} }) {
         my $apply_to = $page->_css_apply_string(@{ $rule_set->{apply_to} });
-        print "apply_to: $apply_to\n";
+        $string     .= "$apply_to {\n";
+        foreach my $rule (keys %{ $rule_set->{rules} }) {
+            my $value = $rule_set->{rules}{$rule};
+            $string  .= "    $rule: $value;\n";
+        }
+        $string .= "}\n";
     }
+    print "$string\n";
+    return $string;
 }
 
 sub _css_apply_string {
