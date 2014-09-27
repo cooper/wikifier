@@ -170,7 +170,7 @@ sub handle_character {
            
             # it can, so we're probably in the block type at this point.
             # append to the block type.
-            elsif ($last_char =~ m/\w|\-|\$/) {
+            elsif ($last_char =~ m/[\w\-\$\.]/) {
                 $block_type = $last_char.$block_type;
                 next;
             }
@@ -197,6 +197,14 @@ sub handle_character {
         $current->{block}{content}[-1] =
             substr($current->{block}{content}[-1], 0, -$chars_scanned);
         
+        # if the block type contains dot(s), it has classes.
+        my @block_classes;
+        if (index($block_type, '.') != -1) {
+            my @split      = split /\./, $block_type;
+            $block_type    = shift @split;
+            @block_classes = @split;
+        }
+        
         # if the block type starts with $, it's a model.
         my $first = \substr($block_type, 0, 1);
         if ($$first eq '$') {
@@ -207,9 +215,10 @@ sub handle_character {
         
         # create the new block.
         $current->{block} = $wikifier->create_block(
-            parent => $current->{block},
-            type   => $block_type,
-            name   => $block_name
+            parent  => $current->{block},
+            type    => $block_type,
+            name    => $block_name,
+            classes => \@block_classes
         );
        
     }

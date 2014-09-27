@@ -127,6 +127,10 @@ sub html {
         $block->html(@_);
     }
 
+    # add classes from the parser.
+    my @classes = @{ delete $block->{classes} || [] };
+    $block->{element}->add_class("class-$_") foreach @classes;
+    
     return $block->{element};
 }
 
