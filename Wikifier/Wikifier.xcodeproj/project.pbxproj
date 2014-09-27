@@ -35,6 +35,7 @@
 		BC0BB17219C621A400CDC378 /* Invisible.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Invisible.pm; sourceTree = "<group>"; };
 		BC4330B919C7884B000470EA /* Model.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Model.pm; sourceTree = "<group>"; };
 		BC569D7219D72A0F0057DD4D /* Style.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Style.pm; sourceTree = "<group>"; };
+		BC569D7319D7634A0057DD4D /* example.page */ = {isa = PBXFileReference; lastKnownFileType = text; name = example.page; path = ../example.page; sourceTree = "<group>"; };
 		BCBD245319C3B9F6000D6FD1 /* Block.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = Block.pm; path = Wikifier/Block.pm; sourceTree = "<group>"; };
 		BCBD245419C3B9F6000D6FD1 /* BlockManager.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = BlockManager.pm; path = Wikifier/BlockManager.pm; sourceTree = "<group>"; };
 		BCBD245619C3BB78000D6FD1 /* Wikirequest.php */ = {isa = PBXFileReference; lastKnownFileType = text.script.php; path = Wikirequest.php; sourceTree = "<group>"; };
@@ -55,6 +56,7 @@
 		A7A5ECBA18B161A400EA4CA0 /* Documentation */ = {
 			isa = PBXGroup;
 			children = (
+				BC569D7319D7634A0057DD4D /* example.page */,
 				A7A5ECBB18B1621000EA4CA0 /* README.md */,
 				A7A5ECB618B070B300EA4CA0 /* configuration */,
 			);
