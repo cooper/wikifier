@@ -74,7 +74,7 @@ sub html {
     Wikifier::lindent("Generate  $$page{name}");
     my $res = $page->{wikifier}{main_block}{element}->generate;
     Wikifier::back();
-    
+    $page->css; #temporary.
     return $res;
 }
 
@@ -83,8 +83,50 @@ sub css {
     my $page = shift;
     return unless $page->{styles};
     foreach my $rule_set (@{ $page->{styles} }) {
-        
+        my $apply_to = $page->_css_apply_string(@{ $rule_set->{apply_to} });
+        print "apply_to: $apply_to\n";
     }
+}
+
+sub _css_apply_string {
+    my ($page, @sets) = @_;
+    # @sets = an array of [
+    #   ['section'],
+    #   ['.someClass'],
+    #   ['section', '.someClass'],
+    #   ['section', '.someClass.someOther']
+    # ] etc.
+    return join ', ', map { $page->_css_set_string(@$_) } @sets;
+}
+
+sub _css_set_string {
+    my ($page, @items) = @_;
+    return join ' ', map { $page->_css_item_string(split //, $_) } @items;
+}
+
+sub _css_item_string {
+    my ($page, @chars) = @_;
+    my $string = '';
+    my ($in_class, $in_el_type);
+    foreach my $char (split //, $item) {
+        
+        # we're starting a class.
+        if ($char eq '.') {
+            $in_class++;
+            $string .= '.wiki-class-';
+            next CHAR;
+        }
+        
+        # we're in neither a class nor an element type.
+        # assume that this is the start of element type.
+        if (!$in_class && !$in_el_type) {
+            $in_el_type = 1;
+            $string .= '.wiki-';
+        }
+        
+        $string .= $char;
+    }
+    return $string;
 }
 
 # set a variable.

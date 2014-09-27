@@ -48,7 +48,7 @@ sub style_parse {
             # ex: p
             # ex: p.something
             # ex: .something.somethingelse
-            push @{ $style{apply_to} }, [ split /\./, $matcher ];
+            push @{ $style{apply_to} }, [ split /\s/, $matcher ];
             
         }
     }
@@ -68,7 +68,7 @@ sub style_html {
     my @apply;
     
     # if we're applying to main, add that.
-    push @apply, [ $main_el->{id} ];
+    push @apply, [ $main_el->{id} ] if $style{apply_to_main};
     
     # add other things, if any.
     foreach my $item (@{ $style{apply_to} }) {
