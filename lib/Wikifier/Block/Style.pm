@@ -79,9 +79,6 @@ sub style_html {
     $style{main_el}  = $main_el->{id};
     $style{apply_to} = \@apply;
     
-    use Data::Dumper;
-    print Dumper \%style;
-    
     push @{ $page->{styles} ||= [] }, \%style;
 }
 
