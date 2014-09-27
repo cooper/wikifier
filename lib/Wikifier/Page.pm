@@ -74,7 +74,7 @@ sub html {
     Wikifier::lindent("Generate  $$page{name}");
     my $res = $page->{wikifier}{main_block}{element}->generate;
     Wikifier::back();
-    $page->css; #temporary.
+
     return $res;
 }
 
@@ -92,7 +92,6 @@ sub css {
         }
         $string .= "}\n";
     }
-    print "$string\n";
     return $string;
 }
 

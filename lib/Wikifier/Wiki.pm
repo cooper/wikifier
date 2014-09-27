@@ -254,6 +254,7 @@ sub _display_page {
     # generate the HTML and headers.
     $result->{type}       = 'page';
     $result->{content}    = $page->html;
+    $result->{css}        = $page->css;
     $result->{length}     = length $result->{content};
     $result->{generated}  = 1;
     $result->{modified}   = time2str(time);
@@ -267,6 +268,7 @@ sub _display_page {
         # save prefixing data.
         print {$fh} JSON->new->pretty(1)->encode({
             %{ $page->get('page') || {} },
+            css        => $result->{css},
             categories => $result->{categories} || []
         }), "\n";
         
