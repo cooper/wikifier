@@ -7,6 +7,8 @@ use strict;
 use Scalar::Util qw(blessed);
 use HTML::Entities qw(encode_entities);
 
+our %identifiers;
+
 # create a new page.
 sub new {
     my ($class, %opts) = @_;
@@ -22,6 +24,11 @@ sub configure {
     $el->{classes}    ||= defined $el->{class} ? [ $el->{class} ] : [];
     $el->{attributes} ||= {};
     $el->{styles}     ||= {};
+    
+    # create an ID.
+    my $it = $el->{classes}[0] || 'generic';
+    my $id = $identifiers{$it}++;
+    $el->{id} = "$it-$id";
     
     # content must an array of items.
     $el->{content} //= [];
@@ -78,6 +85,9 @@ sub generate {
     
     # quickly determine if this is a container.
     $el->{container} ||= scalar @{ $el->{content} };
+    
+    # add ID.
+    $html .= " id=\"wiki-$$el{id}\"";
     
     # add classes.
     my $classes;
