@@ -103,7 +103,7 @@ sub _css_apply_string {
     #   ['section', '.someClass'],
     #   ['section', '.someClass.someOther']
     # ] etc.
-    return join ', ', map {
+    return join ",\n", map {
         my $string = $page->_css_set_string(@$_);
         my $start  = substr $string, 0, 10;
         if (!$start || $start ne '.wiki-main') {
