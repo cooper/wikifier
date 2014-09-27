@@ -230,6 +230,7 @@ sub _display_page {
             # set HTTP data.
             
             $result->{content} .= shift @data;
+            $result->{all_css}  = $result->{css} if length $result->{css};
             $result->{cached}   = 1;
             $result->{modified} = $time;
             $result->{length}   = length $result->{content};
