@@ -63,11 +63,12 @@ sub style_parse {
 
 sub style_html {
     my ($block, $page, $el) = (shift, @_);
-    my %style = %{ $block->{style} };
+    my %style   = %{ $block->{style} };
+    my $main_el = $block->{parent}{element};
     my @apply;
     
     # if we're applying to main, add that.
-    push @apply, [ $el->{parent}{id} ];
+    push @apply, [ $main_el->{id} ];
     
     # add other things, if any.
     foreach my $item ($style{apply_to}) {
@@ -75,7 +76,7 @@ sub style_html {
         push @apply, $item;
     }
     
-    $style{main_el}  = $el->{parent}{id};
+    $style{main_el}  = $main_el;
     $style{apply_to} = \@apply;
     
     use Data::Dumper;
