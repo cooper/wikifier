@@ -108,7 +108,7 @@ sub _css_item_string {
     my ($page, @chars) = @_;
     my $string = '';
     my ($in_class, $in_el_type);
-    foreach my $char (split //, $item) {
+    foreach my $char (@chars) {
         
         # we're starting a class.
         if ($char eq '.') {
