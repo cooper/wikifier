@@ -72,7 +72,7 @@ sub style_html {
     
     # add other things, if any.
     foreach my $item ($style{apply_to}) {
-        unshift @$item,
+        unshift @$item, $main_el->{id};
         push @apply, $item;
     }
     
