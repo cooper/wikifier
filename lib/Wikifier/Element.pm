@@ -24,11 +24,13 @@ sub configure {
     $el->{classes}    ||= defined $el->{class} ? [ $el->{class} ] : [];
     $el->{attributes} ||= {};
     $el->{styles}     ||= {};
+    $el->{ids}        ||= \%identifiers;
     
     # create an ID.
     my $it = $el->{classes}[0] || 'generic';
-    my $id = $identifiers{$it}++;
+    my $id = $el->{ids}{$it}++;
     $el->{id} = "$it-$id";
+    push @{ $el->{classes} }, $el->{id};
     
     # content must an array of items.
     $el->{content} //= [];
@@ -85,9 +87,6 @@ sub generate {
     
     # quickly determine if this is a container.
     $el->{container} ||= scalar @{ $el->{content} };
-    
-    # add ID.
-    $html .= " id=\"wiki-$$el{id}\"";
     
     # add classes.
     my $classes;

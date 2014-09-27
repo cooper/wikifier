@@ -21,6 +21,9 @@ sub create_block {
     my $type = $opts{type};
     my $dir  = _dir(\%opts);
     
+    # this will be weakened in new().
+    $opts{wikifier} = $wikifier;
+    
     # if this block type doesn't exist, try loading its module.
     $wikifier->load_block($type, $dir) if !$block_types{$type};
 

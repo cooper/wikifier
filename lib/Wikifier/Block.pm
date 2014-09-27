@@ -108,7 +108,10 @@ sub html {
     $block->remove_blank;
     
     # create the element.
-    $block->{element} = Wikifier::Element->new(class => $block->{type});
+    $block->{element} = Wikifier::Element->new(
+        class => $block->{type},
+        ids   => $block->{wikifier}{element_identifiers} ||= []
+    );
     #$block->{parent}{element}->add($block->{element})
     #  if $block->{parent}{element};
     
