@@ -32,12 +32,6 @@ sub style_parse {
             $matcher =~ s/^\s*//g;
             $matcher =~ s/\s*$//g;
             
-            # all children.
-            if ($matcher eq '*') {
-                $style{apply_to_all_children}++;
-                next;
-            }
-            
             # this element.
             if ($matcher eq 'this') {
                 $style{apply_to_main}++;

@@ -133,7 +133,7 @@ sub _css_item_string {
         
         # we're in neither a class nor an element type.
         # assume that this is the start of element type.
-        if (!$in_class && !$in_el_type) {
+        if (!$in_class && !$in_el_type && $char ne '*') {
             $in_el_type = 1;
             $string .= '.wiki-';
         }

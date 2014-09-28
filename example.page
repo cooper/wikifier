@@ -4,6 +4,8 @@
 @staff.count:   est. 2.3 million;
 @staff.asof:    2013;
 
+@category.library;
+@category.about;
 
 infobox [NoTrollPlzNet Library] {
 
@@ -172,10 +174,10 @@ section [Management and Employment] {
     
     /* image of the crew */
     imagebox {
-        description: a group of members from the library management crew;
-        align: left;
-        file: the_crew.jpg;
-        height: 200px;
+        description:    a group of members from the library management crew;
+        align:          left;
+        file:           the_crew.jpg;
+        height:         200px;
     }
     
     p {
