@@ -553,6 +553,11 @@ sub generate_image {
             "Skipped '$image{name}' ${width}x${height}".
             " >= ${fi_width}x${fi_height}"
         );
+        
+        # symlink to the full-sized image.
+        $image{full_name} = $image{name};
+        $wiki->symlink_scaled(\%image) if $image{retina};
+        
         return $result;
     }
 
