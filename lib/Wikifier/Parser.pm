@@ -74,7 +74,8 @@ sub handle_line {
     return 1 if $page->{vars_only};
         
     # pass on to main parser.
-    $wikifier->handle_character($_, $page, @rest) foreach (split(//, $line), "\n");
+    $wikifier->handle_character($_,   $page, @rest) foreach (split(//, $line), "\n");
+    $wikifier->handle_character("\n", $page, @rest) if $line eq '';
     
     return 1;
 }

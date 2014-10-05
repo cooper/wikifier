@@ -170,8 +170,8 @@ sub remove_blank {
     my @new;
     foreach my $item (@{ $block->{content} }) {
         push @new, $item and next if blessed $item;
-        my $_item = $item; $_item =~ s/^\s*//g; $_item =~ s/\s*$//g;
-        push @new, $item if length $_item;
+        my $trimmed = Wikifier::Utilities::trim($item);
+        push @new, $item if length $trimmed;
     }
     $block->{content} = \@new;
 }
