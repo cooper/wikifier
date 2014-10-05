@@ -80,16 +80,32 @@ sub section_html {
     }
     
     # add the contained elements.
-    foreach my $item (@{ $block->{content} }) {
+    ITEM: foreach my $item (@{ $block->{content} }) {
 
         # if it's not blessed, it's text.
-        # sections interpret loose text as paragraphs.        
-        $item = $page->wikifier->create_block(
-            parent  => $block,
-            type    => 'paragraph',
-            content => [$item]
-        ) if !blessed $item;
+        # sections interpret loose text as paragraphs.
+        if (!blessed $item) {
+            TEXT: foreach my $text (split "\n\n", $item) {
+                
+                # ignore empty things or spaces, etc.
+                my $trimmed = Wikifier::Utilities::trim($text);
+                next TEXT unless length $text;
+                
+                # create the paragraph.
+                $item = $page->wikifier->create_block(
+                    parent  => $block,
+                    type    => 'paragraph',
+                    content => [$text]
+                );
+                
+                # adopt it.
+                $el->add($item->html($page));
+                
+            }
+            next ITEM;
+        }
         
+        # this is blessed, so it's a block.
         # adopt this element.
         $el->add($item->html($page));
         
