@@ -85,11 +85,11 @@ sub section_html {
         # if it's not blessed, it's text.
         # sections interpret loose text as paragraphs.
         if (!blessed $item) {
-            TEXT: foreach my $text (split "\n\n", $item) {
+            TEXT: foreach my $text (split /(\r*\n+){2}/, $item) {
                 
                 # ignore empty things or spaces, etc.
                 my $trimmed = Wikifier::Utilities::trim($text);
-                next TEXT unless length $text;
+                next TEXT unless length $trimmed;
                 
                 # create the paragraph.
                 $item = $page->wikifier->create_block(
