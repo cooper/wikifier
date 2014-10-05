@@ -42,7 +42,7 @@ sub parse {
     while (my $line = <$fh>) {
         next unless length $line;   # empty line.
         $line =~ s/[\r\n\0]//g;     # remove returns and newlines.
-        $line = trim($line);        # remove prefixing and suffixing whitespace.        
+        $line = trim($line);        # remove prefixing and suffixing whitespace.
         $wikifier->handle_line($line, $page, $current, $last) or last;
     }
     

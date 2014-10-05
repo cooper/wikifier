@@ -81,7 +81,7 @@ sub section_html {
     
     # add the contained elements.
     ITEM: foreach my $item (@{ $block->{content} }) {
-        print "ITEM<< $item >>\n";
+
         # if it's not blessed, it's text.
         # sections interpret loose text as paragraphs.
         if (!blessed $item) {
