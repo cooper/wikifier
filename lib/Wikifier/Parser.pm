@@ -42,9 +42,7 @@ sub parse {
     while (my $line = <$fh>) {
         next unless length $line;   # empty line.
         $line =~ s/[\r\n\0]//g;     # remove returns and newlines.
-        $line = trim($line);        # remove prefixing and suffixing whitespace.
-        next unless length $line;   # line empty after removing unwanted characters.
-        
+        $line = trim($line);        # remove prefixing and suffixing whitespace.        
         $wikifier->handle_line($line, $page, $current, $last) or last;
     }
     
@@ -74,8 +72,7 @@ sub handle_line {
     return 1 if $page->{vars_only};
         
     # pass on to main parser.
-    $wikifier->handle_character($_,   $page, @rest) foreach (split(//, $line), "\n");
-    $wikifier->handle_character("\n", $page, @rest) if $line eq '';
+    $wikifier->handle_character($_, $page, @rest) foreach (split(//, $line), "\n");
     
     return 1;
 }
