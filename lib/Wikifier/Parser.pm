@@ -144,9 +144,6 @@ sub handle_character {
         # chop one character at a time from the end of the content.
         while (my $last_char = chop $content) { $chars_scanned++;
             
-            # ignore newlines.
-            next if $last_char eq "\n";
-            
             # entering block name.
             if ($last_char eq ']') {
                 next if !$in_block_name++;
@@ -174,7 +171,7 @@ sub handle_character {
             }
             
             # this could be a space between things.
-            elsif ($last_char eq ' ' && !length $block_type) {
+            elsif ($last_char =~ m/\s/ && !length $block_type) {
                 next;
             }
             
