@@ -40,11 +40,6 @@ enable.last_section_footer      Default: disabled
     If enabled, the closing </div> tags will be omitted from the final section and wiki
     block. This allows a footer to be injected before closing them off.
 
-enable.category_post_limit      Default: limitless
-
-    If enabled, Wikifier::Wiki's ->display_category_posts() will only display the
-    specified number of pages on a single result page.
-
 
 image.size_method               Default (Page): javascript
                                 Default (Wiki): server
@@ -149,7 +144,17 @@ enable.cache.image              Default: enabled
 enable.cache.page               Default: enabled
 
     Enable caching of generated pages.
-    
+
+cat.per_page                    Default: unlimited
+
+    Number of pages to display on a single category posts page.
+
+cat.main.<name>                 Default: no main page
+
+    Set the main page for the category by the name of <name>.
+    This means that it will be displayed before all other categories, regarldess of
+    any dates.
+
 Wikifier::Server options
 --------------------------------------------------------------------------------
 
@@ -172,8 +177,8 @@ server.enable.pregeneration Default: disabled
 
 server.wiki.<name>.config       Default: none
 
-    The path to a configuration file for the wiki by the name of <wiki>.
+    The path to a configuration file for the wiki by the name of <name>.
 
 server.wiki.<name>.password     Default: none
 
-    The authentication password for the wiki by the name of <wiki>.
+    The authentication password for the wiki by the name of <name>.

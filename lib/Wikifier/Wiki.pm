@@ -663,6 +663,11 @@ sub display_category_posts {
         
         $times{$page_name} = $time || 0;
         $reses{$page_name} = $res;
+        
+        # if this is the main page of the category, it should come first.
+        my $main_page = ($wiki->opt('cat') || {})->{main}{$category} || '';
+        $times{$page_name} = -inf if $page_name eq $main_page;
+        
     }
     
     # order with newest first.
@@ -670,7 +675,9 @@ sub display_category_posts {
     @pages_in_order    = map  { $reses{$_} } @pages_in_order;
     
     # order into PAGES of pages. wow.
-    my $limit = $wiki->opt('enable.category_post_limit') || 'inf';
+    my $limit = $wiki->opt('cat.per_page')               ||
+                $wiki->opt('enable.category_post_limit') ||
+                'inf';
     my $n = 1;
     while (@pages_in_order) {
         $result->{pages}{$n} ||= [];
