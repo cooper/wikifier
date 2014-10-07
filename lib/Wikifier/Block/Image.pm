@@ -192,7 +192,7 @@ sub image_html {
         type       => 'img',
         attributes => {
             src => $image_url,
-            alt => 'image'
+            alt => $block->{file}
         },
         styles     => {
             width  => $width,
