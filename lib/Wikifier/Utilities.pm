@@ -42,6 +42,14 @@ sub unsafe_name {
     return $string;
 }
 
+# two page names equal?
+sub pages_equal {
+    my ($page1, $page2) = @_;
+    $page1 =~ s/\.page$//;
+    $page2 =~ s/\.page$//;
+    return safe_name($page1, 1) eq safe_name($page2, 1);
+}
+
 # removes leading and trailing whitespace from a string.
 sub trim {
     my $string = shift;

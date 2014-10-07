@@ -666,7 +666,8 @@ sub display_category_posts {
         
         # if this is the main page of the category, it should come first.
         my $main_page = ($wiki->opt('cat') || {})->{main}{$category} || '';
-        $times{$page_name} = -inf if $page_name eq $main_page;
+        $times{$page_name} = -inf
+            if Wikifier::Utilities::pages_equal($page_name, $main_page);
         
     }
     
