@@ -644,16 +644,22 @@ sub symlink_scaled {
 sub display_category_posts {
     my ($wiki, $category, $page_n) = @_; my $result = {};
     my ($pages, $title) = $wiki->cat_get_pages($category);
+    
+    # no pages means no category.
     if (!$pages) {
         $result->{error} = "Category '$category' does not exist.";
         $result->{type}  = 'not found';
         return $result;
     }
     
+    my $opts = $wiki->opt('cat') || {};
+    my $main_page = $opts->{main}{$category} || '';
+    
     $result->{type}     = 'catposts';
     $result->{category} = $category;
-    $result->{title}    = $title if defined $title;
+    $result->{title}    = $opts->{title}->{$category} // $title;
     
+    # load each page if necessary.
     my (%times, %reses);
     foreach my $page_name (keys %$pages) {
         my $page_data = $pages->{$page_name};
@@ -665,7 +671,6 @@ sub display_category_posts {
         $reses{$page_name} = $res;
         
         # if this is the main page of the category, it should come first.
-        my $main_page = ($wiki->opt('cat') || {})->{main}{$category} || '';
         $times{$page_name} = 'inf'
             if Wikifier::Utilities::pages_equal($page_name, $main_page);
         
