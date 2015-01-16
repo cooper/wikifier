@@ -298,6 +298,10 @@ sub parse_format_type {
     # new line.
     when (['nl', 'br']) { return '<br />' }
     
+    # dashes.
+    when ('--')  { return '&ndash;' }
+    when ('---') { return '&mdash;' }
+        
     # interporable variable.
     when ($_ =~ /^%([\w.]+)$/ && !$careful) {
         my $var = $page->get($1);
@@ -315,7 +319,7 @@ sub parse_format_type {
     when (/^&(.+)$/) {
         return "&$1;";
     }
-    
+        
     # a link in the form of [[link]], [!link!], or [$link$]
     when (/^([\!\[\$]+?)(.+)([\!\]\$]+?)$/) { # inner match should be most greedy.
     
