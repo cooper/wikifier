@@ -339,6 +339,13 @@ sub parse_format_type {
             $target    = $page->wiki_opt('root.page').q(/).safe_name($target, 1);
         }
         
+        # category wiki link [%category%]
+        if ($link_char eq '%') {
+            $link_type = 'category';
+            $title     = ucfirst $target;
+            $target    = $page->wiki_opt('root.category').q(/).safe_name($target, 1);
+        }
+        
         # external wiki link [!article!]
         elsif ($link_char eq '!') {
             $link_type = 'external';
