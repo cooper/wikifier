@@ -302,7 +302,7 @@ sub parse_format_type {
     when ('--')  { return '&ndash;' }
     when ('---') { return '&mdash;' }
         
-    # interporable variable.
+    # interpolable variable.
     when ($_ =~ /^%([\w.]+)$/ && !$careful) {
         my $var = $page->get($1);
         return defined $var ?
@@ -321,7 +321,7 @@ sub parse_format_type {
     }
         
     # a link in the form of [[link]], [!link!], or [$link$]
-    when (/^([\!\[\$]+?)(.+)([\!\]\$]+?)$/) { # inner match should be most greedy.
+    when (/^([\!\[\$\~]+?)(.+)([\!\]\$\~]+?)$/) { # inner match should be most greedy.
     
         my ($link_char, $inner, $link_type) = (trim($1), trim($2));
         my ($target, $text, $title) = ($inner, $inner, '');
@@ -339,8 +339,8 @@ sub parse_format_type {
             $target    = $page->wiki_opt('root.page').q(/).safe_name($target, 1);
         }
         
-        # category wiki link [%category%]
-        if ($link_char eq '%') {
+        # category wiki link [~category~]
+        if ($link_char eq '~') {
             $link_type = 'category';
             $title     = ucfirst $target;
             $target    = $page->wiki_opt('root.category').q(/).safe_name($target, 1);
