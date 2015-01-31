@@ -100,10 +100,7 @@ sub handle_character {
     $current->{char} = $char;
     
     for ($char) {
-    
-    # inside a comment.
-    last if $current->{in_comment};
-    
+        
     # comment entrance and closure.
     if (defined $last->{char} and $char eq '*' || $char eq '/') {
         if ($char eq '*' && $last->{char} eq '/') {
@@ -115,6 +112,9 @@ sub handle_character {
             last;
         }
     }
+        
+    # inside a comment.
+    last if $current->{in_comment};
         
     # space. terminates a word.
     # delete the current word, setting its value to the last word.
