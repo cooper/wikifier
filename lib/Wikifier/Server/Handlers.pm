@@ -47,9 +47,20 @@ sub handle_wiki {
     Wikifier::l("Successful authentication for read access to '$name' by $$connection{id}");
 }
 
-# method 1: user/password authentication
+# method 1: username/password authentication
+#
+#   username:       the plaintext account name
+#   password:       the plaintext password
+#   session_id:     a string to identify the session (optional)
+#
+sub handle_login {
+    my ($connection, $msg) = read_required(@_, qw(username password)) or return;
+}
 
 # method 2: session ID authentication
+sub handle_resume {
+    
+}
 
 #####################
 ### READ REQUIRED ###

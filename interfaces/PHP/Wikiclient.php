@@ -17,14 +17,20 @@ class Wikiclient {
 
     public $connected = false;
     public $wiki_name;
+    public $session_id;
     private $wiki_pass;
     private $path;
     private $sock;
+    private $username;
+    private $password;
     
-    public function __construct($path, $wiki_name, $wiki_pass) {
+    public function __construct($path, $wiki_name, $wiki_pass, $username, $password, $session_id) {
         $this->path = $path;
-        $this->wiki_name = $wiki_name;
-        $this->wiki_pass = $wiki_pass;
+        $this->wiki_name  = $wiki_name;
+        $this->wiki_pass  = $wiki_pass;
+        $this->username   = $username;
+        $this->password   = $password;
+        $this->session_id = $session_id;
     }
     
     // connect to unix listener.
@@ -35,18 +41,33 @@ class Wikiclient {
             $this->connect($n + 1);
         }
         
-        // send login info
+        // send anonymous login info.
         $auth = array('wiki', array(
             'name'     => $this->wiki_name,
             'password' => $this->wiki_pass
         ));
-        
-        if (fwrite($this->sock, json_encode($auth)."\n")) {
+        if (fwrite($this->sock, json_encode($auth)."\n"))
             $this->connected = true;
-            return true;
+        else return;
+        
+        // send user login info.
+        if (isset($username) && isset($password)) {
+            $auth2 = array('login', array(
+                'username' => $username,
+                'password' => $password
+            ));
+            fwrite($this->sock, json_encode($auth2)."\n");
         }
         
-        return;
+        // send
+        elseif (isset($session_id)) {
+            $auth3 = array('resume', array(
+                'session_id' => $session_id
+            ));
+            fwrite($this->sock, json_encode($auth3)."\n");
+        }
+        
+        return $this->connected;
     }
     
     // send a command/message.
@@ -96,7 +117,7 @@ class Wikiclient {
             'page_n' => $page_n
         ));
     }
-
+    
 }
 
 ?>
