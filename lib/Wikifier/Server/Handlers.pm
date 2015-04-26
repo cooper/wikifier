@@ -47,11 +47,18 @@ sub handle_wiki {
     Wikifier::l("Successful authentication for read access to '$name' by $$connection{id}");
 }
 
+# method 1: user/password authentication
+
+# method 2: session ID authentication
+
 #####################
 ### READ REQUIRED ###
 #####################
 
-# page request.
+# page request
+#
+#   name:   the name of the page
+#
 sub handle_page {
     my ($connection, $msg) = read_required(@_, 'name') or return;
     my $result = $connection->{wiki}->display_page($msg->{name}, 1);
@@ -59,7 +66,14 @@ sub handle_page {
     Wikifier::l("Page '$$msg{name}' requested by $$connection{id}");
 }
 
-# image request.
+# image request
+#
+#   name:       the image filename
+#   width:      desired image width     (optional)
+#   height:     desired image height    (optional)
+#
+#   dimensions default to those of the original image
+#
 sub handle_image {
     my ($connection, $msg) = read_required(@_, 'name') or return;
     Wikifier::lindent("Image '$$msg{name}' requested by $$connection{id}");
@@ -72,7 +86,10 @@ sub handle_image {
     $connection->send('image', $result);
 }
 
-# category posts.
+# category posts
+#
+#   name:   the name of the category
+#
 sub handle_catposts {
     my ($connection, $msg) = read_required(@_, 'name') or return;
     Wikifier::lindent("Category posts for '$$msg{name}' requested by $$connection{id}");
@@ -81,11 +98,49 @@ sub handle_catposts {
     $connection->send('catposts', $result);
 }
 
+# Sort options
+#
+#   a+  sort alphabetically             ascending   (a-z)
+#   a-  sort alphabetically             descending  (z-a)
+#   c+  sort by creation time           ascending   (oldest first)
+#   c-  sort by creation time           descending  (recent first)
+#   m+  sort by modification time       ascending   (oldest first)
+#   m-  sort by modification time       descending  (recent first)
+#
+
+# page list
+#
+#   sort:   method to sort the results
+#
+sub handle_pagelist {
+    my ($connection, $msg) = read_required(@_, 'sort') or return;
+
+}
+
+# category list.
+#
+#   sort:   method to sort the results
+#
+sub handle_pagelist {
+    
+}
+
 ######################
 ### WRITE REQUIRED ###
 ######################
 
+sub handle_pagedel {
+    # copy old page to revisions
+    # delete the page file
+    # remove it from all categories
+    # commit: deleted page x.page
+}
 
+sub handle_catdel {
+    # copy all affected old pages to revisions
+    # search all affected pages for @category.(x)
+    # commit: deleted category x.cat
+}
 
 #################
 ### UTILITIES ###

@@ -51,6 +51,8 @@ class Wikiclient {
     
     // send a command/message.
     private function command($command, $opts) {
+        if ($command != 'wiki' && !$this->connected)
+            $this->connect();
         $opts['close'] = true;
         
         // send request
@@ -70,16 +72,16 @@ class Wikiclient {
         return $res[1];
         
     }
+    
+    /*********** PUBLIC METHODS ***********/
 
     // send a page request.
-    public function page($name) {
-        if (!$this->connected) $this->connect();
+    function page($name) {
         return $this->command('page', array( 'name' => $name ));
     }
     
     // send an image request.
-    public function image($name, $width, $height) {
-        if (!$this->connected) $this->connect();
+    function image($name, $width, $height) {
         return $this->command('image', array(
             'name'   => $name,
             'width'  => $width,
@@ -88,8 +90,7 @@ class Wikiclient {
     }
     
     // send a category posts request.
-    public function catposts($category, $page_n) {
-        if (!$this->connected) $this->connect();
+    function catposts($category, $page_n) {
         return $this->command('catposts', array(
             'name'   => $category,
             'page_n' => $page_n
