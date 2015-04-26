@@ -59,7 +59,7 @@ sub handle_login {
     # FIXME: actually authenticate
     # authentication succeeded.
     $connection->{priv_write} = 1;
-    $connectin->{session_id} = $msg->{session_id};
+    $connection->{session_id} = $msg->{session_id};
     $connection->send(login => { logged_in => 1 });
     
     Wikifier::l("Successful authentication for write access to '$$connection{wiki_name}' by $$connection{id}");
