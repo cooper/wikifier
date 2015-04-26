@@ -40,9 +40,9 @@ sub handle_wiki {
     }
     
     # anonymous authentication succeeded.
-    weaken($connection->{priv_read} = 1);
+    $connection->{priv_read} = 1;
     $connection->{wiki_name} = $name;
-    $connection->{wiki} = $Wikifier::Server::wikis{$name};
+    weaken($connection->{wiki} = $Wikifier::Server::wikis{$name});
     
     Wikifier::l("Successful authentication for read access to '$name' by $$connection{id}");
 }
