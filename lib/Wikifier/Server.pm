@@ -92,7 +92,7 @@ sub handle_stream {
 sub handle_data {
     my ($stream, $buffref, $eof) = @_;
     while ($$buffref =~ s/^(.*?)\n//) {
-    
+        print "~ $1\n";
         # handle the data ($1)
         return unless $stream->{connection}; # might be closed.
         $stream->{connection}->handle($1);
