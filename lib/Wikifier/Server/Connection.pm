@@ -18,6 +18,7 @@ sub new {
 sub send {
     my ($connection, @etc) = @_;
     my $json = JSON->new->allow_blessed(1)->encode(\@etc);
+    print "S: $json\n";
     $connection->{stream}->write("$json\n");
 }
 
@@ -44,6 +45,7 @@ sub error {
 sub handle {
     my ($connection, $line) = @_;
     my $return = undef;
+    print "C: $line\n";
     
     # make sure it's a JSON array.
     my $data = eval { decode_json($line) };
