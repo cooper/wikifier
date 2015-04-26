@@ -24,12 +24,10 @@ class Wikiclient {
     private $username;
     private $password;
     
-    public function __construct($path, $wiki_name, $wiki_pass, $username, $password, $session_id) {
+    public function __construct($path, $wiki_name, $wiki_pass, $session_id) {
         $this->path = $path;
         $this->wiki_name  = $wiki_name;
         $this->wiki_pass  = $wiki_pass;
-        $this->username   = $username;
-        $this->password   = $password;
         $this->session_id = $session_id;
     }
     
@@ -49,22 +47,13 @@ class Wikiclient {
         if (fwrite($this->sock, json_encode($auth)."\n"))
             $this->connected = true;
         else return;
-        
-        // send user login info.
-        if (isset($username) && isset($password)) {
-            $auth2 = array('login', array(
-                'username' => $username,
-                'password' => $password
+
+        // send session ID.
+        if (isset($this->session_id)) {
+            $auth2 = array('resume', array(
+                'session_id' => $this->session_id
             ));
             fwrite($this->sock, json_encode($auth2)."\n");
-        }
-        
-        // send
-        elseif (isset($session_id)) {
-            $auth3 = array('resume', array(
-                'session_id' => $session_id
-            ));
-            fwrite($this->sock, json_encode($auth3)."\n");
         }
         
         return $this->connected;
@@ -115,6 +104,15 @@ class Wikiclient {
         return $this->command('catposts', array(
             'name'   => $category,
             'page_n' => $page_n
+        ));
+    }
+    
+    // send login for write access.
+    function login($username, $password, $session_id) {
+        return $this->command('login', array(
+            'username'   => $username,
+            'password'   => $password,
+            'session_id' => $session_id
         ));
     }
     
