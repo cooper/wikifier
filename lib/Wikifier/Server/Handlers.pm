@@ -56,6 +56,7 @@ sub handle_wiki {
 sub handle_login {
     my ($connection, $msg) = read_required(@_, qw(username password)) or return;
     $connection->send(login => { logged_in => 1 });
+    Wikifier::l("Successful authentication for write access to '$name' by $$connection{id}");
 }
 
 # method 2: session ID authentication
