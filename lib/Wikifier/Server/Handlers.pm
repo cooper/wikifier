@@ -55,13 +55,30 @@ sub handle_wiki {
 #
 sub handle_login {
     my ($connection, $msg) = read_required(@_, qw(username password)) or return;
+    
+    # FIXME: actually authenticate
+    # authentication succeeded.
+    $connection->{priv_write} = 1;
+    $connectin->{session_id} = $msg->{session_id};
     $connection->send(login => { logged_in => 1 });
+    
     Wikifier::l("Successful authentication for write access to '$$connection{wiki_name}' by $$connection{id}");
 }
 
 # method 2: session ID authentication
+#
+#   session_id:     a string to identify the session
+#
 sub handle_resume {
-    
+    my ($connection, $msg) = read_required(@_, 'session_id') or return;
+
+    # FIXME: actually authenticate
+    # authentication succeeded.
+    $connection->{priv_write} = 1;
+    $connection->{session_id} = $msg->{session_id};
+    $connection->send(login => { logged_in => 1 });
+
+    Wikifier::l("Resuming write access to '$$connection{wiki_name}' by $$connection{id}");
 }
 
 #####################
