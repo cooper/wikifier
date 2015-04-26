@@ -72,6 +72,13 @@ sub handle_login {
 sub handle_resume {
     my ($connection, $msg) = read_required(@_, 'session_id') or return;
 
+    # TODO: if no requests from this session in x minutes,
+    # if (no requests from this session in x minutes || unknown session ID) {
+    #     $connection->send('login_again');
+    #     $connection->error('Please login again.');
+    #     return;
+    # }
+    
     # FIXME: actually authenticate
     # authentication succeeded.
     $connection->{priv_write} = 1;

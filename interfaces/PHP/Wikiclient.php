@@ -18,6 +18,8 @@ class Wikiclient {
     public $connected = false;
     public $wiki_name;
     public $session_id;
+    public $login_again_cb;
+    
     private $wiki_pass;
     private $path;
     private $sock;
@@ -81,8 +83,15 @@ class Wikiclient {
         // decode JSON.
         $res = json_decode(trim($data));
         $res[1]->response = $res[0];
-        return $res[1];
+        $res = $res[1];
         
+        // check if the session expired.
+        if ($res->login_again) {
+            if ($this->login_again_cb) $this->login_again_cb();
+            return;
+        }
+        
+        return $res;
     }
     
     /*********** PUBLIC METHODS ***********/
