@@ -4,7 +4,8 @@ package Wikifier::Server::Handlers;
 use warnings;
 use strict;
 
-use Digest::SHA 'sha1_hex';
+use Digest::SHA  'sha1_hex';
+use Scalar::Util 'weaken';
 
 my ($loop, $conf);
 
@@ -12,9 +13,17 @@ sub initialize {
     ($loop, $conf) = ($Wikifier::server::loop, $Wikifier::Server::conf);
 }
 
-# authentication.
+######################
+### AUTHENTICATION ###
+######################
+
+# anonymous authentication
+#
+# note: there is a special exemption for this function so that
+# it does not require read acces - checked BEFORE read_required().
+#
 sub handle_wiki {
-    my ($connection, $msg) = _required(@_, qw(name password)) or return;
+    my ($connection, $msg) = read_required(@_, qw(name password)) or return;
     my $name = (split /\./, $msg->{name})[0];
     
     # ensure that this wiki is configured on this server.
@@ -30,17 +39,21 @@ sub handle_wiki {
         return;
     }
     
-    # authentication succeeded.
-    $connection->{authenticated} = 1;
-    $connection->{wiki_name}     = $name;
-    $connection->{wiki}          = $Wikifier::Server::wikis{$name};
+    # anonymous authentication succeeded.
+    weaken($connection->{priv_read} = 1);
+    $connection->{wiki_name} = $name;
+    $connection->{wiki} = $Wikifier::Server::wikis{$name};
     
-    Wikifier::l("Successful authentication for '$name' by $$connection{id}");
+    Wikifier::l("Successful authentication for read access to '$name' by $$connection{id}");
 }
+
+#####################
+### READ REQUIRED ###
+#####################
 
 # page request.
 sub handle_page {
-    my ($connection, $msg) = _required(@_, 'name') or return;
+    my ($connection, $msg) = read_required(@_, 'name') or return;
     my $result = $connection->{wiki}->display_page($msg->{name}, 1);
     $connection->send('page', $result);
     Wikifier::l("Page '$$msg{name}' requested by $$connection{id}");
@@ -48,7 +61,7 @@ sub handle_page {
 
 # image request.
 sub handle_image {
-    my ($connection, $msg) = _required(@_, 'name') or return;
+    my ($connection, $msg) = read_required(@_, 'name') or return;
     Wikifier::lindent("Image '$$msg{name}' requested by $$connection{id}");
     my $result = $connection->{wiki}->display_image(
         [ $msg->{name}, $msg->{width} || 0, $msg->{height} || 0 ],
@@ -61,16 +74,26 @@ sub handle_image {
 
 # category posts.
 sub handle_catposts {
-    my ($connection, $msg) = _required(@_, 'name') or return;
+    my ($connection, $msg) = read_required(@_, 'name') or return;
     Wikifier::lindent("Category posts for '$$msg{name}' requested by $$connection{id}");
     my $result = $connection->{wiki}->display_category_posts($msg->{name});
     Wikifier::back();
     $connection->send('catposts', $result);
 }
 
+######################
+### WRITE REQUIRED ###
+######################
+
+
+
+#################
+### UTILITIES ###
+#################
+
 # check for all required things.
 # disconnect from the client if one is missing.
-sub _required {
+sub read_required {
     my ($connection, $msg, @required) = @_;
     foreach (@required) {
         next if defined $msg->{$_};
@@ -78,6 +101,18 @@ sub _required {
         return;
     }
     return my @a = ($connection, $msg);
+}
+
+# check for all required things.
+# disconnect from the client if one is missing.
+# disconnect if the client does not have write access.
+sub write_required {
+    my $connection = @_;
+    if (!$connection->{priv_write}) {
+        $connection->error('No write access');
+        return;
+    }
+    return read_required(@_);
 }
 
 1

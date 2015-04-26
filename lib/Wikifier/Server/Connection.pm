@@ -67,8 +67,8 @@ sub handle {
     }
     
     # if the connection is not authenticated, this better be a wiki command.
-    if (!$connection->{authenticated} && $command ne 'wiki') {
-        $connection->error('Authentication required');
+    if (!$connection->{priv_read} && $command ne 'wiki') {
+        $connection->error('No read access');
         return;
     }
     
