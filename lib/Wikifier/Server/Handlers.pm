@@ -83,7 +83,6 @@ sub handle_resume {
     # authentication succeeded.
     $connection->{priv_write} = 1;
     $connection->{session_id} = $msg->{session_id};
-    $connection->send(login => { logged_in => 1 });
 
     Wikifier::l("Resuming write access to '$$connection{wiki_name}' by $$connection{id}");
 }
