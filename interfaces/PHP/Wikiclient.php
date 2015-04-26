@@ -75,7 +75,9 @@ class Wikiclient {
             $data .= fgets($this->sock, 128);
         }
         fclose($this->sock);
-        
+        unset($this->sock);
+        $this->connected = false;
+
         // decode JSON.
         $res = json_decode(trim($data));
         $res[1]->response = $res[0];
