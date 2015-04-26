@@ -55,6 +55,7 @@ sub handle_wiki {
 #
 sub handle_login {
     my ($connection, $msg) = read_required(@_, qw(username password)) or return;
+    $connection->send(login => { logged_in => 1 });
 }
 
 # method 2: session ID authentication
