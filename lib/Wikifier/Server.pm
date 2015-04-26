@@ -7,6 +7,7 @@ use strict;
 use IO::Async::Loop;
 use IO::Async::File;
 use IO::Async::Listener;
+use IO::Async::Timer::Periodic;
 use IO::Socket::UNIX;
 use JSON qw(encode_json decode_json);
 
@@ -14,7 +15,7 @@ use Wikifier::Wiki;
 use Wikifier::Server::Connection;
 use Wikifier::Server::Handlers;
 
-our ($loop, $conf, %wikis, %files);
+our ($loop, $conf, %wikis, %files, %sessions);
 
 # start the server.
 sub start {
@@ -27,6 +28,13 @@ sub start {
         name => $conf_file
     ) or die "Error in configuration\n")->parse;
 
+    # create a timer for session disposal.
+    my $timer = IO::Async::Timer::Periodic->new(
+        interval => 300,
+        on_tick  => \&delete_old_sessions
+    );
+    $loop->add($timer);
+    
     # create a new listener and add it to the loop.
     my $listener = IO::Async::Listener->new(on_stream => \&handle_stream);
     $loop->add($listener);
@@ -164,6 +172,14 @@ sub gen_wiki {
     }
     
     Wikifier::lback("Done [$$wiki{name}]");
+}
+
+# dispose of sessions older than 5 hours
+sub delete_old_sessions {
+    foreach my $session_id (keys %sessions) {
+        next if time - $sessions{$session_id} < 18000;
+        delete $sessions{$session_id};
+    }
 }
 
 1
