@@ -75,7 +75,7 @@ sub handle_resume {
 
     # session is too old or never existed.
     if (!$Wikifier::Server::sessions{ $msg->{session_id} }) {
-        $connection->send('login_again');
+        $connection->send('resume' => { login_again => 1 });
         return;
     }
     
