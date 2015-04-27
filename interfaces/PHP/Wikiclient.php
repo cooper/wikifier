@@ -106,6 +106,10 @@ class Wikiclient {
         return $this->command('page_code', array( 'name' => $name ));
     }
     
+    function page_list() {
+        return $this->command('page_list');
+    }
+    
     // send an image request.
     function image($name, $width, $height) {
         return $this->command('image', array(

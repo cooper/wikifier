@@ -114,6 +114,18 @@ sub handle_page_code {
     Wikifier::l("Code for page '$$msg{name}' requested by $$connection{id}");
 }
 
+# page list
+#
+#   sort:   method to sort the results
+#
+sub handle_page_list {
+    my ($connection, $msg) = read_required(@_, 'sort') or return;
+    my $result = $connection->{wiki}->cat_get_pages('all');
+    # TODO: sort
+    $connection->send('page_list', { pages => $result });
+    Wikifier::l("Complete page list requested by $$connection{id}");
+}
+
 # image request
 #
 #   name:       the image filename
@@ -156,20 +168,11 @@ sub handle_catposts {
 #   m-  sort by modification time       descending  (recent first)
 #
 
-# page list
-#
-#   sort:   method to sort the results
-#
-sub handle_pagelist {
-    my ($connection, $msg) = read_required(@_, 'sort') or return;
-
-}
-
 # category list.
 #
 #   sort:   method to sort the results
 #
-sub handle_pagelist {
+sub handle_cat_list {
     
 }
 
@@ -184,7 +187,7 @@ sub handle_pagedel {
     # commit: deleted page x.page
 }
 
-sub handle_catdel {
+sub handle_cat_del {
     # copy all affected old pages to revisions
     # search all affected pages for @category.(x)
     # commit: deleted category x.cat
