@@ -211,7 +211,14 @@ sub handle_page_save {
     # update the page file
     # regenerate it
     # commit: (existed? added : modified) x.page: user edit message
-    my ($connection, $msg) = write_required(@_, qw(name));
+    my ($connection, $msg) = write_required(@_, qw(name content));
+    
+    # update the page
+    my $wiki = $connection->{wiki};
+    my $page = $wiki->page_named($msg->{name}, content => $msg->{content});
+    $wiki->write_page($page);
+    
+    $connection->send(page_save => { saved => 1 });
 }
 
 sub handle_page_del {

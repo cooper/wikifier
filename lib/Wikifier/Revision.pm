@@ -1,24 +1,33 @@
 #
 # Copyright (c) 2014, Mitchell Cooper
 #
-# Version control methods.
+# Version control methods for WiWiki.
 #
-package Wikifier::Revision;
+package Wikifier::Wiki;
 
 use warnings;
 use strict;
 
-use Wikifier;
+sub write_page {
+    my ($wiki, $page, $reason) = @_;
 
-# add to a revision
-sub rev_add (@) {
-    my @files = _filify(@_);
-}
-
-# remove from a revision
-sub rev_rm (@) {
+    # write the file
+    open my $fh, '>', $page->path or return;
+    print {$fh} $page->{content};
+    close $fh;
     
+    # commit the change
+    rev_commit(
+        message => defined $reason ? "Updated $$page{name}: $reason" : "Created $$page{name}",
+        affects => [ $page->path ]
+    );
+    
+    return 1;
 }
+
+####################################
+### LOW-LEVEL REVISION FUNCTIONS ###
+####################################
 
 # commit a revision
 sub rev_commit (@) {

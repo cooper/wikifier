@@ -23,6 +23,7 @@ use File::Basename 'basename';          # determining object names
 use JSON qw(encode_json decode_json);   # caching and storing
 
 use Wikifier;
+use Wikifier::Wiki::Revision;
 
 # default options.
 our %wiki_defaults = (
@@ -54,6 +55,16 @@ sub new {
         if defined $opts{config_file};
     
     return $wiki;
+}
+
+sub page_named {
+    my ($wiki, $page_name, %opts) = @_;
+    my $page = Wikifier::Page->new(
+        name     => $page_name,
+        wiki     => $wiki,
+        wikifier => $wiki->{wikifier},
+        %opts
+    );
 }
 
 # read options from a configuration page file.
