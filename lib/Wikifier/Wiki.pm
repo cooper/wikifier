@@ -978,7 +978,7 @@ my %crypts = (
 sub verify_login {
     my ($wiki, $username, $password) = @_;
     if (!$wiki->{pconf}) {
-        Wikfiier::l('Attempted verify_login() without configured credentials');
+        Wikifier::l('Attempted verify_login() without configured credentials');
         return;
     }
     
@@ -995,7 +995,7 @@ sub verify_login {
         require $c->[0];
         $c->[2]($password);
     };
-    
+    Wikifier::l("comparing $hash to $$user{password}");
     return ($hash // '') eq $user->{password};
 }
 #####################
