@@ -24,6 +24,7 @@ use Wikifier::Utilities 'trim';
 # parse a wiki file.
 sub parse {
     my ($wikifier, $page, $file) = @_;
+    $file = $page->path if $page;
     
     # no file given.
     if (!defined $file) {
