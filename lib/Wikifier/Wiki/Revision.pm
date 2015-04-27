@@ -22,6 +22,9 @@ sub write_page {
         affects => [ $page->path ]
     );
     
+    # update the page
+    $wiki->display_page($page);
+    
     return 1;
 }
 

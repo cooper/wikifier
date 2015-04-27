@@ -21,6 +21,7 @@ use Cwd 'abs_path';                     # resolving symlinks
 use File::Spec ();                      # simplifying symlinks
 use File::Basename 'basename';          # determining object names
 use JSON qw(encode_json decode_json);   # caching and storing
+use Scalar::Util 'blessed';
 
 use Wikifier;
 use Wikifier::Wiki::Revision;
@@ -203,6 +204,7 @@ sub display_page {
 }
 sub _display_page {
     my ($wiki, $page_name) = @_; my $result = {};
+    $page_name = $page_name->name if blessed $page_name;
     
     my $page = Wikifier::Page->new(
         name     => $page_name,
