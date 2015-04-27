@@ -13,6 +13,24 @@ sub initialize {
     ($loop, $conf) = ($Wikifier::server::loop, $Wikifier::Server::conf);
 }
 
+# Sort options
+#
+#   a+  sort alphabetically             ascending   (a-z)
+#   a-  sort alphabetically             descending  (z-a)
+#   c+  sort by creation time           ascending   (oldest first)
+#   c-  sort by creation time           descending  (recent first)
+#   m+  sort by modification time       ascending   (oldest first)
+#   m-  sort by modification time       descending  (recent first)
+#
+my %sort_options = (
+    'a+' => sub { $_[0]{title}    // '' cmp $_[1]{title}    },
+    'a-' => sub { $_[1]{title}    // '' cmp $_[0]{title}    },
+    'c+' => sub { $_[0]{created}  || 0  <=> $_[1]{created}  },
+    'c-' => sub { $_[1]{created}  || 0  <=> $_[0]{created}  },
+    'm+' => sub { $_[0]{modified} || 0  <=> $_[1]{modified} },
+    'm-' => sub { $_[1]{modified} || 0  <=> $_[0]{modified} },
+);
+
 ######################
 ### AUTHENTICATION ###
 ######################
@@ -163,24 +181,6 @@ sub handle_catposts {
     Wikifier::back();
     $connection->send('catposts', $result);
 }
-
-# Sort options
-#
-#   a+  sort alphabetically             ascending   (a-z)
-#   a-  sort alphabetically             descending  (z-a)
-#   c+  sort by creation time           ascending   (oldest first)
-#   c-  sort by creation time           descending  (recent first)
-#   m+  sort by modification time       ascending   (oldest first)
-#   m-  sort by modification time       descending  (recent first)
-#
-my %sort_options = (
-    'a+' => sub { $_[0]{title}    // '' cmp $_[1]{title}    },
-    'a-' => sub { $_[1]{title}    // '' cmp $_[0]{title}    },
-    'c+' => sub { $_[0]{created}  || 0  <=> $_[1]{created}  },
-    'c-' => sub { $_[1]{created}  || 0  <=> $_[0]{created}  },
-    'm+' => sub { $_[0]{modified} || 0  <=> $_[1]{modified} },
-    'm-' => sub { $_[1]{modified} || 0  <=> $_[0]{modified} },
-);
 
 # category list.
 #
