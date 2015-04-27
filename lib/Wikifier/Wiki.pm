@@ -994,7 +994,8 @@ sub verify_login {
         my $c = $crypts{ $user->{crypt} || 'sha1' } || $crypts{'sha1'};
         $c->[0] =~ s/::/\//; $c->[0] .= '.pm';
         require $c->[0];
-        $c->[2]($password);
+        my $h = $c->[2]($password);
+        $h;
     };
 
     return ($hash // '') eq $user->{password};
