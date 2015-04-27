@@ -172,7 +172,7 @@ sub display_page {
 sub _display_page {
     my ($wiki, $page_name) = @_; my $result = {};
     
-    my $file = abs_path($wiki->opt('dir.page').q(/)._page_filename($page_name);
+    my $file = abs_path($wiki->opt('dir.page').q(/)._page_filename($page_name));
     $page_name = basename($file);
     my $cache_file = $wiki->opt('dir.cache').q(/).$page_name.q(.cache);
     
@@ -281,7 +281,7 @@ sub _display_page {
 # Displays the wikifier code for a page.
 sub display_page_code {
     my ($wiki, $page_name) = @_; my $result = {};
-    my $file   = abs_path($wiki->opt('dir.page').q(/)._page_filename($page_name);
+    my $file   = abs_path($wiki->opt('dir.page').q(/)._page_filename($page_name));
     $page_name = basename($file);
 
     # file does not exist.
