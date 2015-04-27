@@ -76,7 +76,7 @@ sub handle_resume {
     # session is too old or never existed.
     if (!$Wikifier::Server::sessions{ $msg->{session_id} }) {
         Wikifier::l("Bad session ID for $$connection{id}; refusing authentication");
-        $connection->send(resume => { login_again => 1 });
+        $connection->error('Please login again', login_again => 1);
         return;
     }
     

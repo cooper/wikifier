@@ -35,8 +35,8 @@ sub close {
 
 # send an error and close connection.
 sub error {
-    my ($connection, $error) = @_;
-    $connection->send(error => { reason => $error });
+    my ($connection, $error, %other) = @_;
+    $connection->send(error => { reason => $error, %other });
     Wikifier::l("Connection error '$error' $$connection{id}");
     $connection->close;
 }
