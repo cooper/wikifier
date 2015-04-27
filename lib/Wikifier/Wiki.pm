@@ -990,13 +990,20 @@ sub verify_login {
     }
     
     # hash it.
+    my $crypt = $crypts{ $user->{crypt} } ? $user->{crypt} : 'sha1';
     my $hash = eval {
-        my $c = $crypts{ $user->{crypt} || 'sha1' } || $crypts{'sha1'};
+        my $c = $crypts{$crypt};
         $c->[0] =~ s/::/\//; $c->[0] .= '.pm';
         require $c->[0];
         my $h = $c->[2]($password);
         $h;
     };
+    
+    # error
+    if (!defined $hash && $@) {
+        Wikifier::l("Error with $crypt: $@");
+        return;
+    }
 
     return ($hash // '') eq $user->{password};
 }
