@@ -995,7 +995,7 @@ sub verify_login {
         my $c = $crypts{$crypt};
         $c->[0] =~ s/::/\//; $c->[0] .= '.pm';
         require $c->[0];
-        my $h = $c->[2]($password);
+        my $h = $c->[1]($password);
         $h;
     };
     
