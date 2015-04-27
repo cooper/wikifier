@@ -214,7 +214,7 @@ sub handle_page_save {
     my ($connection, $msg) = write_required(@_, qw(name content));
     
     # update the page
-    my $wiki = $connection->{wiki};
+    my $wiki = $connection->{wiki} or return;
     my $page = $wiki->page_named($msg->{name}, content => $msg->{content});
     $wiki->write_page($page);
     
@@ -259,7 +259,7 @@ sub write_required {
         $connection->error('No write access');
         return;
     }
-    return read_required(@_);
+    &read_required;
 }
 
 1
