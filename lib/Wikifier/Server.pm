@@ -25,7 +25,7 @@ sub start {
     # load configuration.
     ($conf = Wikifier::Page->new(
         file_path => $conf_file,
-        name      => $conf_file
+        name      => basename($conf_file)
     ) or die "Error in configuration\n")->parse;
 
     # create a timer for session disposal.

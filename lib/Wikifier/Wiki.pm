@@ -71,8 +71,8 @@ sub page_named {
 sub read_config {
     my ($wiki, $file, $private_file) = @_;
     my $conf = $wiki->{conf} = Wikifier::Page->new(
-        file      => $file,
-        name      => $file,
+        file_path => $file,
+        name      => basename($file),
         wikifier  => $wiki->{wikifier},
         vars_only => 1
     );
@@ -87,7 +87,7 @@ sub read_config {
     if (length $private_file) {
         my $pconf = $wiki->{pconf} = Wikifier::Page->new(
             file      => $private_file,
-            name      => $private_file,
+            name      => basename($private_file),
             wikifier  => $wiki->{wikifier},
             vars_only => 1
         );
@@ -894,7 +894,7 @@ sub cat_get_pages {
             # we will create a dummy Wikifier::Page that will stop after reading variables.
             my $page = Wikifier::Page->new(
                 name      => $page_name,
-                file      => $page_path,
+                file_path => $page_path,
                 wikifier  => $wiki->{wikifier},
                 vars_only => 1
             );
