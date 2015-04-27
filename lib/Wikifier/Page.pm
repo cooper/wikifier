@@ -44,7 +44,6 @@ sub new {
     # create the page.
     my $page = bless \%opts, $class;
     $page->{name} = _page_filename($page->{name});
-    $page->{file} = $page->{name};
     
     # create the page's main block.
     $page->{main_block} = $wikifier->{main_block} = $wikifier->create_block(
@@ -254,6 +253,7 @@ sub cache_path {
 
 sub path {
     my $page = shift;
+    return $page->{path} if length $page->{path};
     return abs_path($page->wiki_opt('dir.page').q(/).$page->name);
 }
 
