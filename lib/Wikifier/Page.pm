@@ -269,7 +269,7 @@ sub _page_filename {
     $page_name = lc $page_name;
     
     # append .page if it isn't already there.
-    if ($page_name !~ m/\.page$/) {
+    if ($page_name !~ m/\.(page|conf)$/) {
         $page_name .= q(.page);
     }
     
