@@ -140,7 +140,8 @@ sub handle_page_list {
     my ($connection, $msg) = read_required(@_, 'sort') or return;
     
     # get all pages
-    my @pages = values %{ $connection->{wiki}->cat_get_pages('all') };
+    my %pages = %{ $connection->{wiki}->cat_get_pages('all') };
+    my @pages = map { (%{ $pages{$_} }, file => $_) } keys %pages;
     
     # sort
     # TODO: m+ and m- won't work because 'modified' doesn't exist
