@@ -73,8 +73,13 @@ sub handle_wiki {
 #
 sub handle_login {
     my ($connection, $msg) = read_required(@_, qw(username password)) or return;
+
+    # verify password
+    if (!$connection->{wiki}->verify_login($msg->{username}, $msg->{password})) {
+        $connection->error('Incorrect password', incorrect => 1);
+        return;
+    }
     
-    # FIXME: actually authenticate
     # authentication succeeded.
     $connection->{priv_write} = 1;
     $connection->{session_id} = $msg->{session_id};
@@ -196,7 +201,7 @@ sub handle_cat_list {
 ### WRITE REQUIRED ###
 ######################
 
-sub handle_pagedel {
+sub handle_page_del {
     # copy old page to revisions
     # delete the page file
     # remove it from all categories

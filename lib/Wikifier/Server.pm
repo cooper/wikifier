@@ -112,7 +112,8 @@ sub create_wikis {
     
         # load the wiki.
         my $wiki = Wikifier::Wiki->new(
-            config_file => $conf->get("server.wiki.$name.config")
+            config_file  => $conf->get("server.wiki.$name.config"),
+            private_conf => $conf->get("server.wiki.$name.private")
         );
         
         # it failed.

@@ -46,28 +46,49 @@ sub new {
     $wiki->{wikifier} ||= Wikifier->new();
     
     # if there were no provided options, assume we're reading from /etc/wikifier.conf.
-    $wiki->read_config('/etc/wikifier.conf') if not scalar keys %opts;
+    $wiki->read_config('/etc/wikifier.conf', '/etc/wikifier_private.conf')
+        if not scalar keys %opts;
     
     # if a config file is provided, use it.
-    $wiki->read_config($opts{config_file}) if defined $opts{config_file};
+    $wiki->read_config($opts{config_file}, $opts{private_file})
+        if defined $opts{config_file};
     
     return $wiki;
 }
 
 # read options from a configuration page file.
 sub read_config {
-    my ($wiki, $file) = @_;
+    my ($wiki, $file, $private_file) = @_;
     my $conf = $wiki->{conf} = Wikifier::Page->new(
         file      => $file,
         name      => $file,
         wikifier  => $wiki->{wikifier},
         vars_only => 1
     );
-    
+
     # error.
     if (!$conf->parse) {
         Wikifier::l("Failed to parse configuration");
         return;
+    }
+    
+    # private configuration.
+    if (length $private_file) {
+        my $pconf = $wiki->{pconf} = Wikifier::Page->new(
+            file      => $private_file,
+            name      => $private_file,
+            wikifier  => $wiki->{wikifier},
+            vars_only => 1
+        );
+
+        # error.
+        if (!$pconf->parse) {
+            Wikifier::l("Failed to parse private configuration");
+            return;
+        }
+    }
+    else {
+        $wiki->{pconf} = $conf;
     }
     
     return 1;
@@ -292,11 +313,8 @@ sub display_page_code {
     }
     
     # read.
-    open my $fh, '<', $file
-    or return { type => 'not found', error => 'Failed to open' };
-    my $code = do { local $/ = undef; <$fh> };
-    close $fh;
-    
+    my $code = file_contents($file);
+    defined $code or return { type => 'not found', error => 'Failed to open' };
     
     # set path, file, and meme type.
     $result->{file}     = $page_name;
@@ -947,6 +965,40 @@ sub all_categories {
     return files_in_dir(shift->opt('dir.category'), 'cat');
 }
 
+######################
+### AUTHENTICATION ###
+######################
+
+my %crypts = (
+    'sha1'   => ['Digest::SHA', sub { Digest::SHA::sha1_hex(shift)   } ],
+    'sha256' => ['Digest::SHA', sub { Digest::SHA::sha256_hex(shift) } ],
+    'sha512' => ['Digest::SHA', sub { Digest::SHA::sha512_hex(shift) } ]
+);
+
+sub verify_login {
+    my ($wiki, $username, $password) = @_;
+    if (!$wiki->{pconf}) {
+        Wikfiier::l('Attempted verify_login() without configured credentials');
+        return;
+    }
+    
+    # find the user.
+    my $user = $wiki->{pconf}->get("admin.$username");
+    if (!$user) {
+        Wikifier::l("Attempted to login as '$user' which does not exist");
+        return;
+    }
+    
+    # hash it.
+    my $hash = eval {
+        my $c = $crypts{ $user->{crypt} || 'sha1' };
+        return undef if !$c;
+        require $c->[0];
+        $c->[2]($password);
+    };
+    
+    return ($hash // '') eq $user->{password};
+}
 #####################
 ### MISCELLANEOUS ###
 #####################
