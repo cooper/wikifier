@@ -39,7 +39,7 @@ sub _filify {
 
 sub _path {
     my $thing = shift;
-    return $thing->file_path;
+    return $thing->path;
 }
 
 1

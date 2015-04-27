@@ -43,6 +43,8 @@ sub new {
     
     # create the page.
     my $page = bless \%opts, $class;
+    $page->{name} = _page_filename($page->{name});
+    $page->{file} = $page->{name};
     
     # create the page's main block.
     $page->{main_block} = $wikifier->{main_block} = $wikifier->create_block(
@@ -247,17 +249,16 @@ sub image_round {
 
 sub cache_path {
     my $page = shift;
-    return abs_path($page->wiki_opt('dir.cache').q(/).$page->file_name.q(.cache));
+    return abs_path($page->wiki_opt('dir.cache').q(/).$page->name.q(.cache));
 }
 
-sub file_path {
+sub path {
     my $page = shift;
-    return abs_path($page->wiki_opt('dir.page').q(/).$page->file_name);
+    return abs_path($page->wiki_opt('dir.page').q(/).$page->name);
 }
 
-sub file_name {
-    my $page = shift;
-    return _page_filename($page->{name});
+sub name {
+    return shift->{name};
 }
 
 sub _page_filename {

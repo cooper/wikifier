@@ -199,8 +199,8 @@ sub _display_page {
         wikifier => $wiki->{wikifier}
     );
     
-    $page_name     = $page->file_name;
-    my $path       = $page->file_path;
+    $page_name     = $page->name;
+    my $path       = $page->path;
     my $cache_path = $page->cache_path;
     
     # file does not exist.
@@ -310,8 +310,8 @@ sub display_page_code {
         wikifier => $wiki->{wikifier}
     );
     
-    $page_name     = $page->file_name;
-    my $path       = $page->file_path;
+    $page_name = $page->name;
+    my $path   = $page->path;
 
     # file does not exist.
     if (!-f $path) {
