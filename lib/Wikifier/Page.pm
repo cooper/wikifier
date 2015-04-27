@@ -61,7 +61,7 @@ sub parse {
     my $page = shift;
 
     Wikifier::lindent("Parse     $$page{name}");
-    my $res = $page->wikifier->parse($page, $page->name);
+    my $res = $page->wikifier->parse($page, $page->path);
     Wikifier::back();
     
     return $res;
