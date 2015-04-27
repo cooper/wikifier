@@ -107,7 +107,9 @@ class Wikiclient {
     }
     
     function page_list() {
-        return $this->command('page_list');
+        return $this->command('page_list', array(
+            'sort' => $sort
+        ));
     }
     
     // send an image request.
