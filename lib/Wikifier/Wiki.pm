@@ -745,7 +745,8 @@ sub display_category_posts {
 # deal with categories after parsing a page.
 sub check_categories {
     my ($wiki, $page) = @_;
-
+    $wiki->cat_add_page($page, 'all');
+    
     # actual categories.
     my $cats = $page->get('category');
     if ($cats && ref $cats eq 'HASH') {
