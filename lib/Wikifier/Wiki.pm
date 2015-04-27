@@ -992,7 +992,7 @@ sub verify_login {
     # hash it.
     my $hash = eval {
         my $c = $crypts{ $user->{crypt} || 'sha1' } || $crypts{'sha1'};
-        $c->[0] =~ m/::/\//; $c->[0] .= '.pm';
+        $c->[0] =~ s/::/\//; $c->[0] .= '.pm';
         require $c->[0];
         $c->[2]($password);
     };
