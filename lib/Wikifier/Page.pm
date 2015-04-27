@@ -253,7 +253,7 @@ sub cache_path {
 
 sub path {
     my $page = shift;
-    return $page->{path} if length $page->{path};
+    return $page->{file_path} if length $page->{file_path};
     return abs_path($page->wiki_opt('dir.page').q(/).$page->name);
 }
 
