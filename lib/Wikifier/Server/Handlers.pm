@@ -141,7 +141,7 @@ sub handle_page_list {
     
     # get all pages
     my %pages = %{ $connection->{wiki}->cat_get_pages('all') };
-    my @pages = map { (%{ $pages{$_} }, file => $_) } keys %pages;
+    my @pages = map { my $ref = $pages{$_}; $ref->{file} = $_; $ref } keys %pages;
     
     # sort
     # TODO: m+ and m- won't work because 'modified' doesn't exist
