@@ -47,6 +47,9 @@ sub handle {
     my $return = undef;
     print "C: $line\n";
     
+    # not interested if we're dropping the connection
+    return if $connection->{closed};
+    
     # make sure it's a JSON array.
     my $data = eval { decode_json($line) };
     if (!$line || !$data || ref $data ne 'ARRAY') {
