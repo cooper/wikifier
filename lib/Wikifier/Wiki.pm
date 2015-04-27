@@ -985,7 +985,7 @@ sub verify_login {
     # find the user.
     my $user = $wiki->{pconf}->get("admin.$username");
     if (!$user) {
-        Wikifier::l("Attempted to login as '$user' which does not exist");
+        Wikifier::l("Attempted to login as '$username' which does not exist");
         return;
     }
     
