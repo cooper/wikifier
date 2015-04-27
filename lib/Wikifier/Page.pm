@@ -9,6 +9,7 @@ package Wikifier::Page;
 use warnings;
 use strict;
 use Scalar::Util 'blessed';
+use Cwd 'abs_path'; # resolving symlinks
 
 # default options.
 our %wiki_defaults = (
