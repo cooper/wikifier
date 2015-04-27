@@ -251,7 +251,7 @@ sub cache_path {
 
 sub file_path {
     my $page = shift;
-    return abs_path($page->wiki_opt('dir.page').q(/).$page->file);
+    return abs_path($page->wiki_opt('dir.page').q(/).$page->file_name);
 }
 
 sub file_name {
