@@ -178,7 +178,8 @@ sub gen_wiki {
 # dispose of sessions older than 5 hours
 sub delete_old_sessions {
     foreach my $session_id (keys %sessions) {
-        next if time - $sessions{$session_id} < 18000;
+        next if time - $sessions{$session_id}[0] < 18000;
+        Wikifier::l("Disposing of old session '$session_id'");
         delete $sessions{$session_id};
     }
 }

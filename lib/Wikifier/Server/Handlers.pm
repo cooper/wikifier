@@ -81,10 +81,11 @@ sub handle_login {
     }
     
     # authentication succeeded.
+    $connection->{username}   = $msg->{username};
     $connection->{priv_write} = 1;
     $connection->{session_id} = $msg->{session_id};
     $connection->send(login => { logged_in => 1 });
-    $Wikifier::Server::sessions{ $msg->{session_id} } = time;
+    $Wikifier::Server::sessions{ $msg->{session_id} } = [ time, $connection->{username} ];
 
     Wikifier::l("Successful authentication for write access to '$$connection{wiki_name}' by $$connection{id}");
 }
@@ -106,7 +107,7 @@ sub handle_resume {
     # authentication succeeded.
     $connection->{priv_write} = 1;
     $connection->{session_id} = $msg->{session_id};
-    $Wikifier::Server::sessions{ $msg->{session_id} } = time;
+    $Wikifier::Server::sessions{ $msg->{session_id} }[0] = time;
 
     Wikifier::l("Resuming write access to '$$connection{wiki_name}' by $$connection{id}");
 }
@@ -200,6 +201,18 @@ sub handle_cat_list {
 ######################
 ### WRITE REQUIRED ###
 ######################
+
+# page save
+#
+#   name:       the name of the page
+#   content:    the page code
+#
+sub handle_page_save {
+    # update the page file
+    # regenerate it
+    # commit: (existed? added : modified) x.page: user edit message
+    my ($connection, $msg) = write_required(@_, qw(name));
+}
 
 sub handle_page_del {
     # copy old page to revisions
