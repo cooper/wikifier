@@ -193,12 +193,18 @@ sub display_page {
 sub _display_page {
     my ($wiki, $page_name) = @_; my $result = {};
     
-    my $file = abs_path($wiki->opt('dir.page').q(/)._page_filename($page_name));
-    $page_name = basename($file);
-    my $cache_file = $wiki->opt('dir.cache').q(/).$page_name.q(.cache);
+    my $page = Wikifier::Page->new(
+        name     => $page_name,
+        wiki     => $wiki,
+        wikifier => $wiki->{wikifier}
+    );
+    
+    $page_name     = $page->file_name;
+    my $path       = $page->file_path;
+    my $cache_path = $page->cache_path;
     
     # file does not exist.
-    if (!-f $file) {
+    if (!-f $path) {
         $result->{error} = "Page '$page_name' does not exist.";
         $result->{type}  = 'not found';
         return $result;
@@ -206,19 +212,19 @@ sub _display_page {
     
     # set path, file, and meme type.
     $result->{file} = $page_name;
-    $result->{path} = $file;
+    $result->{path} = $path;
     $result->{mime} = 'text/html';
     
     # caching is enabled, so let's check for a cached copy.
     
-    if ($wiki->opt('enable.cache.page') && -f $cache_file) {
-        my ($page_modify, $cache_modify) = ((stat $file)[9], (stat $cache_file)[9]);
+    if ($wiki->opt('enable.cache.page') && -f $cache_path) {
+        my ($page_modify, $cache_modify) = ((stat $path)[9], (stat $cache_path)[9]);
     
         # the page's file is more recent than the cache file.
         if ($page_modify > $cache_modify) {
         
             # discard the outdated cached copy.
-            unlink $cache_file;
+            unlink $cache_path;
         
         }
         
@@ -229,7 +235,7 @@ sub _display_page {
             $result->{content}  = "<!-- cached page dated $time -->\n\n";
             
             # fetch the prefixing data.
-            my $cache_data = file_contents($cache_file);
+            my $cache_data = file_contents($cache_path);
             my @data = split /\n\n/, $cache_data, 2;
             
             # decode.
@@ -252,12 +258,7 @@ sub _display_page {
     }
     
     # cache was not used. generate a new copy.
-    my $page = $result->{page} = Wikifier::Page->new(
-        name     => $page_name,
-        file     => $file,
-        wiki     => $wiki,
-        wikifier => $wiki->{wikifier}
-    );
+    $result->{page} = $page;
     
     # parse the page.
     $page->parse();
@@ -276,7 +277,7 @@ sub _display_page {
     # caching is enabled, so let's save this for later.
     if ($wiki->opt('enable.cache.page')) {
     
-        open my $fh, '>', $cache_file;
+        open my $fh, '>', $cache_path;
         
         # save prefixing data.
         print {$fh} JSON->new->pretty(1)->encode({
@@ -291,7 +292,7 @@ sub _display_page {
         close $fh;
         
         # overwrite modified date to actual.
-        $result->{modified}  = time2str((stat $cache_file)[9]);
+        $result->{modified}  = time2str((stat $cache_path)[9]);
         $result->{cache_gen} = 1;
         
     }
@@ -302,7 +303,7 @@ sub _display_page {
 # Displays the wikifier code for a page.
 sub display_page_code {
     my ($wiki, $page_name) = @_; my $result = {};
-    my $file   = abs_path($wiki->opt('dir.page').q(/)._page_filename($page_name));
+    my $file   = abs_path($wiki->opt('dir.page').q(/).Wikifier::Page::_page_filename($page_name));
     $page_name = basename($file);
 
     # file does not exist.
@@ -325,21 +326,6 @@ sub display_page_code {
     $result->{length}   = length $result->{content};
 
     return $result;
-}
-
-sub _page_filename {
-    my $page_name = shift;
-    
-    # replace spaces with _ and lowercase.
-    $page_name =~ s/\s/_/g;
-    $page_name = lc $page_name;
-    
-    # append .page if it isn't already there.
-    if ($page_name !~ m/\.page$/) {
-        $page_name .= q(.page);
-    }
-    
-    return $page_name;
 }
 
 ##############

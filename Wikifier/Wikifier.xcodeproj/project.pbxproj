@@ -33,6 +33,7 @@
 		A7A67A3F18AC3B9C00427886 /* wiki.example.conf */ = {isa = PBXFileReference; lastKnownFileType = text; name = wiki.example.conf; path = ../wiki.example.conf; sourceTree = "<group>"; };
 		A7A67A4018AC3B9C00427886 /* wikiserver.example.conf */ = {isa = PBXFileReference; lastKnownFileType = text; name = wikiserver.example.conf; path = ../wikiserver.example.conf; sourceTree = "<group>"; };
 		BC0BB17219C621A400CDC378 /* Invisible.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Invisible.pm; sourceTree = "<group>"; };
+		BC157A941AEE7A0D0005BA50 /* Revision.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; name = Revision.pm; path = Wikifier/Revision.pm; sourceTree = "<group>"; };
 		BC4330B919C7884B000470EA /* Model.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Model.pm; sourceTree = "<group>"; };
 		BC569D7219D72A0F0057DD4D /* Style.pm */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = Style.pm; sourceTree = "<group>"; };
 		BC569D7319D7634A0057DD4D /* example.page */ = {isa = PBXFileReference; lastKnownFileType = text; name = example.page; path = ../example.page; sourceTree = "<group>"; };
@@ -105,6 +106,7 @@
 				A7A67A3318AC3B9C00427886 /* Element.pm */,
 				BCBD245319C3B9F6000D6FD1 /* Block.pm */,
 				BCBD245419C3B9F6000D6FD1 /* BlockManager.pm */,
+				BC157A941AEE7A0D0005BA50 /* Revision.pm */,
 				A7A67A2018AC3B9C00427886 /* Blocks */,
 				A7A67A3818AC3B9C00427886 /* Server */,
 			);

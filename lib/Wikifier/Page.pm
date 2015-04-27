@@ -244,6 +244,36 @@ sub image_round {
     return $size; # fallback.
 }
 
+sub cache_path {
+    my $page = shift;
+    return abs_path($page->wiki_opt('dir.cache').q(/).$page->file_name.q(.cache));
+}
+
+sub file_path {
+    my $page = shift;
+    return abs_path($page->wiki_opt('dir.page').q(/).$page->file);
+}
+
+sub file_name {
+    my $page = shift;
+    return _page_filename($page->{name});
+}
+
+sub _page_filename {
+    my $page_name = shift;
+    
+    # replace spaces with _ and lowercase.
+    $page_name =~ s/\s/_/g;
+    $page_name = lc $page_name;
+    
+    # append .page if it isn't already there.
+    if ($page_name !~ m/\.page$/) {
+        $page_name .= q(.page);
+    }
+    
+    return $page_name;
+}
+
 sub wikifier { shift->{wikifier} }
 
 1
