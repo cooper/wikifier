@@ -991,8 +991,7 @@ sub verify_login {
     
     # hash it.
     my $hash = eval {
-        my $c = $crypts{ $user->{crypt} || 'sha1' };
-        return undef if !$c;
+        my $c = $crypts{ $user->{crypt} || 'sha1' } || $crypts{'sha1'};
         require $c->[0];
         $c->[2]($password);
     };
