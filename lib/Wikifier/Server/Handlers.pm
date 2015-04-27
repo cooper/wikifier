@@ -254,7 +254,7 @@ sub read_required {
 # disconnect from the client if one is missing.
 # disconnect if the client does not have write access.
 sub write_required {
-    my $connection = @_;
+    my ($connection) = @_;
     if (!$connection->{priv_write}) {
         $connection->error('No write access');
         return;
