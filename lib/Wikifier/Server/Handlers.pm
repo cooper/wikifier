@@ -146,7 +146,7 @@ sub handle_page_list {
     my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'d-'};
     @pages = sort { $sorter->($a, $b) } @pages;
     
-    $connection->send('page_list', { pages => $result });
+    $connection->send('page_list', { pages => \@pages });
     Wikifier::l("Complete page list requested by $$connection{id}");
 }
 
