@@ -106,7 +106,7 @@ class Wikiclient {
         return $this->command('page_code', array( 'name' => $name ));
     }
     
-    function page_list() {
+    function page_list($sort = 'm-') {
         return $this->command('page_list', array(
             'sort' => $sort
         ));
