@@ -94,7 +94,16 @@ class Wikiclient {
         return $res;
     }
     
-    /*********** PUBLIC METHODS ***********/
+    // send login for write access.
+    function login($username, $password, $session_id) {
+        return $this->command('login', array(
+            'username'   => $username,
+            'password'   => $password,
+            'session_id' => $session_id
+        ));
+    }
+    
+    /*********** PUBLIC READ METHODS ***********/
 
     // send a page request.
     function page($name) {
@@ -129,12 +138,12 @@ class Wikiclient {
         ));
     }
     
-    // send login for write access.
-    function login($username, $password, $session_id) {
-        return $this->command('login', array(
-            'username'   => $username,
-            'password'   => $password,
-            'session_id' => $session_id
+    /*********** PUBLIC WRITE METHODS ***********/
+ 
+    function page_save($name, $content) {
+        return $this->command('page_save', array(
+            'name'     => $name,
+             'content' => $content
         ));
     }
     
