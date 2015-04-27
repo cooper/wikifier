@@ -10,6 +10,7 @@ use IO::Async::Listener;
 use IO::Async::Timer::Periodic;
 use IO::Socket::UNIX;
 use JSON qw(encode_json decode_json);
+use File::Basename 'basename';
 
 use Wikifier::Wiki;
 use Wikifier::Server::Connection;
