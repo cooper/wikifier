@@ -98,9 +98,20 @@ sub handle_resume {
 #
 sub handle_page {
     my ($connection, $msg) = read_required(@_, 'name') or return;
-    my $result = $connection->{wiki}->display_page($msg->{name}, 1);
+    my $result = $connection->{wiki}->display_page($msg->{name});
     $connection->send('page', $result);
     Wikifier::l("Page '$$msg{name}' requested by $$connection{id}");
+}
+
+# page code request
+#
+#   name:   the name of the page
+#
+sub handle_page_code {
+    my ($connection, $msg) = read_required(@_, 'name') or return;
+    my $result = $connection->{wiki}->display_page_code($msg->{name});
+    $connection->send('page_code', $result);
+    Wikifier::l("Code for page '$$msg{name}' requested by $$connection{id}");
 }
 
 # image request

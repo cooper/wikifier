@@ -172,18 +172,8 @@ sub display_page {
 sub _display_page {
     my ($wiki, $page_name) = @_; my $result = {};
     
-    # replace spaces with _ and lowercase.
-    $page_name =~ s/\s/_/g;
-    $page_name = lc $page_name;
-    
-    # append .page if it isn't already there.
-    if ($page_name !~ m/\.page$/) {
-        $page_name .= q(.page);
-    }
-    
-    # determine the page file name.
-    my $file       = abs_path($wiki->opt('dir.page').q(/).$page_name);
-       $page_name  = basename($file);
+    my $file = _page_filename($page_name);
+    $page_name = basename($file);
     my $cache_file = $wiki->opt('dir.cache').q(/).$page_name.q(.cache);
     
     # file does not exist.
@@ -286,6 +276,52 @@ sub _display_page {
     }
     
     return $result;
+}
+
+# Displays the wikifier code for a page.
+sub display_page_code {
+    my ($wiki, $page_name) = @_; my $result = {};
+    my $file   = _page_filename($page_name);
+    $page_name = basename($file);
+
+    # file does not exist.
+    if (!-f $file) {
+        $result->{error} = "Page '$page_name' does not exist.";
+        $result->{type}  = 'not found';
+        return $result;
+    }
+    
+    # read.
+    open my $fh, '<', $file
+    or return { type => 'not found', error => 'Failed to open' };
+    my $code = do { local $/ = undef; <$fh> };
+    close $fh;
+    
+    
+    # set path, file, and meme type.
+    $result->{file}     = $page_name;
+    $result->{path}     = $file;
+    $result->{mime}     = 'text/plain';
+    $result->{type}     = 'page_code';
+    $result->{content}  = $code;
+    $result->{length}   = length $result->{content};
+
+    return $result;
+}
+
+sub _page_filename {
+    my $page_name = shift;
+    
+    # replace spaces with _ and lowercase.
+    $page_name =~ s/\s/_/g;
+    $page_name = lc $page_name;
+    
+    # append .page if it isn't already there.
+    if ($page_name !~ m/\.page$/) {
+        $page_name .= q(.page);
+    }
+    
+    return $page_name;
 }
 
 ##############
