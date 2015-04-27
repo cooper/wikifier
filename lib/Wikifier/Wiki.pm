@@ -86,7 +86,7 @@ sub read_config {
     # private configuration.
     if (length $private_file) {
         my $pconf = $wiki->{pconf} = Wikifier::Page->new(
-            file      => $private_file,
+            file_path => $private_file,
             name      => basename($private_file),
             wikifier  => $wiki->{wikifier},
             vars_only => 1
