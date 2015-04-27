@@ -864,9 +864,8 @@ sub cat_get_pages {
         }
         
         # check if the modification date is more recent than as of date.
-        # 'all' category is ignored.
         my $mod_date = (stat $page_path)[9];
-        if ($mod_date > $p->{asof} && $category ne 'all') {
+        if ($mod_date > $p->{asof}) {
             $changed = 1;
             
             # the page has since been modified.

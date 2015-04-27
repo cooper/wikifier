@@ -120,8 +120,14 @@ sub handle_page_code {
 #
 sub handle_page_list {
     my ($connection, $msg) = read_required(@_, 'sort') or return;
-    my $result = $connection->{wiki}->cat_get_pages('all');
-    # TODO: sort
+    
+    # get all pages
+    my @pages = values %{ $connection->{wiki}->cat_get_pages('all') };
+    
+    # sort
+    my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'d-'};
+    @pages = sort { $sorter->($a, $b) } @pages;
+    
     $connection->send('page_list', { pages => $result });
     Wikifier::l("Complete page list requested by $$connection{id}");
 }
@@ -167,6 +173,14 @@ sub handle_catposts {
 #   m+  sort by modification time       ascending   (oldest first)
 #   m-  sort by modification time       descending  (recent first)
 #
+my %sort_options = (
+    'a+' => sub { $_[0]{title}    // '' cmp $_[1]{title}    },
+    'a-' => sub { $_[1]{title}    // '' cmp $_[0]{title}    },
+    'c+' => sub { $_[0]{created}  || 0  <=> $_[1]{created}  },
+    'c-' => sub { $_[1]{created}  || 0  <=> $_[0]{created}  },
+    'm+' => sub { $_[0]{modified} || 0  <=> $_[1]{modified} },
+    'm-' => sub { $_[1]{modified} || 0  <=> $_[0]{modified} },
+);
 
 # category list.
 #
