@@ -303,23 +303,30 @@ sub _display_page {
 # Displays the wikifier code for a page.
 sub display_page_code {
     my ($wiki, $page_name) = @_; my $result = {};
-    my $file   = abs_path($wiki->opt('dir.page').q(/).Wikifier::Page::_page_filename($page_name));
-    $page_name = basename($file);
+    
+    my $page = Wikifier::Page->new(
+        name     => $page_name,
+        wiki     => $wiki,
+        wikifier => $wiki->{wikifier}
+    );
+    
+    $page_name     = $page->file_name;
+    my $path       = $page->file_path;
 
     # file does not exist.
-    if (!-f $file) {
+    if (!-f $path) {
         $result->{error} = "Page '$page_name' does not exist.";
         $result->{type}  = 'not found';
         return $result;
     }
     
     # read.
-    my $code = file_contents($file);
+    my $code = file_contents($path);
     defined $code or return { type => 'not found', error => 'Failed to open' };
     
     # set path, file, and meme type.
     $result->{file}     = $page_name;
-    $result->{path}     = $file;
+    $result->{path}     = $path;
     $result->{mime}     = 'text/plain';
     $result->{type}     = 'page_code';
     $result->{content}  = $code;
