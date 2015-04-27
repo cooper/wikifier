@@ -23,12 +23,12 @@ sub initialize {
 #   m-  sort by modification time       descending  (recent first)
 #
 my %sort_options = (
-    'a+' => sub { $_[0]{title}    // '' cmp $_[1]{title}    },
-    'a-' => sub { $_[1]{title}    // '' cmp $_[0]{title}    },
-    'c+' => sub { $_[0]{created}  || 0  <=> $_[1]{created}  },
-    'c-' => sub { $_[1]{created}  || 0  <=> $_[0]{created}  },
-    'm+' => sub { $_[0]{modified} || 0  <=> $_[1]{modified} },
-    'm-' => sub { $_[1]{modified} || 0  <=> $_[0]{modified} },
+    'a+' => sub { ($_[0]{title}    // '') cmp $_[1]{title}      },
+    'a-' => sub { ($_[1]{title}    // '') cmp $_[0]{title}      },
+    'c+' => sub { ($_[0]{created}  ||  0) <=> $_[1]{created}    },
+    'c-' => sub { ($_[1]{created}  ||  0) <=> $_[0]{created}    },
+    'm+' => sub { ($_[0]{modified} ||  0) <=> $_[1]{modified}   },
+    'm-' => sub { ($_[1]{modified} ||  0) <=> $_[0]{modified}   }
 );
 
 ######################
@@ -143,7 +143,8 @@ sub handle_page_list {
     my @pages = values %{ $connection->{wiki}->cat_get_pages('all') };
     
     # sort
-    my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'d-'};
+    # TODO: m+ and m- won't work because 'modified' doesn't exist
+    my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
     @pages = sort { $sorter->($a, $b) } @pages;
     
     $connection->send('page_list', { pages => \@pages });
