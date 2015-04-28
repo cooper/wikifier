@@ -215,6 +215,7 @@ sub handle_page_save {
     
     # remove carriage returns injected by the browser
     $msg->{content} =~ s/\r\n/\n/g;
+    $msg->{content} =~ s/\r//g;
     
     # update the page
     my $wiki = $connection->{wiki} or return;
