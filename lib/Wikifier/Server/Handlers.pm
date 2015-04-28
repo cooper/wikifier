@@ -213,6 +213,9 @@ sub handle_page_save {
     # commit: (existed? added : modified) x.page: user edit message
     my ($connection, $msg) = write_required(@_, qw(name content));
     
+    # remove carriage returns injected by the browser
+    $msg->{content} =~ s/\r\n/\n/g;
+    
     # update the page
     my $wiki = $connection->{wiki} or return;
     my $page = $wiki->page_named($msg->{name}, content => $msg->{content});

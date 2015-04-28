@@ -12,7 +12,7 @@ sub write_page {
     my ($wiki, $page, $reason) = @_;
 
     # write the file
-    open my $fh, '+>', $page->path or return;
+    open my $fh, '>', $page->path or return;
     print {$fh} $page->{content};
     close $fh;
     
