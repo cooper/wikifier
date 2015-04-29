@@ -230,6 +230,14 @@ sub handle_page_del {
     # delete the page file
     # remove it from all categories
     # commit: deleted page x.page
+    my ($connection, $msg) = write_required(@_, 'name');
+
+    # delete the page
+    my $wiki = $connection->{wiki};
+    my $page = $wiki->page_named($msg->{name});
+    $wiki->delete_page($page);
+    
+    $connection->send(page_del => { deleted => 1 });
 }
 
 sub handle_cat_del {

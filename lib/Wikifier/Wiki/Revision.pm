@@ -19,11 +19,28 @@ sub write_page {
     # commit the change
     rev_commit(
         message => defined $reason ? "Updated $$page{name}: $reason" : "Created $$page{name}",
-        affects => [ $page->path ]
+        add     => [ $page->path ]
     );
     
     # update the page
     $wiki->display_page($page);
+    
+    return 1;
+}
+
+sub delete_page {
+    my ($wiki, $page) = @_;
+    
+    # delete the file as well as the cache
+    # consider: should we just let git rm unlink them?
+    unlink $page->path       or return;
+    unlink $page->cache_path or return;
+    
+    # commit the change
+    rev_commit(
+        message => "Deleted $$page{name}";
+        rm      => [ $page->path, $page->cache_path ]
+    );
     
     return 1;
 }
