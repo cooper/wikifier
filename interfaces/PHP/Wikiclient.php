@@ -153,6 +153,13 @@ class Wikiclient {
         ));
     }
     
+    function page_move($name, $new_name) {
+        return $this->command('page_move', array(
+            'name'     => $name,
+            'new_name' => $new_name
+        ));
+    }
+    
 }
 
 ?>

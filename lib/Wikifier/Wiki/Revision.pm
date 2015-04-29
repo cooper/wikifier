@@ -45,6 +45,30 @@ sub delete_page {
     return 1;
 }
 
+sub move_page {
+    my ($wiki, $page, $new_name) = @_;
+    $new_name = Wikifier::Page::_page_filename($new_name);
+    my ($old_name, $old_path) = ($page->name, $page->path);
+    $page->{name} = $new_name;
+
+    # consider: what if the destination page exists?
+    
+    # move the file as well as the cache
+    # consider: should we just let git mv move it?
+    rename $old_path, $page->path or do {
+        $page->{name} = $old_name;
+        return;
+    };
+    
+    # commit the change
+    rev_commit(
+        message => "Moved $old_name -> $new_name",
+        mv      => { $old_path => $page->path }
+    );
+    
+    return 1;
+}
+
 ####################################
 ### LOW-LEVEL REVISION FUNCTIONS ###
 ####################################

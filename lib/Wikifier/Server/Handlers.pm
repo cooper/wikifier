@@ -240,6 +240,19 @@ sub handle_page_del {
     $connection->send(page_del => { deleted => 1 });
 }
 
+sub handle_page_move {
+    # rename page file
+    # commit: moved page a.page -> b.page
+    my ($connection, $msg) = write_required(@_, qw(name new_name));
+    
+    # rename the page
+    my $wiki = $connection->{wiki};
+    my $page = $wiki->page_named($msg->{name});
+    $wiki->move_page($page, $msg->{new_name});
+    
+    $connection->send(page_move => { moved => 1 });
+}
+
 sub handle_cat_del {
     # copy all affected old pages to revisions
     # search all affected pages for @category.(x)
