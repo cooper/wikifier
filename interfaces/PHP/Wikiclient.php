@@ -142,8 +142,14 @@ class Wikiclient {
  
     function page_save($name, $content) {
         return $this->command('page_save', array(
-            'name'     => $name,
-             'content' => $content
+            'name'    => $name,
+            'content' => $content
+        ));
+    }
+    
+    function page_del($name) {
+        return $this->command('page_del', array(
+            'name' => $name
         ));
     }
     
