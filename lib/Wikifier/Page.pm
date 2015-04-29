@@ -265,7 +265,7 @@ sub _page_filename {
     my $page_name = shift;
     
     # replace non-alphanumerics with _ and lowercase.
-    $page_name =~ s/\W/_/g;
+    $page_name =~ s/[^\w\.]/_/g;
     $page_name = lc $page_name;
     
     # append .page if it isn't already there.
