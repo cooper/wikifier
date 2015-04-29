@@ -38,7 +38,7 @@ sub delete_page {
     
     # commit the change
     rev_commit(
-        message => "Deleted $$page{name}";
+        message => "Deleted $$page{name}",
         rm      => [ $page->path, $page->cache_path ]
     );
     
