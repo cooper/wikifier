@@ -16,14 +16,14 @@ sub write_page {
     print {$fh} $page->{content};
     close $fh;
     
+    # update the page
+    $wiki->display_page($page);
+    
     # commit the change
     rev_commit(
         message => defined $reason ? "Updated $$page{name}: $reason" : "Created $$page{name}",
         add     => [ $page->path ]
     );
-    
-    # update the page
-    $wiki->display_page($page);
     
     return 1;
 }
@@ -33,8 +33,8 @@ sub delete_page {
     
     # delete the file as well as the cache
     # consider: should we just let git rm unlink them?
-    unlink $page->path       or return;
-    unlink $page->cache_path or return;
+    unlink $page->path or return;
+    unlink $page->cache_path; # may or may not exist
     
     # commit the change
     rev_commit(
@@ -53,12 +53,18 @@ sub move_page {
 
     # consider: what if the destination page exists?
     
+    # delete the old cache file
+    unlink $page->cache_path; # may or may not exist
+    
     # move the file as well as the cache
     # consider: should we just let git mv move it?
     rename $old_path, $page->path or do {
         $page->{name} = $old_name;
         return;
     };
+    
+    # update the page
+    $wiki->display_page($page);
     
     # commit the change
     rev_commit(
