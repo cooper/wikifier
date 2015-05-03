@@ -21,14 +21,18 @@ sub initialize {
 #   c-  sort by creation time           descending  (recent first)
 #   m+  sort by modification time       ascending   (oldest first)
 #   m-  sort by modification time       descending  (recent first)
+#   u+  sort by author alphabetically   ascending   (a-z)
+#   u-  sort by author alphabetically   descending  (z-a)
 #
 my %sort_options = (
-    'a+' => sub { ($_[0]{title}    // '') cmp $_[1]{title}      },
-    'a-' => sub { ($_[1]{title}    // '') cmp $_[0]{title}      },
-    'c+' => sub { ($_[0]{created}  ||  0) <=> $_[1]{created}    },
-    'c-' => sub { ($_[1]{created}  ||  0) <=> $_[0]{created}    },
-    'm+' => sub { ($_[0]{modified} ||  0) <=> $_[1]{modified}   },
-    'm-' => sub { ($_[1]{modified} ||  0) <=> $_[0]{modified}   }
+    'a+' => sub { lc($_[0]{title}    // '') cmp lc($_[1]{title}    // '')   },
+    'a-' => sub { lc($_[1]{title}    // '') cmp lc($_[0]{title}    // '')   },
+    'c+' => sub {   ($_[0]{created}  ||  0) <=>   ($_[1]{created}  ||  0)   },
+    'c-' => sub {   ($_[1]{created}  ||  0) <=>   ($_[0]{created}  ||  0)   },
+    'm+' => sub {   ($_[0]{modified} ||  0) <=>   ($_[1]{modified} ||  0)   },
+    'm-' => sub {   ($_[1]{modified} ||  0) <=>   ($_[0]{modified} ||  0)   },
+    'u+' => sub { lc($_[0]{author}   // '') cmp lc($_[1]{author}   // '')   },
+    'u-' => sub { lc($_[1]{author}   // '') cmp lc($_[0]{author}   // '')   }
 );
 
 ######################
