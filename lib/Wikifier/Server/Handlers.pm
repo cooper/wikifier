@@ -26,8 +26,8 @@ sub initialize {
 #
 sub _t { lc(length $_[0]{title} ? $_[0]{title} : $_[0]{file}) }
 my %sort_options = (
-    'a+' => sub { _t($_[0]->{title}       ) cmp _t($_[1]->{title}       )   },
-    'a-' => sub { _t($_[1]->{title}       ) cmp _t($_[0]->{title}       )   },
+    'a+' => sub { _t($_[0])                 cmp _t($_[1])                   },
+    'a-' => sub { _t($_[1])                 cmp _t($_[0])                   },
     'c+' => sub {   ($_[0]{created}  ||  0) <=>   ($_[1]{created}  ||  0)   },
     'c-' => sub {   ($_[1]{created}  ||  0) <=>   ($_[0]{created}  ||  0)   },
     'm+' => sub {   ($_[0]{modified} ||  0) <=>   ($_[1]{modified} ||  0)   },
