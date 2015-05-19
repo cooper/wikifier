@@ -276,6 +276,11 @@ sub _page_filename {
     return $page_name;
 }
 
+sub title {
+    my $page = shift;
+    return length $page->{title} ? $page->{title} : $page->name;
+}
+
 sub wikifier { shift->{wikifier} }
 
 1
