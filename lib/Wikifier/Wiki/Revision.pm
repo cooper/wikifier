@@ -79,9 +79,45 @@ sub move_page {
 ### LOW-LEVEL REVISION FUNCTIONS ###
 ####################################
 
+sub capture_logs(&@) {
+    my ($code, $command) = @_;
+    eval { $code->() };
+    if ($@ && ref $@ eq 'Git::Wrapper::Exception') {
+        my $message = $command.' exited with code '.$@->status.'. ';
+        $message .= $@->error.$/.$@->output;
+        Wikifier::l($message);
+    }
+    elsif ($@) {
+        Wikifier::l('Unspecified git error');
+    }
+    return 1;
+}
+
 # commit a revision
+our $git;
 sub rev_commit (@) {
-    
+    if (!$git) {
+        $git = Git::Wrapper->new('');
+    }
+    eval { &_rev_commit };
+}
+
+sub _rev_commit {
+    my %opts = @_;
+    my ($rm, $add, $mv) = @opts{'rm', 'add', 'mv'};
+    if ($rm && ref $rm eq 'ARRAY') {
+        capture_logs { $git->rm(@$rm) }, 'git rm';
+    }
+    if ($add && ref $add eq 'ARRAY') {
+        capture_logs { $git->add(@$add) }, 'git add';
+    }
+    if ($mv && ref $mv eq 'HASH') {
+        foreach (keys %$mv) {
+            capture_logs { $git->mv($_, $mv{$_}) }, 'git mv';
+        }
+    }
+    Wikifier::l("git commit: $opts{message}");
+    capture_logs { $git->commit(message => $opts{message} // 'Unspecified') };
 }
 
 # convert objects to file paths.
