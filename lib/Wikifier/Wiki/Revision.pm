@@ -80,7 +80,7 @@ sub move_page {
 ### LOW-LEVEL REVISION FUNCTIONS ###
 ####################################
 
-sub capture_logs(&@) {
+sub capture_logs(&$;&) {
     my ($code, $command) = @_;
     eval { $code->() };
     if ($@ && ref $@ eq 'Git::Wrapper::Exception') {
@@ -113,14 +113,14 @@ sub _rev_commit {
     my %opts = @_;
     my ($rm, $add, $mv) = @opts{'rm', 'add', 'mv'};
     if ($rm && ref $rm eq 'ARRAY') {
-        capture_logs { $git->rm(@$rm) }, 'git rm';
+        capture_logs { $git->rm(@$rm) } 'git rm';
     }
     if ($add && ref $add eq 'ARRAY') {
-        capture_logs { $git->add(@$add) }, 'git add';
+        capture_logs { $git->add(@$add) } 'git add';
     }
     if ($mv && ref $mv eq 'HASH') {
         foreach (keys %$mv) {
-            capture_logs { $git->mv($_, $mv->{$_}) }, 'git mv';
+            capture_logs { $git->mv($_, $mv->{$_}) } 'git mv';
         }
     }
     Wikifier::l("git commit: $opts{message}");
