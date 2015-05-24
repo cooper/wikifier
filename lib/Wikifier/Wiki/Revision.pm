@@ -120,7 +120,7 @@ sub _rev_commit {
     }
     if ($mv && ref $mv eq 'HASH') {
         foreach (keys %$mv) {
-            capture_logs { $git->mv($_, $mv{$_}) }, 'git mv';
+            capture_logs { $git->mv($_, $mv->{$_}) }, 'git mv';
         }
     }
     Wikifier::l("git commit: $opts{message}");
