@@ -20,7 +20,7 @@ sub write_page {
     $wiki->display_page($page);
     
     # commit the change
-    rev_commit(
+    $wiki->rev_commit(
         message => defined $reason ? "Updated $$page{name}: $reason" : "Created $$page{name}",
         add     => [ $page->path ]
     );
@@ -37,7 +37,7 @@ sub delete_page {
     unlink $page->cache_path; # may or may not exist
     
     # commit the change
-    rev_commit(
+    $wiki->rev_commit(
         message => "Deleted $$page{name}",
         rm      => [ $page->path, $page->cache_path ]
     );
@@ -67,7 +67,7 @@ sub move_page {
     $wiki->display_page($page);
     
     # commit the change
-    rev_commit(
+    $wiki->rev_commit(
         message => "Moved $old_name -> $new_name",
         mv      => { $old_path => $page->path }
     );
@@ -96,8 +96,14 @@ sub capture_logs(&@) {
 # commit a revision
 our $git;
 sub rev_commit (@) {
+    my $wiki = shift;
     if (!$git) {
-        $git = Git::Wrapper->new('');
+        my $dir = $wiki->opt('dir.wiki');
+        if (!length $dir) {
+            Wikifier::l('Cannot commit; @dir.wiki not set');
+            return;
+        }
+        $git = Git::Wrapper->new($dir);
     }
     eval { &_rev_commit };
 }
