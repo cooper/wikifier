@@ -7,6 +7,7 @@ package Wikifier::Wiki;
 
 use warnings;
 use strict;
+use Git::Wrapper;
 
 sub write_page {
     my ($wiki, $page, $reason) = @_;
