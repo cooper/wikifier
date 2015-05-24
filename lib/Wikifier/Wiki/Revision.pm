@@ -80,7 +80,7 @@ sub move_page {
 ### LOW-LEVEL REVISION FUNCTIONS ###
 ####################################
 
-sub capture_logs(&$;&) {
+sub capture_logs(&$) {
     my ($code, $command) = @_;
     eval { $code->() };
     if ($@ && ref $@ eq 'Git::Wrapper::Exception') {
@@ -124,7 +124,7 @@ sub _rev_commit {
         }
     }
     Wikifier::l("git commit: $opts{message}");
-    capture_logs { $git->commit(message => $opts{message} // 'Unspecified') };
+    capture_logs { $git->commit(message => $opts{message} // 'Unspecified') } 'git commit';
 }
 
 # convert objects to file paths.
