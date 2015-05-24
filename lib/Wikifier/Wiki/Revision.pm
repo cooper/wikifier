@@ -124,7 +124,7 @@ sub _rev_commit {
         }
     }
     Wikifier::l("git commit: $opts{message}");
-    capture_logs { $git->commit(message => $opts{message} // 'Unspecified') } 'git commit';
+    capture_logs { $git->commit({ message => $opts{message} // 'Unspecified' }) } 'git commit';
 }
 
 # convert objects to file paths.
