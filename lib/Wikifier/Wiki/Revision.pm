@@ -33,8 +33,6 @@ sub delete_page {
     my ($wiki, $page) = @_;
     
     # delete the file as well as the cache
-    # consider: should we just let git rm unlink them?
-    unlink $page->path or return;
     unlink $page->cache_path; # may or may not exist
     
     # commit the change
@@ -57,21 +55,21 @@ sub move_page {
     # delete the old cache file
     unlink $page->cache_path; # may or may not exist
     
-    # move the file as well as the cache
-    # consider: should we just let git mv move it?
-    rename $old_path, $page->path or do {
-        $page->{name} = $old_name;
-        return;
-    };
-    
-    # update the page
-    $wiki->display_page($page);
+#    # move the file as well as the cache
+#    # consider: should we just let git mv move it?
+#    rename $old_path, $page->path or do {
+#        $page->{name} = $old_name;
+#        return;
+#    };
     
     # commit the change
     $wiki->rev_commit(
         message => "Moved $old_name -> $new_name",
         mv      => { $old_path => $page->path }
     );
+    
+    # update the page
+    $wiki->display_page($page);
     
     return 1;
 }
