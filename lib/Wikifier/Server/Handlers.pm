@@ -230,6 +230,7 @@ sub handle_page_save {
     $connection->send(page_save => {
         saved      => !@errs,
         rev_errors => \@errs,
+        rev_error  => join "\n\n", @errs,
         rev_latest => @errs ? undef : $wiki->rev_latest
     });
 }
