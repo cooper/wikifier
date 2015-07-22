@@ -140,10 +140,11 @@ class Wikiclient {
     
     /*********** PUBLIC WRITE METHODS ***********/
  
-    function page_save($name, $content) {
+    function page_save($name, $content, $message) {
         return $this->command('page_save', array(
             'name'    => $name,
-            'content' => $content
+            'content' => $content,
+            'message' => $message
         ));
     }
     

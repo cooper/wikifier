@@ -235,7 +235,7 @@ sub handle_page_save {
     # update the page
     my $wiki = $connection->{wiki} or return;
     my $page = $wiki->page_named($msg->{name}, content => $msg->{content});
-    my @errs = $wiki->write_page($page);
+    my @errs = $wiki->write_page($page, $msg->{message});
     
     $connection->send(page_save => {
         saved      => !@errs,
