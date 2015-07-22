@@ -21,12 +21,11 @@ sub write_page {
     $wiki->display_page($page);
     
     # commit the change
-    $wiki->rev_commit(
+    return $wiki->rev_commit(
         message => defined $reason ? "Updated $$page{name}: $reason" : "Created $$page{name}",
         add     => [ $page->path ]
     );
     
-    return 1;
 }
 
 sub delete_page {
@@ -78,51 +77,114 @@ sub move_page {
 ### LOW-LEVEL REVISION FUNCTIONS ###
 ####################################
 
+# returns a scalar reference error on fail.
+# returns 1 on success.
+my @op_errors;
 sub capture_logs(&$) {
+    my $ret = _capture_logs(@_);
+    push @op_errors, $ret if ref $ret;
+    return $ret;
+}
+sub _capture_logs(&$) {
     my ($code, $command) = @_;
     eval { $code->() };
     if ($@ && ref $@ eq 'Git::Wrapper::Exception') {
         my $message = $command.' exited with code '.$@->status.'. ';
         $message .= $@->error.$/.$@->output;
         Wikifier::l($message);
+        return \$@->error;
     }
     elsif ($@) {
         Wikifier::l('Unspecified git error');
+        return \ 'Unknown error';
     }
     return 1;
 }
 
-# commit a revision
-our $git;
-sub rev_commit (@) {
+# return the results of the operations
+# clear the list of operation results
+#
+# if all operations were successful,
+# this returns an empty list
+#
+sub _rev_operation_finish {
+    my @ops = @op_errors;
+    @op_errors = ();
+    return @ops;
+}
+
+# get info about the latest revision (commit)
+# returns a hash reference containing the following:
+#
+# id
+# author
+# date
+# message
+#
+sub rev_latest {
     my $wiki = shift;
-    if (!$git) {
+    my $git  = $wiki->_prepare_git();
+    my @logs = $git->log;
+    my $last = shift @logs or return;
+    return {
+        id            => $last->id,
+        author        => $last->author,
+        date          => $last->date,
+        message       => $last->message
+    };
+}
+
+# create a git object for this wiki if there isn't one
+sub _prepare_git {
+    my $wiki = shift;
+    if (!$wiki->{git}) {
         my $dir = $wiki->opt('dir.wiki');
         if (!length $dir) {
             Wikifier::l('Cannot commit; @dir.wiki not set');
             return;
         }
-        $git = Git::Wrapper->new($dir);
+        $wiki->{git} = Git::Wrapper->new($dir);
     }
-    eval { &_rev_commit };
+    return $wiki->{git};
+}
+
+# commit a revision
+# returns a list of errors or an empty list on success
+sub rev_commit (@) {
+    my $wiki = shift;
+    $wiki->_prepare_git();
+    unshift @_, $wiki->{git};
+    return eval { &_rev_commit };
 }
 
 sub _rev_commit {
-    my %opts = @_;
+    my ($git, %opts) = @_;
     my ($rm, $add, $mv) = @opts{'rm', 'add', 'mv'};
+    
+    # rm operation
     if ($rm && ref $rm eq 'ARRAY') {
         capture_logs { $git->rm(@$rm) } 'git rm';
     }
+    
+    # add operation
     if ($add && ref $add eq 'ARRAY') {
         capture_logs { $git->add(@$add) } 'git add';
     }
+    
+    # mv operation
     if ($mv && ref $mv eq 'HASH') {
         foreach (keys %$mv) {
             capture_logs { $git->mv($_, $mv->{$_}) } 'git mv';
         }
     }
+    
+    # commit operations
     Wikifier::l("git commit: $opts{message}");
     capture_logs { $git->commit({ message => $opts{message} // 'Unspecified' }) } 'git commit';
+    
+    # return errors
+    return _rev_operation_finish();
+    
 }
 
 # convert objects to file paths.

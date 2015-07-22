@@ -225,9 +225,13 @@ sub handle_page_save {
     # update the page
     my $wiki = $connection->{wiki} or return;
     my $page = $wiki->page_named($msg->{name}, content => $msg->{content});
-    $wiki->write_page($page);
+    my @errs = $wiki->write_page($page);
     
-    $connection->send(page_save => { saved => 1 });
+    $connection->send(page_save => {
+        saved      => !scalar @errs,
+        rev_errors => \@errs,
+        rev_latest => $wiki->rev_latest
+    });
 }
 
 sub handle_page_del {
