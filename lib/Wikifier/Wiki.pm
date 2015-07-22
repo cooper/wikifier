@@ -257,6 +257,15 @@ sub _display_page {
                 $result->{$_} = $jdata->{$_} foreach keys %$jdata;
             }
             
+            # if this is a draft, pretend it doesn't exist.
+            if ($result->{draft}) {
+                return {
+                    error => "Page '$page_name' does not exist.",
+                    type  => 'not found',
+                    draft => 1
+                };
+            }
+            
             # set HTTP data.
             
             $result->{content} .= shift @data;
@@ -276,6 +285,15 @@ sub _display_page {
     # parse the page.
     $page->parse();
     $wiki->check_categories($page);
+    
+    # if this is a draft, pretend it doesn't exist.
+    if ($page->var('page.draft')) {
+        return {
+            error => "Page '$page_name' does not exist.",
+            type  => 'not found',
+            draft => 1
+        };
+    }
     
     # generate the HTML and headers.
     $result->{type}       = 'page';
@@ -726,6 +744,9 @@ sub display_category_posts {
         my $res  = $wiki->display_page($page_name);
         my $time = $res->{page} ? $res->{page}->get('page.created')
                    : $res->{created} || 0;
+        
+        # there was an error or it's a draft, skip.
+        next if $res->{error} || $res->{draft};
         
         $times{$page_name} = $time || 0;
         $reses{$page_name} = $res;
