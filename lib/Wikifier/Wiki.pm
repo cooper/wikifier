@@ -287,7 +287,7 @@ sub _display_page {
     $wiki->check_categories($page);
     
     # if this is a draft, pretend it doesn't exist.
-    if ($page->var('page.draft')) {
+    if ($page->get('page.draft')) {
         return {
             error => "Page '$page_name' does not exist.",
             type  => 'not found',
