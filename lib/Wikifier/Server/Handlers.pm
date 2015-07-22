@@ -39,8 +39,8 @@ my %sort_options = (
 sub _simplify_errors {
     my @errs = @_;
     my @final;
-    foreach $err (@errs) {
-        @lines = grep { s/\r//g; !/^#/ } split /\n/, $err;
+    foreach my $err (@errs) {
+        my @lines = grep { s/\r//g; !/^#/ } split /\n/, $err;
         push @final, join "\n", @lines;
     }
     return join "\n\n", @final;
