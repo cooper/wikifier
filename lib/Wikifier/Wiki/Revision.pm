@@ -82,7 +82,7 @@ sub move_page {
 my @op_errors;
 sub capture_logs(&$) {
     my $ret = _capture_logs(@_);
-    push @op_errors, $ret if ref $ret;
+    push @op_errors, $$ret if ref $ret;
     return $ret;
 }
 sub _capture_logs(&$) {
