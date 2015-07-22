@@ -22,7 +22,7 @@ sub write_page {
     
     # commit the change
     return $wiki->rev_commit(
-        message => defined $reason ? "Updated $$page{name}: $reason" : "Updated $$page{name}",
+        message => length $reason ? "Updated $$page{name}: $reason" : "Updated $$page{name}",
         add     => [ $page->path ]
     );
     
