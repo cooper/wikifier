@@ -92,7 +92,7 @@ sub _capture_logs(&$) {
         my $message = $command.' exited with code '.$@->status.'. ';
         $message .= $@->error.$/.$@->output;
         Wikifier::l($message);
-        return \$@->error;
+        return \$message;
     }
     elsif ($@) {
         Wikifier::l('Unspecified git error');

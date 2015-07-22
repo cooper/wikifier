@@ -228,9 +228,9 @@ sub handle_page_save {
     my @errs = $wiki->write_page($page);
     
     $connection->send(page_save => {
-        saved      => !scalar @errs,
+        saved      => !@errs,
         rev_errors => \@errs,
-        rev_latest => $wiki->rev_latest
+        rev_latest => @errs ? undef : $wiki->rev_latest
     });
 }
 
