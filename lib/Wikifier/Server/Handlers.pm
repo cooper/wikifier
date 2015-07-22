@@ -36,6 +36,16 @@ my %sort_options = (
     'u-' => sub { lc($_[1]{author}   // '') cmp lc($_[0]{author}   // '')   }
 );
 
+sub _simplify_errors {
+    my @errs = @_;
+    my @final;
+    foreach $err (@errs) {
+        @lines = grep { s/\r//g; !/^#/ } split /\n/, $err;
+        push @final, join "\n", @lines;
+    }
+    return join "\n\n", @final;
+}
+
 ######################
 ### AUTHENTICATION ###
 ######################
@@ -230,7 +240,7 @@ sub handle_page_save {
     $connection->send(page_save => {
         saved      => !@errs,
         rev_errors => \@errs,
-        rev_error  => join("\n\n", @errs),
+        rev_error  => _simplify_errors(@errs),
         rev_latest => @errs ? undef : $wiki->rev_latest
     });
 }
