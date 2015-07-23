@@ -31,10 +31,6 @@ sub write_page {
 sub delete_page {
     my ($wiki, $page) = @_;
     
-    # delete the file as well as the cache
-    unlink $page->path;
-    unlink $page->cache_path; # may or may not exist
-    
     # commit the change
     $wiki->rev_commit(
         message => "Deleted $$page{name}",
@@ -164,12 +160,12 @@ sub _rev_commit {
     
     # rm operation
     if ($rm && ref $rm eq 'ARRAY') {
-        capture_logs { $git->rm(@$rm) } 'git rm';
+        capture_logs { $git->rm($_) } 'git rm' foreach @$rm;
     }
     
     # add operation
     if ($add && ref $add eq 'ARRAY') {
-        capture_logs { $git->add(@$add) } 'git add';
+        capture_logs { $git->add($_) } 'git add' foreach @$add;
     }
     
     # mv operation
