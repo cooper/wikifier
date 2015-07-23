@@ -32,6 +32,7 @@ sub delete_page {
     my ($wiki, $page) = @_;
     
     # delete the file as well as the cache
+    unlink $page->path;
     unlink $page->cache_path; # may or may not exist
     
     # commit the change
