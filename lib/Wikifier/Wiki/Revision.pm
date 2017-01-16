@@ -157,8 +157,6 @@ sub rev_commit (@) {
 
     # add the author maybe
     my $user = $wiki->{user};
-    use Data::Dumper;
-    print "USER: ", Dumper($user), "\n";
     if ($user && length $user->{name} && length $user->{email}) {
         push @_, author => "$$user{name} <$$user{email}>";
     }
@@ -211,7 +209,6 @@ sub _rev_commit {
 
     # return errors
     return _rev_operation_finish();
-
 }
 
 # convert objects to file paths.
