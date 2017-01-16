@@ -107,7 +107,10 @@ sub handle_login {
     $connection->{priv_write} = 1;
     $connection->{session_id} = $msg->{session_id};
     $connection->send(login => { logged_in => 1, %$user_info });
-    $Wikifier::Server::sessions{ $msg->{session_id} } = [ time, $username ];
+
+    # store the session
+    $Wikifier::Server::sessions{ $msg->{session_id} } =
+        [ time, $msg->{session_id}, $username, $user_info ];
 
     Wikifier::l("Successful authentication for write access to '$$connection{wiki_name}' by $$connection{id}");
 }
@@ -120,16 +123,17 @@ sub handle_resume {
     my ($connection, $msg) = read_required(@_, 'session_id') or return;
 
     # session is too old or never existed.
-    if (!$Wikifier::Server::sessions{ $msg->{session_id} }) {
+    my $sess = $Wikifier::Server::sessions{ $msg->{session_id} };
+    if (!$sess) {
         Wikifier::l("Bad session ID for $$connection{id}; refusing authentication");
         $connection->error('Please login again', login_again => 1);
         return;
     }
 
     # authentication succeeded.
+    $sess->[0] = time;
     $connection->{priv_write} = 1;
-    $connection->{session_id} = $msg->{session_id};
-    $Wikifier::Server::sessions{ $msg->{session_id} }[0] = time;
+    @$connection{'session_id', 'username', 'user'} = @$sess[1..$#$sess];
 
     Wikifier::l("Resuming write access to '$$connection{wiki_name}' by $$connection{id}");
 }
