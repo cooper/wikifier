@@ -157,6 +157,8 @@ sub rev_commit (@) {
 
     # add the author maybe
     my $user = $wiki->{user};
+    use Data::Dumper;
+    print "USER: ", Dumper($user), "\n";
     if ($user && length $user->{name} && length $user->{email}) {
         push @_, author => "$$user{name} <$$user{email}>";
     }
@@ -164,7 +166,7 @@ sub rev_commit (@) {
     # add the git
     unshift @_, $wiki->{git};
 
-    return eval { &_rev_commit };
+    return eval { _rev_commit(@_) };
 }
 
 sub _rev_commit {
