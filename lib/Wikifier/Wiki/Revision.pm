@@ -156,6 +156,7 @@ sub rev_commit (@) {
     $wiki->_prepare_git();
 
     # add the author maybe
+    my $user = $wiki->{user};
     if ($user && length $user->{name} && length $user->{email}) {
         push @_, author => "$$user{name} <$$user{email}>";
     }
@@ -191,7 +192,7 @@ sub _rev_commit {
     Wikifier::l("git commit: $opts{message}");
     capture_logs {
         $git->commit({
-            message => $opts{message} // 'Unspecified'
+            message => $opts{message} // 'Unspecified',
             author  => $opts{author}
         })
     } 'git commit';
