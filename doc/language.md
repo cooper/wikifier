@@ -13,6 +13,8 @@ full-sized image.
 Many blocks may contain text as well as other blocks. Each block type handles
 the data inside of it differently.
 
+See [Blocks](blocks.md) for a list of built-in block types.
+
 ### Block syntax
 
 Blocks can have names: Some do, and some don't. Each block type may use its name
