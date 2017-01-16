@@ -120,6 +120,30 @@ else {
 }
 ```
 
+### Special variables
+
+`@page` contains information about the current page. Its attributes are set at
+the very top of a page source file.
+
+* `@page.name` - Human-readable page name. Utilized internally by the Wikifier,
+  so it is required for most purposes. Often used as the `<title>` of the
+  page, as well as in the `<h1>` above the first `section{}` block.
+* `@page.created` - UNIX timestamp of the page creation time. This is not used
+  in the Wikifier itself, but can be used in frontends for sorting the page list
+  by creation date.
+* `@page.author` - The name of the page author. This is also optional but may be
+  used by frontends to organize pages by author.
+* `@page.draft` - This boolean value marks the page as a draft. This means that
+  it will not be served to unauthenticated users or cached.
+
+`@category` is used to mark the page as belonging to a category. Each attribute
+of it is a boolean. If present, the page belongs to that category. Example:
+* `@category.news;`
+* `@category.important;`
+
+`@m` is a special variable used only in [models](models.md). Its attributes are
+mapped to any options provided in the model block.
+
 ## Text formatting
 
 Many block types can contain formatted text. Square brackets `[` and `]` are

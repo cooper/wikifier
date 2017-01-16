@@ -36,7 +36,6 @@ sub model_parse {
 
     # parse the page.
     $model->parse;
-
 }
 
 sub model_html {
@@ -51,7 +50,6 @@ sub model_html {
     $main_el->remove_class('main');
     $el->add_class("model-$$model{model_name}");
     $el->add($main_el);
-
 }
 
 __PACKAGE__
