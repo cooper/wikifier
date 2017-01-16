@@ -51,3 +51,12 @@ In addition to autocompiling and serving wiki pages, Wikifier::Server features
 write authentication. This allows frontends such as
 [adminifier](https://github.com/cooper/adminifier) to commit changes to the
 wiki directly from a web browser.
+
+## Interfaces
+
+Wikifier::Server is not a web server. You have to link your web server to it
+with some sort of script. Wikifier comes with some programming interfaces to do
+this. They are located in the [interfaces](../interfaces) directory.
+
+Documentation for each interface:
+* [__PHP__](../interfaces/PHP/README.md)
