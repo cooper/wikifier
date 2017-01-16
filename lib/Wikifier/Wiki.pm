@@ -290,7 +290,7 @@ sub _display_page {
     # if this is a draft, pretend it doesn't exist.
     if ($page->get('page.draft')) {
         return {
-            error => "Page '$page_name' does not exist.",
+            error => "Page '$page_name' has not yet been published.",
             type  => 'not found',
             draft => 1
         };
