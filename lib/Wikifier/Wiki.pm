@@ -200,9 +200,9 @@ sub display {
 sub display_page {
     my ($wiki, $page_name) = (shift, @_);
     my $result = $wiki->_display_page(@_);
-    Wikifier::l("Error for '$page_name' display: $$result{error}")
+    Wikifier::l("Error for $page_name display: $$result{error}")
         if $result->{error} && !$result->{draft};
-    Wikifier::l("Skipping '$page_name' because it is a draft")
+    Wikifier::l("Skipping draft $page_name")
         if $result->{draft};
     return $result;
 }
