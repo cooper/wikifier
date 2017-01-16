@@ -188,17 +188,21 @@ sub _rev_commit {
         }
     }
 
+    my @more;
+
+    # add commit author maybe
+    if (length $opts{author}) {
+        Wikifier::l("Using author $opts{author}");
+        push @more, author => $opts{author};
+    }
+
     # commit operations
     Wikifier::l("git commit: $opts{message}");
     capture_logs {
 
-        # add author to commit maybe
-        my @author = author => $opts{author}
-            if length $opts{author};
-
         $git->commit({
             message => $opts{message} // 'Unspecified',
-            @author
+            @more
         })
 
     } 'git commit';
