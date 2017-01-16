@@ -1001,9 +1001,10 @@ sub all_categories {
 ######################
 
 my %crypts = (
-    'sha1'   => ['Digest::SHA', sub { Digest::SHA::sha1_hex(shift)   } ],
-    'sha256' => ['Digest::SHA', sub { Digest::SHA::sha256_hex(shift) } ],
-    'sha512' => ['Digest::SHA', sub { Digest::SHA::sha512_hex(shift) } ]
+    'none'   => [ undef,            sub { shift()                           } ],
+    'sha1'   => [ 'Digest::SHA',    sub { Digest::SHA::sha1_hex(shift)      } ],
+    'sha256' => [ 'Digest::SHA',    sub { Digest::SHA::sha256_hex(shift)    } ],
+    'sha512' => [ 'Digest::SHA',    sub { Digest::SHA::sha512_hex(shift)    } ]
 );
 
 sub verify_login {
@@ -1025,8 +1026,10 @@ sub verify_login {
     $crypt = $crypts{$crypt} ? $crypt : 'sha1';
     my $hash = eval {
         my @c = @{ $crypts{$crypt} };
-        $c[0] =~ s/::/\//; $c[0] .= '.pm';
-        require $c[0];
+        if (my $pkg = $c[0]) {
+            $pkg =~ s/::/\//;
+            require "$pkg.pm";
+        }
         my $h = $c[1]($password);
         $h;
     };
