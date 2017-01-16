@@ -1,0 +1,145 @@
+# Language
+
+Wikifier's unique language is designed specifically for easy legibility.
+
+## Blocks
+
+The fundamental component of the Wikifier language is the block. Each block
+belongs to a specific type, and each type provides a unique function. For
+example, `infobox{}` displays a table of information associated with an
+article. `imagebox{}` displays an image preview with a caption and link to a
+full-sized image.
+
+Many blocks may contain text as well as other blocks. Each block type handles
+the data inside of it differently.
+
+### Block syntax
+
+Blocks can have names: Some do, and some don't. Each block type may use its name
+for a different purpose. For example, section blocks use the name to display a
+title header over the section. Infoboxes use the name to display a title along
+the top of the box. The syntax for blocks is as follows.
+
+
+**Nameless blocks**
+
+    blocktype {
+        ...
+    }
+
+Example
+
+    imagebox {
+        description: [[Foxy]], supreme librarian;
+        align: left;
+        file: foxy2.png;
+        width: 100px;
+    }
+
+**Named blocks**
+
+    blocktype [block name] {
+        ...
+    }
+
+Example
+
+    sec [Statistics] {
+        NoTrollPlzNet Library's online division currently hosts
+        [b][@stats.site.articles][/b] articles.
+    }
+
+
+## Variables
+
+Wikifier supports string and boolean variables.
+
+### Assignment
+
+String variables look like this:
+```
+@some_variable: The value;
+@another_variable: You can escape semicolons\; I think;
+```
+
+Boolean variables look like this:
+```
+@some_bool;
+```
+
+### Retrieval
+
+Once variables are assigned, they are typically used in formatted text. You can
+use variables anywhere that formatted text is accepted:
+```
+sec {
+    This is a paragraph inside a section. I am allow to use [b]bold text[/b],
+    as well as [@variables].
+}
+```
+
+### Formatted variables
+
+By the way, you can use text formatting within string variables, including other
+embedded variables:
+```
+@site: MyWiki;
+@name: John;
+@welcome: Welcome to [@site], [@name].
+```
+
+### Attributes
+
+Also, variables can have attributes. This helps to organize things:
+```
+@page.name: Hello World!;
+@page.author: John Doe;
+```
+
+### Conditionals
+
+You can use conditionals on boolean variables:
+```
+if [@page.draft] {
+    Note to self: Don't forget to publish this page.
+}
+else {
+    Thanks for checking out my page.
+}
+```
+
+## Text formatting
+
+Many block types can contain formatted text. Square brackets `[` and `]` are
+used for text formatting tokens.
+
+**Basic formatting**
+* `[b]bold text[/b]`
+* `[s]strikethrough text[/s]`
+* `[i]italicized text[/i]`
+* `[^]superscript text[/^]`
+* `[Aquamarine]some colored text[/]`
+
+**Variables**
+* `[@some.variable]` - normal variable
+* `[%some.variable]` - interpolable variable
+* See [Variables](#variables) above
+
+**Links**
+* `[[ Page name ]]` - internal wiki page link
+* `[! Page name !]` - external wiki page link
+* `[~ Cat name ~]` - category link
+* `[$ http://google.com $]` - external site link
+* For any link type, you can change the display text:
+  `[$ Google | http://google.com $]`
+
+**References**
+* `[ref]` - a fake reference. just to make your wiki look credible.
+* `[1]` - an actual reference number. a true reference.
+
+**Characters**
+* `[nl]` - a line break
+* `[--]` - an en dash
+* `[---]` - an em dash
+* `[&copy]` - HTML entities by name
+* `[&#34]` - HTML entities by number
