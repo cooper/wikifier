@@ -18,7 +18,7 @@ our %block_types = (
 
 sub model_parse {
     my ($block, $page) = (shift, @_);
-    
+
     # parse the hash.
     $block->parse_base(@_);
 
@@ -31,12 +31,12 @@ sub model_parse {
         model_name => $name,
         #wikifier   => $page->wikifier,
         wiki       => $page->{wiki}, # (might not exist)
-        variables  => { m => $block->{hash} }
+        variables  => { 'm' => $block->{hash} }
     );
-    
+
     # parse the page.
     $model->parse;
-    
+
 }
 
 sub model_html {
@@ -46,12 +46,12 @@ sub model_html {
 
     # generate the objective DOM.
     my $main_el = $main_block->html($model) or return;
-    
+
     # add the main page element to our element.
     $main_el->remove_class('main');
     $el->add_class("model-$$model{model_name}");
     $el->add($main_el);
-    
+
 }
 
 __PACKAGE__
