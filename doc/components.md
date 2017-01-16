@@ -1,5 +1,7 @@
 # Components
 
+## Wikifier
+
 The most basic package is Wikifier. It provides the minimal functionality for
 parsing and handling wiki language source files. The package is divided into
 several subpackages:
