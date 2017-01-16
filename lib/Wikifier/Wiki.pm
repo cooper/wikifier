@@ -203,7 +203,8 @@ sub display_page {
     return $result;
 }
 sub _display_page {
-    my ($wiki, $page_name) = @_; my $result = {};
+    my ($wiki, $page_name) = @_;
+    my $result = {};
     $page_name = $page_name->name if blessed $page_name;
 
     my $page = Wikifier::Page->new(
@@ -260,7 +261,7 @@ sub _display_page {
             # if this is a draft, pretend it doesn't exist.
             if ($result->{draft}) {
                 return {
-                    error => "Page '$page_name' does not exist.",
+                    error => "Page '$page_name' has not yet been published.",
                     type  => 'not found',
                     draft => 1
                 };
