@@ -1,0 +1,241 @@
+.wiki-clear {
+    clear: both;
+}
+
+p.wiki-paragraph {
+/*
+    line-height: 19px;
+    overflow: hidden;
+    margin: .4em 0 .5em 0;
+    display: block;
+*/
+    margin: .4em 0 .5em 0;
+    line-height: 1.8em;
+}
+
+a img {
+    border: 0;
+}
+
+/* sections */
+
+h1.wiki-section-page-title {
+    margin: 0 0 15px 0;
+    clear: left;
+    border-bottom: 1px solid #ccc;
+    line-height: 40px;
+}
+
+h2.wiki-section-title {
+    border-bottom: 1px solid #ccc;
+    line-height: 38px;
+    clear: left;
+}
+
+h2.wiki-section-title,
+h3.wiki-section-title,
+h4.wiki-section-title,
+h5.wiki-section-title,
+h6.wiki-section-title {
+    margin-top: 15px;
+}
+
+/* infoboxes */
+
+div.wiki-infobox {
+    width: 280px;
+    margin: 0.5em 0 0.5em 1em;
+    border: 1px solid #ccc;
+    float: right;
+    clear: right;
+    background-color: #f7f7f7;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+div.wiki-infobox-title {
+    text-align: center;
+    background-color: #eee;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+    padding: 5px;
+}
+
+table.wiki-infobox-table {
+    border: none;
+    font-size: 0.8em;
+    border-collapse: separate;
+    border-spacing: 5px 0;
+    margin: 0;
+    padding: 0;
+    width: 270px;
+    padding: 5px 0;
+}
+
+tr.wiki-infobox-pair {
+}
+
+td.wiki-infobox-key {
+    vertical-align: top;
+    font-weight: bold;
+    max-width: 100px;
+    padding: 5px;
+    white-space: nowrap;
+}
+
+
+td.wiki-infobox-value {
+    padding: 5px;
+}
+
+td.wiki-infobox-anon {
+    padding: 0;
+}
+
+/* imageboxes */
+
+div.wiki-imagebox {
+    background-color: #eee;
+    color: #000;
+    direction: ltr;
+    display: block;
+    border: 1px solid #ccc;
+}
+
+div.wiki-imagebox-inner {
+    background-color: #eee;
+    padding: 2px !important;
+    text-align: center;
+    overflow: hidden;
+    min-width: 100px;
+}
+
+div.wiki-imagebox img {
+    display: block;
+}
+
+div.wiki-imagebox-left {
+    float: left;
+    clear: left;
+    margin: .5em 1.4em 1.3em 0;
+}
+
+div.wiki-imagebox-right {
+    float: right;
+    clear: right;
+    margin: .5em 0 1.3em 1.4em;
+}
+
+div.wiki-imagebox-description {
+    text-align: left;
+    background-color: #eee;
+    font-size: 85%;
+    display: block;
+    width: 100%;
+}
+
+div.wiki-imagebox-description-inner {
+    padding: 5px 3px 3px 3px;
+    line-height: 1.2em;
+}
+
+/* images */
+
+div.wiki-image {
+}
+
+/* links */
+
+a.wiki-link-internal {
+    text-decoration: none;
+    color: #0084FF;
+    padding: 0;
+    margin: 0;
+}
+
+a.wiki-link-external {
+    text-decoration: none;
+    color: #0084FF;
+    padding: 0;
+    margin: 0;
+}
+
+a.wiki-link-other {
+    text-decoration: none;
+    color: pink;
+    padding: 0;
+    margin: 0;
+}
+
+a.wiki-link-internal:hover, a.wiki-link-external:hover, a.wiki-link-other:hover {
+    color: blue;
+}
+
+/* history */
+
+div.wiki-history {
+
+    margin: 0 0 10px 5px;
+    min-height: 100px;
+}
+
+table.wiki-history-table {
+    padding: 3px;
+    border: none;
+    border-collapse: separate;
+    border-spacing: 5px;
+    font-size: 12px;
+}
+
+tr.wiki-history-pair {
+}
+
+td.wiki-history-key {
+    min-width: 200px;
+    font-weight: bold;
+    max-width: 80px;
+}
+
+td.wiki-history-value {
+    padding: 2px;
+}
+
+/* code */
+
+pre.wiki-code {
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    font-size: 13px;
+    line-height: 19px;
+    overflow: auto;
+    padding: 6px 10px;
+    border-radius: 3px;
+    margin: 15px 0;
+    white-space: pre;
+    display: block;
+    font-family: Consolas, "Liberation Mono", Courier, monospace;
+}
+
+/* references */
+
+ul.wiki-references {
+    list-style-type: none;
+    padding: 0;
+    line-height: 1.8em;
+}
+
+li.wiki-ref-item {
+}
+
+span.wiki-ref-key {
+    margin-left: 10px;
+    display: inline-block;
+    min-width: 30px;
+    font-weight: bold;
+}
+
+a.wiki-ref-anchor, a.wiki-ref-anchor:hover {
+    color: inherit;
+    text-decoration: inherit;
+    font-size: inherit;
+}
