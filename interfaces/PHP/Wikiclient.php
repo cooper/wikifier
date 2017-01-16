@@ -132,9 +132,9 @@ class Wikiclient {
     }
 
     // send a category posts request.
-    function catposts($category, $page_n) {
+    function catposts($name, $page_n) {
         return $this->command('catposts', array(
-            'name'   => $category,
+            'name'   => $name,
             'page_n' => $page_n
         ));
     }
