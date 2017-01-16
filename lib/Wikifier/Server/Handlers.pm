@@ -89,6 +89,13 @@ sub handle_wiki {
 sub handle_login {
     my ($connection, $msg) = read_required(@_, qw(username password)) or return;
 
+    # session exists already
+    my $sess_id = $msg->{session_id};
+    if (length $sess_id && $Wikifier::Server::sessions{$sess_id}) {
+        $connection->error('Session exists', exists => 1);
+        return;
+    }
+
     # verify password
     my $username  = $msg->{username};
     my $user_info = $connection->{wiki}->verify_login(
@@ -101,16 +108,16 @@ sub handle_login {
     }
 
     # authentication succeeded.
-
     $connection->{user}       = $user_info;
     $connection->{username}   = $username;
     $connection->{priv_write} = 1;
-    $connection->{session_id} = $msg->{session_id};
+    $connection->{session_id} = $sess_id;
     $connection->send(login => { logged_in => 1, %$user_info });
 
     # store the session
-    $Wikifier::Server::sessions{ $msg->{session_id} } =
-        [ time, $msg->{session_id}, $username, $user_info ];
+    $Wikifier::Server::sessions{$sess_id} =
+        [ time, $sess_id, $username, $user_info ]
+    if length $sess_id;
 
     Wikifier::l("Successful authentication for write access to '$$connection{wiki_name}' by $$connection{id}");
 }
