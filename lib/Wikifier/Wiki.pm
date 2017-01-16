@@ -1021,6 +1021,9 @@ sub verify_login {
         return;
     }
 
+    # make a copy of the user.
+    $user = { %$user };
+
     # hash it.
     my $crypt = delete $user->{crypt};
     $crypt = $crypts{$crypt} ? $crypt : 'sha1';
