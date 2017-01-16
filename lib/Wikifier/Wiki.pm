@@ -1025,23 +1025,22 @@ sub verify_login {
     my $crypt = delete $user->{crypt};
     $crypt = $crypts{$crypt} ? $crypt : 'sha1';
     my $hash = eval {
-        my @c = @{ $crypts{$crypt} };
+        my ($pkg, $func) = @{ $crypts{$crypt} };
         if (my $pkg = $c[0]) {
             $pkg =~ s/::/\//;
             require "$pkg.pm";
         }
-        my $h = $c[1]($password);
-        $h;
+        scalar $func->($password);
     };
 
     # error
-    if (!defined $hash && $@) {
+    if (!defined $hash) {
         Wikifier::l("Error with $crypt: $@");
         return;
     }
 
     # invalid credentials
-    if (($hash // '') ne delete $user->{password}) {
+    if ($hash ne delete $user->{password}) {
         Wikifier::l("Incorrect password for '$username'");
         return;
     }
