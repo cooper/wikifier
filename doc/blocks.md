@@ -190,11 +190,6 @@ sec [My Section] {
 }
 ```
 
-## Paragraph-clear
-
-Same as `paragraph{}`, except that it conveniently clears both sides. This is a
-shorthand for `p{}` followed by `clear{}`. You can also write it as `p-clear{}`.
-
 ## Section
 
 A section is kinda like a `<div>`, except that it can also have a header. The
