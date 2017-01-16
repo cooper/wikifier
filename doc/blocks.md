@@ -1,5 +1,8 @@
 # Blocks
 
+This is the list of built-in block types. For a syntactical explanation of
+blocks, see [Language](language.md).
+
 ## Clear
 
 Creates a `<div>` with `clear: both`.
@@ -153,7 +156,7 @@ yields an unordered list.
 list {
     Item one;
     Item two;
-    Item three can have a escaped semicolon\; I think;
+    Item three can have an escaped semicolon\; I think;
 }
 ```
 
