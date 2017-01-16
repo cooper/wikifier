@@ -58,25 +58,25 @@ sub _simplify_errors {
 sub handle_wiki {
     my ($connection, $msg) = read_required(@_, qw(name password)) or return;
     my $name = (split /\./, $msg->{name})[0];
-    
+
     # ensure that this wiki is configured on this server.
     if (!$conf->get("server.wiki.$name") || !$Wikifier::Server::wikis{$name}) {
         $connection->error("Wiki '$name' not configured on this server");
         return;
     }
-    
+
     # see if the passwords match.
     my $encrypted = sha1_hex($msg->{password});
     if ($encrypted ne $conf->get("server.wiki.$name.password")) {
         $connection->error("Password does not match configuration");
         return;
     }
-    
+
     # anonymous authentication succeeded.
     $connection->{priv_read} = 1;
     $connection->{wiki_name} = $name;
     weaken($connection->{wiki} = $Wikifier::Server::wikis{$name});
-    
+
     Wikifier::l("Successful authentication for read access to '$name' by $$connection{id}");
 }
 
@@ -90,16 +90,20 @@ sub handle_login {
     my ($connection, $msg) = read_required(@_, qw(username password)) or return;
 
     # verify password
-    if (!$connection->{wiki}->verify_login($msg->{username}, $msg->{password})) {
+    my $user_info = $connection->{wiki}->verify_login(
+        $msg->{username},
+        $msg->{password}
+    );
+    if (!$user_info) {
         $connection->error('Incorrect password', incorrect => 1);
         return;
     }
-    
+
     # authentication succeeded.
     $connection->{username}   = $msg->{username};
     $connection->{priv_write} = 1;
     $connection->{session_id} = $msg->{session_id};
-    $connection->send(login => { logged_in => 1 });
+    $connection->send(login => { logged_in => 1, %$user_info });
     $Wikifier::Server::sessions{ $msg->{session_id} } = [ time, $connection->{username} ];
 
     Wikifier::l("Successful authentication for write access to '$$connection{wiki_name}' by $$connection{id}");
@@ -118,7 +122,7 @@ sub handle_resume {
         $connection->error('Please login again', login_again => 1);
         return;
     }
-    
+
     # authentication succeeded.
     $connection->{priv_write} = 1;
     $connection->{session_id} = $msg->{session_id};
@@ -159,16 +163,16 @@ sub handle_page_code {
 #
 sub handle_page_list {
     my ($connection, $msg) = read_required(@_, 'sort') or return;
-    
+
     # get all pages
     my %pages = %{ $connection->{wiki}->cat_get_pages('all') };
     my @pages = map { my $ref = $pages{$_}; $ref->{file} = $_; $ref } keys %pages;
-    
+
     # sort
     # TODO: m+ and m- won't work because 'modified' doesn't exist
     my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
     @pages = sort { $sorter->($a, $b) } @pages;
-    
+
     $connection->send('page_list', { pages => \@pages });
     Wikifier::l("Complete page list requested by $$connection{id}");
 }
@@ -210,7 +214,7 @@ sub handle_catposts {
 #   sort:   method to sort the results
 #
 sub handle_cat_list {
-    
+
 }
 
 ######################
@@ -227,16 +231,16 @@ sub handle_page_save {
     # regenerate it
     # commit: (existed? added : modified) x.page: user edit message
     my ($connection, $msg) = write_required(@_, qw(name content));
-    
+
     # remove carriage returns injected by the browser
     $msg->{content} =~ s/\r\n/\n/g;
     $msg->{content} =~ s/\r//g;
-    
+
     # update the page
     my $wiki = $connection->{wiki} or return;
     my $page = $wiki->page_named($msg->{name}, content => $msg->{content});
     my @errs = $wiki->write_page($page, $msg->{message});
-    
+
     $connection->send(page_save => {
         saved      => !@errs,
         rev_errors => \@errs,
@@ -256,7 +260,7 @@ sub handle_page_del {
     my $wiki = $connection->{wiki};
     my $page = $wiki->page_named($msg->{name});
     $wiki->delete_page($page);
-    
+
     $connection->send(page_del => { deleted => 1 });
 }
 
@@ -264,12 +268,12 @@ sub handle_page_move {
     # rename page file
     # commit: moved page a.page -> b.page
     my ($connection, $msg) = write_required(@_, qw(name new_name));
-    
+
     # rename the page
     my $wiki = $connection->{wiki};
     my $page = $wiki->page_named($msg->{name});
     $wiki->move_page($page, $msg->{new_name});
-    
+
     $connection->send(page_move => { moved => 1 });
 }
 

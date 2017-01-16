@@ -42,19 +42,19 @@ our %wiki_defaults = (
 sub new {
     my ($class, %opts) = @_;
     my $wiki = bless \%opts, $class;
-    
+
     # create the Wiki's Wikifier instance.
     # using the same wikifier instance over and over makes parsing much faster.
     $wiki->{wikifier} ||= Wikifier->new();
-    
+
     # if there were no provided options, assume we're reading from /etc/wikifier.conf.
     $wiki->read_config('/etc/wikifier.conf', '/etc/wikifier_private.conf')
         if not scalar keys %opts;
-    
+
     # if a config file is provided, use it.
     $wiki->read_config($opts{config_file}, $opts{private_file})
         if defined $opts{config_file};
-    
+
     return $wiki;
 }
 
@@ -83,7 +83,7 @@ sub read_config {
         Wikifier::l("Failed to parse configuration");
         return;
     }
-    
+
     # private configuration.
     if (length $private_file) {
         my $pconf = $wiki->{pconf} = Wikifier::Page->new(
@@ -102,7 +102,7 @@ sub read_config {
     else {
         $wiki->{pconf} = $conf;
     }
-    
+
     return 1;
 }
 
@@ -145,7 +145,7 @@ sub opt {
 #
 # Returns a hash reference of results for display.
 #   type: either 'page', 'image', or 'not found'
-#   
+#
 #   if the type is 'page':
 #       cached:     true if the content was fetched from cache.
 #       generated:  true if the content was just generated.
@@ -173,23 +173,23 @@ sub opt {
 #
 sub display {
     my ($wiki, $page_name) = (shift, shift);
-    
+
     # it's an image.
     if ($page_name =~ m|^image/(.+)$|) {
         return $wiki->display_image($1);
     }
-    
+
     # it's a wiki page.
     else {
         return $wiki->display_page($page_name);
     }
-    
+
     # not sure.
     return {
         type  => 'not found',
         error => 'Unsure how to handle this request'
     };
-    
+
 }
 
 #############
@@ -205,58 +205,58 @@ sub display_page {
 sub _display_page {
     my ($wiki, $page_name) = @_; my $result = {};
     $page_name = $page_name->name if blessed $page_name;
-    
+
     my $page = Wikifier::Page->new(
         name     => $page_name,
         wiki     => $wiki,
         wikifier => $wiki->{wikifier}
     );
-    
+
     $page_name     = $page->name;
     my $path       = $page->path;
     my $cache_path = $page->cache_path;
-    
+
     # file does not exist.
     if (!-f $path) {
         $result->{error} = "Page '$page_name' does not exist.";
         $result->{type}  = 'not found';
         return $result;
     }
-    
+
     # set path, file, and meme type.
     $result->{file} = $page_name;
     $result->{path} = $path;
     $result->{mime} = 'text/html';
-    
+
     # caching is enabled, so let's check for a cached copy.
-    
+
     if ($wiki->opt('enable.cache.page') && -f $cache_path) {
         my ($page_modify, $cache_modify) = ((stat $path)[9], (stat $cache_path)[9]);
-    
+
         # the page's file is more recent than the cache file.
         if ($page_modify > $cache_modify) {
-        
+
             # discard the outdated cached copy.
             unlink $cache_path;
-        
+
         }
-        
+
         # the cached file is newer, so use it.
         else {
             my $time = time2str($cache_modify);
             $result->{type}     = 'page';
             $result->{content}  = "<!-- cached page dated $time -->\n\n";
-            
+
             # fetch the prefixing data.
             my $cache_data = file_contents($cache_path);
             my @data = split /\n\n/, $cache_data, 2;
-            
+
             # decode.
             my $jdata = eval { decode_json(shift @data) } || {};
             if (ref $jdata eq 'HASH') {
                 $result->{$_} = $jdata->{$_} foreach keys %$jdata;
             }
-            
+
             # if this is a draft, pretend it doesn't exist.
             if ($result->{draft}) {
                 return {
@@ -265,27 +265,27 @@ sub _display_page {
                     draft => 1
                 };
             }
-            
+
             # set HTTP data.
-            
+
             $result->{content} .= shift @data;
             $result->{all_css}  = $result->{css} if length $result->{css};
             $result->{cached}   = 1;
             $result->{modified} = $time;
             $result->{length}   = length $result->{content};
-            
+
             return $result;
         }
-        
+
     }
-    
+
     # cache was not used. generate a new copy.
     $result->{page} = $page;
-    
+
     # parse the page.
     $page->parse();
     $wiki->check_categories($page);
-    
+
     # if this is a draft, pretend it doesn't exist.
     if ($page->get('page.draft')) {
         return {
@@ -294,7 +294,7 @@ sub _display_page {
             draft => 1
         };
     }
-    
+
     # generate the HTML and headers.
     $result->{type}       = 'page';
     $result->{content}    = $page->html;
@@ -304,43 +304,43 @@ sub _display_page {
     $result->{generated}  = 1;
     $result->{modified}   = time2str(time);
     $result->{categories} = $page->{categories} if $page->{categories};
-    
+
     # caching is enabled, so let's save this for later.
     if ($wiki->opt('enable.cache.page')) {
-    
+
         open my $fh, '>', $cache_path;
-        
+
         # save prefixing data.
         print {$fh} JSON->new->pretty(1)->encode({
             %{ $page->get('page') || {} },
             css        => $result->{css},
             categories => $result->{categories} || []
         }), "\n";
-        
+
         # save the content.
         print {$fh} $result->{content};
-        
+
         close $fh;
-        
+
         # overwrite modified date to actual.
         $result->{modified}  = time2str((stat $cache_path)[9]);
         $result->{cache_gen} = 1;
-        
+
     }
-    
+
     return $result;
 }
 
 # Displays the wikifier code for a page.
 sub display_page_code {
     my ($wiki, $page_name) = @_; my $result = {};
-    
+
     my $page = Wikifier::Page->new(
         name     => $page_name,
         wiki     => $wiki,
         wikifier => $wiki->{wikifier}
     );
-    
+
     $page_name = $page->name;
     my $path   = $page->path;
 
@@ -350,11 +350,11 @@ sub display_page_code {
         $result->{type}  = 'not found';
         return $result;
     }
-    
+
     # read.
     my $code = file_contents($path);
     defined $code or return { type => 'not found', error => 'Failed to open' };
-    
+
     # set path, file, and meme type.
     $result->{file}     = $page_name;
     $result->{path}     = $path;
@@ -388,7 +388,7 @@ sub parse_image_name {
     # split image parts.
     my ($image_wo_ext, $image_ext) = ($image_name =~ m/^(.+)\.(.+?)$/);
     my $image_name_s = $image_name;
-    
+
     # if this is a retina request; calculate 2x scaling.
     my ($real_width, $real_height) = ($width, $height);
     my $retina_request;
@@ -399,7 +399,7 @@ sub parse_image_name {
         $width  *= $retina_request;
         $height *= $retina_request;
     }
-    
+
     my $full_name    = $image_name;
     my $full_name_ne = $image_wo_ext;
        $full_name    = "${width}x${height}-${image_name}"   if $width || $height;
@@ -434,7 +434,7 @@ sub display_image {
     return $result;
 }
 sub _display_image {
-    my ($wiki, $image_name, $dont_open) = @_;    
+    my ($wiki, $image_name, $dont_open) = @_;
     my $result = {};
 
     # if $image_name is an array ref, it's given in [ name, width, height ].
@@ -442,37 +442,37 @@ sub _display_image {
         my ($name, $w, $h) = @$image_name;
         $image_name = "${w}x${h}-$name";
     }
-    
+
     # parse the image name.
     my %image   = %{ $wiki->parse_image_name($image_name) };
     $image_name = $image{name};
     my $width   = $image{width};
     my $height  = $image{height};
-        
+
     # an error occurred.
     if ($image{error}) {
         $result->{type} = 'not found';
         $result->{error} = $image{error};
         return $result;
     }
-        
+
     # image name and full path.
     $result->{type} = 'image';
     $result->{file} = $image_name;
     $result->{path} = $result->{fullsize_path} = $image{big_path};
-    
-    # image type and mime type.    
+
+    # image type and mime type.
     $result->{image_type} = $image{ext} eq 'jpg' ||
                             $image{ext} eq 'jpeg' ? 'jpeg' : 'png';
     $result->{mime} = $image{ext} eq 'png' ? 'image/png' : 'image/jpeg';
-    
-    ##################################   
+
+    ##################################
     ### THIS IS A FULL-SIZED IMAGE ###
     ######################################################################################
-    
+
     # stat for full-size image.
     my @stat = stat $image{big_path};
-    
+
     # if no width or height are specified,
     # display the full-sized version of the image.
     if (!$width || !$height) {
@@ -482,17 +482,17 @@ sub _display_image {
         $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
         return $result;
     }
-    
-    ##############################   
+
+    ##############################
     ### THIS IS A SCALED IMAGE ###
     ######################################################################################
 
     #============================#
     #=== Retina scale support ===#
     #============================#
-    
+
     # note: retina image name is handled above in "early retina check."
-    
+
     # hack:
     # this is not a retina request, but retina is enabled, and so is pregeneration.
     # therefore, we will call ->generate_image() in order to pregenerate a retina version.
@@ -504,7 +504,7 @@ sub _display_image {
             $wiki->display_image($retina_file, 1);
         }
     }
-    
+
     # determine the full file name of the image.
     # this may have doubled sizes for retina.
     my $cache_file = $wiki->opt('dir.cache').q(/).$image{full_name};
@@ -513,22 +513,22 @@ sub _display_image {
     #============================#
     #=== Finding cached image ===#
     #============================#
-    
+
     # if caching is enabled, check if this exists in cache.
     if ($wiki->opt('enable.cache.image') && -f $cache_file) {
         my ($image_modify, $cache_modify) = ($stat[9], (stat $cache_file)[9]);
-        
+
         # the image's file is more recent than the cache file.
         if ($image_modify > $cache_modify) {
-        
+
             # discard the outdated cached copy.
             unlink $cache_file;
-        
+
         }
-        
+
         # the cached file is newer, so use it.
         else {
-            
+
             # set HTTP data.
             $result->{path}         = $cache_file;
             $result->{cached}       = 1;
@@ -536,25 +536,25 @@ sub _display_image {
             $result->{modified}     = time2str($cache_modify);
             $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
             $result->{length}       = -s $cache_file;
-            
+
             # symlink scaled version if necessary.
             $wiki->symlink_scaled(\%image) if $image{retina};
 
             return $result;
         }
-        
+
     }
-    
+
     # if image generation is disabled, we must supply the full-sized image data.
     if (!$wiki->opt('enable.cache.image')) {
         return $wiki->display_image($result, $image_name, 0, 0);
     }
-    
+
     #==========================#
     #=== Generate the image ===#
     #==========================#
     $wiki->generate_image(\%image, $result);
-    
+
     # the generator says to use the full-sized image.
     if (delete $result->{use_fullsize}) {
         $result->{content}      = file_contents($image{big_path}, 1) unless $dont_open;
@@ -562,7 +562,7 @@ sub _display_image {
         $result->{length}       = $stat[7];
         $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
     }
-    
+
     delete $result->{content} if $dont_open;
     return $result;
 }
@@ -575,8 +575,8 @@ sub _display_image {
 sub generate_image {
     my ($wiki, $_image, $result) = @_;
     $_image   = $wiki->parse_image_name($_image) unless ref $_image eq 'HASH';
-    my %image = %$_image; 
-    
+    my %image = %$_image;
+
     # an error occurred.
     if ($image{error}) {
         return {
@@ -584,14 +584,14 @@ sub generate_image {
             error => $image{error}
         }
     };
-    
+
     # no result hash reference; create one with default values.
     $result ||= do {
 
         # determine image short name, extension, and mime type.
         my $mime = $image{ext} eq 'png' ? 'image/png' : 'image/jpeg';
         my $type = $mime eq 'image/png' ? 'png' : 'jpeg';
-        
+
         # base $result
         {
             type          => 'image',
@@ -603,8 +603,8 @@ sub generate_image {
             mime          => $mime
         }
     };
-    
-    
+
+
     # if we are restricting to only sizes used in the wiki, check.
     my ($width, $height) = ($image{width}, $image{height});
 #    if ($wiki->opt('image.enable.restriction')) {
@@ -614,7 +614,7 @@ sub generate_image {
 #            return $result;
 #        }
 #    }
-    
+
     # create GD instance with this full size image.
     GD::Image->trueColor(1);
     my $full_image = GD::Image->new($result->{fullsize_path}) or do {
@@ -631,11 +631,11 @@ sub generate_image {
             "Skipped '$image{name}' ${width}x${height}".
             " >= ${fi_width}x${fi_height}"
         );
-        
+
         # symlink to the full-sized image.
         $image{full_name} = $image{name};
         $wiki->symlink_scaled(\%image) if $image{retina};
-        
+
         return $result;
     }
 
@@ -653,7 +653,7 @@ sub generate_image {
         $width, $height,
         ($fi_width, $fi_height)
     );
-    
+
     # create JPEG or PNG data.
     my $use = $wiki->opt('image.type') || $result->{image_type};
     if ($use eq 'jpeg') {
@@ -670,26 +670,26 @@ sub generate_image {
     $result->{modified}     = time2str(time);
     $result->{length}       = length $result->{content};
     $result->{etag}         = q(").md5_hex($image{name}.$result->{modified}).q(");
-    
+
     # caching is enabled, so let's save this for later.
     my $cache_file = $result->{cache_path};
     if ($wiki->opt('enable.cache.image')) {
-    
+
         open my $fh, '>', $cache_file;
         print {$fh} $result->{content};
         close $fh;
-        
+
         # overwrite modified date to actual.
         $result->{path}       = $cache_file;
         $result->{modified}   = time2str((stat $cache_file)[9]);
         $result->{cache_gen}  = 1;
         $result->{etag}       = q(").md5_hex($image{name}.$result->{modified}).q(");
-        
+
         # if this image is available in more than 1 scale, symlink.
         $wiki->symlink_scaled(\%image) if $image{retina};
-        
+
     }
-    
+
     my $scale_str = $image{retina} ? " (\@$image{retina}x)" : '';
     Wikifier::l("Generated image '$image{name}' at ${width}x${height}$scale_str");
 
@@ -709,7 +709,7 @@ sub symlink_scaled {
         $image{ext};
     return 1 if -e $scale_path;
     symlink $image{full_name}, $scale_path;
-    
+
     # note: using full_name rather than $cache_file
     # results in a relative rather than absolute symlink.
 }
@@ -722,21 +722,21 @@ sub symlink_scaled {
 sub display_category_posts {
     my ($wiki, $category, $page_n) = @_; my $result = {};
     my ($pages, $title) = $wiki->cat_get_pages($category);
-    
+
     # no pages means no category.
     if (!$pages) {
         $result->{error} = "Category '$category' does not exist.";
         $result->{type}  = 'not found';
         return $result;
     }
-    
+
     my $opts = $wiki->opt('cat') || {};
     my $main_page = $opts->{main}{$category} || '';
-    
+
     $result->{type}     = 'catposts';
     $result->{category} = $category;
     $result->{title}    = $opts->{title}->{$category} // $title;
-    
+
     # load each page if necessary.
     my (%times, %reses);
     foreach my $page_name (keys %$pages) {
@@ -744,23 +744,23 @@ sub display_category_posts {
         my $res  = $wiki->display_page($page_name);
         my $time = $res->{page} ? $res->{page}->get('page.created')
                    : $res->{created} || 0;
-        
+
         # there was an error or it's a draft, skip.
         next if $res->{error} || $res->{draft};
-        
+
         $times{$page_name} = $time || 0;
         $reses{$page_name} = $res;
-        
+
         # if this is the main page of the category, it should come first.
         $times{$page_name} = 'inf'
             if Wikifier::Utilities::pages_equal($page_name, $main_page);
-        
+
     }
-    
+
     # order with newest first.
     my @pages_in_order = sort { $times{$b} cmp $times{$a} } keys %times;
     @pages_in_order    = map  { $reses{$_} } @pages_in_order;
-    
+
     # order into PAGES of pages. wow.
     my $limit = $wiki->opt('cat.per_page')               ||
                 $wiki->opt('enable.category_post_limit') ||
@@ -769,21 +769,21 @@ sub display_category_posts {
     while (@pages_in_order) {
         $result->{pages}{$n} ||= [];
         for (1..$limit) {
-            
+
             # there are no more pages.
             last unless @pages_in_order;
-            
+
             # add the next page.
             my $page = shift @pages_in_order;
             push @{ $result->{pages}{$n} }, $page;
-            
+
             # add the CSS.
             ($result->{all_css} ||= '') .= $page->{css} if length $page->{css};
-            
+
         }
         $n++;
     }
-    
+
     return $result;
 }
 
@@ -791,14 +791,14 @@ sub display_category_posts {
 sub check_categories {
     my ($wiki, $page) = @_;
     $wiki->cat_add_page($page, 'all');
-    
+
     # actual categories.
     my $cats = $page->get('category');
     if ($cats && ref $cats eq 'HASH') {
         $page->{categories} = [keys %$cats];
         $wiki->cat_add_page($page, $_) foreach keys %$cats;
     }
-    
+
     # image categories.
     return unless $wiki->opt('image.enable.tracking');
     $wiki->cat_add_page($page, "image-$_") foreach keys %{ $page->{images} || {} };
@@ -810,7 +810,7 @@ sub cat_add_page {
     my ($wiki, $page, $category) = @_;
     my ($time, $fh) = time;
     my $cat_file = $wiki->opt('dir.category').q(/).$category.q(.cat);
-    
+
     # fetch page infos.
     my $p_vars = $page->get('page');
     my $page_data = { asof => $time };
@@ -820,53 +820,53 @@ sub cat_add_page {
             $page_data->{$var} = $p_vars->{$var};
         }
     }
-    
+
     # this is an image category, so include the dimensions.
     if ($category =~ m/^image-(.+)$/) {
         $page_data->{dimensions} = $page->{images}{$1};
     }
-    
+
     # first, check if the category exists yet.
     if (-f $cat_file) {
         my $cat = eval { decode_json(file_contents($cat_file)) };
-        
+
         # JSON error or the value is not a hash.
         if (!$cat || ref $cat ne 'HASH') {
             Wikifier::l("Error parsing JSON category '$cat_file': $@");
             close $fh;
             return;
         }
-        
+
         # update information for this page,
         # or add it if it is not there already.
         $cat->{pages}{ $page->{name} } = $page_data;
-        
+
         # open the file or log error.
         if (!open $fh, '>', $cat_file) {
             Wikifier::l("Cannot open '$cat_file': $!");
             return;
         }
-        
+
         # print the resulting JSON.
         print {$fh} JSON->new->pretty(1)->encode($cat);
         close $fh;
-        
+
         return 1;
     }
-    
+
     # open file or error.
     if (!open $fh, '>', $cat_file) {
         Wikifier::l("Cannot open '$cat_file': $!");
         return;
     }
-    
+
     # the category does not yet exist.
     print {$fh} JSON->new->pretty(1)->encode({
         category   => $category,
         created    => $time,
         pages      => { $page->{name} => $page_data }
     });
-    
+
     close $fh;
     return 1;
 }
@@ -880,14 +880,14 @@ sub cat_get_pages {
     # page file in question. if it is, it should check the page again. if it still in
     # the category, the time in the cat file should be updated to the current time. if it
     # is no longer in the category, it should be removed from the cat file.
-    
+
     # this category does not exist.
     my $cat_file = $wiki->opt('dir.category').q(/).$category.q(.cat);
     return unless -f $cat_file;
-    
+
     # it exists; let's see what's inside.
     my $cat = eval { decode_json(file_contents($cat_file)) };
-    
+
     # JSON error or the value is not a hash.
     if (!$cat || ref $cat ne 'HASH') {
         Wikifier::l("Error parsing JSON category '$cat_file': $@");
@@ -898,21 +898,21 @@ sub cat_get_pages {
     my ($time, $changed, %final_pages) = time;
     PAGE: foreach my $page_name (%{ $cat->{pages} || {} }) {
         my $page_data = my $p = $cat->{pages}{$page_name};
-        
+
         # determine the page file name.
         my $page_path = abs_path($wiki->opt('dir.page').q(/).$page_name);
-        
+
         # page no longer exists.
         if (!-f $page_path) {
             $changed = 1;
             next PAGE;
         }
-        
+
         # check if the modification date is more recent than as of date.
         my $mod_date = (stat $page_path)[9];
         if ($mod_date > $p->{asof}) {
             $changed = 1;
-            
+
             # the page has since been modified.
             # we will create a dummy Wikifier::Page that will stop after reading variables.
             my $page = Wikifier::Page->new(
@@ -922,7 +922,7 @@ sub cat_get_pages {
                 vars_only => 1
             );
             $page->parse;
-            
+
             # update data.
             my $p_vars = $page->get('page');
             $page_data = { asof => $time };
@@ -932,7 +932,7 @@ sub cat_get_pages {
                     $page_data->{$var} = $p_vars->{$var};
                 }
             }
-            
+
             # page is no longer member of category.
             if ($category =~ m/^image-(.+)/) {
                 next PAGE unless defined $page->{images}{$1};
@@ -940,41 +940,41 @@ sub cat_get_pages {
             else {
                 next PAGE unless $page->get("category.$category");
             }
-            
+
         }
-        
+
         # nothing has changed. this one made it.
         $final_pages{$page_name} = $page_data;
-        
+
     }
-    
+
     # it looks like something has changed. we need to update the cat file.
     if ($changed) {
-    
+
         # is this category now empty?
         if (!scalar keys %final_pages) {
             unlink $cat_file;
             return;
         }
-    
+
         # no, there are still page(s) in it.
         # update the file.
-        
+
         $cat->{updated} = $time;
         $cat->{pages}   = \%final_pages;
-        
+
         # unable to open.
         my $fh;
         if (!open $fh, '>', $cat_file) {
             Wikifier::l("Cannot open '$cat_file': $!");
             return;
         }
-        
+
         print {$fh} JSON->new->pretty(1)->encode($cat);
         close $fh;
-        
+
     }
-    
+
     return wantarray ? (\%final_pages, $cat->{title}) : \%final_pages;
 }
 
@@ -1008,16 +1008,17 @@ sub verify_login {
         Wikifier::l('Attempted verify_login() without configured credentials');
         return;
     }
-    
+
     # find the user.
     my $user = $wiki->{pconf}->get("admin.$username");
     if (!$user) {
         Wikifier::l("Attempted to login as '$username' which does not exist");
         return;
     }
-    
+
     # hash it.
-    my $crypt = $crypts{ $user->{crypt} } ? $user->{crypt} : 'sha1';
+    my $crypt = delete $user->{crypt};
+    $crypt = $crypts{$crypt} ? $crypt : 'sha1';
     my $hash = eval {
         my @c = @{ $crypts{$crypt} };
         $c[0] =~ s/::/\//; $c[0] .= '.pm';
@@ -1025,14 +1026,21 @@ sub verify_login {
         my $h = $c[1]($password);
         $h;
     };
-    
+
     # error
     if (!defined $hash && $@) {
         Wikifier::l("Error with $crypt: $@");
         return;
     }
 
-    return ($hash // '') eq $user->{password};
+    # invalid credentials
+    if (($hash // '') ne delete $user->{password}) {
+        Wikifier::l("Incorrect password for '$username'");
+        return;
+    }
+
+    # return the user info, with crypt and password removed.
+    return $user;
 }
 #####################
 ### MISCELLANEOUS ###
@@ -1045,21 +1053,21 @@ sub files_in_dir {
     opendir my $dh, $dir or Wikifier::l("Cannot open dir '$dir': $!") and return;
     my %files;
     while (my $file = readdir $dh) {
-        
+
         # skip hidden files.
         next if substr($file, 0, 1) eq '.';
-        
+
         # skip files without desired extension.
         next if $ext && $file !~ m/.+\.$ext$/;
-        
+
         # resolve symlinks.
         my $file = abs_path($dir.q(/).$file);
         next if !$file; # couldn't resolve symlink.
         $file = basename($file);
-        
+
         # already got this one.
         next if $files{$file};
-        
+
         $files{$file} = 1;
     }
     closedir $dh;
@@ -1083,29 +1091,29 @@ sub _wiki_default_calc {
     my $page = $img{page};
     my $wiki = $page->{wiki};
     my $file = $page->wiki_opt('dir.image').q(/).$img{file};
-    
+
     # find the image size using GD.
     my $full_image      = GD::Image->new($file) or return (0, 0);
     my ($big_w, $big_h) = $full_image->getBounds();
     undef $full_image;
-    
+
     # call the default handler with these full dimensions.
     my ($w, $h, $full_size) = Wikifier::Page::_default_calculator(
         %img,
         big_width  => $big_w,
         big_height => $big_h
     );
-    
+
     # store these as accepted dimensions.
     $wiki->{allowed_dimensions}{ $img{file} }{ $w.q(x).$h } = 1;
-    
+
     # pregenerate if necessary.
     # this allows the direct use of the cache directory as served from
     # the web server, reducing the wikifier server's load when requesting
     # cached pages and their images.
     if ($page->wiki_opt('image.enable.pregeneration')) {
         my $res = $wiki->display_image([ $img{file}, $w, $h ], 1);
-    
+
         # we must symlink to images in cache directory.
         my ($image_dir, $cache_dir) = (
             $page->wiki_opt('dir.image'),
@@ -1114,9 +1122,9 @@ sub _wiki_default_calc {
         unlink  "$cache_dir/$img{file}";
         symlink File::Spec->abs2rel($image_dir, $cache_dir).q(/).$img{file},
                 "$cache_dir/$img{file}";
-        
+
     }
-    
+
     return ($w, $h, $full_size);
 
 }
@@ -1126,15 +1134,15 @@ sub _wiki_default_sizer {
     my %img = @_;
     my $page = $img{page};
     my $wiki = $page->{wiki};
-    
+
     # full-sized image.
     if (!$img{width} || !$img{height}) {
         return $wiki->opt('root.image').q(/).$img{file};
     }
-    
+
     # scaled image.
     return $wiki->opt('root.image').q(/).$img{width}.q(x).$img{height}.q(-).$img{file};
-    
+
 }
 
 
