@@ -22,7 +22,7 @@ infobox {
     Type:           [! Wiki !] suite;
     Established:    February 2013;
     Author:         [$ Mitchell Cooper | https://github.com/cooper $];
-    Website:        [$ https://github.com/cooper/wikifier $];
+    Website:        [$ wikifier on GitHub | https://github.com/cooper/wikifier $];
 }
 
 sec {
