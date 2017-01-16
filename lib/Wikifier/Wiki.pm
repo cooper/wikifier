@@ -1026,7 +1026,7 @@ sub verify_login {
     $crypt = $crypts{$crypt} ? $crypt : 'sha1';
     my $hash = eval {
         my ($pkg, $func) = @{ $crypts{$crypt} };
-        if (my $pkg = $c[0]) {
+        if ($pkg) {
             $pkg =~ s/::/\//;
             require "$pkg.pm";
         }
