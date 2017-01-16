@@ -12,31 +12,35 @@ use Git::Wrapper;
 sub write_page {
     my ($wiki, $page, $reason) = @_;
 
+    # determine reason
+    $reason = length $reason            ?
+        "Updated $$page{name}: $reason" :
+        "Updated $$page{name}";
+
     # write the file
     open my $fh, '>', $page->path or return;
     print {$fh} $page->{content};
     close $fh;
-    
+
     # update the page
     $wiki->display_page($page);
-    
+
     # commit the change
     return $wiki->rev_commit(
-        message => length $reason ? "Updated $$page{name}: $reason" : "Updated $$page{name}",
+        message => $reason,
         add     => [ $page->path ]
     );
-    
 }
 
 sub delete_page {
     my ($wiki, $page) = @_;
-    
+
     # commit the change
     $wiki->rev_commit(
         message => "Deleted $$page{name}",
         rm      => [ $page->path, $page->cache_path ]
     );
-    
+
     return 1;
 }
 
@@ -47,26 +51,26 @@ sub move_page {
     $page->{name} = $new_name;
 
     # consider: what if the destination page exists?
-    
+
     # delete the old cache file
     unlink $page->cache_path; # may or may not exist
-    
+
 #    # move the file as well as the cache
 #    # consider: should we just let git mv move it?
 #    rename $old_path, $page->path or do {
 #        $page->{name} = $old_name;
 #        return;
 #    };
-    
+
     # commit the change
     $wiki->rev_commit(
         message => "Moved $old_name -> $new_name",
         mv      => { $old_path => $page->path }
     );
-    
+
     # update the page
     $wiki->display_page($page);
-    
+
     return 1;
 }
 
@@ -150,38 +154,51 @@ sub _prepare_git {
 sub rev_commit (@) {
     my $wiki = shift;
     $wiki->_prepare_git();
+
+    # add the author maybe
+    if ($user && length $user->{name} && length $user->{email}) {
+        push @_, author => "$$user{name} <$$user{email}>";
+    }
+
+    # add the git
     unshift @_, $wiki->{git};
+
     return eval { &_rev_commit };
 }
 
 sub _rev_commit {
     my ($git, %opts) = @_;
     my ($rm, $add, $mv) = @opts{'rm', 'add', 'mv'};
-    
+
     # rm operation
     if ($rm && ref $rm eq 'ARRAY') {
         capture_logs { $git->rm($_) } 'git rm' foreach @$rm;
     }
-    
+
     # add operation
     if ($add && ref $add eq 'ARRAY') {
         capture_logs { $git->add($_) } 'git add' foreach @$add;
     }
-    
+
     # mv operation
     if ($mv && ref $mv eq 'HASH') {
         foreach (keys %$mv) {
             capture_logs { $git->mv($_, $mv->{$_}) } 'git mv';
         }
     }
-    
+
     # commit operations
     Wikifier::l("git commit: $opts{message}");
-    capture_logs { $git->commit({ message => $opts{message} // 'Unspecified' }) } 'git commit';
-    
+    capture_logs {
+        $git->commit({
+            message => $opts{message} // 'Unspecified'
+            author  => $opts{author}
+        })
+    } 'git commit';
+
     # return errors
     return _rev_operation_finish();
-    
+
 }
 
 # convert objects to file paths.

@@ -23,7 +23,7 @@ sub send {
 }
 
 # close the connection.
-sub close {
+sub close : method {
     my $connection = shift;
     return if $connection->{closed};
     $connection->{closed} = 1;
@@ -46,10 +46,10 @@ sub handle {
     my ($connection, $line) = @_;
     my $return = undef;
     print "C: $line\n";
-    
+
     # not interested if we're dropping the connection
     return if $connection->{closed};
-    
+
     # make sure it's a JSON array.
     my $data = eval { decode_json($line) };
     if (!$line || !$data || ref $data ne 'ARRAY') {
@@ -58,36 +58,44 @@ sub handle {
         return;
     }
     my ($command, $msg) = @$data;
-    
+
     # make sure it has a message type.
     if (!$command && !length $command) {
         $connection->error('Empty message type received');
         return;
     }
-    
+
     # make sure the second element is an object.
     if ($msg && ref $msg ne 'HASH') {
         $connection->error('Second element of message must be a JSON object');
         return;
     }
-    
+
     # if the connection is not authenticated, this better be a wiki command.
     if (!$connection->{priv_read} && $command ne 'wiki') {
         $connection->error('No read access');
         return;
     }
-    
+
     # pass it on to handlers.
     if (my $code = Wikifier::Server::Handlers->can("handle_$command")) {
+
+        # set the user in the wiki for the handler
+        my ($wiki, $user_info) = @$connection{'wiki', 'user'};
+        $wiki->{user} = $user_info if $wiki && $user_info;
+
+        # call the code
         $return = $code->($connection, $msg || {});
+
+        delete $wiki->{user} if $wiki;
     }
-    
+
     # if the 'close' option exists, close the connection afterward.
     if ($msg->{close}) {
         Wikifier::l("Connection $$connection{id} requested close");
         $connection->close;
     }
-    
+
     return $return;
 }
 

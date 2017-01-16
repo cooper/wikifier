@@ -90,8 +90,9 @@ sub handle_login {
     my ($connection, $msg) = read_required(@_, qw(username password)) or return;
 
     # verify password
+    my $username  = $msg->{username};
     my $user_info = $connection->{wiki}->verify_login(
-        $msg->{username},
+        $username,
         $msg->{password}
     );
     if (!$user_info) {
@@ -100,11 +101,13 @@ sub handle_login {
     }
 
     # authentication succeeded.
-    $connection->{username}   = $msg->{username};
+
+    $connection->{user}       = $user_info;
+    $connection->{username}   = $username;
     $connection->{priv_write} = 1;
     $connection->{session_id} = $msg->{session_id};
     $connection->send(login => { logged_in => 1, %$user_info });
-    $Wikifier::Server::sessions{ $msg->{session_id} } = [ time, $connection->{username} ];
+    $Wikifier::Server::sessions{ $msg->{session_id} } = [ time, $username ];
 
     Wikifier::l("Successful authentication for write access to '$$connection{wiki_name}' by $$connection{id}");
 }
