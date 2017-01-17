@@ -67,8 +67,8 @@ sub read_config {
     );
 
     # error.
-    if (!$conf->parse) {
-        Wikifier::l("Failed to parse configuration");
+    if (my $err = $conf->parse) {
+        Wikifier::l("Failed to parse configuration: $err");
         return;
     }
 
@@ -81,8 +81,8 @@ sub read_config {
         );
 
         # error.
-        if (!$pconf->parse) {
-            Wikifier::l("Failed to parse private configuration");
+        if (my $err = $pconf->parse) {
+            Wikifier::l("Failed to parse private configuration: $err");
             return;
         }
     }
