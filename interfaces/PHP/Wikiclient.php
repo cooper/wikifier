@@ -62,7 +62,7 @@ class Wikiclient {
     }
 
     // send a command/message.
-    private function command($command, $opts) {
+    private function command($command, $opts = array()) {
         if ($command != 'wiki' && !$this->connected)
             $this->connect();
         $opts['close'] = true;
@@ -137,6 +137,11 @@ class Wikiclient {
             'name'   => $name,
             'page_n' => $page_n
         ));
+    }
+
+    // check connection
+    function ping() {
+        return $this->command('ping');
     }
 
     /*********** PUBLIC WRITE METHODS ***********/
