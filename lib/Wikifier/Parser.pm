@@ -43,15 +43,16 @@ sub parse {
 
     # read it line-by-line.
     while (my $line = <$fh>) {
-        next unless length $line;   # empty line.
         $line =~ s/[\r\n\0]//g;     # remove returns and newlines.
         $line = trim($line);        # remove prefixing and suffixing whitespace.
-        $wikifier->handle_line($line, $page, $current, $last) or last;
+        next if !length $line;
+        my $err = $wikifier->handle_line($line, $page, $current, $last);
+        return $err if $err;
     }
 
     # some block was not closed.
     if ($current->{block} != $page->{main_block}) {
-        return "$file: Missing a closing bracket somewhere";
+        return 'Missing a closing bracket somewhere';
     }
 
     # run ->parse on children.
@@ -67,17 +68,17 @@ sub handle_line {
     # illegal regex filters out variable declaration.
     if ($line =~ m/^\s*\@([\w\.]+):\s*(.+);\s*$/) {
         $page->set($1, $wikifier->parse_formatted_text($page, $2));
-        return 1;
+        return;
     }
 
     # variable boolean.
     elsif ($line =~ m/^\s*\@([\w\.]+);\s*$/) {
         $page->set($1, 1);
-        return 1;
+        return;
     }
 
     # only parsing variables.
-    return 1 if $page->{vars_only};
+    return if $page->{vars_only};
 
     # pass on to main parser.
     for (split(//, $line), "\n") {
@@ -85,7 +86,7 @@ sub handle_line {
         return $err if $err;
     }
 
-    return 1;
+    return;
 }
 
 # % current
