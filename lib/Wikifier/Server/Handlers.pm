@@ -174,7 +174,11 @@ sub handle_page_list {
 
     # get all pages
     my %pages = %{ $connection->{wiki}->cat_get_pages('all') };
-    my @pages = map { my $ref = $pages{$_}; $ref->{file} = $_; $ref } keys %pages;
+    my @pages = map {
+        my $ref = $pages{$_};
+        $ref->{file} = $_;
+        $ref
+    } keys %pages;
 
     # sort
     # TODO: m+ and m- won't work because 'modified' doesn't exist
@@ -289,6 +293,11 @@ sub handle_cat_del {
     # copy all affected old pages to revisions
     # search all affected pages for @category.(x)
     # commit: deleted category x.cat
+}
+
+sub handle_ping {
+    my ($connection) = @_;
+    $connection->send(pong => { connected => 1 });
 }
 
 #################
