@@ -213,7 +213,8 @@ sub _display_page {
     # caching is enabled, so let's check for a cached copy.
 
     if ($wiki->opt('enable.cache.page') && -f $cache_path) {
-        my ($page_modify, $cache_modify) = map (stat $_)[9], $path, $cache_path;
+        my ($page_modify, $cache_modify) =
+            map { (stat $_)[9] } $path, $cache_path;
 
         # the page's file is more recent than the cache file.
         # discard the outdated cached copy.
