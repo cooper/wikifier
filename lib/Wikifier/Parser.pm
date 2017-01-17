@@ -80,8 +80,10 @@ sub handle_line {
     return 1 if $page->{vars_only};
 
     # pass on to main parser.
-    $wikifier->handle_character($_, $page, @rest)
-        for (split(//, $line), "\n");
+    for (split(//, $line), "\n") {
+        my $err = $wikifier->handle_character($_, $page, @rest);
+        return $err if $err;
+    }
 
     return 1;
 }
@@ -149,6 +151,9 @@ sub handle_character {
         my $content       = $current->{block}{content}[-1];
         my $block_type    = my $block_name    = '';
         my $in_block_name = my $chars_scanned = 0;
+
+        return "Block has no type"
+            if !length $content;
 
         # chop one character at a time from the end of the content.
         while (my $last_char = chop $content) { $chars_scanned++;
@@ -352,7 +357,7 @@ sub handle_character {
     ### do not do anything below that depends on $current->{escaped} ###
     ###   because it has already been modified for the next char   ###
 
-    return 1;
+    return;
 }
 
 1
