@@ -85,9 +85,7 @@ sub _display_image {
     # HACK: this is not a retina request, but retina is enabled, and so i
     # pregeneration. therefore, we will call ->generate_image() in order to
     # pregenerate a retina version.
-    my $retina = $wiki->opt('image.enable.retina');
-    my @scales = split ',', ( || '');
-    if ($retina) {
+    if (my $retina = $wiki->opt('image.enable.retina')) {
         my @scales = split /,/, $retina;
         foreach (@scales) {
 
