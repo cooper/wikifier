@@ -3,9 +3,11 @@ package Wikifier::Server::Connection;
 
 use warnings;
 use strict;
+use 5.010;
 
-use JSON qw(encode_json decode_json);
+use JSON::XS ();
 
+my $json = JSON::XS->new->allow_blessed;
 my $id = 'a';
 
 # create a new connection.
@@ -17,9 +19,9 @@ sub new {
 # write a line of JSON-encoded data.
 sub send {
     my ($connection, @etc) = @_;
-    my $json = JSON->new->allow_blessed(1)->encode(\@etc);
-    print "S: $json\n";
-    $connection->{stream}->write("$json\n");
+    my $json_text = $json->encode(\@etc);
+    print "S: $json_text\n";
+    $connection->{stream}->write("$json_text\n");
 }
 
 # close the connection.
@@ -51,7 +53,7 @@ sub handle {
     return if $connection->{closed};
 
     # make sure it's a JSON array.
-    my $data = eval { decode_json($line) };
+    my $data = eval { $json->decode($line) };
     if (!$line || !$data || ref $data ne 'ARRAY') {
         $connection->error('Message must be a JSON array');
         $connection->close;

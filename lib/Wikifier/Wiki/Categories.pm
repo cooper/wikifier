@@ -180,7 +180,7 @@ sub cat_get_pages {
     return unless -f $cat_file;
 
     # it exists; let's see what's inside.
-    my $cat = eval { decode_json(file_contents($cat_file)) };
+    my $cat = eval { $json->decode(file_contents($cat_file)) };
 
     # JSON error or the value is not a hash.
     if (!$cat || ref $cat ne 'HASH') {

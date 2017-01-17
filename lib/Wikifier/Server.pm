@@ -9,7 +9,6 @@ use IO::Async::File;
 use IO::Async::Listener;
 use IO::Async::Timer::Periodic;
 use IO::Socket::UNIX;
-use JSON qw(encode_json decode_json);
 use File::Basename 'basename';
 
 use Wikifier::Wiki;
@@ -22,7 +21,7 @@ our ($loop, $conf, %wikis, %files, %sessions);
 sub start {
     ($loop, my $conf_file) = @_;
     Wikifier::lindent('Initializing Wikifier::Server');
-    
+
     # load configuration.
     ($conf = Wikifier::Page->new(
         file_path => $conf_file,
@@ -35,7 +34,7 @@ sub start {
         on_tick  => \&delete_old_sessions
     );
     $loop->add($timer);
-    
+
     # create a new listener and add it to the loop.
     my $listener = IO::Async::Listener->new(on_stream => \&handle_stream);
     $loop->add($listener);
@@ -57,23 +56,23 @@ sub start {
 
     # set up handlers.
     Wikifier::Server::Handlers::initialize();
-    
+
     # create Wikifier::Wiki instances.
     create_wikis();
     pregenerate();
 
     # run forever.
     $loop->run;
-    
+
 }
 
 # handle a new stream.
 sub handle_stream {
     my (undef, $stream) = @_;
-   
+
     $stream->{connection} = Wikifier::Server::Connection->new($stream);
     Wikifier::l("New connection $$stream{connection}{id}");
-    
+
     # configure the stream.
     my $close = sub { shift->{connection}->close };
     $stream->configure(
@@ -83,7 +82,7 @@ sub handle_stream {
         on_read_error   => $close,
         on_write_error  => $close,
     );
-    
+
     # add the stream to the loop.
     $loop->add($stream);
 
@@ -93,11 +92,11 @@ sub handle_stream {
 sub handle_data {
     my ($stream, $buffref, $eof) = @_;
     while ($$buffref =~ s/^(.*?)\n//) {
-        
+
         # handle the data ($1)
         return unless $stream->{connection}; # might be closed.
         $stream->{connection}->handle($1);
-        
+
     }
 }
 
@@ -106,28 +105,28 @@ sub create_wikis {
     my $w = $conf->get('server.wiki');
     my %confwikis = $w && ref $w eq 'HASH' ? %$w : {};
     Wikifier::lindent('Initializing Wikifier::Wiki instances');
-    
+
     foreach my $name (keys %confwikis) {
 
         Wikifier::lindent("[$name]");
-    
+
         # load the wiki.
         my $wiki = Wikifier::Wiki->new(
             config_file  => $conf->get("server.wiki.$name.config"),
             private_file => $conf->get("server.wiki.$name.private")
         );
-        
+
         # it failed.
         Wikifier::l("Error in wiki configuration") and next unless $wiki;
-        
+
         # it succeeded.
         $wikis{$name} = $wiki;
         $wiki->{name} = $name;
-        
+
         Wikifier::back();
-        
+
     }
-    
+
     Wikifier::lback('Done initializing');
 }
 
@@ -152,27 +151,27 @@ sub gen_wiki {
     }
 
     Wikifier::lindent("Checking [$$wiki{name}]");
-    
+
     foreach my $page_name ($wiki->all_pages) {
         my $page_file  = "$page_dir/$page_name";
         my $cache_file = "$cache_dir/$page_name.cache";
-        
+
         # determine modification times.
         my $page_modified  = (stat $page_file )[9];
         my $cache_modified = (stat $cache_file)[9] if $cache_file;
-        
+
         # cached copy is newer; skip this page.
         if ($page_modified && $cache_modified) {
             next if $cache_modified >= $page_modified;
         }
-        
+
         # page is not cached or has changed since cache time.
         Wikifier::lindent("($page_name)");
         $wiki->display_page($page_name);
         Wikifier::back();
-        
+
     }
-    
+
     Wikifier::lback("Done [$$wiki{name}]");
 }
 
