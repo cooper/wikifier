@@ -39,7 +39,7 @@ sub parse {
 
     # set initial parse info.
     my $current = { block => $wikifier->{main_block} };
-    my $last    = {};
+    my $last = {};
 
     # read it line-by-line.
     while (my $line = <$fh>) {
@@ -47,7 +47,7 @@ sub parse {
         $line = trim($line);        # remove prefixing and suffixing whitespace.
         next if !length $line;
         my $err = $wikifier->handle_line($line, $page, $current, $last);
-        return $err if $err;
+        return "Line $.: $err" if $err;
     }
 
     # some block was not closed.

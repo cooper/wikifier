@@ -107,11 +107,13 @@ sub _display_page {
 
     # cache was not used. generate a new copy.
     $result->{page} = $page;
+    $wiki->cat_add_page($page, 'all');
 
     # parse the page.
     my $err = $page->parse;
     return display_error($err) if $err;
 
+    # update categories
     $wiki->check_categories($page);
 
     # if this is a draft, pretend it doesn't exist.
