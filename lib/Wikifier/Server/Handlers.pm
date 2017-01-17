@@ -253,11 +253,17 @@ sub handle_page_save {
     my $page = $wiki->page_named($msg->{name}, content => $msg->{content});
     my @errs = $wiki->write_page($page, $msg->{message});
 
+    # the results of ->display_page are stored here
+    my %page_results;
+    %page_results = %{ $page->{recent_result} }
+        if ref $page->{recent_result} eq 'HASH';
+
     $connection->send(page_save => {
+        %page_results,
         saved      => !@errs,
         rev_errors => \@errs,
         rev_error  => _simplify_errors(@errs),
-        rev_latest => @errs ? undef : $wiki->rev_latest
+        rev_latest => @errs ? undef : $wiki->rev_latest,
     });
 }
 
