@@ -28,12 +28,14 @@ sub page_named {
 # Displays a page.
 sub display_page {
     my ($wiki, $page_name) = (shift, shift);
+    my $page = $page_name if blessed $page_name;
     $page_name = page_name($page_name);
     my $result = $wiki->_display_page($page_name, @_);
     Wikifier::l("Error     $page_name: $$result{error}")
         if $result->{error} && !$result->{draft};
     Wikifier::l("Draft     $page_name; skipped")
         if $result->{draft};
+    $page->{recent_result} = $result if $page;
     return $result;
 }
 sub _display_page {
