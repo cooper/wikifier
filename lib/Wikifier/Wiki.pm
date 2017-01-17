@@ -829,7 +829,7 @@ sub cat_add_page {
     my $p_vars = $page->get('page');
     my $page_data = {
         asof     => $time,
-        mod_unix => $page->{mod_unix}
+        mod_unix => $page->modified_time
     };
     foreach my $var (keys %$p_vars) {
         last if ref $p_vars ne 'HASH';
@@ -940,10 +940,7 @@ sub cat_get_pages {
 
             # update data.
             my $p_vars = $page->get('page');
-            $page_data = {
-                asof     => $time,
-                mod_unix => $page->{mod_unix}
-            };
+            $page_data = { asof => $time };
             foreach my $var (keys %$p_vars) {
                 last if ref $p_vars ne 'HASH';
                 $page_data->{$var} = $p_vars->{$var};
@@ -958,7 +955,8 @@ sub cat_get_pages {
             }
         }
 
-        # nothing has changed. this one made it.
+        # this one made it.
+        $page_data->{mod_unix}   = $mod_date;
         $final_pages{$page_name} = $page_data;
     }
 
