@@ -283,7 +283,10 @@ sub page_name {
 # resolves symlinks only counts each file once.
 sub files_in_dir {
     my ($dir, $ext) = @_;
-    opendir my $dh, $dir or Wikifier::l("Cannot open dir '$dir': $!") and return;
+    if (!opendir my $dh, $dir) {
+        Wikifier::l("Cannot open dir '$dir': $!");
+        return;
+    }
     my %files;
     while (my $file = readdir $dh) {
 
@@ -311,7 +314,10 @@ sub files_in_dir {
 sub file_contents {
     my ($file, $binary) = @_;
     local $/ = undef;
-    open my $fh, '<', $file or Wikifier::l("Cannot open file '$file': $!") and return;
+    if (!open my $fh, '<', $file) {
+        Wikifier::l("Cannot open file '$file': $!");
+        return;
+    }
     binmode $fh if $binary;
     my $content = <$fh>;
     close $fh;

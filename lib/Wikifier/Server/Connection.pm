@@ -101,4 +101,9 @@ sub handle {
     return $return;
 }
 
+sub l {
+    my $connection = shift;
+    Wikifier::l("[$$connection{id}] @_");
+}
+
 1

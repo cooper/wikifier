@@ -77,7 +77,7 @@ sub handle_wiki {
     $connection->{wiki_name} = $name;
     weaken($connection->{wiki} = $Wikifier::Server::wikis{$name});
 
-    Wikifier::l("Successful authentication for read access to '$name' by $$connection{id}");
+    $connection->l("Successfully authenticated for read access to '$name'");
 }
 
 # method 1: username/password authentication
@@ -113,9 +113,9 @@ sub handle_login {
         [ time, $sess_id, $username, $user_info ]
     if length $sess_id;
 
-    Wikifier::l(
-        'Successful authentication for write access to '.
-        $connection->{wiki_name}.' by  '.$connection->{id}
+    $connection->l(
+        'Successfully authenticated for write access to '.
+        $connection->{wiki_name}
     );
 }
 
@@ -129,7 +129,7 @@ sub handle_resume {
     # session is too old or never existed.
     my $sess = $Wikifier::Server::sessions{ $msg->{session_id} };
     if (!$sess) {
-        Wikifier::l("Bad session ID for $$connection{id}; refusing authentication");
+        $connection->l("Bad session ID; refusing reauthentication");
         $connection->error('Please login again', login_again => 1);
         return;
     }
@@ -139,7 +139,7 @@ sub handle_resume {
     $connection->{priv_write} = 1;
     @$connection{'session_id', 'username', 'user'} = @$sess[1..$#$sess];
 
-    Wikifier::l("Resuming write access to '$$connection{wiki_name}' by $$connection{id}");
+    $connection->l("Resuming write access to $$connection{wiki_name}");
 }
 
 #####################
@@ -154,7 +154,7 @@ sub handle_page {
     my ($connection, $msg) = read_required(@_, 'name') or return;
     my $result = $connection->{wiki}->display_page($msg->{name});
     $connection->send('page', $result);
-    Wikifier::l("Page '$$msg{name}' requested by $$connection{id}");
+    $connection->l("Page '$$msg{name}' requested");
 }
 
 # page code request
@@ -165,7 +165,7 @@ sub handle_page_code {
     my ($connection, $msg) = read_required(@_, 'name') or return;
     my $result = $connection->{wiki}->display_page_code($msg->{name});
     $connection->send('page_code', $result);
-    Wikifier::l("Code for page '$$msg{name}' requested by $$connection{id}");
+    $connection->l("Page '$$msg{name}' code requested");
 }
 
 # page list
@@ -185,7 +185,7 @@ sub handle_page_list {
     @pages = sort { $sorter->($a, $b) } @pages;
 
     $connection->send('page_list', { pages => \@pages });
-    Wikifier::l("Complete page list requested by $$connection{id}");
+    $connection->l("Complete page list requested");
 }
 
 # image request
