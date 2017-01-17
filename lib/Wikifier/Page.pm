@@ -263,6 +263,18 @@ sub path {
     return abs_path($page->wiki_opt('dir.page').q(/).$page->name);
 }
 
+sub created_time {
+    my $page = shift;
+    my $page_data = $page->get('page');
+    $page_data = {} if ref $page_data ne 'HASH';
+    return $page_data->{created} || $page->{created};
+}
+
+sub modified_time {
+    my $page = shift;
+    return (stat $page->path)[9]
+}
+
 sub name {
     return shift->{name};
 }
