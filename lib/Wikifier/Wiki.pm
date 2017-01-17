@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2014, Mitchell Cooper
+# Copyright (c) 2016, Mitchell Cooper
 #
 # The Wikifier is a simple wiki language parser. It merely converts wiki language to HTML.
 # Wikifier::Wiki, on the other hand, provides a full wiki management mechanism. It
@@ -99,9 +98,7 @@ sub opt {
     my ($wiki, $opt) = @_;
     return $wiki->{$opt} if exists $wiki->{$opt};
     my $v = $wiki->{conf}->get($opt);
-    return defined $v ? $v :
-        $wiki_defaults{$opt} //
-        $Wikifier::Page::wiki_defaults{$opt};
+    return $v // $wiki_defaults{$opt} // $Wikifier::Page::wiki_defaults{$opt};
 }
 
 sub wiki_opt;
@@ -254,17 +251,20 @@ sub display_error {
     };
 }
 
+# return abs path for a page
 sub path_for_page {
     my ($wiki, $page_name) = @_;
     $page_name = page_name($page_name);
     return abs_path($wiki->opt('dir.page').'/'.$page_name);
 }
 
+# return abs path for a category
 sub path_for_category {
     my ($wiki, $cat_name) = @_;
     return abs_path($wiki->opt('dir.category')."/$cat_name.cat");
 }
 
+# return abs path for an image
 sub path_for_image {
     my ($wiki, $image_name) = @_;
     return abs_path($wiki->opt('dir.image').'/'.$image_name);
