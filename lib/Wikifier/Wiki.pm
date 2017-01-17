@@ -24,6 +24,7 @@ use Wikifier;
 use Wikifier::Wiki::Pages;
 use Wikifier::Wiki::Images;
 use Wikifier::Wiki::Revision;
+use Wikifier::Wiki::Categories;
 
 # default options.
 our %wiki_defaults = (
