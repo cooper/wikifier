@@ -114,6 +114,9 @@ sub opt {
         $Wikifier::Page::wiki_defaults{$opt};
 }
 
+sub wiki_opt;
+*wiki_opt = \&opt;
+
 #############   This is Wikifier's built in URI handler. If you wish to implement your own
 # display() #   URI handler, simply have it call the other display_*() methods directly.
 #############   Returns information for displaying a wiki page or resource.
@@ -403,7 +406,7 @@ sub parse_image_name {
     if ($image_wo_ext =~ m/^(.+)\@(\d+)x$/) {
         $image_wo_ext   = $1;
         $retina_request = $2;
-        $image_name     = $1.q(.).$image_ext;
+        $image_name     = "$1.$image_ext";
         $width  *= $retina_request;
         $height *= $retina_request;
     }
@@ -414,7 +417,7 @@ sub parse_image_name {
        $full_name_ne = "${width}x${height}-${image_wo_ext}" if $width || $height;
 
     # check if the file exists.
-    my $image_path = abs_path($wiki->opt('dir.image').q(/).$image_name);
+    my $image_path = $wiki->path_for_image($image_name);
     if (!-f $image_path) {
         return { error => "Image '$image_name' does not exist." };
     }
@@ -488,7 +491,7 @@ sub _display_image {
         $result->{modified}     = time2str($stat[9]);
         $result->{mod_unix}     = $stat[9];
         $result->{length}       = $stat[7];
-        $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
+        $result->{etag}         = make_etag($image_name, $stat[9]);
         return $result;
     }
 
@@ -516,7 +519,7 @@ sub _display_image {
 
     # determine the full file name of the image.
     # this may have doubled sizes for retina.
-    my $cache_file = $wiki->opt('dir.cache').q(/).$image{full_name};
+    my $cache_file = $wiki->opt('dir.cache').'/'.$image{full_name};
     $result->{cache_path} = $cache_file;
 
     #============================#
@@ -544,7 +547,7 @@ sub _display_image {
             $result->{content}      = file_contents($cache_file, 1) unless $dont_open;
             $result->{modified}     = time2str($cache_modify);
             $result->{mod_unix}     = $cache_modify;
-            $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
+            $result->{etag}         = make_etag($image_name, $cache_modify);
             $result->{length}       = -s $cache_file;
 
             # symlink scaled version if necessary.
@@ -571,7 +574,7 @@ sub _display_image {
         $result->{modified}     = time2str($stat[9]);
         $result->{mod_unix}     = $stat[9];
         $result->{length}       = $stat[7];
-        $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
+        $result->{etag}         = make_etag($image_name, $stat[9]);
     }
 
     delete $result->{content} if $dont_open;
@@ -609,7 +612,7 @@ sub generate_image {
             file          => $image{name},
             path          => $image{path} || $image{big_path},
             fullsize_path => $image{big_path},
-            cache_path    => $wiki->opt('dir.cache').q(/).$image{full_name},
+            cache_path    => $wiki->opt('dir.cache').'/'.$image{full_name},
             image_type    => $type,
             mime          => $mime
         }
@@ -681,7 +684,7 @@ sub generate_image {
     $result->{modified}     = time2str(time);
     $result->{mod_unix}     = time;
     $result->{length}       = length $result->{content};
-    $result->{etag}         = q(").md5_hex($image{name}.$result->{modified}).q(");
+    $result->{etag}         = make_etag($image{name}, time);
 
     # caching is enabled, so let's save this for later.
     my $cache_file = $result->{cache_path};
@@ -697,7 +700,7 @@ sub generate_image {
         $result->{modified}   = time2str($modified);
         $result->{mod_unix}   = $modified;
         $result->{cache_gen}  = 1;
-        $result->{etag}       = q(").md5_hex($image{name}.$result->{modified}).q(");
+        $result->{etag}       = make_etag($image{name}, $modified);
 
         # if this image is available in more than 1 scale, symlink.
         $wiki->symlink_scaled(\%image) if $image{retina};
@@ -726,6 +729,71 @@ sub symlink_scaled {
 
     # note: using full_name rather than $cache_file
     # results in a relative rather than absolute symlink.
+}
+
+# generate an etag
+sub make_etag {
+    my $md5 = md5_hex(join '', @_);
+    return "\"$md5\"";
+}
+
+# default image calculator for a wiki.
+sub _wiki_default_calc {
+    my %img  = @_;
+    my $page = $img{page};
+    my $wiki = $page->{wiki};
+    my $file = $wiki->path_for_image($img{file});
+
+    # find the image size using GD.
+    my $full_image      = GD::Image->new($file) or return (0, 0);
+    my ($big_w, $big_h) = $full_image->getBounds();
+    undef $full_image;
+
+    # call the default handler with these full dimensions.
+    my ($w, $h, $full_size) = Wikifier::Page::_default_calculator(
+        %img,
+        big_width  => $big_w,
+        big_height => $big_h
+    );
+
+    # store these as accepted dimensions.
+    $wiki->{allowed_dimensions}{ $img{file} }{ $w.q(x).$h } = 1;
+
+    # pregenerate if necessary.
+    # this allows the direct use of the cache directory as served from
+    # the web server, reducing the wikifier server's load when requesting
+    # cached pages and their images.
+    if ($page->wiki_opt('image.enable.pregeneration')) {
+        my $res = $wiki->display_image([ $img{file}, $w, $h ], 1);
+
+        # we must symlink to images in cache directory.
+        my ($image_dir, $cache_dir) = (
+            $page->wiki_opt('dir.image'),
+            $page->wiki_opt('dir.cache')
+        );
+        unlink  "$cache_dir/$img{file}";
+        symlink File::Spec->abs2rel($image_dir, $cache_dir).q(/).$img{file},
+                "$cache_dir/$img{file}";
+
+    }
+
+    return ($w, $h, $full_size);
+}
+
+# default image sizer for a wiki.
+# this returns a URL for an image of the given dimensions.
+sub _wiki_default_sizer {
+    my %img = @_;
+    my $page = $img{page};
+    my $wiki = $page->{wiki};
+
+    # full-sized image.
+    if (!$img{width} || !$img{height}) {
+        return $wiki->opt('root.image').'/'.$img{file};
+    }
+
+    # scaled image.
+    return $wiki->opt('root.image')."/$img{width}x$img{height}-$img{file}";
 }
 
 ##################
@@ -823,7 +891,7 @@ sub check_categories {
 sub cat_add_page {
     my ($wiki, $page, $category) = @_;
     my ($time, $fh) = time;
-    my $cat_file = $wiki->opt('dir.category').q(/).$category.q(.cat);
+    my $cat_file = $wiki->path_for_category($category);
 
     # fetch page infos.
     my $p_vars = $page->get('page');
@@ -897,7 +965,7 @@ sub cat_get_pages {
     # is no longer in the category, it should be removed from the cat file.
 
     # this category does not exist.
-    my $cat_file = $wiki->opt('dir.category').q(/).$category.q(.cat);
+    my $cat_file = $wiki->path_for_category($category);
     return unless -f $cat_file;
 
     # it exists; let's see what's inside.
@@ -914,10 +982,8 @@ sub cat_get_pages {
     PAGE: foreach my $page_name (%{ $cat->{pages} || {} }) {
         my $page_data = my $p = $cat->{pages}{$page_name};
 
-        # determine the page file name.
-        my $page_path = abs_path($wiki->opt('dir.page').q(/).$page_name);
-
         # page no longer exists.
+        my $page_path = $wiki->path_for_page($page_name);
         if (!-f $page_path) {
             $changed = 1;
             next PAGE;
@@ -1063,6 +1129,31 @@ sub verify_login {
 ### MISCELLANEOUS ###
 #####################
 
+sub path_for_page {
+    my ($wiki, $page_name) = @_;
+    $page_name = page_name($page_name);
+    return abs_path($wiki->opt('dir.page').'/'.$page_name);
+}
+
+sub path_for_category {
+    my ($wiki, $cat_name) = @_;
+    return abs_path($wiki->opt('dir.category')."/$cat_name.cat");
+}
+
+sub path_for_image {
+    my ($wiki, $image_name);
+    return abs_path($wiki->opt('dir.image').'/'.$image_name);
+}
+
+# page_name(some_page)      -> some_page.page
+# page_name(some_page.page) -> some_page.page
+# page_name($page)          -> some_page.page
+sub page_name {
+    my $page_name = shift;
+    return $page_name->name if blessed $page_name;
+    return Wikifier::Page::_page_filename($page_name);
+}
+
 # files in directory.
 # resolves symlinks only counts each file once.
 sub files_in_dir {
@@ -1078,7 +1169,7 @@ sub files_in_dir {
         next if $ext && $file !~ m/.+\.$ext$/;
 
         # resolve symlinks.
-        my $file = abs_path($dir.q(/).$file);
+        my $file = abs_path("$dir/$file");
         next if !$file; # couldn't resolve symlink.
         $file = basename($file);
 
@@ -1101,66 +1192,5 @@ sub file_contents {
     close $fh;
     return $content;
 }
-
-# default image calculator for a wiki.
-sub _wiki_default_calc {
-    my %img  = @_;
-    my $page = $img{page};
-    my $wiki = $page->{wiki};
-    my $file = $page->wiki_opt('dir.image').q(/).$img{file};
-
-    # find the image size using GD.
-    my $full_image      = GD::Image->new($file) or return (0, 0);
-    my ($big_w, $big_h) = $full_image->getBounds();
-    undef $full_image;
-
-    # call the default handler with these full dimensions.
-    my ($w, $h, $full_size) = Wikifier::Page::_default_calculator(
-        %img,
-        big_width  => $big_w,
-        big_height => $big_h
-    );
-
-    # store these as accepted dimensions.
-    $wiki->{allowed_dimensions}{ $img{file} }{ $w.q(x).$h } = 1;
-
-    # pregenerate if necessary.
-    # this allows the direct use of the cache directory as served from
-    # the web server, reducing the wikifier server's load when requesting
-    # cached pages and their images.
-    if ($page->wiki_opt('image.enable.pregeneration')) {
-        my $res = $wiki->display_image([ $img{file}, $w, $h ], 1);
-
-        # we must symlink to images in cache directory.
-        my ($image_dir, $cache_dir) = (
-            $page->wiki_opt('dir.image'),
-            $page->wiki_opt('dir.cache')
-        );
-        unlink  "$cache_dir/$img{file}";
-        symlink File::Spec->abs2rel($image_dir, $cache_dir).q(/).$img{file},
-                "$cache_dir/$img{file}";
-
-    }
-
-    return ($w, $h, $full_size);
-
-}
-
-# default image sizer for a wiki.
-sub _wiki_default_sizer {
-    my %img = @_;
-    my $page = $img{page};
-    my $wiki = $page->{wiki};
-
-    # full-sized image.
-    if (!$img{width} || !$img{height}) {
-        return $wiki->opt('root.image').q(/).$img{file};
-    }
-
-    # scaled image.
-    return $wiki->opt('root.image').q(/).$img{width}.q(x).$img{height}.q(-).$img{file};
-
-}
-
 
 1
