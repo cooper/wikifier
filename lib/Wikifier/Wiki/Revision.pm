@@ -152,19 +152,16 @@ sub _prepare_git {
 # commit a revision
 # returns a list of errors or an empty list on success
 sub rev_commit (@) {
-    my $wiki = shift;
+    my ($wiki, %opts) = (shift, @_);
     $wiki->_prepare_git();
 
     # add the author maybe
     my $user = $wiki->{user};
     if ($user && length $user->{name} && length $user->{email}) {
-        push @_, author => "$$user{name} <$$user{email}>";
+        $opts{author} = "$$user{name} <$$user{email}>";
     }
 
-    # add the git
-    unshift @_, $wiki->{git};
-
-    return eval { _rev_commit(@_) };
+    return eval { _rev_commit($wiki->{git}, %opts) };
 }
 
 sub _rev_commit {
