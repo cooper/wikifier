@@ -64,12 +64,11 @@ sub new {
 # parses the file.
 sub parse {
     my $page = shift;
-
     Wikifier::lindent("Parse     $$page{name}");
-    my $res = $page->wikifier->parse($page, $page->path);
+    my $err = $page->wikifier->parse($page, $page->path);
+    Wikifier::l(      "Error     $err") if $err;
     Wikifier::back();
-
-    return $res;
+    return $err;
 }
 
 # returns the generated page HTML.

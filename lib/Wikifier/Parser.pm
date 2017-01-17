@@ -28,12 +28,14 @@ sub parse {
 
     # no file given.
     if (!defined $file) {
-        Wikifier::l("No file specified for parsing.");
-        return;
+        return "No file specified for parsing";
     }
 
     # open the file.
-    open my $fh, '<', $file or Wikifier::l("Couldn't read '$file': $!");
+    my $fh;
+    if (!open $fh, '<', $file) {
+        return "Couldn't open '$file': $!";
+    }
 
     # set initial parse info.
     my $current = { block => $wikifier->{main_block} };
@@ -49,14 +51,13 @@ sub parse {
 
     # some block was not closed.
     if ($current->{block} != $page->{main_block}) {
-        Wikifier::l("$file: Missing a closing bracket somewhere");
-        return;
+        return "$file: Missing a closing bracket somewhere";
     }
 
     # run ->parse on children.
     $page->{main_block}->parse($page);
 
-    return 1;
+    return;
 }
 
 # parse a single line.

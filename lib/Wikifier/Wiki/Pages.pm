@@ -109,7 +109,9 @@ sub _display_page {
     $result->{page} = $page;
 
     # parse the page.
-    $page->parse();
+    my $err = $page->parse;
+    return display_error($err) if !$err;
+
     $wiki->check_categories($page);
 
     # if this is a draft, pretend it doesn't exist.
