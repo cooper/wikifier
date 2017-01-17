@@ -689,7 +689,7 @@ sub path_for_category {
 }
 
 sub path_for_image {
-    my ($wiki, $image_name);
+    my ($wiki, $image_name) = @_;
     return abs_path($wiki->opt('dir.image').'/'.$image_name);
 }
 
