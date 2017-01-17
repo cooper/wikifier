@@ -39,22 +39,18 @@ sub display_page {
 sub _display_page {
     my ($wiki, $page_name) = @_;
     my $result = {};
-    $page_name = page_name($page_name);
 
-    my $page = Wikifier::Page->new(
-        name     => $page_name,
-        wiki     => $wiki,
-        wikifier => $wiki->{wikifier}
-    );
+    # create a page object
+    my $page = $wiki->page_named($page_name);
 
+    # get page info
     $page_name     = $page->name;
     my $path       = $page->path;
     my $cache_path = $page->cache_path;
 
     # file does not exist.
-    if (!-f $path) {
-        return display_error("Page '$page_name' does not exist.");
-    }
+    return display_error("Page '$page_name' does not exist.")
+        if !-f $path;
 
     # set path, file, and meme type.
     $result->{file} = $page_name;
@@ -62,7 +58,6 @@ sub _display_page {
     $result->{mime} = 'text/html';
 
     # caching is enabled, so let's check for a cached copy.
-
     if ($wiki->opt('enable.cache.page') && -f $cache_path) {
         my ($page_modify, $cache_modify) =
             map { (stat $_)[9] } $path, $cache_path;
@@ -75,18 +70,18 @@ sub _display_page {
 
         # the cached file is newer, so use it.
         else {
-            my $time = time2str($cache_modify);
+            my $time_str = time2str($cache_modify);
             $result->{type}     = 'page';
-            $result->{content}  = "<!-- cached page dated $time -->\n\n";
+            $result->{content}  = "<!-- cached page dated $time_str -->\n\n";
 
             # fetch the prefixing data.
             my $cache_data = file_contents($cache_path);
             my @data = split /\n\n/, $cache_data, 2;
 
             # decode.
-            my $jdata = eval { $json->decode(shift @data) } || {};
+            my $jdata = eval { $json->decode(shift @data) };
             if (ref $jdata eq 'HASH') {
-                $result->{$_} = $jdata->{$_} foreach keys %$jdata;
+                $result->{$_} = $jdata->{$_} for keys %$jdata;
             }
 
             # if this is a draft, pretend it doesn't exist.
@@ -100,7 +95,7 @@ sub _display_page {
             $result->{content} .= shift @data;
             $result->{all_css}  = $result->{css} if length $result->{css};
             $result->{cached}   = 1;
-            $result->{modified} = $time;
+            $result->{modified} = $time_str;
             $result->{mod_unix} = $cache_modify;
             $result->{length}   = length $result->{content};
 
@@ -147,7 +142,6 @@ sub _display_page {
 
         # save the content.
         print {$fh} $result->{content};
-
         close $fh;
 
         # overwrite modified date to actual.
