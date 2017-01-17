@@ -27,32 +27,28 @@ our %block_types = (
 # in order to leave room for a footer.
 sub section_parse {
     my ($block, $page) = @_;
-    
+
     # determine header level.
     $block->{header_level} = ($block->{parent}{header_level} || 1) + 1;
-
-    # track the section count.
-    $page->{c_section_n} = -1 if not defined $page->{section_n};
-    $page->{section_n}   = -1 if not defined $page->{section_n};
-
+    
     $page->{section_n}++;
 }
 
 sub section_html {
     my ($block, $page, $el) = @_;
     $page->{c_section_n}++;
-    
+
     # clear at end of element.
     $el->configure(clear => 1);
-    
+
     # determine if this is the intro section.
     my $is_intro = !$page->{c_section_n};
     my $class    = $is_intro ? 'section-page-title' : 'section-title';
-    
+
     # determine the heading level.
-    my $l    = $is_intro ? 1 : $block->{header_level};
-       $l    = 6 if $block->{header_level} > 6;
-    
+    my $l = $is_intro ? 1 : $block->{header_level};
+       $l = 6 if ($block->{header_level} || 0) > 6;
+
     # disable the footer if necessary.
     # this only works if the section is the last item in the main block.
     if ($page->wiki_opt('enable.last_section_footer') &&
@@ -62,9 +58,9 @@ sub section_html {
     }
 
     # determine the page title if necessary.
-    my $title    = $block->{name};
-       $title    = $page->get('page.title') if $is_intro && !length $title;
-    
+    my $title = $block->{name};
+       $title = $page->get('page.title') if $is_intro && !length $title;
+
     # if we have a title and this type of title is enabled.
     if (length $title and $is_intro ? $page->wiki_opt('enable.page_titles') : 1) {
 
@@ -75,10 +71,10 @@ sub section_html {
             content   => $page->parse_formatted_text($title),
             container => 1
         );
-        
+
         $el->add($heading);
     }
-    
+
     # add the contained elements.
     ITEM: foreach my $item (@{ $block->{content} }) {
 
@@ -86,31 +82,29 @@ sub section_html {
         # sections interpret loose text as paragraphs.
         if (!blessed $item) {
             TEXT: foreach my $text (split /(\r*\n+){2}/, $item) {
-                
+
                 # ignore empty things or spaces, etc.
                 my $trimmed = Wikifier::Utilities::trim($text);
                 next TEXT unless length $trimmed;
-                
+
                 # create the paragraph.
                 $item = $page->wikifier->create_block(
                     parent  => $block,
                     type    => 'paragraph',
                     content => [$text]
                 );
-                
+
                 # adopt it.
                 $el->add($item->html($page));
-                
+
             }
             next ITEM;
         }
-        
+
         # this is blessed, so it's a block.
         # adopt this element.
         $el->add($item->html($page));
-        
     }
-
 }
 
 sub clear_html {
