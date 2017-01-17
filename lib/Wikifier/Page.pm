@@ -259,7 +259,8 @@ sub cache_path {
 
 sub path {
     my $page = shift;
-    return $page->{file_path} if length $page->{file_path};
+    return abs_path($page->{file_path})
+        if length $page->{file_path};
     return abs_path($page->wiki_opt('dir.page').q(/).$page->name);
 }
 
@@ -272,7 +273,7 @@ sub created_time {
 
 sub modified_time {
     my $page = shift;
-    return (stat $page->path)[9]
+    return (stat $page->path)[9];
 }
 
 sub name {

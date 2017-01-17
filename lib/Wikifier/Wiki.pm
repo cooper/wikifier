@@ -45,9 +45,9 @@ sub new {
 
     # create the Wiki's Wikifier instance.
     # using the same wikifier instance over and over makes parsing much faster.
-    $wiki->{wikifier} ||= Wikifier->new();
+    $wiki->{wikifier} ||= Wikifier->new;
 
-    # if there were no provided options, assume we're reading from /etc/wikifier.conf.
+    # if there were no provided options, assume we're reading from /etc
     $wiki->read_config('/etc/wikifier.conf', '/etc/wikifier_private.conf')
         if not scalar keys %opts;
 
@@ -56,16 +56,6 @@ sub new {
         if defined $opts{config_file};
 
     return $wiki;
-}
-
-sub page_named {
-    my ($wiki, $page_name, %opts) = @_;
-    my $page = Wikifier::Page->new(
-        name     => $page_name,
-        wiki     => $wiki,
-        wikifier => $wiki->{wikifier},
-        %opts
-    );
 }
 
 # read options from a configuration page file.
@@ -117,9 +107,9 @@ sub opt {
 sub wiki_opt;
 *wiki_opt = \&opt;
 
-#############   This is Wikifier's built in URI handler. If you wish to implement your own
-# display() #   URI handler, simply have it call the other display_*() methods directly.
-#############   Returns information for displaying a wiki page or resource.
+#######################
+### DISPLAY METHODS ###
+################################################################################
 #
 # Pages
 # -----
@@ -145,53 +135,41 @@ sub wiki_opt;
 # -------
 #
 # Returns a hash reference of results for display.
-#   type: either 'page', 'image', or 'not found'
+#
+#   type = one of these:
+#       page        some HTML
+#       page_code:  some wikifier code
+#       image:      an image
+#       catposts:   a category with HTML for several pages
+#       not found:  used for all errors
 #
 #   if the type is 'page':
 #       cached:     true if the content was fetched from cache.
 #       generated:  true if the content was just generated.
 #       cache_gen:  true if the content was generated and has been cached.
 #       page:       the Wikifier::Page object representing the page. (if generated)
+#       content:    this will be some HTML page content
 #
 #   if the type is 'image':
 #       image_type: either 'jpeg' or 'png'
-#       image_data: the image binary data (synonym to 'content')
 #       cached:     true if the image was fetched from cache.
 #       generated:  true if the image was just generated.
 #       cache_gen:  true if the image was generated and has been cached.
+#       content:    this will be some binary image data
 #
 #   for anything except errors, the following will be set:
 #       file:       the filename of the resource (not path) ex 'hello.png' or 'some.page'
 #       path:       the full path of the resource ex '/srv/www/example.com/hello.png'
 #       mime:       the MIME type, such as 'text/html' or 'image/png'
 #       modified:   the last modified date of the resource in HTTP date format
-#       length:     the length of the resource in octets
+#       mod_unix:   the modified UNIX timestamp
+#       length:     the length of the resource in bytes
 #       etag:       an HTTP etag for the resource in the form of an md5 string
-#       content:    the page content or binary data to be sent to the client
+#       content:    the content or binary data to be sent to the client
 #
 #   if the type is 'not found'
-#       error: a string error.
+#       error:      a human-readable error message
 #
-sub display {
-    my ($wiki, $page_name) = (shift, shift);
-
-    # it's an image.
-    if ($page_name =~ m|^image/(.+)$|) {
-        return $wiki->display_image($1);
-    }
-
-    # it's a wiki page.
-    else {
-        return $wiki->display_page($page_name);
-    }
-
-    # not sure.
-    return {
-        type  => 'not found',
-        error => 'Unsure how to handle this request'
-    };
-
-}
 
 #############
 ### PAGES ###
@@ -225,9 +203,7 @@ sub _display_page {
 
     # file does not exist.
     if (!-f $path) {
-        $result->{error} = "Page '$page_name' does not exist.";
-        $result->{type}  = 'not found';
-        return $result;
+        return display_error("Page '$page_name' does not exist.");
     }
 
     # set path, file, and meme type.
@@ -241,11 +217,9 @@ sub _display_page {
         my ($page_modify, $cache_modify) = ((stat $path)[9], (stat $cache_path)[9]);
 
         # the page's file is more recent than the cache file.
+        # discard the outdated cached copy.
         if ($page_modify > $cache_modify) {
-
-            # discard the outdated cached copy.
             unlink $cache_path;
-
         }
 
         # the cached file is newer, so use it.
@@ -266,14 +240,11 @@ sub _display_page {
 
             # if this is a draft, pretend it doesn't exist.
             if ($result->{draft}) {
-                return {
-                    error => "Page '$page_name' has not yet been published.",
-                    type  => 'not found',
+                return display_error(
+                    "Page '$page_name' has not yet been published.",
                     draft => 1
-                };
+                );
             }
-
-            # set HTTP data.
 
             $result->{content} .= shift @data;
             $result->{all_css}  = $result->{css} if length $result->{css};
@@ -284,7 +255,6 @@ sub _display_page {
 
             return $result;
         }
-
     }
 
     # cache was not used. generate a new copy.
@@ -296,11 +266,10 @@ sub _display_page {
 
     # if this is a draft, pretend it doesn't exist.
     if ($page->get('page.draft')) {
-        return {
-            error => "Page '$page_name' has not yet been published.",
-            type  => 'not found',
+        return display_error(
+            "Page '$page_name' has not yet been published.",
             draft => 1
-        };
+        );
     }
 
     # generate the HTML and headers.
@@ -316,7 +285,6 @@ sub _display_page {
 
     # caching is enabled, so let's save this for later.
     if ($wiki->opt('enable.cache.page')) {
-
         open my $fh, '>', $cache_path;
 
         # save prefixing data.
@@ -336,7 +304,6 @@ sub _display_page {
         $result->{modified}  = time2str($modified);
         $result->{mod_unix}  = $modified;
         $result->{cache_gen} = 1;
-
     }
 
     return $result;
@@ -344,27 +311,21 @@ sub _display_page {
 
 # Displays the wikifier code for a page.
 sub display_page_code {
-    my ($wiki, $page_name) = @_; my $result = {};
-
-    my $page = Wikifier::Page->new(
-        name     => $page_name,
-        wiki     => $wiki,
-        wikifier => $wiki->{wikifier}
-    );
-
-    $page_name = $page->name;
-    my $path   = $page->path;
+    my ($wiki, $page_name) = @_;
+    $page_name = page_name($page_name);
+    my $path   = $wiki->path_for_page($page_name);
+    my $result = {};
 
     # file does not exist.
     if (!-f $path) {
-        $result->{error} = "Page '$page_name' does not exist.";
-        $result->{type}  = 'not found';
-        return $result;
+        return display_error("Page '$page_name' does not exist.");
     }
 
     # read.
     my $code = file_contents($path);
-    defined $code or return { type => 'not found', error => 'Failed to open' };
+    if (!defined $code) {
+        return display_error("Failed to read '$page_name'");
+    }
 
     # set path, file, and meme type.
     $result->{file}     = $page_name;
@@ -461,11 +422,8 @@ sub _display_image {
     my $height  = $image{height};
 
     # an error occurred.
-    if ($image{error}) {
-        $result->{type} = 'not found';
-        $result->{error} = $image{error};
-        return $result;
-    }
+    return display_error($image{error})
+        if $image{error};
 
     # image name and full path.
     $result->{type} = 'image';
@@ -592,12 +550,8 @@ sub generate_image {
     my %image = %$_image;
 
     # an error occurred.
-    if ($image{error}) {
-        return {
-            type  => 'not found',
-            error => $image{error}
-        }
-    };
+    return display_error($image{error})
+        if $image{error};
 
     # no result hash reference; create one with default values.
     $result ||= do {
@@ -621,21 +575,18 @@ sub generate_image {
 
     # if we are restricting to only sizes used in the wiki, check.
     my ($width, $height) = ($image{width}, $image{height});
-#    if ($wiki->opt('image.enable.restriction')) {
-#        if (!$wiki->{allowed_dimensions}{ $image{name} }{ $width.q(x).$height }) {
-#            $result->{type}  = 'not found';
-#            $result->{error} = "Image '$image{name}' does not exist in these dimensions.";
-#            return $result;
-#        }
-#    }
+    if ($wiki->opt('image.enable.restriction')) {
+        my $dimension_str = "${width}x${height}";
+        return display_error(
+            "Image '$image{name}' does not exist in those dimensions."
+        ) if !$wiki->{allowed_dimensions}{ $image{name} }{$dimension_str};
+    }
 
     # create GD instance with this full size image.
     GD::Image->trueColor(1);
-    my $full_image = GD::Image->new($result->{fullsize_path}) or do {
-        $result->{type}  = 'not found';
-        $result->{error} = "Couldn't handle image $$result{fullsize_path}";
-        return $result;
-    };
+    my $full_image = GD::Image->new($result->{fullsize_path});
+    return display_error("Couldn't handle image $$result{fullsize_path}")
+        if !$full_image;
     my ($fi_width, $fi_height) = $full_image->getBounds();
 
     # the request is to generate an image the same or larger than the original.
@@ -654,11 +605,9 @@ sub generate_image {
     }
 
     # create resized image.
-    my $image = GD::Image->new($width, $height) or do {
-        $result->{type}  = 'not found';
-        $result->{error} = "Couldn't create an empty image";
-        return $result;
-    };
+    my $image = GD::Image->new($width, $height);
+    return display_error("Couldn't create an empty image")
+        if !$image;
     $image->saveAlpha(1);
     $image->alphaBlending(0);
     $image->copyResampled($full_image,
@@ -806,11 +755,8 @@ sub display_category_posts {
     my ($pages, $title) = $wiki->cat_get_pages($category);
 
     # no pages means no category.
-    if (!$pages) {
-        $result->{error} = "Category '$category' does not exist.";
-        $result->{type}  = 'not found';
-        return $result;
-    }
+    return display_error("Category '$category' does not exist.")
+        if !$pages;
 
     my $opts = $wiki->opt('cat') || {};
     my $main_page = $opts->{main}{$category} || '';
@@ -1129,6 +1075,15 @@ sub verify_login {
 ### MISCELLANEOUS ###
 #####################
 
+sub display_error {
+    my ($error_str, %opts) = @_;
+    return {
+        type => 'not found',
+        error => $error_str,
+        %opts
+    };
+}
+
 sub path_for_page {
     my ($wiki, $page_name) = @_;
     $page_name = page_name($page_name);
@@ -1152,6 +1107,17 @@ sub page_name {
     my $page_name = shift;
     return $page_name->name if blessed $page_name;
     return Wikifier::Page::_page_filename($page_name);
+}
+
+# create a page object with this wiki
+sub page_named {
+    my ($wiki, $page_name, %opts) = @_;
+    my $page = Wikifier::Page->new(
+        name     => page_name($page_name),
+        wiki     => $wiki,
+        wikifier => $wiki->{wikifier},
+        %opts
+    );
 }
 
 # files in directory.
