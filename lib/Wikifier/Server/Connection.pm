@@ -103,7 +103,9 @@ sub handle {
 
 sub l {
     my $connection = shift;
-    Wikifier::l("[$$connection{id}] @_");
+    my $wiki = $connection->{wiki_name};
+    $wiki = length $wiki ? "/$wiki" : '';
+    Wikifier::l("[$$connection{id}$wiki] @_");
 }
 
 1

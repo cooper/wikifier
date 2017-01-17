@@ -77,7 +77,7 @@ sub handle_wiki {
     $connection->{wiki_name} = $name;
     weaken($connection->{wiki} = $Wikifier::Server::wikis{$name});
 
-    $connection->l("Successfully authenticated for read access to '$name'");
+    $connection->l("Successfully authenticated for read access");
 }
 
 # method 1: username/password authentication
@@ -113,10 +113,7 @@ sub handle_login {
         [ time, $sess_id, $username, $user_info ]
     if length $sess_id;
 
-    $connection->l(
-        'Successfully authenticated for write access to '.
-        $connection->{wiki_name}
-    );
+    $connection->l('Successfully authenticated for write access');
 }
 
 # method 2: session ID authentication
@@ -139,7 +136,7 @@ sub handle_resume {
     $connection->{priv_write} = 1;
     @$connection{'session_id', 'username', 'user'} = @$sess[1..$#$sess];
 
-    $connection->l("Resuming write access to $$connection{wiki_name}");
+    $connection->l('Resuming write access');
 }
 
 #####################
