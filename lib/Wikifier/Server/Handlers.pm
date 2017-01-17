@@ -30,8 +30,8 @@ my %sort_options = (
     'a-' => sub { _t($_[1])                 cmp _t($_[0])                   },
     'c+' => sub {   ($_[0]{created}  ||  0) <=>   ($_[1]{created}  ||  0)   },
     'c-' => sub {   ($_[1]{created}  ||  0) <=>   ($_[0]{created}  ||  0)   },
-    'm+' => sub {   ($_[0]{modified} ||  0) <=>   ($_[1]{modified} ||  0)   },
-    'm-' => sub {   ($_[1]{modified} ||  0) <=>   ($_[0]{modified} ||  0)   },
+    'm+' => sub {   ($_[0]{mod_unix} ||  0) <=>   ($_[1]{mod_unix} ||  0)   },
+    'm-' => sub {   ($_[1]{mod_unix} ||  0) <=>   ($_[0]{mod_unix} ||  0)   },
     'u+' => sub { lc($_[0]{author}   // '') cmp lc($_[1]{author}   // '')   },
     'u-' => sub { lc($_[1]{author}   // '') cmp lc($_[0]{author}   // '')   }
 );

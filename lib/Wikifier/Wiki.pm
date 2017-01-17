@@ -276,6 +276,7 @@ sub _display_page {
             $result->{all_css}  = $result->{css} if length $result->{css};
             $result->{cached}   = 1;
             $result->{modified} = $time;
+            $result->{mod_unix} = $cache_modify;
             $result->{length}   = length $result->{content};
 
             return $result;
@@ -306,7 +307,7 @@ sub _display_page {
     $result->{all_css}    = $result->{css};
     $result->{length}     = length $result->{content};
     $result->{generated}  = 1;
-    $result->{modified}   = time2str(time);
+    $result->   = time2str(time);
     $result->{categories} = $page->{categories} if $page->{categories};
 
     # caching is enabled, so let's save this for later.
@@ -327,7 +328,9 @@ sub _display_page {
         close $fh;
 
         # overwrite modified date to actual.
-        $result->{modified}  = time2str((stat $cache_path)[9]);
+        my $modified = (stat $cache_path)[9];
+        $result->{modified}  = time2str($modified);
+        $result->{mod_unix}  = $modified;
         $result->{cache_gen} = 1;
 
     }
@@ -482,6 +485,7 @@ sub _display_image {
     if (!$width || !$height) {
         $result->{content}      = file_contents($image{big_path}, 1) unless $dont_open;
         $result->{modified}     = time2str($stat[9]);
+        $result->{mod_unix}     = $stat[9];
         $result->{length}       = $stat[7];
         $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
         return $result;
@@ -538,6 +542,7 @@ sub _display_image {
             $result->{cached}       = 1;
             $result->{content}      = file_contents($cache_file, 1) unless $dont_open;
             $result->{modified}     = time2str($cache_modify);
+            $result->{mod_unix}     = $cache_modify;
             $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
             $result->{length}       = -s $cache_file;
 
@@ -563,6 +568,7 @@ sub _display_image {
     if (delete $result->{use_fullsize}) {
         $result->{content}      = file_contents($image{big_path}, 1) unless $dont_open;
         $result->{modified}     = time2str($stat[9]);
+        $result->{mod_unix}     = $stat[9];
         $result->{length}       = $stat[7];
         $result->{etag}         = q(").md5_hex($image_name.$result->{modified}).q(");
     }
@@ -672,6 +678,7 @@ sub generate_image {
 
     $result->{generated}    = 1;
     $result->{modified}     = time2str(time);
+    $result->{mod_unix}     = time;
     $result->{length}       = length $result->{content};
     $result->{etag}         = q(").md5_hex($image{name}.$result->{modified}).q(");
 
@@ -684,8 +691,10 @@ sub generate_image {
         close $fh;
 
         # overwrite modified date to actual.
+        my $modified = (stat $cache_file)[9];
         $result->{path}       = $cache_file;
-        $result->{modified}   = time2str((stat $cache_file)[9]);
+        $result->{modified}   = time2str($modified);
+        $result->{mod_unix}   = $modified;
         $result->{cache_gen}  = 1;
         $result->{etag}       = q(").md5_hex($image{name}.$result->{modified}).q(");
 
