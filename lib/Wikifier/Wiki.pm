@@ -827,12 +827,13 @@ sub cat_add_page {
 
     # fetch page infos.
     my $p_vars = $page->get('page');
-    my $page_data = { asof => $time };
-    if (ref $p_vars eq 'HASH') {
-        foreach my $var (keys %$p_vars) {
-            next if $var eq 'asof';
-            $page_data->{$var} = $p_vars->{$var};
-        }
+    my $page_data = {
+        asof     => $time,
+        mod_unix => $page->{mod_unix}
+    };
+    foreach my $var (keys %$p_vars) {
+        last if ref $p_vars ne 'HASH';
+        $page_data->{$var} = $p_vars->{$var};
     }
 
     # this is an image category, so include the dimensions.
@@ -939,12 +940,13 @@ sub cat_get_pages {
 
             # update data.
             my $p_vars = $page->get('page');
-            $page_data = { asof => $time };
-            if (ref $p_vars eq 'HASH') {
-                foreach my $var (keys %$p_vars) {
-                    next if $var eq 'asof';
-                    $page_data->{$var} = $p_vars->{$var};
-                }
+            $page_data = {
+                asof     => $time,
+                mod_unix => $page->{mod_unix}
+            };
+            foreach my $var (keys %$p_vars) {
+                last if ref $p_vars ne 'HASH';
+                $page_data->{$var} = $p_vars->{$var};
             }
 
             # page is no longer member of category.
@@ -954,12 +956,10 @@ sub cat_get_pages {
             else {
                 next PAGE unless $page->get("category.$category");
             }
-
         }
 
         # nothing has changed. this one made it.
         $final_pages{$page_name} = $page_data;
-
     }
 
     # it looks like something has changed. we need to update the cat file.
