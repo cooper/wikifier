@@ -307,7 +307,8 @@ sub _display_page {
     $result->{all_css}    = $result->{css};
     $result->{length}     = length $result->{content};
     $result->{generated}  = 1;
-    $result->   = time2str(time);
+    $result->{modified}   = time2str(time);
+    $result->{mod_unix}   = time;
     $result->{categories} = $page->{categories} if $page->{categories};
 
     # caching is enabled, so let's save this for later.
