@@ -110,7 +110,7 @@ sub _display_page {
 
     # parse the page.
     my $err = $page->parse;
-    return display_error($err) if !$err;
+    return display_error($err) if $err;
 
     $wiki->check_categories($page);
 
