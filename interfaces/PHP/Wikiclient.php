@@ -112,8 +112,11 @@ class Wikiclient {
     }
 
     // send a page code request.
-    function page_code($name) {
-        return $this->command('page_code', array( 'name' => $name ));
+    function page_code($name, $display_page) {
+        return $this->command('page_code', array(
+            'name'         => $name,
+            'display_page' => $display_page
+        ));
     }
 
     function page_list($sort = 'm-') {
