@@ -156,11 +156,18 @@ sub handle_page {
 
 # page code request
 #
-#   name:   the name of the page
+#   name:           the name of the page
+#
+#   display_page:   (optional). 1 to call ->display_page and set its result
+#                   to {display_result} in the response, except for the
+#                   {content}. 2 to do the same except also preserve the content
 #
 sub handle_page_code {
     my ($connection, $msg) = read_required(@_, 'name') or return;
-    my $result = $connection->{wiki}->display_page_code($msg->{name});
+    my $result = $connection->{wiki}->display_page_code(
+        $msg->{name},
+        $msg->{display_page}
+    );
     $connection->send('page_code', $result);
     $connection->l("Page '$$msg{name}' code requested");
 }

@@ -162,7 +162,7 @@ sub _display_page {
 
 # Displays the wikifier code for a page.
 sub display_page_code {
-    my ($wiki, $page_name) = @_;
+    my ($wiki, $page_name, $display_page) = @_;
     $page_name = page_name($page_name);
     my $path   = $wiki->path_for_page($page_name);
     my $result = {};
@@ -185,6 +185,15 @@ sub display_page_code {
     $result->{type}     = 'page_code';
     $result->{content}  = $code;
     $result->{length}   = length $result->{content};
+
+    # we might want to also call ->display_page(). this would be useful
+    # for determining where errors occur on the page.
+    if ($display_page) {
+        my %page_res_copy = %{ $wiki->display_page($page_name) };
+        delete $page_res_copy{content}
+            unless $display_page == 2;
+        $result->{display_result} = \%page_res_copy;
+    }
 
     return $result;
 }
