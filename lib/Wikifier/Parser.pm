@@ -46,8 +46,8 @@ sub parse {
         $line =~ s/[\r\n\0]//g;     # remove returns and newlines.
         $line = trim($line);        # remove prefixing and suffixing whitespace.
         next if !length $line;
-        my $err = $wikifier->handle_line($line, $page, $current, $last);
-        return "Line $.: $err" if $err;
+        my ($i, $err) = $wikifier->handle_line($line, $page, $current, $last);
+        return "Line $.:$i: $err" if $err;
     }
 
     # some block was not closed.
@@ -81,9 +81,11 @@ sub handle_line {
     return if $page->{vars_only};
 
     # pass on to main parser.
+    my $i = 0;
     for (split(//, $line), "\n") {
+        $i++;
         my $err = $wikifier->handle_character($_, $page, @rest);
-        return $err if $err;
+        return ($i, $err) if $err;
     }
 
     return;
