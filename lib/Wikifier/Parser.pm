@@ -39,7 +39,7 @@ sub parse {
 
     # set initial parse info.
     my $current = {
-        block => $wikifier->{main_block}
+        block => $wikifier->{main_block},
         last  => {}
     };
 
