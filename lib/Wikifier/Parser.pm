@@ -46,13 +46,15 @@ sub parse {
         $line =~ s/[\r\n\0]//g;     # remove returns and newlines.
         $line = trim($line);        # remove prefixing and suffixing whitespace.
         next if !length $line;
+        $current->{line} = $.;
         my ($i, $err) = $wikifier->handle_line($line, $page, $current, $last);
         return "Line $.:$i: $err" if $err;
     }
 
     # some block was not closed.
     if ($current->{block} != $page->{main_block}) {
-        return 'Missing a closing bracket somewhere';
+        my ($type, $line, $col) = @${ $current->{block} }{ qw(type line col) };
+        return "Line $line:$col: $type{} still open at EOF";
     }
 
     # run ->parse on children.
@@ -83,7 +85,7 @@ sub handle_line {
     # pass on to main parser.
     my $i = 0;
     for (split(//, $line), "\n") {
-        $i++;
+        $current->{col} = ++$i;
         my $err = $wikifier->handle_character($_, $page, @rest);
         return ($i, $err) if $err;
     }
@@ -227,6 +229,8 @@ sub handle_character {
 
         # create the new block.
         $current->{block} = $wikifier->create_block(
+            line    => $current->{line},
+            col     => $current->{col},
             parent  => $current->{block},
             type    => $block_type,
             name    => $block_name,
