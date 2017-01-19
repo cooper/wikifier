@@ -21,7 +21,7 @@ sub import {
 sub indent {
     my ($string, $times) = (shift, shift || 1);
     my $space = '    ' x $times;
-    my $final_string = q();
+    my $final_string = '';
     foreach my $line (split "\n", $string) {
         $final_string .= "$space$line\n";
     }

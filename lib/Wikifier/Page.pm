@@ -253,14 +253,14 @@ sub image_round {
 
 sub cache_path {
     my $page = shift;
-    return abs_path($page->wiki_opt('dir.cache').q(/).$page->name.q(.cache));
+    return abs_path($page->wiki_opt('dir.cache').'/'.$page->name.'.cache');
 }
 
 sub path {
     my $page = shift;
     return abs_path($page->{file_path})
         if length $page->{file_path};
-    return abs_path($page->wiki_opt('dir.page').q(/).$page->name);
+    return abs_path($page->wiki_opt('dir.page').'/'.$page->name);
 }
 
 sub created_time {
@@ -288,7 +288,7 @@ sub _page_filename {
 
     # append .page if it isn't already there.
     if ($page_name !~ m/\.(page|conf)$/) {
-        $page_name .= q(.page);
+        $page_name .= '.page';
     }
 
     return $page_name;

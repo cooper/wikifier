@@ -170,11 +170,11 @@ our %colors = (
 sub parse_formatted_text {
     my ($wikifier, $page, $text, $no_html_entities, $careful) = @_;
     my @items;
-    my $string = q();
+    my $string = '';
 
-    my $last_char    = q();  # the last parsed character.
+    my $last_char    = '';   # the last parsed character.
     my $in_format    = 0;    # inside a formatting element.
-    my $format_type  = q();  # format name such as 'i' or '/b'
+    my $format_type  = '';   # format name such as 'i' or '/b'
     my $escaped      = 0;    # this character was escaped.
     my $next_escaped = 0;    # the next character will be escaped.
 
@@ -205,12 +205,12 @@ sub parse_formatted_text {
 
             # we are now inside the format type.
             $in_format   = 1;
-            $format_type = q();
+            $format_type = '';
 
             # store the string we have so far.
             if (defined $string) {
                 push @items, [ $no_html_entities, $string ];
-                $string = q();
+                $string = '';
             }
 
         }
@@ -336,21 +336,21 @@ sub parse_format_type {
         if ($link_char eq '[') {
             $link_type = 'internal';
             $title     = ucfirst $target;
-            $target    = $page->wiki_opt('root.page').q(/).safe_name($target, 1);
+            $target    = $page->wiki_opt('root.page').'/'.safe_name($target, 1);
         }
 
         # category wiki link [~category~]
         elsif ($link_char eq '~') {
             $link_type = 'category';
             $title     = ucfirst $target;
-            $target    = $page->wiki_opt('root.category').q(/).safe_name($target, 1);
+            $target    = $page->wiki_opt('root.category').'/'.safe_name($target, 1);
         }
 
         # external wiki link [!article!]
         elsif ($link_char eq '!') {
             $link_type = 'external';
-            $title     = $page->wiki_opt('external.name').q(: ).ucfirst($target);
-            $target    = $page->wiki_opt('external.root').q(/).safe_name($target);
+            $title     = $page->wiki_opt('external.name').': '.ucfirst($target);
+            $target    = $page->wiki_opt('external.root').'/'.safe_name($target);
         }
 
         # other non-wiki link [$url$]

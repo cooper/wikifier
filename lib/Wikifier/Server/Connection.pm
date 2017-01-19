@@ -13,7 +13,7 @@ my $id = 'a';
 # create a new connection.
 sub new {
     my ($class, $stream) = @_;
-    return bless { stream => $stream, id => q(@).$id++ }, $class;
+    return bless { stream => $stream, id => '@'.$id++ }, $class;
 }
 
 # write a line of JSON-encoded data.

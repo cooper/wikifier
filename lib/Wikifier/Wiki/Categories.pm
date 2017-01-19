@@ -164,8 +164,8 @@ sub cat_add_page {
     return 1;
 }
 
-# returns the names of the pages in the given category.
-# if the category does not exist, an undefined value is returned.
+# returns a name-to-metadata hash of the pages in the given category.
+# if the category does not exist, returns nothing.
 sub cat_get_pages {
     my ($wiki, $category) = @_;
     # this should read a file for pages of a category.

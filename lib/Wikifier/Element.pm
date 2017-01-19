@@ -102,7 +102,7 @@ sub generate {
     my $styles;
     foreach my $style (keys %{ $el->{styles} }) {
         $styles ||= '';
-        $styles  .= "$style: ".$el->{styles}{$style}.q(; );
+        $styles  .= "$style: ".$el->{styles}{$style}.'; ';
     }
     $html .= " style=\"$styles\"" if defined $styles;
     
