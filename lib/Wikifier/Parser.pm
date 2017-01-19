@@ -65,7 +65,7 @@ sub parse {
 
 # parse a single line.
 sub handle_line {
-    my ($wikifier, $line, $page, @rest) = @_;
+    my ($wikifier, $line, $page, $current, @rest) = @_;
 
     # illegal regex filters out variable declaration.
     if ($line =~ m/^\s*\@([\w\.]+):\s*(.+);\s*$/) {
@@ -86,7 +86,7 @@ sub handle_line {
     my $i = 0;
     for (split(//, $line), "\n") {
         $current->{col} = ++$i;
-        my $err = $wikifier->handle_character($_, $page, @rest);
+        my $err = $wikifier->handle_character($_, $page, $current, @rest);
         return ($i, $err) if $err;
     }
 
