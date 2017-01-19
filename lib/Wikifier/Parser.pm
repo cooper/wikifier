@@ -53,7 +53,7 @@ sub parse {
 
     # some block was not closed.
     if ($current->{block} != $page->{main_block}) {
-        my ($type, $line, $col) = @${ $current->{block} }{ qw(type line col) };
+        my ($type, $line, $col) = @{ $current->{block} }{ qw(type line col) };
         return "Line $line:$col: $type\{} still open at EOF";
     }
 
