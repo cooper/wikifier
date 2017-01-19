@@ -38,8 +38,10 @@ sub parse {
     }
 
     # set initial parse info.
-    my $current = { block => $wikifier->{main_block} };
-    my $last = {};
+    my $current = {
+        block => $wikifier->{main_block}
+        last  => {}
+    };
 
     # read it line-by-line.
     while (my $line = <$fh>) {
@@ -47,7 +49,7 @@ sub parse {
         $line = trim($line);        # remove prefixing and suffixing whitespace.
         next if !length $line;
         $current->{line} = $.;
-        my ($i, $err) = $wikifier->handle_line($line, $page, $current, $last);
+        my ($i, $err) = $wikifier->handle_line($line, $page, $current);
         return "Line $.:$i: $err" if $err;
     }
 
@@ -65,7 +67,7 @@ sub parse {
 
 # parse a single line.
 sub handle_line {
-    my ($wikifier, $line, $page, $current, @rest) = @_;
+    my ($wikifier, $line, $page, $current) = @_;
 
     # illegal regex filters out variable declaration.
     if ($line =~ m/^\s*\@([\w\.]+):\s*(.+);\s*$/) {
@@ -86,7 +88,7 @@ sub handle_line {
     my $i = 0;
     for (split(//, $line), "\n") {
         $current->{col} = ++$i;
-        my $err = $wikifier->handle_character($_, $page, $current, @rest);
+        my $err = $wikifier->handle_character($_, $page, $current);
         return ($i, $err) if $err;
     }
 
@@ -98,8 +100,10 @@ sub handle_line {
 #   word:       the current word. (may not yet be complete.)
 #   escaped:    true if the current character was escaped. (last character = \)
 #   block:      the current block object.
-#   ignored:    true if the character is a master parster character({, }, etc.).
-
+#   ignored:    true if the character is a master parser character({, }, etc.).
+#   line:       current line number
+#   col:        current column number (actually column + 1)
+#
 # %last
 #   char:       the last parsed character.
 #   word:       the last full word.
@@ -110,7 +114,8 @@ sub handle_line {
 # parse a single character.
 # note: never return from this method; instead last from for loop.
 sub handle_character {
-    my ($wikifier, $char, $page, $current, $last) = @_;
+    my ($wikifier, $char, $page, $current) = @_;
+    my $last = $current->{last};
 
     # set current character.
     $current->{char} = $char;
@@ -342,8 +347,6 @@ sub handle_character {
     } # end of default
 
     } # end of switch
-
-    AFTER: # used in substitution of return.
 
     # set last stuff for next character.
     $last->{char}       = $char;

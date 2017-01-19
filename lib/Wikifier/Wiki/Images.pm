@@ -91,7 +91,7 @@ sub _display_image {
 
             # the image is already retina, or pregeneration is disabled
             last if $image{retina};
-            last if $wiki->opt('image.enable.pregeneration');
+            last if !$wiki->opt('image.enable.pregeneration');
 
             # ignore scale 1 and non-integers
             s/^\s*//;
