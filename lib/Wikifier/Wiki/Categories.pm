@@ -83,6 +83,7 @@ sub display_category_posts {
 # deal with categories after parsing a page.
 sub check_categories {
     my ($wiki, $page) = @_;
+    $wiki->cat_add_page($page, 'all');
 
     # actual categories.
     my $cats = $page->get('category');
@@ -93,8 +94,7 @@ sub check_categories {
 
     # image categories.
     return unless $wiki->opt('image.enable.tracking');
-    $wiki->cat_add_page($page, "image-$_") foreach keys %{ $page->{images} || {} };
-
+    $wiki->cat_add_page($page, "image-$_") for keys %{ $page->{images} || {} };
 }
 
 # add a page to a category if it is not in it already.

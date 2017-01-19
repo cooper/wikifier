@@ -107,11 +107,17 @@ sub _display_page {
 
     # cache was not used. generate a new copy.
     $result->{page} = $page;
-    $wiki->cat_add_page($page, 'all');
 
     # parse the page.
+    # if an error occurs, parse it again in variable-only mode.
+    # then hopefully we can at least get the metadata and categories.
     my $err = $page->parse;
-    return display_error($err) if $err;
+    if ($err) {
+        $page->{vars_only}++;
+        $page->parse;
+        $wiki->check_categories($page);
+        return display_error($err);
+    }
 
     # update categories
     $wiki->check_categories($page);
