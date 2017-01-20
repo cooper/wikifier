@@ -16,7 +16,7 @@ my $json = JSON::XS->new->pretty(1);
 ##################
 
 # displays a pages from a category in a blog-like form.
-sub display_category_posts {
+sub display_cat_posts {
     my ($wiki, $category, $page_n) = @_; my $result = {};
     my ($pages, $title) = $wiki->cat_get_pages($category);
 

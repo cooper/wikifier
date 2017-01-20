@@ -228,7 +228,7 @@ sub handle_image {
 sub handle_cat_posts {
     my ($connection, $msg) = read_required(@_, 'name') or return;
     Wikifier::lindent("Category posts for '$$msg{name}' requested by $$connection{id}");
-    my $result = $connection->{wiki}->display_category_posts($msg->{name});
+    my $result = $connection->{wiki}->display_cat_posts($msg->{name});
     Wikifier::back();
     $connection->send('cat_posts', $result);
 }
