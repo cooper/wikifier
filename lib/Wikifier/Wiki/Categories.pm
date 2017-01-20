@@ -154,7 +154,7 @@ sub cat_add_page {
     }
 
     # the category does not yet exist.
-    print {$fh} JSON->new->pretty(1)->encode({
+    print {$fh} JSON::XS->new->pretty(1)->encode({
         category   => $category,
         created    => $time,
         pages      => { $page->{name} => $page_data }
