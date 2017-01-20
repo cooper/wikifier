@@ -8,6 +8,7 @@ package Wikifier::Wiki;
 use warnings;
 use strict;
 use Git::Wrapper;
+use Wikifier::Utilities qw(page_name);
 
 sub write_page {
     my ($wiki, $page, $reason) = @_;
@@ -46,7 +47,7 @@ sub delete_page {
 
 sub move_page {
     my ($wiki, $page, $new_name) = @_;
-    $new_name = Wikifier::Page::_page_filename($new_name);
+    $new_name = page_name($new_name);
     my ($old_name, $old_path) = ($page->name, $page->path);
     $page->{name} = $new_name;
 

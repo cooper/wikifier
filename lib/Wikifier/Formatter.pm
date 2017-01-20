@@ -12,8 +12,7 @@ use 5.010;
 
 use Scalar::Util   ();
 use HTML::Entities ();
-
-use Wikifier::Utilities qw(safe_name trim);
+use Wikifier::Utilities qw(page_name trim);
 
 our %colors = (
     AliceBlue               => '#F0F8FF',
@@ -336,21 +335,21 @@ sub parse_format_type {
         if ($link_char eq '[') {
             $link_type = 'internal';
             $title     = ucfirst $target;
-            $target    = $page->wiki_opt('root.page').'/'.safe_name($target, 1);
+            $target    = $page->wiki_opt('root.page').'/'.page_name($target);
         }
 
         # category wiki link [~category~]
         elsif ($link_char eq '~') {
             $link_type = 'category';
             $title     = ucfirst $target;
-            $target    = $page->wiki_opt('root.category').'/'.safe_name($target, 1);
+            $target    = $page->wiki_opt('root.category').'/'.page_name($target);
         }
 
         # external wiki link [!article!]
         elsif ($link_char eq '!') {
             $link_type = 'external';
             $title     = $page->wiki_opt('external.name').': '.ucfirst($target);
-            $target    = $page->wiki_opt('external.root').'/'.safe_name($target);
+            $target    = $page->wiki_opt('external.root').'/'.page_name($target);
         }
 
         # other non-wiki link [$url$]

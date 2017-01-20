@@ -6,6 +6,7 @@ use strict;
 use 5.010;
 
 use HTTP::Date qw(time2str);
+use Wikifier::Utilities qw(page_name);
 use JSON::XS ();
 
 my $json = JSON::XS->new->pretty(1);

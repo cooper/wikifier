@@ -5,6 +5,7 @@ use warnings;
 use strict;
 use 5.010;
 
+use Wikifier::Utilities qw(page_names_equal);
 use HTTP::Date qw(time2str);
 use JSON::XS ();
 
@@ -46,7 +47,7 @@ sub display_category_posts {
 
         # if this is the main page of the category, it should come first.
         $times{$page_name} = 'inf'
-            if Wikifier::Utilities::pages_equal($page_name, $main_page);
+            if page_names_equal($page_name, $main_page);
 
     }
 
@@ -94,12 +95,13 @@ sub check_categories {
 
     # image categories.
     return unless $wiki->opt('image.enable.tracking');
-    $wiki->cat_add_page($page, "image-$_") for keys %{ $page->{images} || {} };
+    $wiki->cat_add_page($page, "image-$_", $_)
+        for keys %{ $page->{images} || {} };
 }
 
 # add a page to a category if it is not in it already.
 sub cat_add_page {
-    my ($wiki, $page, $category) = @_;
+    my ($wiki, $page, $category, $image_name) = @_;
     my $time = time;
     my $cat_file = $wiki->path_for_category($category);
 
@@ -115,7 +117,7 @@ sub cat_add_page {
     }
 
     # this is an image category, so include the dimensions.
-    if ($category =~ m/^image-(.+)$/) {
+    if (length $image_name) {
         $page_data->{dimensions} = $page->{images}{$1};
     }
 
@@ -155,7 +157,7 @@ sub cat_add_page {
     }
 
     # the category does not yet exist.
-    print {$fh} JSON::XS->new->pretty(1)->encode({
+    print {$fh} $json->encode({
         category   => $category,
         created    => $time,
         pages      => { $page->{name} => $page_data }
@@ -170,10 +172,11 @@ sub cat_add_page {
 sub cat_get_pages {
     my ($wiki, $category) = @_;
     # this should read a file for pages of a category.
-    # it should then check if the 'asof' time is older than the modification date of the
-    # page file in question. if it is, it should check the page again. if it still in
-    # the category, the time in the cat file should be updated to the current time. if it
-    # is no longer in the category, it should be removed from the cat file.
+    # it should then check if the 'asof' time is older than the modification
+    # date of the page file in question. if it is, it should check the page
+    # again. if it still in the category, the time in the cat file should be
+    # updated to the current time. if it is no longer in the category, it should
+    # be removed from the cat file.
 
     # this category does not exist.
     my $cat_file = $wiki->path_for_category($category);
@@ -196,24 +199,30 @@ sub cat_get_pages {
         # page no longer exists.
         my $page_path = $wiki->path_for_page($page_name);
         if (!-f $page_path) {
-            $changed = 1;
+            $changed++;
             next PAGE;
         }
 
         # check if the modification date is more recent than as of date.
         my $mod_date = (stat $page_path)[9];
         if ($mod_date > $p->{asof}) {
-            $changed = 1;
+            $changed++;
 
             # the page has since been modified.
-            # we will create a dummy Wikifier::Page that will stop after reading variables.
+            # we will create a page that will stop after reading variables.
             my $page = Wikifier::Page->new(
                 name      => $page_name,
                 file_path => $page_path,
                 wikifier  => $wiki->{wikifier},
                 vars_only => 1
             );
-            $page->parse;
+
+            # parse variables. if an error occurs, don't change anything.
+            my $err = $page->parse;
+            if ($err) {
+                $changed--;
+                return;
+            }
 
             # update data.
             my $p_vars = $page->get('page');

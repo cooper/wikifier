@@ -28,26 +28,27 @@ sub indent {
     return $final_string;
 }
 
-# 'Some Article' -> 'Some_Article'
-sub safe_name {
-    my ($string, $lc) = @_;
-    $string =~ s/ /_/g;
-    return $lc ? lc $string : $string;
-}
+# 'Some Article' -> 'Some_Article.page'
+sub page_name {
+    my $page_name = shift;
+    return $page_name->name if blessed $page_name;
 
-# 'Some_Article' -> 'Some Article'
-sub unsafe_name {
-    my $string = shift;
-    $string =~ s/_/ /g;
-    return $string;
+    # replace non-alphanumerics with _ and lowercase.
+    $page_name =~ s/[^\w\.]/_/g;
+    $page_name = lc $page_name;
+
+    # append .page if it isn't already there.
+    if ($page_name !~ m/\.(page|conf)$/) {
+        $page_name .= '.page';
+    }
+
+    return $page_name;
 }
 
 # two page names equal?
-sub pages_equal {
-    my ($page1, $page2) = @_;
-    $page1 =~ s/\.page$//;
-    $page2 =~ s/\.page$//;
-    return safe_name($page1, 1) eq safe_name($page2, 1);
+sub page_names_equal {
+    my ($page_name_1, $page_name_2) = @_;
+    return page_name($page_name_1) eq page_name($page_name_2);
 }
 
 # removes leading and trailing whitespace from a string.

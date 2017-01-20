@@ -8,9 +8,10 @@ package Wikifier::Page;
 
 use warnings;
 use strict;
-use Scalar::Util 'blessed';
-use File::Basename 'basename';
-use Cwd 'abs_path'; # resolving symlinks
+use Scalar::Util qw(blessed);
+use File::Basename qw(basename);
+use Cwd qw(abs_path);
+use Wikifier::Utilities qw(page_name);
 
 # default options.
 our %wiki_defaults = (
@@ -49,7 +50,7 @@ sub new {
 
     # create the page.
     my $page = bless \%opts, $class;
-    $page->{name} = _page_filename($page->{name});
+    $page->{name} = page_name($page->{name});
 
     # create the page's main block.
     $page->{main_block} = $wikifier->{main_block} = $wikifier->create_block(
@@ -277,21 +278,6 @@ sub modified_time {
 
 sub name {
     return shift->{name};
-}
-
-sub _page_filename {
-    my $page_name = shift;
-
-    # replace non-alphanumerics with _ and lowercase.
-    $page_name =~ s/[^\w\.]/_/g;
-    $page_name = lc $page_name;
-
-    # append .page if it isn't already there.
-    if ($page_name !~ m/\.(page|conf)$/) {
-        $page_name .= '.page';
-    }
-
-    return $page_name;
 }
 
 sub title {

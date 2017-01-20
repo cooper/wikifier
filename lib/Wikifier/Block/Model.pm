@@ -6,7 +6,8 @@ package Wikifier::Block::Model;
 use warnings;
 use strict;
 
-use Scalar::Util 'blessed';
+use Scalar::Util qw(blessed);
+use Wikifier::Utilities qw(page_name);
 
 our %block_types = (
     model => {
@@ -23,8 +24,8 @@ sub model_parse {
     $block->parse_base(@_);
 
     # create a page.
-    my $name  = Wikifier::Utilities::safe_name($block->{name});
-    my $path  = Cwd::abs_path($page->wiki_opt('dir.model').'/'."$name.page");
+    my $name  = page_name($block->{name});
+    my $path  = Cwd::abs_path($page->wiki_opt('dir.model')."/$name");
     my $model = $block->{model} = Wikifier::Page->new(
         file_path  => $path,
         name       => "$name.page",

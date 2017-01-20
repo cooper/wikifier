@@ -270,15 +270,6 @@ sub path_for_image {
     return abs_path($wiki->opt('dir.image').'/'.$image_name);
 }
 
-# page_name(some_page)      -> some_page.page
-# page_name(some_page.page) -> some_page.page
-# page_name($page)          -> some_page.page
-sub page_name {
-    my $page_name = shift;
-    return $page_name->name if blessed $page_name;
-    return Wikifier::Page::_page_filename($page_name);
-}
-
 # files in directory.
 # resolves symlinks only counts each file once.
 sub files_in_dir {
