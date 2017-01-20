@@ -86,6 +86,9 @@ sub read_config {
             return;
         }
     }
+
+    # if there's no private conf, assume the main conf also
+    # contains private settings.
     else {
         $wiki->{pconf} = $conf;
     }

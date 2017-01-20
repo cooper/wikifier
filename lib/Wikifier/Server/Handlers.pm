@@ -106,7 +106,11 @@ sub handle_login {
     $connection->{username}   = $username;
     $connection->{priv_write} = 1;
     $connection->{session_id} = $sess_id;
-    $connection->send(login => { logged_in => 1, %$user_info });
+    $connection->send(login => {
+        logged_in => 1,
+        %$user_info,
+        conf => $wiki->{conf}{variables} || {}
+    });
 
     # store the session
     $Wikifier::Server::sessions{$sess_id} =
