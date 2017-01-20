@@ -27,7 +27,7 @@ sub display_category_posts {
     my $opts = $wiki->opt('cat') || {};
     my $main_page = $opts->{main}{$category} || '';
 
-    $result->{type}     = 'catposts';
+    $result->{type}     = 'cat_posts';
     $result->{category} = $category;
     $result->{title}    = $opts->{title}->{$category} // $title;
 

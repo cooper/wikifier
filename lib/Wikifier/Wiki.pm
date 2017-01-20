@@ -140,7 +140,7 @@ sub wiki_opt;
 #       page        some HTML
 #       page_code:  some wikifier code
 #       image:      an image
-#       catposts:   a category with HTML for several pages
+#       cat_posts:   a category with HTML for several pages
 #       not found:  used for all errors
 #
 #   if the type is 'page':

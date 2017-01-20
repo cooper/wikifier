@@ -105,7 +105,7 @@ for ascending or `-` for descending. Default `m-` (recently-modified first).
 
 Returns an object with properties:
 * __->pages__ - array of page objects. Objects are in the same format as
-  returned by [catposts](#catposts), except that the `->content` is omitted.
+  returned by [cat_posts](#cat_posts), except that the `->content` is omitted.
 
 ### image
 
@@ -141,10 +141,10 @@ Returns an object with properties:
 * __->cache_gen__ - true if this request resulted in writing a new cached image.
 * May return an [error](#errors) instead.
 
-### catposts
+### cat_posts
 
 ```php
-$wikiclient->catposts($name, $page_n);
+$wikiclient->cat_posts($name, $page_n);
 ```
 
 ### page_save
