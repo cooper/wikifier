@@ -117,12 +117,12 @@ sub _display_page {
     if ($err) {
         $page->{vars_only}++;
         $page->parse;
-        $wiki->check_categories($page);
+        $wiki->cat_check_page($page);
         return display_error($err);
     }
 
     # update categories
-    $wiki->check_categories($page);
+    $wiki->cat_check_page($page);
 
     # if this is a draft, pretend it doesn't exist.
     if ($page->get('page.draft')) {

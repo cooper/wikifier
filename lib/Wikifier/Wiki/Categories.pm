@@ -82,7 +82,7 @@ sub display_cat_posts {
 }
 
 # deal with categories after parsing a page.
-sub check_categories {
+sub cat_check_page {
     my ($wiki, $page) = @_;
     $wiki->cat_add_page($page, 'all');
 
