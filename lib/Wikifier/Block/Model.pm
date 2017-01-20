@@ -6,7 +6,6 @@ package Wikifier::Block::Model;
 use warnings;
 use strict;
 
-use Scalar::Util qw(blessed);
 use Wikifier::Utilities qw(page_name);
 
 our %block_types = (

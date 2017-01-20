@@ -6,6 +6,7 @@ package Wikifier::Utilities;
 
 use warnings;
 use strict;
+use Scalar::Util qw(blessed);
 
 sub import {
     my $package = caller;

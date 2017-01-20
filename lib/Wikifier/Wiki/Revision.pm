@@ -8,6 +8,7 @@ package Wikifier::Wiki;
 use warnings;
 use strict;
 use Git::Wrapper;
+use Scalar::Util qw(blessed);
 use Wikifier::Utilities qw(page_name);
 
 sub write_page {
