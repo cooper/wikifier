@@ -91,8 +91,9 @@ sub handle_login {
     my $sess_id = $msg->{session_id};
 
     # verify password
+    my $wiki = $connection->{wiki};
     my $username  = $msg->{username};
-    my $user_info = $connection->{wiki}->verify_login(
+    my $user_info = $wiki->verify_login(
         $username,
         $msg->{password}
     );
@@ -260,7 +261,7 @@ sub handle_page_save {
     $msg->{content} =~ s/\r//g;
 
     # update the page
-    my $wiki = $connection->{wiki} or return;
+    my $wiki = $connection->{wiki};
     my $page = $wiki->page_named($msg->{name}, content => $msg->{content});
     my @errs = $wiki->write_page($page, $msg->{message});
 
