@@ -100,7 +100,7 @@ sub check_categories {
 # add a page to a category if it is not in it already.
 sub cat_add_page {
     my ($wiki, $page, $category) = @_;
-    my ($time, $fh) = time;
+    my $time = time;
     my $cat_file = $wiki->path_for_category($category);
 
     # fetch page infos.
@@ -126,7 +126,6 @@ sub cat_add_page {
         # JSON error or the value is not a hash.
         if (!$cat || ref $cat ne 'HASH') {
             Wikifier::l("Error parsing JSON category '$cat_file': $@");
-            close $fh;
             return;
         }
 
@@ -135,6 +134,7 @@ sub cat_add_page {
         $cat->{pages}{ $page->{name} } = $page_data;
 
         # open the file or log error.
+        my $fh;
         if (!open $fh, '>', $cat_file) {
             Wikifier::l("Cannot open '$cat_file': $!");
             return;
@@ -148,6 +148,7 @@ sub cat_add_page {
     }
 
     # open file or error.
+    my $fh;
     if (!open $fh, '>', $cat_file) {
         Wikifier::l("Cannot open '$cat_file': $!");
         return;
