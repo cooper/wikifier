@@ -193,7 +193,6 @@ sub handle_page_list {
     } keys %pages;
 
     # sort
-    # TODO: m+ and m- won't work because 'modified' doesn't exist
     my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
     @pages = sort { $sorter->($a, $b) } @pages;
 
@@ -254,7 +253,7 @@ sub handle_page_save {
     # update the page file
     # regenerate it
     # commit: (existed? added : modified) x.page: user edit message
-    my ($connection, $msg) = write_required(@_, qw(name content));
+    my ($connection, $msg) = write_required(@_, qw(name content)) or return;
 
     # remove carriage returns injected by the browser
     $msg->{content} =~ s/\r\n/\n/g;
@@ -279,7 +278,7 @@ sub handle_page_del {
     # delete the page file
     # remove it from all categories
     # commit: deleted page x.page
-    my ($connection, $msg) = write_required(@_, 'name');
+    my ($connection, $msg) = write_required(@_, 'name') or return;
 
     # delete the page
     my $wiki = $connection->{wiki};
@@ -292,7 +291,7 @@ sub handle_page_del {
 sub handle_page_move {
     # rename page file
     # commit: moved page a.page -> b.page
-    my ($connection, $msg) = write_required(@_, qw(name new_name));
+    my ($connection, $msg) = write_required(@_, qw(name new_name)) or return;
 
     # rename the page
     my $wiki = $connection->{wiki};
