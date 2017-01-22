@@ -66,11 +66,10 @@ sub new {
 sub parse {
     my $page = shift;
     my $err;
-    L(sub {
-        page_log('Parse');
+    L(page_log('Parse'), sub {
         $err = $page->wikifier->parse($page, $page->path);
-        page_log('Error', $err) if $err;
     });
+    L(page_log('Error', $err)) if $err;
     return $err;
 }
 
@@ -78,12 +77,10 @@ sub parse {
 sub html {
     my $page = shift;
     my $res;
-    L(sub {
-        page_log('HTML');
+    L('HTML', sub {
         $page->{wikifier}{main_block}->html($page);
     });
-    L(sub {
-        page_log('Generate');
+    L('Generate', sub {
         $res = $page->{wikifier}{main_block}{element}->generate;
     });
     return $res;

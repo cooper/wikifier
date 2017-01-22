@@ -56,10 +56,17 @@ sub new {
 
 # log.
 sub l($) {
-    my $str = shift;
-    chomp $str;
-    $str = ('    ' x $indent).$str;
-    say $str;
+    foreach (@_) {
+        if (ref eq 'CODE') {
+            indent();
+            $_->();
+            back();
+            next;
+        }
+        chomp;
+        $_ = ('    ' x $indent).$str;
+        say;
+    }
 }
 
 # log and then indent.
