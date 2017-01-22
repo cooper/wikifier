@@ -69,6 +69,6 @@ sub page_log {
 }
 
 sub L;
-*L = Wikifier::l;
+*L = \&Wikifier::l;
 
 1
