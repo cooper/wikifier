@@ -64,7 +64,7 @@ sub l($) {
             next;
         }
         chomp;
-        say ('    ' x $indent).$_;
+        say(('    ' x $indent).$_);
     }
 }
 
