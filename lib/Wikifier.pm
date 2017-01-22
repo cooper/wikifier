@@ -55,8 +55,9 @@ sub new {
 }
 
 # log.
-sub l($) {
-    foreach my $str (@_) {
+sub l {
+    my @lines = @_;
+    foreach my $str (@lines) {
         if (ref $str eq 'CODE') {
             indent();
             $_->();
