@@ -62,10 +62,7 @@ sub trim {
 
 sub page_log {
     my ($action, $info) = @_;
-    return sprintf '%-10s%s',
-        $action,
-        $info // ''
-    );
+    return sprintf '%-10s%s', $action, $info // '';
 }
 
 sub L;
