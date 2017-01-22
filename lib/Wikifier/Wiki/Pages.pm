@@ -6,7 +6,7 @@ use strict;
 use 5.010;
 
 use HTTP::Date qw(time2str);
-use Wikifier::Utilities qw(page_name);
+use Wikifier::Utilities qw(page_name page_log);
 use Scalar::Util qw(blessed);
 use JSON::XS ();
 
@@ -33,9 +33,9 @@ sub display_page {
     my $page = $page_name if blessed $page_name;
     $page_name = page_name($page_name);
     my $result = $wiki->_display_page($page_name, @_);
-    Wikifier::l("Error     $page_name: $$result{error}")
+    page_log($page_name, 'Error', $result->{error})
         if $result->{error} && !$result->{draft};
-    Wikifier::l("Draft     $page_name; skipped")
+    page_log($page_name, 'Draft', 'skipped')
         if $result->{draft};
     $page->{recent_result} = $result if $page;
     return $result;

@@ -11,7 +11,7 @@ use strict;
 use Scalar::Util qw(blessed);
 use File::Basename qw(basename);
 use Cwd qw(abs_path);
-use Wikifier::Utilities qw(page_name);
+use Wikifier::Utilities qw(page_name page_log L);
 
 # default options.
 our %wiki_defaults = (
@@ -65,24 +65,25 @@ sub new {
 # parses the file.
 sub parse {
     my $page = shift;
-    Wikifier::lindent("Parse     $$page{name}");
-    my $err = $page->wikifier->parse($page, $page->path);
-    Wikifier::l(      "Error     $err") if $err;
-    Wikifier::back();
+    L(sub {
+        page_log($page->name, 'Parse');
+        my $err = $page->wikifier->parse($page, $page->path);
+        page_log($page->name, 'Error', $err) if $err;
+    });
     return $err;
 }
 
 # returns the generated page HTML.
 sub html {
     my $page = shift;
-    Wikifier::lindent("HTML      $$page{name}");
-    $page->{wikifier}{main_block}->html($page);
-    Wikifier::back();
-
-    Wikifier::lindent("Generate  $$page{name}");
-    my $res = $page->{wikifier}{main_block}{element}->generate;
-    Wikifier::back();
-
+    L(sub {
+        page_log($page->name, 'HTML');
+        $page->{wikifier}{main_block}->html($page);
+    });
+    L(sub {
+        page_log($page->name, 'Generate');
+        my $res = $page->{wikifier}{main_block}{element}->generate;
+    });
     return $res;
 }
 

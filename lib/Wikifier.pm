@@ -16,7 +16,7 @@
 # the block loading system was redesigned to require registration rather than dynamically
 # loading modules as they are needed. This new approach may require more memory, but it
 # will be faster and more practical for an HTTPd wiki application.
-# 
+#
 # Whereas before a Wikifier::Page object would store most parser-related storage, the
 # Wikifier object now has this duty; Wikifier::Page objects represent a single page now.
 # (That makes more sense anyway, right?)

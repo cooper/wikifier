@@ -9,7 +9,7 @@ use IO::Async::File;
 use IO::Async::Listener;
 use IO::Async::Timer::Periodic;
 use IO::Socket::UNIX;
-use File::Basename 'basename';
+use File::Basename qw(basename);
 
 use Wikifier::Wiki;
 use Wikifier::Server::Connection;
@@ -169,7 +169,6 @@ sub gen_wiki {
         Wikifier::lindent("($page_name)");
         $wiki->display_page($page_name);
         Wikifier::back();
-
     }
 
     Wikifier::lback("Done [$$wiki{name}]");

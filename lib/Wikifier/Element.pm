@@ -25,19 +25,19 @@ sub configure {
     $el->{attributes} ||= {};
     $el->{styles}     ||= {};
     $el->{ids}        ||= \%identifiers;
-    
+
     # create an ID.
     if (!length $el->{id}) {
         my $it = $el->{classes}[0] || 'generic';
         my $id = $el->{ids}{$it}++;
         $el->{id} = "$it-$id";
     }
-    
+
     # content must an array of items.
     $el->{content} //= [];
     $el->{content}   = ref $el->{content} eq 'ARRAY' ? $el->{content} : [ $el->{content} ];
     $el->{container} = 1 if $el->{type} eq 'div';
-    
+
     return $el;
 }
 
@@ -85,10 +85,10 @@ sub remove_class {
 sub generate {
     my $el   = shift;
     my $html = "<$$el{type}";
-    
+
     # quickly determine if this is a container.
     $el->{container} ||= scalar @{ $el->{content} };
-    
+
     # add classes.
     my $classes;
     push @{ $el->{classes} }, $el->{id};
@@ -97,7 +97,7 @@ sub generate {
         $classes  = "wiki-$class"  if not defined $classes;
     }
     $html .= " class=\"$classes\"" if defined $classes;
-    
+
     # add styles.
     my $styles;
     foreach my $style (keys %{ $el->{styles} }) {
@@ -105,14 +105,14 @@ sub generate {
         $styles  .= "$style: ".$el->{styles}{$style}.'; ';
     }
     $html .= " style=\"$styles\"" if defined $styles;
-    
+
     # add other attributes.
     foreach my $attr (keys %{ $el->{attributes} }) {
         my $value = encode_entities($el->{attributes}{$attr});
         $html    .= " $attr=\"$value\"";
     }
     $html .= ">\n" if $el->{container};
-    
+
     # add the inner content.
     my $content;
     foreach my $child (@{ $el->{content} }) {
@@ -124,12 +124,12 @@ sub generate {
         $content .= Wikifier::Utilities::indent($child->generate);
     }
     $html .= $content if defined $content;
-    
+
     # close it off.
     unless ($el->{no_close_tag}) {
         $html .= $el->{container} ? "</$$el{type}>" : ' />';
     }
-    
+
     return "$html\n";
 }
 

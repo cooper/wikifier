@@ -60,4 +60,24 @@ sub trim {
     return $string;
 }
 
+sub page_log {
+    my ($page_name, $action, $info) = @_;
+    Wikifier::l(sprintf '%-10s %s%s',
+        $action,
+        page_name($page_name),
+        length $info ? ": $info" : ''
+    );
+}
+
+sub L {
+    my ($what) = @_;
+    if (ref $what eq 'CODE') {
+        Wikifier::indent();
+        $what->();
+        Wikifier::back();
+        return;
+    }
+    Wikifier::l(@_);
+}
+
 1
