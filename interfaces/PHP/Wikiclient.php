@@ -34,11 +34,11 @@ class Wikiclient {
     }
 
     // connect to unix listener.
-    private function connect($n = 1) {
+    private function connect($n = 1, $is_login = false) {
         $this->sock = fsockopen('unix://'.$this->path, 0, $errno, $errstr, 10);
         if (!$this->sock) {
             if ($n == 5) return;
-            $this->connect($n + 1);
+            $this->connect($n + 1, $is_login);
         }
 
         // send anonymous login info.
@@ -51,7 +51,7 @@ class Wikiclient {
         else return;
 
         // send session ID.
-        if (isset($this->session_id)) {
+        if (isset($this->session_id) && !$is_login) {
             $auth2 = array('resume', array(
                 'session_id' => $this->session_id
             ));
@@ -64,7 +64,7 @@ class Wikiclient {
     // send a command/message.
     private function command($command, $opts = array()) {
         if ($command != 'wiki' && !$this->connected)
-            $this->connect();
+            $this->connect(1, $command == 'login');
         $opts['close'] = true;
 
         // send request
