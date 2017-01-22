@@ -182,7 +182,7 @@ sub handle_page_code {
 #   sort:   method to sort the results
 #
 sub handle_page_list {
-    my ($connection, $msg) = read_required(@_, 'sort') or return;
+    my ($connection, $msg) = write_required(@_, 'sort') or return;
 
     # get all pages
     my %pages = %{ $connection->{wiki}->cat_get_pages('all') };
@@ -308,7 +308,7 @@ sub handle_cat_del {
 }
 
 sub handle_ping {
-    my ($connection) = @_;
+    my ($connection) = write_required(@_) or return;
     $connection->send(pong => { connected => 1 });
 }
 
@@ -320,12 +320,16 @@ sub handle_ping {
 # disconnect from the client if one is missing.
 sub read_required {
     my ($connection, $msg, @required) = @_;
+    my @good;
     foreach (@required) {
-        next if defined $msg->{$_};
+        if (defined $msg->{$_}) {
+            push @good, $msg->{$_};
+            next;
+        }
         $connection->error("Required option '$_' missing");
         return;
     }
-    return my @a = ($connection, $msg);
+    return my @a = ($connection, $msg, @good);
 }
 
 # check for all required things.
