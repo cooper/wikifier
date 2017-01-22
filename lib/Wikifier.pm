@@ -56,15 +56,15 @@ sub new {
 
 # log.
 sub l($) {
-    foreach (@_) {
-        if (ref eq 'CODE') {
+    foreach my $str (@_) {
+        if (ref $str eq 'CODE') {
             indent();
             $_->();
             back();
             next;
         }
-        chomp;
-        say(('    ' x $indent).$_);
+        chomp $str;
+        say(('    ' x $indent).$str);
     }
 }
 
