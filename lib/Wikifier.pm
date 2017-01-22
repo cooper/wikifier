@@ -60,7 +60,7 @@ sub l {
     foreach my $str (@lines) {
         if (ref $str eq 'CODE') {
             indent();
-            $_->();
+            $str->();
             back();
             next;
         }
