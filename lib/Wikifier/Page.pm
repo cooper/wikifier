@@ -65,9 +65,10 @@ sub new {
 # parses the file.
 sub parse {
     my $page = shift;
+    my $err;
     L(sub {
         page_log($page->name, 'Parse');
-        my $err = $page->wikifier->parse($page, $page->path);
+        $err = $page->wikifier->parse($page, $page->path);
         page_log($page->name, 'Error', $err) if $err;
     });
     return $err;
@@ -76,13 +77,14 @@ sub parse {
 # returns the generated page HTML.
 sub html {
     my $page = shift;
+    my $res;
     L(sub {
         page_log($page->name, 'HTML');
         $page->{wikifier}{main_block}->html($page);
     });
     L(sub {
         page_log($page->name, 'Generate');
-        my $res = $page->{wikifier}{main_block}{element}->generate;
+        $res = $page->{wikifier}{main_block}{element}->generate;
     });
     return $res;
 }
