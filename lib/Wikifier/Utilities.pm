@@ -61,10 +61,9 @@ sub trim {
 }
 
 sub page_log {
-    my ($page_name, $action, $info) = @_;
-    Wikifier::l(sprintf '%-10s %s%s',
+    my ($action, $info) = @_;
+    Wikifier::l(sprintf '%-10s%s',
         $action,
-        page_name($page_name),
         length $info ? ": $info" : ''
     );
 }

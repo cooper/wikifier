@@ -33,9 +33,9 @@ sub display_page {
     my $page = $page_name if blessed $page_name;
     $page_name = page_name($page_name);
     my $result = $wiki->_display_page($page_name, @_);
-    page_log($page_name, 'Error', $result->{error})
-        if $result->{error} && !$result->{draft};
-    page_log($page_name, 'Draft', 'skipped')
+    page_log('Error', $result->{error})
+        if $result->{error} && !$result->{draft} && !$result->{parse_error};
+    page_log('Draft', 'skipped')
         if $result->{draft};
     $page->{recent_result} = $result if $page;
     return $result;
@@ -118,7 +118,7 @@ sub _display_page {
         $page->{vars_only}++;
         $page->parse;
         $wiki->cat_check_page($page);
-        return display_error($err);
+        return display_error($err, parse_error => 1);
     }
 
     # update categories
