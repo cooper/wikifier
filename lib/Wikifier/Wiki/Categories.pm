@@ -19,6 +19,7 @@ my $json = JSON::XS->new->pretty(1);
 sub display_cat_posts {
     my ($wiki, $category, $page_n) = @_; my $result = {};
     my ($pages, $title) = $wiki->cat_get_pages($category);
+    my $opts = $wiki->opt('cat') || {};
 
     # no pages means no category.
     return display_error("Category '$category' does not exist.")
@@ -41,7 +42,7 @@ sub display_cat_posts {
 
         # store time.
         # if this is the main page of the category, it should come first.
-        my $main = $wiki->_is_main_page($category, $res);
+        my $main = $wiki->_is_main_page($category, $res, $opts);
         $times{$page_name}  = $time || 0;
         $times{$page_name} += time  if $main == 1;
         $times{$page_name}  = 'inf' if $main == 2;
@@ -82,13 +83,11 @@ sub display_cat_posts {
 
 # true if the page result is the main page of a category.
 sub _is_main_page {
-    my ($wiki, $category, $res) = @_;
+    my ($wiki, $category, $res, $opts) = @_;
 
     # if it is defined in the configuration,
     # this always overrides all other pages.
-    my $opts = $wiki->opt('cat') || {};
-    my $main_page_name = $opts->{main}{$category} || '';
-    return 2 if page_names_equal($res->{file}, $main_page_name);
+    return 2 if page_names_equal($res->{file}, $opts->{main}{$category} || '');
 
     # in the just-parsed page, something like
     # @category.some_cat.main; # was found
