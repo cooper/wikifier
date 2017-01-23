@@ -117,7 +117,10 @@ sub create_wikis {
         );
 
         # it failed.
-        Wikifier::l("Error in wiki configuration") and next unless $wiki;
+        unless ($wiki) {
+            Wikifier::l('Failed to initialize');
+            next;
+        }
 
         # it succeeded.
         $wikis{$name} = $wiki;
@@ -127,7 +130,7 @@ sub create_wikis {
 
     }
 
-    Wikifier::lback('Done initializing');
+    Wikifier::lback('Done');
 }
 
 # if pregeneration is enabled, do so.
@@ -150,7 +153,7 @@ sub gen_wiki {
         $loop->add($file);
     }
 
-    Wikifier::lindent("Checking [$$wiki{name}]");
+    Wikifier::lindent("[$$wiki{name}]");
 
     foreach my $page_name ($wiki->all_pages) {
         my $page_file  = "$page_dir/$page_name";
@@ -171,7 +174,7 @@ sub gen_wiki {
         Wikifier::back();
     }
 
-    Wikifier::lback("Done [$$wiki{name}]");
+    Wikifier::lback('Done');
 }
 
 # dispose of sessions older than 5 hours
