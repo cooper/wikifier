@@ -179,7 +179,7 @@ sub _get_hash {
     my @parts = split /\./, $var;
     foreach my $part (@parts) {
         last if $i == $#parts;
-        $hash->{$part} ||= {};
+        $hash->{$part} = {} if ref $hash->{$part} ne 'HASH';
         $hash = $hash->{$part};
         $i++;
     }
