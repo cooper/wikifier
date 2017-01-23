@@ -19,7 +19,7 @@ sub import {
 #################
 
 # Increase indention level by $times indents.
-sub indent {
+sub indent_str {
     my ($string, $times) = (shift, shift || 1);
     my $space = '    ' x $times;
     my $final_string = '';
@@ -61,6 +61,8 @@ sub trim {
 }
 
 ### LOGGING
+
+our $indent = 0;
 
 # log.
 sub L {

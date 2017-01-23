@@ -45,8 +45,6 @@ use Wikifier::Page;
 use Wikifier::Block;
 use Wikifier::Element;
 
-our $indent = 0;
-
 # create a new wikifier instance.
 sub new {
     my ($class, %opts) = @_;
