@@ -21,7 +21,7 @@ our ($loop, $conf, %wikis, %files, %sessions);
 # start the server.
 sub start {
     ($loop, my $conf_file) = @_;
-    Linent('Initializing server');
+    Lindent('Initializing server');
 
     # load configuration.
     ($conf = Wikifier::Page->new(
