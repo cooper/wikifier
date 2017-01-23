@@ -24,9 +24,6 @@ sub display_cat_posts {
     return display_error("Category '$category' does not exist.")
         if !$pages;
 
-    my $opts = $wiki->opt('cat') || {};
-    my $main_page = $opts->{main}{$category} || '';
-
     $result->{type}     = 'cat_posts';
     $result->{category} = $category;
     $result->{title}    = $opts->{title}->{$category} // $title;
@@ -44,7 +41,7 @@ sub display_cat_posts {
 
         # store time.
         # if this is the main page of the category, it should come first.
-        my $main = _is_main_page($category, $res);
+        my $main = $wiki->_is_main_page($category, $res);
         $times{$page_name}  = $time || 0;
         $times{$page_name} += time  if $main == 1;
         $times{$page_name}  = 'inf' if $main == 2;
@@ -85,11 +82,13 @@ sub display_cat_posts {
 
 # true if the page result is the main page of a category.
 sub _is_main_page {
-    my ($category, $res) = @_;
+    my ($wiki, $category, $res) = @_;
 
     # if it is defined in the configuration,
     # this always overrides all other pages.
-    return 2 if page_names_equal($res->{file});
+    my $opts = $wiki->opt('cat') || {};
+    my $main_page_name = $opts->{main}{$category} || '';
+    return 2 if page_names_equal($res->{file}, $main_page_name);
 
     # in the just-parsed page, something like
     # @category.some_cat.main; # was found
