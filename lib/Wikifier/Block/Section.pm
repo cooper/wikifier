@@ -30,19 +30,18 @@ sub section_parse {
 
     # determine header level.
     $block->{header_level} = ($block->{parent}{header_level} || 1) + 1;
-    
+
     $page->{section_n}++;
 }
 
 sub section_html {
     my ($block, $page, $el) = @_;
-    $page->{c_section_n}++;
 
     # clear at end of element.
     $el->configure(clear => 1);
 
     # determine if this is the intro section.
-    my $is_intro = !$page->{c_section_n};
+    my $is_intro = !$page->{c_section_n}++;
     my $class    = $is_intro ? 'section-page-title' : 'section-title';
 
     # determine the heading level.
