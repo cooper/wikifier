@@ -98,7 +98,10 @@ sub _is_main_page {
     # in the JSON data, something like
     # { "categories": { "some_cat": { "main": 1 } } }
     my $cats = $res->{categories};
-    return 1 if ref $cats eq 'HASH' && $cats->{$category}{main};
+    return 1 if
+        ref $cats eq 'HASH'                 &&
+        ref $cats->{$category} eq 'HASH'    &&
+        $cats->{$category}{main};
 
     return 0;
 }
