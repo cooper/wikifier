@@ -24,6 +24,7 @@ use Wikifier::Wiki::Pages;
 use Wikifier::Wiki::Images;
 use Wikifier::Wiki::Revision;
 use Wikifier::Wiki::Categories;
+use Wikifier::Utilities qw(L);
 
 # default options.
 our %wiki_defaults = (
@@ -68,7 +69,7 @@ sub read_config {
 
     # error.
     if (my $err = $conf->parse) {
-        Wikifier::l("Failed to parse configuration: $err");
+        L("Failed to parse configuration: $err");
         return;
     }
 
@@ -82,7 +83,7 @@ sub read_config {
 
         # error.
         if (my $err = $pconf->parse) {
-            Wikifier::l("Failed to parse private configuration: $err");
+            L("Failed to parse private configuration: $err");
             return;
         }
     }
@@ -199,14 +200,14 @@ my %crypts = (
 sub verify_login {
     my ($wiki, $username, $password) = @_;
     if (!$wiki->{pconf}) {
-        Wikifier::l('Attempted verify_login() without configured credentials');
+        L('Attempted verify_login() without configured credentials');
         return;
     }
 
     # find the user.
     my $user = $wiki->{pconf}->get("admin.$username");
     if (!$user) {
-        Wikifier::l("Attempted to login as '$username' which does not exist");
+        L("Attempted to login as '$username' which does not exist");
         return;
     }
 
@@ -227,13 +228,13 @@ sub verify_login {
 
     # error
     if (!defined $hash) {
-        Wikifier::l("Error with $crypt: $@");
+        L("Error with $crypt: $@");
         return;
     }
 
     # invalid credentials
     if ($hash ne delete $user->{password}) {
-        Wikifier::l("Incorrect password for '$username'");
+        L("Incorrect password for '$username'");
         return;
     }
 
@@ -279,7 +280,7 @@ sub files_in_dir {
     my ($dir, $ext) = @_;
     my $dh;
     if (!opendir $dh, $dir) {
-        Wikifier::l("Cannot open dir '$dir': $!");
+        L("Cannot open dir '$dir': $!");
         return;
     }
     my %files;
@@ -311,7 +312,7 @@ sub file_contents {
     local $/ = undef;
     my $fh;
     if (!open $fh, '<', $file) {
-        Wikifier::l("Cannot open file '$file': $!");
+        L("Cannot open file '$file': $!");
         return;
     }
     binmode $fh if $binary;

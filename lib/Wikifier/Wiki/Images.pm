@@ -9,6 +9,7 @@ use GD;                             # image generation
 use HTTP::Date qw(time2str);        # HTTP date formatting
 use Digest::MD5 qw(md5_hex);        # etags
 use File::Spec ();                  # simplifying symlinks
+use Wikifier::Utilities qw(L page_log);
 
 ##############
 ### IMAGES ###
@@ -17,7 +18,7 @@ use File::Spec ();                  # simplifying symlinks
 # Displays an image of the supplied dimensions.
 sub display_image {
     my $result = _display_image(@_);
-    Wikifier::l("Error     $_[1]: $$result{error}")
+    L(page_log('Error', "$_[1]: $$result{error}"))
         if $result->{error};
     return $result;
 }
@@ -283,7 +284,7 @@ sub generate_image {
     # the request is to generate an image the same or larger than the original.
     if ($width >= $fi_width && $height >= $fi_height) {
         $result->{use_fullsize} = 1;
-        Wikifier::l(
+        L(
             "Skipped '$image{name}' ${width}x${height}".
             " >= ${fi_width}x${fi_height}"
         );
@@ -349,7 +350,7 @@ sub generate_image {
 
     }
 
-    Wikifier::l(
+    L(
         "Generated image '$image{name}' at ${width}x${height}" .
         ($image{retina} ? " (\@$image{retina}x)" : '')
     );

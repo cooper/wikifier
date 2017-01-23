@@ -6,6 +6,7 @@ use strict;
 use 5.010;
 
 use JSON::XS ();
+use Wikifier::Utilities qw(L);
 
 my $json = JSON::XS->new->allow_blessed;
 my $id = 'a';
@@ -31,7 +32,7 @@ sub close : method {
     $connection->{closed} = 1;
     my $stream = delete $connection->{stream};
     delete $stream->{connection};
-    Wikifier::l('Closing connection '.$connection->{id});
+    L('Closing connection '.$connection->{id});
     $stream->close;
 }
 
@@ -39,7 +40,7 @@ sub close : method {
 sub error {
     my ($connection, $error, %other) = @_;
     $connection->send(error => { reason => $error, %other });
-    Wikifier::l("Connection error '$error' $$connection{id}");
+    L("Connection error '$error' $$connection{id}");
     $connection->close;
 }
 
@@ -94,7 +95,7 @@ sub handle {
 
     # if the 'close' option exists, close the connection afterward.
     if ($msg->{close}) {
-        Wikifier::l("Connection $$connection{id} requested close");
+        L("Connection $$connection{id} requested close");
         $connection->close;
     }
 
@@ -105,7 +106,7 @@ sub l {
     my $connection = shift;
     my $wiki = $connection->{wiki_name};
     $wiki = length $wiki ? "/$wiki" : '';
-    Wikifier::l("[$$connection{id}$wiki] @_");
+    L("[$$connection{id}$wiki] @_");
 }
 
 1

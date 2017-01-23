@@ -14,13 +14,14 @@ use File::Basename qw(basename);
 use Wikifier::Wiki;
 use Wikifier::Server::Connection;
 use Wikifier::Server::Handlers;
+use Wikifier::Utilities qw(page_log L Lindent back);
 
 our ($loop, $conf, %wikis, %files, %sessions);
 
 # start the server.
 sub start {
     ($loop, my $conf_file) = @_;
-    Wikifier::lindent('Initializing Wikifier::Server');
+    Linent('Initializing server');
 
     # load configuration.
     ($conf = Wikifier::Page->new(
@@ -51,8 +52,8 @@ sub start {
 
     # begin listening.
     $listener->listen(handle => $socket);
-    Wikifier::l("Listen    $path");
-    Wikifier::back();
+    L(page_log('Listen', $path));
+    back;
 
     # set up handlers.
     Wikifier::Server::Handlers::initialize();
@@ -62,8 +63,8 @@ sub start {
     pregenerate();
 
     # run forever.
+    L('Done initializing');
     $loop->run;
-
 }
 
 # handle a new stream.
@@ -71,7 +72,7 @@ sub handle_stream {
     my (undef, $stream) = @_;
 
     $stream->{connection} = Wikifier::Server::Connection->new($stream);
-    Wikifier::l("New connection $$stream{connection}{id}");
+    L("New connection $$stream{connection}{id}");
 
     # configure the stream.
     my $close = sub { shift->{connection}->close };
@@ -104,11 +105,10 @@ sub handle_data {
 sub create_wikis {
     my $w = $conf->get('server.wiki');
     my %confwikis = $w && ref $w eq 'HASH' ? %$w : {};
-    Wikifier::lindent('Initializing Wikifier::Wiki instances');
+    Lindent('Initializing wikis');
 
     foreach my $name (keys %confwikis) {
-
-        Wikifier::lindent("[$name]");
+        Lindent("[$name]");
 
         # load the wiki.
         my $wiki = Wikifier::Wiki->new(
@@ -118,7 +118,7 @@ sub create_wikis {
 
         # it failed.
         unless ($wiki) {
-            Wikifier::l('Failed to initialize');
+            L('Failed to initialize');
             next;
         }
 
@@ -126,11 +126,10 @@ sub create_wikis {
         $wikis{$name} = $wiki;
         $wiki->{name} = $name;
 
-        Wikifier::back();
-
+        back;
     }
 
-    Wikifier::back();
+    back;
 }
 
 # if pregeneration is enabled, do so.
@@ -153,7 +152,7 @@ sub gen_wiki {
         $loop->add($file);
     }
 
-    Wikifier::lindent("[$$wiki{name}]");
+    Lindent("[$$wiki{name}]");
 
     foreach my $page_name ($wiki->all_pages) {
         my $page_file  = "$page_dir/$page_name";
@@ -169,19 +168,19 @@ sub gen_wiki {
         }
 
         # page is not cached or has changed since cache time.
-        Wikifier::lindent("($page_name)");
+        Lindent("($page_name)");
         $wiki->display_page($page_name);
-        Wikifier::back();
+        back;
     }
 
-    Wikifier::back();
+    back;
 }
 
 # dispose of sessions older than 5 hours
 sub delete_old_sessions {
     foreach my $session_id (keys %sessions) {
         next if time - $sessions{$session_id}[0] < 18000;
-        Wikifier::l("Disposing of old session '$session_id'");
+        L("Disposing of old session '$session_id'");
         delete $sessions{$session_id};
     }
 }

@@ -13,9 +13,8 @@ use warnings;
 use strict;
 use 5.010;
 
-use Scalar::Util 'blessed';
-
-use Wikifier::Utilities 'trim';
+use Scalar::Util qw(blessed);
+use Wikifier::Utilities qw(trim L);
 
 ###############
 ### PARSING ###
@@ -251,7 +250,7 @@ sub handle_character {
 
         # we cannot close the main block.
         if ($current->{block} == $page->{main_block}) {
-            Wikifier::l("Attempted to close main block");
+            L("Attempted to close main block");
             return;
         }
 

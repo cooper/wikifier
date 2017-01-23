@@ -54,34 +54,4 @@ sub new {
     return $wikifier;
 }
 
-# log.
-sub l {
-    my @lines = @_;
-    foreach my $str (@lines) {
-        if (ref $str eq 'CODE') {
-            indent();
-            $str->();
-            back();
-            next;
-        }
-        chomp $str;
-        say(('    ' x $indent).$str);
-    }
-}
-
-# log and then indent.
-sub lindent($) {
-    l(shift);
-    indent();
-}
-
-# go back and then log.
-sub lback($) {
-    back();
-    l(shift);
-}
-
-sub indent () { $indent++ }
-sub back   () { $indent-- }
-
 1

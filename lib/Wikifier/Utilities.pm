@@ -60,12 +60,41 @@ sub trim {
     return $string;
 }
 
+### LOGGING
+
+# log.
+sub L {
+    my @lines = @_;
+    foreach my $str (@lines) {
+        if (ref $str eq 'CODE') {
+            indent;
+            $str->();
+            back;
+            next;
+        }
+        chomp $str;
+        say(('    ' x $indent).$str);
+    }
+}
+
+# log and then indent.
+sub Lindent($) {
+    L(shift);
+    indent;
+}
+
+# go back and then log.
+sub Lback($) {
+    back;
+    L(shift);
+}
+
 sub page_log {
     my ($action, $info) = @_;
     return sprintf '%-10s%s', $action, $info // '';
 }
 
-sub L;
-*L = \&Wikifier::l;
+sub indent () { $indent++ }
+sub back   () { $indent-- }
 
 1

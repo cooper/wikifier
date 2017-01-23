@@ -6,6 +6,7 @@ use strict;
 
 use Digest::SHA  'sha1_hex';
 use Scalar::Util 'weaken';
+use Wikifier::Utilities qw(Lindent back);
 
 my ($loop, $conf);
 
@@ -210,13 +211,13 @@ sub handle_page_list {
 #
 sub handle_image {
     my ($connection, $msg) = read_required(@_, 'name') or return;
-    Wikifier::lindent("Image '$$msg{name}' requested by $$connection{id}");
+    Lindent("Image '$$msg{name}' requested by $$connection{id}");
     my $result = $connection->{wiki}->display_image(
         [ $msg->{name}, $msg->{width} || 0, $msg->{height} || 0 ],
         1 # don't open the image
     );
     delete $result->{content};
-    Wikifier::back();
+    back;
     $connection->send('image', $result);
 }
 
@@ -226,9 +227,9 @@ sub handle_image {
 #
 sub handle_cat_posts {
     my ($connection, $msg) = read_required(@_, 'name') or return;
-    Wikifier::lindent("Category posts for '$$msg{name}' requested by $$connection{id}");
+    Lindent("Category posts for '$$msg{name}' requested by $$connection{id}");
     my $result = $connection->{wiki}->display_cat_posts($msg->{name});
-    Wikifier::back();
+    back;
     $connection->send('cat_posts', $result);
 }
 

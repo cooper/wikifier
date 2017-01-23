@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010;
 
-use Wikifier::Utilities qw(page_names_equal);
+use Wikifier::Utilities qw(page_names_equal L);
 use HTTP::Date qw(time2str);
 use JSON::XS ();
 
@@ -150,7 +150,7 @@ sub cat_add_page {
 
         # JSON error or the value is not a hash.
         if (!$cat || ref $cat ne 'HASH') {
-            Wikifier::l("Error parsing JSON category '$cat_file': $@");
+            L("Error parsing JSON category '$cat_file': $@");
             return;
         }
 
@@ -161,7 +161,7 @@ sub cat_add_page {
         # open the file or log error.
         my $fh;
         if (!open $fh, '>', $cat_file) {
-            Wikifier::l("Cannot open '$cat_file': $!");
+            L("Cannot open '$cat_file': $!");
             return;
         }
 
@@ -175,7 +175,7 @@ sub cat_add_page {
     # open file or error.
     my $fh;
     if (!open $fh, '>', $cat_file) {
-        Wikifier::l("Cannot open '$cat_file': $!");
+        L("Cannot open '$cat_file': $!");
         return;
     }
 
@@ -210,7 +210,7 @@ sub cat_get_pages {
 
     # JSON error or the value is not a hash.
     if (!$cat || ref $cat ne 'HASH') {
-        Wikifier::l("Error parsing JSON category '$cat_file': $@");
+        L("Error parsing JSON category '$cat_file': $@");
         return;
     }
 
@@ -287,7 +287,7 @@ sub cat_get_pages {
         # unable to open.
         my $fh;
         if (!open $fh, '>', $cat_file) {
-            Wikifier::l("Cannot open '$cat_file': $!");
+            L("Cannot open '$cat_file': $!");
             return;
         }
 

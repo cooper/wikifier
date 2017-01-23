@@ -11,6 +11,8 @@ use warnings;
 use strict;
 use 5.010;
 
+use Wikifier::Utilities qw(L);
+
 our %block_types = (
     if   => {},
     else => {}
@@ -57,13 +59,13 @@ sub load_block {
 
     # does the file exist?
     if (!-f $file && !-l $file) {
-        Wikifier::l("Block ${type}{} does not exist");
+        L("Block ${type}{} does not exist");
         return;
     }
 
     # do the file.
     my $package = do $file
-        or Wikifier::l("Error loading ${type}{} block: ".($@ || $! || 'but idk why'));
+        or L("Error loading ${type}{} block: ".($@ || $!));
     return unless $package;
 
     # fetch blocks.
@@ -88,7 +90,7 @@ sub load_block {
           if $blocks{$block_type}{base};
 
 
-        Wikifier::l("Loaded block ${block_type}{}");
+        L("Loaded block ${block_type}{}");
     }
 
     return 1;

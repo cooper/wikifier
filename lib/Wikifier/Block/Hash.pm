@@ -9,7 +9,8 @@ use warnings;
 use strict;
 use 5.010;
 
-use Scalar::Util 'blessed';
+use Scalar::Util qw(blessed);
+use Wikifier::Utilities qw(L);
 
 our %block_types = (
     hash => {
@@ -27,10 +28,10 @@ sub hash_init {
 sub hash_parse {
     my $block = shift;
     my ($key, $value, $in_value, %values) = (q.., q..);
-    
+
     # for each content item...
     ITEM: foreach my $item (@{ $block->{content} }) {
-        
+
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
 
@@ -39,41 +40,41 @@ sub hash_parse {
 
             next ITEM;
         }
-        
+
         # for each character in this string...
         my $escaped; # true if the last was escape character
         my $i = 0;
         for (split //, $item) { $i++;
             my $char = $_;
-            
+
             # the first colon indicates that we're beginning a value.
             when (':') {
-                
+
                 # if there is no key, give up.
                 if (!length $key) {
-                    Wikifier::l("No key for text value in hash-based block ($value)");
+                    L("No key for text value in hash-based block ($value)");
                     $key = "Item $i";
                 }
-                
+
                 # if we're already in a value, this colon belongs to the value.
                 continue if $in_value; # to default.
-                
+
                 # this was escaped.
                 continue if $escaped;
-                
+
                 # we're now inside the value.
                 $in_value = 1;
-                
+
             }
-            
+
             when ("\\") {
                 continue if $escaped; # this backslash was escaped.
                 $escaped = 1;
             }
-            
+
             # a semicolon indicates the termination of a pair.
             when (';') {
-            
+
                 # it was escaped.
                 continue if $escaped;
 
@@ -86,7 +87,7 @@ sub hash_parse {
                     $key       = "anon_$i";
                     $key_title = undef;
                 }
-           
+
                 # if this key exists, rename it to the next available <key>_key_<n>.
                 while (exists $values{$key}) {
                     my ($key_name, $key_number) = split '_key_', $key;
@@ -97,46 +98,46 @@ sub hash_parse {
                     $key_number++;
                     $key = "${key_name}_${key_number}";
                 }
-                
+
                 # store the value.
                 $values{$key} = $value;
                 push @{ $block->{hash_array} }, [$key_title, $value, $key];
-            
+
                 # reset status.
                 $in_value = 0;
                 $key = $value = '';
-                
+
             }
-            
+
             # any other characters.
             default {
-            
+
                 # if we're in a value, append to the value.
                 if ($in_value) {
                     $value .= $char;
                 }
-                
+
                 # otherwise, append to the key.
                 else {
                     $key .= $char;
                 }
-                
+
                 # pretty simple stuff.
-                
+
                 $escaped = 0;
             }
-            
+
         } # end of character loop.
 
     } # end of item loop.
-    
+
     # append/overwrite values found in this parser.
     my %hash = $block->{hash} ? %{ $block->{hash} } : ();
     @hash{ keys %values } = values %values;
-    
+
     # reassign the hash.
     $block->{hash} = \%hash;
-    
+
     return 1;
 }
 
