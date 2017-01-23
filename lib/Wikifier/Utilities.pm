@@ -6,6 +6,8 @@ package Wikifier::Utilities;
 
 use warnings;
 use strict;
+use 5.010;
+
 use Scalar::Util qw(blessed);
 
 sub import {
