@@ -64,6 +64,9 @@ sub trim {
 
 our $indent = 0;
 
+sub indent () { $indent++ }
+sub back   () { $indent-- }
+
 # log.
 sub L {
     my @lines = @_;
@@ -95,8 +98,5 @@ sub page_log {
     my ($action, $info) = @_;
     return sprintf '%-10s%s', $action, $info // '';
 }
-
-sub indent () { $indent++ }
-sub back   () { $indent-- }
 
 1
