@@ -141,7 +141,7 @@ sub _display_page {
     $result->{generated}  = 1;
     $result->{modified}   = time2str(time);
     $result->{mod_unix}   = time;
-    $result->{categories} = $page->{categories} if $page->{categories};
+    $result->{categories} = [ _cats_to_list($page->{categories}) ];
 
     # caching is enabled, so let's save this for later.
     if ($wiki->opt('enable.cache.page')) {
@@ -149,9 +149,16 @@ sub _display_page {
 
         # save prefixing data.
         print {$fh} $json->encode({
+
+            # page variables
             %{ $page->get('page') || {} },
-            css        => $result->{css},
-            categories => $result->{categories} || []
+
+            # generated CSS
+            css => $result->{css},
+
+            # categories
+            categories => $page->{categories} || {}
+
         }), "\n";
 
         # save the content.
@@ -166,6 +173,14 @@ sub _display_page {
     }
 
     return $result;
+}
+
+# stored categories -> list of category names
+sub _cats {
+    my $cats = shift;
+    return keys %$cats  if ref $cats eq 'HASH';
+    return @$cats       if ref $cats eq 'ARRAY';
+    return;
 }
 
 # Displays the wikifier code for a page.

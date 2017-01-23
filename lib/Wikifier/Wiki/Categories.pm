@@ -34,21 +34,23 @@ sub display_cat_posts {
     # load each page if necessary.
     my (%times, %reses);
     foreach my $page_name (keys %$pages) {
-        my $page_data = $pages->{$page_name};
         my $res  = $wiki->display_page($page_name);
-        my $time = $res->{page} ? $res->{page}->get('page.created')
-                   : $res->{created} || 0;
+        my $time = $res->{page}                 ?
+            $res->{page}->get('page.created')   :
+            $res->{created} || 0;
 
         # there was an error or it's a draft, skip.
         next if $res->{error} || $res->{draft};
 
-        $times{$page_name} = $time || 0;
-        $reses{$page_name} = $res;
-
+        # store time.
         # if this is the main page of the category, it should come first.
-        $times{$page_name} = 'inf'
-            if page_names_equal($page_name, $main_page);
+        my $main = _is_main_page($category, $res);
+        $times{$page_name}  = $time || 0;
+        $times{$page_name} += time  if $main == 1;
+        $times{$page_name}  = 'inf' if $main == 2;
 
+        # store res.
+        $reses{$page_name} = $res;
     }
 
     # order with newest first.
@@ -81,6 +83,26 @@ sub display_cat_posts {
     return $result;
 }
 
+# true if the page result is the main page of a category.
+sub _is_main_page {
+    my ($category, $res) = @_;
+
+    # if it is defined in the configuration,
+    # this always overrides all other pages.
+    return 2 if page_names_equal($res->{file});
+
+    # in the just-parsed page, something like
+    # @category.some_cat.main; # was found
+    return 1 if $res->{page} && $res->{page}->get("category.$category.main");
+
+    # in the JSON data, something like
+    # { "categories": { "some_cat": { "main": 1 } } }
+    my $cats = $res->{categories};
+    return 1 if ref $cats eq 'HASH' && $cats->{$category}{main};
+
+    return 0;
+}
+
 # deal with categories after parsing a page.
 sub cat_check_page {
     my ($wiki, $page) = @_;
@@ -89,8 +111,8 @@ sub cat_check_page {
     # actual categories.
     my $cats = $page->get('category');
     if ($cats && ref $cats eq 'HASH') {
-        $page->{categories} = [keys %$cats];
-        $wiki->cat_add_page($page, $_) foreach keys %$cats;
+        $page->{categories} = $cats;
+        $wiki->cat_add_page($page, $_) for keys %$cats;
     }
 
     # image categories.
@@ -194,7 +216,7 @@ sub cat_get_pages {
     # check each page's modification date.
     my ($time, $changed, %final_pages) = time;
     PAGE: foreach my $page_name (%{ $cat->{pages} || {} }) {
-        my $page_data = my $p = $cat->{pages}{$page_name};
+        my $page_data = $cat->{pages}{$page_name};
 
         # page no longer exists.
         my $page_path = $wiki->path_for_page($page_name);
@@ -205,7 +227,7 @@ sub cat_get_pages {
 
         # check if the modification date is more recent than as of date.
         my $mod_date = (stat $page_path)[9];
-        if ($mod_date > $p->{asof}) {
+        if ($mod_date > $page_data->{asof}) {
             $changed++;
 
             # the page has since been modified.
