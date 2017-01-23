@@ -130,7 +130,7 @@ sub create_wikis {
 
     }
 
-    Wikifier::lback('Done');
+    Wikifier::back();
 }
 
 # if pregeneration is enabled, do so.
@@ -174,7 +174,7 @@ sub gen_wiki {
         Wikifier::back();
     }
 
-    Wikifier::lback('Done');
+    Wikifier::back();
 }
 
 # dispose of sessions older than 5 hours
