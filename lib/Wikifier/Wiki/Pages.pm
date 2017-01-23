@@ -176,7 +176,7 @@ sub _display_page {
 }
 
 # stored categories -> list of category names
-sub _cats {
+sub _cats_to_list {
     my $cats = shift;
     return keys %$cats  if ref $cats eq 'HASH';
     return @$cats       if ref $cats eq 'ARRAY';
