@@ -9,7 +9,7 @@ use GD;                             # image generation
 use HTTP::Date qw(time2str);        # HTTP date formatting
 use Digest::MD5 qw(md5_hex);        # etags
 use File::Spec ();                  # simplifying symlinks
-use Wikifier::Utilities qw(L page_log);
+use Wikifier::Utilities qw(L align);
 
 ##############
 ### IMAGES ###
@@ -18,7 +18,7 @@ use Wikifier::Utilities qw(L page_log);
 # Displays an image of the supplied dimensions.
 sub display_image {
     my $result = _display_image(@_);
-    L(page_log('Error', "$_[1]: $$result{error}"))
+    L(align('Error', "$_[1]: $$result{error}"))
         if $result->{error};
     return $result;
 }

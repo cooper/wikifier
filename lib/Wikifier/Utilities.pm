@@ -96,7 +96,7 @@ sub Lback($) {
     L(shift);
 }
 
-sub page_log {
+sub align {
     my ($action, $info) = @_;
     return sprintf '%-10s%s', $action, $info // '';
 }

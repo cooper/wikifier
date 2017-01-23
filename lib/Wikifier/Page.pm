@@ -11,7 +11,7 @@ use strict;
 use Scalar::Util qw(blessed);
 use File::Basename qw(basename);
 use Cwd qw(abs_path);
-use Wikifier::Utilities qw(page_name page_log L);
+use Wikifier::Utilities qw(page_name align L);
 
 # default options.
 our %wiki_defaults = (
@@ -66,10 +66,10 @@ sub new {
 sub parse {
     my $page = shift;
     my $err;
-    L(page_log('Parse'), sub {
+    L(align('Parse'), sub {
         $err = $page->wikifier->parse($page, $page->path);
     });
-    L(page_log('Error', $err)) if $err;
+    L(align('Error', $err)) if $err;
     return $err;
 }
 

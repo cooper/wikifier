@@ -14,7 +14,7 @@ use File::Basename qw(basename);
 use Wikifier::Wiki;
 use Wikifier::Server::Connection;
 use Wikifier::Server::Handlers;
-use Wikifier::Utilities qw(page_log L Lindent back);
+use Wikifier::Utilities qw(align L Lindent back);
 
 our ($loop, $conf, %wikis, %files, %sessions);
 
@@ -52,7 +52,7 @@ sub start {
 
     # begin listening.
     $listener->listen(handle => $socket);
-    L(page_log('Listen', $path));
+    L(align('Listen', $path));
     back;
 
     # set up handlers.
