@@ -212,7 +212,7 @@ sub handle_page_list {
 #
 #   sort:   method to sort the results
 #
-sub handle_page_list {
+sub handle_model_list {
     my ($connection, $msg) = write_required(@_, 'sort') or return;
 
     # get all models
