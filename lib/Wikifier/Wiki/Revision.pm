@@ -21,7 +21,7 @@ sub write_page {
 
     # write the file
     open my $fh, '>', $page->path or return;
-    print {$fh} $page->{content};
+    print {$fh} $page->{content} if !ref $page->{content};
     close $fh;
 
     # update the page

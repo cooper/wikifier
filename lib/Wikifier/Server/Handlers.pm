@@ -288,12 +288,13 @@ sub handle_page_save {
     my ($connection, $msg) = write_required(@_, qw(name content)) or return;
 
     # remove carriage returns injected by the browser
-    $msg->{content} =~ s/\r\n/\n/g;
-    $msg->{content} =~ s/\r//g;
+    my $content = $msg->{content};
+    $content =~ s/\r\n/\n/g;
+    $content =~ s/\r//g;
 
     # update the page
     my $wiki = $connection->{wiki};
-    my $page = $wiki->page_named($msg->{name}, content => $msg->{content});
+    my $page = $wiki->page_named($msg->{name}, content => $content);
     my @errs = $wiki->write_page($page, $msg->{message});
 
     $connection->send(page_save => {

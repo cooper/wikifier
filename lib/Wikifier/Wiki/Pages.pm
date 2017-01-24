@@ -184,6 +184,8 @@ sub _cats_to_list {
 }
 
 # Displays the wikifier code for a page.
+# display_page = 1  also include ->display_page result, omitting  {content}
+# display_page = 2  also include ->display_page result, including {content}
 sub display_page_code {
     my ($wiki, $page_name, $display_page) = @_;
     $page_name = page_name($page_name);
