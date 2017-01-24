@@ -208,6 +208,29 @@ sub handle_page_list {
     $connection->l("Complete page list requested");
 }
 
+# model list
+#
+#   sort:   method to sort the results
+#
+sub handle_page_list {
+    my ($connection, $msg) = write_required(@_, 'sort') or return;
+
+    # get all models
+    my @models;
+    foreach my $model_name ($connection->{wiki}->all_models) {
+        push @models, {
+            name => $model_name
+        };
+    }
+
+    # sort
+    my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
+    @models = sort { $sorter->($a, $b) } @models;
+
+    $connection->send('model_list', { models => \@models });
+    $connection->l("Complete model list requested");
+}
+
 # image request
 #
 #   name:       the image filename

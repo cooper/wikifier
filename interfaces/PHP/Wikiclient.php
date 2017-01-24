@@ -119,8 +119,16 @@ class Wikiclient {
         ));
     }
 
+    // send a page list request.
     function page_list($sort = 'm-') {
         return $this->command('page_list', array(
+            'sort' => $sort
+        ));
+    }
+
+    // send a model list request
+    function model_list($sort = 'm-') {
+        return $this->command('model_list', array(
             'sort' => $sort
         ));
     }
