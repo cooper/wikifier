@@ -219,7 +219,7 @@ sub handle_model_list {
     my @models;
     foreach my $model_name ($connection->{wiki}->all_models) {
         push @models, {
-            file  => $model_name
+            file  => $model_name,
             title => $model_name
         };
     }
