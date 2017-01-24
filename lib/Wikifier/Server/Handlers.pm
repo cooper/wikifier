@@ -176,7 +176,7 @@ sub handle_page {
 #                   {content}. 2 to do the same except also preserve the content
 #
 sub handle_page_code {
-    my ($connection, $msg) = read_required(@_, 'name') or return;
+    my ($connection, $msg) = write_required(@_, 'name') or return;
     my $result = $connection->{wiki}->display_page_code(
         $msg->{name},
         $msg->{display_page}
