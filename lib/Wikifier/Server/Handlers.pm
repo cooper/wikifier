@@ -6,7 +6,7 @@ use strict;
 
 use Digest::SHA  'sha1_hex';
 use Scalar::Util 'weaken';
-use Wikifier::Utilities qw(Lindent back);
+use Wikifier::Utilities qw(Lindent back notice);
 
 my ($loop, $conf);
 
@@ -104,20 +104,28 @@ sub handle_login {
     }
 
     # authentication succeeded.
-    $connection->{user}       = $user_info;
-    $connection->{username}   = $username;
-    $connection->{priv_write} = 1;
-    $connection->{session_id} = $sess_id;
     $connection->send(login => {
         logged_in => 1,
         %$user_info,
         conf => $wiki->{conf}{variables} || {}
     });
 
-    # store the session
-    $Wikifier::Server::sessions{$sess_id} =
-        [ time, $sess_id, $username, $user_info ]
-    if length $sess_id;
+    notice(user_logged_in => %$user_info);
+
+    # store the session in the connection no matter what
+    $connection->{sess} = {
+        login_time  => time,        # session creation time
+        time        => time,        # time of last (re)authentication
+        id          => $sess_id,    # session ID (optional)
+        username    => $username,   # username
+        user        => $user_info,  # user info hash
+        notices     => [],          # pending notifications
+        priv_write  => 1            # write access
+    };
+
+    # also store it in the session hash if an ID was provided
+    $Wikifier::Server::sessions{$sess_id} = $connection->{sess}
+        if length $sess_id;
 
     $connection->l('Successfully authenticated for write access');
 }
@@ -138,9 +146,8 @@ sub handle_resume {
     }
 
     # authentication succeeded.
-    $sess->[0] = time;
-    $connection->{priv_write} = 1;
-    @$connection{'session_id', 'username', 'user'} = @$sess[1..$#$sess];
+    $sess->{time} = time;
+    $connection->{sess} = $sess;
 
     $connection->l('Resuming write access');
 }
@@ -310,7 +317,12 @@ sub handle_cat_del {
 
 sub handle_ping {
     my ($connection) = write_required(@_) or return;
-    $connection->send(pong => { connected => 1 });
+    my $notices = delete $connection->{sess}{notifications};
+    $connection->{sess}{notifications} = [];
+    $connection->send(pong => {
+        connected     => 1,
+        notifications => $notices
+    });
 }
 
 #################
@@ -338,7 +350,7 @@ sub read_required {
 # disconnect if the client does not have write access.
 sub write_required {
     my ($connection) = @_;
-    if (!$connection->{priv_write}) {
+    if (!$connection->{sess} || !$connection->{sess}{priv_write}) {
         $connection->error('No write access');
         return;
     }

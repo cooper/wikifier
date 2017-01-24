@@ -84,8 +84,8 @@ sub handle {
     if (my $code = Wikifier::Server::Handlers->can("handle_$command")) {
 
         # set the user in the wiki for the handler
-        my ($wiki, $user_info) = @$connection{'wiki', 'user'};
-        $wiki->{user} = $user_info if $wiki && $user_info;
+        my ($wiki, $sess) = @$connection{'wiki', 'sess'};
+        $wiki->{user} = $sess->{user} if $sess && $sess->{user};
 
         # call the code
         $return = $code->($connection, $msg || {});

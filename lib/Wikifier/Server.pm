@@ -86,7 +86,6 @@ sub handle_stream {
 
     # add the stream to the loop.
     $loop->add($stream);
-
 }
 
 # handle incoming data.

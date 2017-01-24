@@ -101,4 +101,13 @@ sub align {
     return sprintf '%-10s%s', $action, $info // '';
 }
 
+sub notice {
+    my ($type, %opts) = @_;
+    my $noti = { %opts, type => $type };
+    foreach my $sess (values %Wikifier::Server::sessions) {
+        # TODO: make it possible to subscribe to specific types of notifications
+        push @{ $sess->{notifications} }, $noti;
+    }
+}
+
 1
