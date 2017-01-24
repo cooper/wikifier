@@ -186,6 +186,11 @@ sub all_categories {
     return files_in_dir(shift->opt('dir.category'), 'cat');
 }
 
+# an array of file names in the model directory.
+sub all_models {
+    return files_in_dir(shift->opt('dir.model'), 'page');
+}
+
 ######################
 ### AUTHENTICATION ###
 ######################
@@ -272,6 +277,13 @@ sub path_for_category {
 sub path_for_image {
     my ($wiki, $image_name) = @_;
     return abs_path($wiki->opt('dir.image').'/'.$image_name);
+}
+
+# return abs path for a model
+sub path_for_model {
+    my ($wiki, $model_name) = @_;
+    $model_name = page_name($model_name);
+    return abs_path($wiki->opt('dir.model').'/'.$model_name);
 }
 
 # files in directory.
