@@ -42,20 +42,21 @@ sub model_parse {
 }
 
 sub model_html {
-    my ($block, $page, $el) = (shift, @_);
+    my ($block, $page) = (shift, @_);
     my $model      = $block->{model} or return;
     my $main_block = $model->{wikifier}{main_block} or return;
 
     $block->html_base($page); # call hash html.
 
-    # generate the DOM. configure model element with all
-    # of the options from the main element of the model.
-    my $main_el = $main_block->html($model) or return;
-    $el->configure(%$main_el);
+    # generate the DOM
+    my $el = $main_block->html($model) or return;
 
     # add the main page element to our element.
     $el->remove_class('main');
     $el->add_class("model-$$model{model_name}");
+
+    # overwrite the model element
+    $block->{element} = $el;
 }
 
 __PACKAGE__
