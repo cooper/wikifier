@@ -63,7 +63,6 @@ sub hash_parse {
 
                 # we're now inside the value.
                 $in_value = 1;
-
             }
 
             when ("\\") {

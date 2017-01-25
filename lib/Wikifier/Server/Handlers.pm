@@ -236,7 +236,7 @@ sub handle_model_list {
     # get all models
     my @models;
     foreach my $model_name ($connection->{wiki}->all_models) {
-        push @models, {
+        push @models, { # FIXME: real info
             file  => $model_name,
             title => $model_name
         };
@@ -287,8 +287,25 @@ sub handle_cat_posts {
 #   sort:   method to sort the results
 #
 sub handle_cat_list {
+    my ($connection, $msg) = write_required(@_, 'sort') or return;
 
+    # get all cats
+    my @cats;
+    foreach my $cat_name ($connection->{wiki}->all_categories) {
+        push @cats, { # FIXME: real info
+            file  => $cat_name,
+            title => $cat_name
+        };
+    }
+
+    # sort
+    my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
+    @cats = sort { $sorter->($a, $b) } @cats;
+
+    $connection->send('cat_list', { categories => \@cats });
+    $connection->l("Complete category list requested");
 }
+
 
 ######################
 ### WRITE REQUIRED ###

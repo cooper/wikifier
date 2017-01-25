@@ -158,6 +158,13 @@ class Wikiclient {
         ));
     }
 
+    // send a category list request
+    function cat_list($sort = 'm-') {
+        return $this->command('cat_list', array(
+            'sort' => $sort
+        ));
+    }
+
     // check connection
     function ping() {
         return $this->command('ping');
