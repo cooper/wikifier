@@ -97,8 +97,8 @@ sub hash_parse {
                 else {
                     $value =~ s/(^\s*)|(\s*$)//g;
 
-                    # special value -no_format_values;
-                    if ($value eq '-no_format_values') {
+                    # special value -no-format-values;
+                    if ($value eq '-no-format-values') {
                         $block->{no_format_values}++;
                         $in_value = 0;
                         $key = $value = '';

@@ -56,16 +56,12 @@ sub list_parse {
                 else {
                     $value =~ s/(^\s*)|(\s*$)//g;
 
-                    # special value -no_format_values;
-                    if ($value eq '-no_format_values') {
-                        $block{no_format_values}++;
+                    # special value -no-format-values;
+                    if ($value eq '-no-format-values') {
+                        $block->{no_format_values}++;
                         $value = '';
                         next CHAR;
                     }
-
-                    # format
-                    $value = $page->parse_formatted_text($value)
-                        unless $block->{no_format_values};
                 }
 
                 # store the value.
