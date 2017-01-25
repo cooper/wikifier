@@ -6,7 +6,7 @@ use strict;
 use 5.010;
 
 use HTTP::Date qw(time2str);
-use Wikifier::Utilities qw(page_name align L);
+use Wikifier::Utilities qw(page_name align L Lindent back);
 use Scalar::Util qw(blessed);
 use JSON::XS ();
 
@@ -32,12 +32,14 @@ sub display_page {
     my ($wiki, $page_name) = (shift, shift);
     my $page = $page_name if blessed $page_name;
     $page_name = page_name($page_name);
+    Lindent("($page_name)");
     my $result = $wiki->_display_page($page_name, @_);
     L(align('Error', $result->{error}))
         if $result->{error} && !$result->{draft} && !$result->{parse_error};
     L(align('Draft', 'skipped'))
         if $result->{draft};
     $page->{recent_result} = $result if $page;
+    back;
     return $result;
 }
 sub _display_page {
@@ -187,8 +189,18 @@ sub _cats_to_list {
 # display_page = 1  also include ->display_page result, omitting  {content}
 # display_page = 2  also include ->display_page result, including {content}
 sub display_page_code {
-    my ($wiki, $page_name, $display_page) = @_;
+    my ($wiki, $page_name) = (shift, shift);
+    my $page = $page_name if blessed $page_name;
     $page_name = page_name($page_name);
+    Lindent("($page_name)");
+    my $result = $wiki->_display_page_code($page_name, @_);
+    L(align('Error', $result->{error}))
+        if $result->{error};
+    back;
+    return $result;
+}
+sub _display_page_code {
+    my ($wiki, $page_name, $display_page) = @_;
     my $path   = $wiki->path_for_page($page_name);
     my $result = {};
 

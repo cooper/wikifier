@@ -6,7 +6,7 @@ use strict;
 use 5.010;
 
 use HTTP::Date qw(time2str);
-use Wikifier::Utilities qw(page_name page_name_ne align L);
+use Wikifier::Utilities qw(page_name page_name_ne align L Lindent back);
 use Scalar::Util qw(blessed);
 
 ##############
@@ -34,12 +34,14 @@ sub display_model {
     my ($wiki, $page_name) = (shift, shift);
     my $page = $page_name if blessed $page_name;
     $page_name = page_name($page_name);
+    Lindent("($page_name)");
     my $result = $wiki->_display_model($page_name, @_);
     L(align('Error', $result->{error}))
         if $result->{error} && !$result->{draft} && !$result->{parse_error};
     L(align('Draft', 'skipped'))
         if $result->{draft};
     $page->{recent_result} = $result if $page;
+    back;
     return $result;
 }
 sub _display_model {
@@ -102,7 +104,18 @@ sub _display_model {
 # Displays the wikifier code for a model.
 # display_model = 1  also include ->display_model result, omitting  {content}
 # display_model = 2  also include ->display_model result, including {content}
-sub display_model_code {
+sub display_model {
+    my ($wiki, $page_name) = (shift, shift);
+    my $page = $page_name if blessed $page_name;
+    $page_name = page_name($page_name);
+    Lindent("($page_name)");
+    my $result = $wiki->_display_model_code($page_name, @_);
+    L(align('Error', $result->{error}))
+        if $result->{error};
+    back;
+    return $result;
+}
+sub _display_model_code {
     my ($wiki, $page_name, $display_model) = @_;
     $page_name = page_name($page_name);
     my $path   = $wiki->path_for_model($page_name);

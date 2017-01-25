@@ -152,7 +152,6 @@ sub gen_wiki {
     }
 
     Lindent("[$$wiki{name}]");
-
     foreach my $page_name ($wiki->all_pages) {
         my $page_file  = "$page_dir/$page_name";
         my $cache_file = "$cache_dir/$page_name.cache";
@@ -167,11 +166,8 @@ sub gen_wiki {
         }
 
         # page is not cached or has changed since cache time.
-        Lindent("($page_name)");
         $wiki->display_page($page_name);
-        back;
     }
-
     back;
 }
 
