@@ -42,7 +42,7 @@ sub page_name {
 
     # append .page if it isn't already there.
     if ($page_name !~ m/\.(page|conf|model)$/) {
-        $ext //= '.page'
+        $ext //= '.page';
         $page_name .= $ext;
     }
 
@@ -51,8 +51,7 @@ sub page_name {
 
 # 'Some_Article.page' -> 'Some_Article'
 sub page_name_ne {
-    my $page_name = shift;
-    $page_name = page_name($page_name, '');
+    my $page_name = page_name(shift, '');
     $page_name =~ s/\.(page|conf|model)$//;
     return $page_name;
 }
