@@ -294,16 +294,21 @@ sub handle_cat_list {
 ### WRITE REQUIRED ###
 ######################
 
+# Pages
+
 # page save
 #
 #   name:       the name of the page
 #   content:    the page code
 #
-sub handle_page_save {
+sub  handle_page_save { _handle_page_save(0, @_) }
+sub _handle_page_save {
     # update the page file
     # regenerate it
     # commit: (existed? added : modified) x.page: user edit message
+    my $is_model = shift;
     my ($connection, $msg) = write_required(@_, qw(name content)) or return;
+    my $method;
 
     # remove carriage returns injected by the browser
     my $content = $msg->{content};
@@ -312,10 +317,12 @@ sub handle_page_save {
 
     # update the page
     my $wiki = $connection->{wiki};
-    my $page = $wiki->page_named($msg->{name}, content => $content);
-    my @errs = $wiki->write_page($page, $msg->{message});
+    $method  = $is_model ? 'model_named' : 'page_named';
+    my $page = $wiki->$method($msg->{name}, content => $content);
+    $method  = $is_model ? 'write_model' : 'write_page';
+    my @errs = $wiki->$method($page, $msg->{message});
 
-    $connection->send(page_save => {
+    $connection->send($is_model ? 'model_save' : 'page_save' => {
         result     => $page->{recent_result},
         saved      => !@errs,
         rev_errors => \@errs,
@@ -324,33 +331,56 @@ sub handle_page_save {
     });
 }
 
-sub handle_page_del {
+sub  handle_page_del { _handle_page_del(0, @_) }
+sub _handle_page_del {
     # copy old page to revisions
     # delete the page file
     # remove it from all categories
     # commit: deleted page x.page
+    my $is_model = shift;
     my ($connection, $msg) = write_required(@_, 'name') or return;
+    my $method;
 
     # delete the page
     my $wiki = $connection->{wiki};
-    my $page = $wiki->page_named($msg->{name});
-    $wiki->delete_page($page);
+    $method  = $is_model ? 'model_named' : 'page_named';
+    my $page = $wiki->$method($msg->{name});
+    $method  = $is_model ? 'delete_model' : 'delete_page';
+    $wiki->$method($page);
 
-    $connection->send(page_del => { deleted => 1 });
+    $connection->send($is_model ? 'model_del' : 'page_del' => {
+        deleted => 1
+    });
 }
 
-sub handle_page_move {
+sub  handle_page_move { _handle_page_move(0, @_) }
+sub _handle_page_move {
     # rename page file
     # commit: moved page a.page -> b.page
+    my $is_model = shift;
     my ($connection, $msg) = write_required(@_, qw(name new_name)) or return;
+    my $method;
 
     # rename the page
     my $wiki = $connection->{wiki};
-    my $page = $wiki->page_named($msg->{name});
-    $wiki->move_page($page, $msg->{new_name});
+    $method  = $is_model ? 'model_named' : 'page_named';
+    my $page = $wiki->$method($msg->{name});
+    $method  = $is_model ? 'move_model' : 'move_page';
+    $wiki->$method($page, $msg->{new_name});
 
-    $connection->send(page_move => { moved => 1 });
+    $connection->send($is_model ? 'model_move' : 'page_move' => {
+        moved => 1
+    });
 }
+
+# Models
+
+# model save
+sub handle_model_save   { _handle_page_save(1, @_) }
+sub handle_model_del    { _handle_page_del (1, @_) }
+sub handle_model_move   { _handle_page_move(1, @_) }
+
+# Categories
 
 sub handle_cat_del {
     # copy all affected old pages to revisions
