@@ -39,12 +39,16 @@ sub style_parse {
                 next;
             }
 
+            # split up matchers by space.
+            # replace $blah with model-blah.
+            my @matchers = split /\s/, $matcher;
+            @matchers = map { (my $m = $_) =~ s/^\$/model-/ }
+
             # element type or class, etc.
             # ex: p
             # ex: p.something
             # ex: .something.somethingelse
-            push @{ $style{apply_to} }, [ split /\s/, $matcher ];
-
+            push @{ $style{apply_to} }, \@matchers;;
         }
     }
 
