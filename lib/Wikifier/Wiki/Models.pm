@@ -15,11 +15,12 @@ use Scalar::Util qw(blessed);
 
 # create a page object with this wiki
 sub model_named {
-    my ($wiki, $page_name, %opts) = @_;
+    my ($wiki, $name, %opts) = @_;
+    (my $no_ext_name = $name) =~ s/\.page$//;
     my $page = Wikifier::Page->new(
-        file_path  => path_for_model($page_name),
-        name       => $page_name,
-        model_name => $name,
+        file_path  => path_for_model($name),
+        name       => $name,
+        model_name => $no_ext_name,
         #wikifier   => $page->wikifier, FIXME?
         wiki       => $wiki,
         %opts
