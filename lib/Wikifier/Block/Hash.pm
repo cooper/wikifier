@@ -91,7 +91,7 @@ sub hash_parse {
 
                 # fix value
                 if (blessed $value) {
-                    $value = $value->html($page);
+                    $value = $value->html($page)->generate;
                 }
                 else {
                     $value =~ s/(^\s*)|(\s*$)//g;

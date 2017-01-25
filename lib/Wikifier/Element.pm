@@ -6,6 +6,7 @@ use strict;
 
 use Scalar::Util qw(blessed);
 use HTML::Entities qw(encode_entities);
+use Wikifier::Utilities qw(indent_str);
 
 our %identifiers;
 
@@ -118,10 +119,10 @@ sub generate {
     foreach my $child (@{ $el->{content} }) {
         $content  = '' if not defined $content;
         if (not blessed $child) {
-            $content .= Wikifier::Utilities::indent_str("$child\n");
+            $content .= indent_str("$child\n");
             next;
         }
-        $content .= Wikifier::Utilities::indent_str($child->generate);
+        $content .= indent_str($child->generate);
     }
     $html .= $content if defined $content;
 
