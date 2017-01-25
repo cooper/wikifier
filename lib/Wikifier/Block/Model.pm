@@ -53,8 +53,9 @@ sub model_html {
 
     # add the main page element to our element.
     $el->remove_class('main');
+    $el->add_class('model');
     $el->add_class("model-$$model{model_name}");
-    $el->add_class($_) for $model_el->classes;
+    $el->add_class("model-$$model_el{id}");
 
     # overwrite the model element
     $block->{element} = $el;
