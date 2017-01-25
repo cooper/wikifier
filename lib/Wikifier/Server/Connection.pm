@@ -21,7 +21,7 @@ sub new {
 sub send {
     my ($connection, @etc) = @_;
     my $json_text = $json->encode(\@etc);
-    print "S: $json_text\n";
+    print "S: $json_text\n" if $ENV{WIKIFIER_DEBUG};
     $connection->{stream}->write("$json_text\n");
 }
 
@@ -48,7 +48,7 @@ sub error {
 sub handle {
     my ($connection, $line) = @_;
     my $return = undef;
-    print "C: $line\n";
+    print "C: $line\n" if $ENV{WIKIFIER_DEBUG};
 
     # not interested if we're dropping the connection
     return if $connection->{closed};
