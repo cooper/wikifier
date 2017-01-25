@@ -126,6 +126,14 @@ class Wikiclient {
         ));
     }
 
+    // send a model code request.
+    function model_code($name, $display_model) {
+        return $this->command('model_code', array(
+            'name'          => $name,
+            'display_model' => $display_model
+        ));
+    }
+
     // send a model list request
     function model_list($sort = 'm-') {
         return $this->command('model_list', array(
