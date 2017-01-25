@@ -48,13 +48,14 @@ sub model_html {
 
     $block->html_base($page); # call hash html.
 
-    # generate the objective DOM.
+    # generate the DOM. configure model element with all
+    # of the options from the main element of the model.
     my $main_el = $main_block->html($model) or return;
+    $el->configure(%$main_el);
 
     # add the main page element to our element.
-    $main_el->remove_class('main');
+    $el->remove_class('main');
     $el->add_class("model-$$model{model_name}");
-    $el->add($main_el);
 }
 
 __PACKAGE__
