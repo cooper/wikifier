@@ -33,7 +33,7 @@ sub indent_str {
 
 # 'Some Article' -> 'Some_Article.page'
 sub page_name {
-    my $page_name = shift;
+    my ($page_name, $ext) = @_;
     return $page_name->name if blessed $page_name;
 
     # replace non-alphanumerics with _ and lowercase.
@@ -41,17 +41,26 @@ sub page_name {
     $page_name = lc $page_name;
 
     # append .page if it isn't already there.
-    if ($page_name !~ m/\.(page|conf)$/) {
-        $page_name .= '.page';
+    if ($page_name !~ m/\.(page|conf|model)$/) {
+        $ext //= '.page'
+        $page_name .= $ext;
     }
 
     return $page_name;
 }
 
+# 'Some_Article.page' -> 'Some_Article'
+sub page_name_ne {
+    my $page_name = shift;
+    $page_name = page_name($page_name, '');
+    $page_name =~ s/\.(page|conf|model)$//;
+    return $page_name;
+}
+
 # two page names equal?
 sub page_names_equal {
-    my ($page_name_1, $page_name_2) = @_;
-    return page_name($page_name_1) eq page_name($page_name_2);
+    my ($page_name_1, $page_name_2, $ext) = @_;
+    return page_name($page_name_1, $ext) eq page_name($page_name_2, $ext);
 }
 
 # removes leading and trailing whitespace from a string.

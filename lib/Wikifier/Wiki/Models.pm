@@ -6,7 +6,7 @@ use strict;
 use 5.010;
 
 use HTTP::Date qw(time2str);
-use Wikifier::Utilities qw(page_name align L);
+use Wikifier::Utilities qw(page_name page_name_ne align L);
 use Scalar::Util qw(blessed);
 
 ##############
@@ -20,8 +20,8 @@ sub model_named {
     my $page = Wikifier::Page->new(
         is_model   => 1,
         file_path  => $wiki->path_for_model($name),
-        name       => $name,
-        model_name => $no_ext_name,
+        name       => page_name($name, '.model'),
+        model_name => page_name_ne($name),
         #wikifier   => $page->wikifier, FIXME?
         wiki       => $wiki,
         %opts

@@ -283,7 +283,7 @@ sub path_for_image {
 # return abs path for a model
 sub path_for_model {
     my ($wiki, $model_name) = @_;
-    $model_name = page_name($model_name);
+    $model_name = page_name($model_name, '.model');
     return abs_path($wiki->opt('dir.model').'/'.$model_name);
 }
 
