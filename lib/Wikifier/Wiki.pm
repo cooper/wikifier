@@ -22,6 +22,7 @@ use Scalar::Util qw(blessed);
 use Wikifier;
 use Wikifier::Wiki::Pages;
 use Wikifier::Wiki::Images;
+use Wikifier::Wiki::Models;
 use Wikifier::Wiki::Revision;
 use Wikifier::Wiki::Categories;
 use Wikifier::Utilities qw(L);
