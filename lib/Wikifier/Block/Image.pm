@@ -139,7 +139,7 @@ sub image_parse {
 # HTML.
 sub image_html {
     my ($box, $block, $page, $el) = (shift, shift, @_);
-    $block->html_base(@_); # call hash html.
+    $block->html_base($page); # call hash html.
 
     # add the appropriate float class.
     $el->add_class('imagebox-'.$block->{float}) if $box;

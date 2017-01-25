@@ -46,7 +46,7 @@ sub model_html {
     my $model      = $block->{model} or return;
     my $main_block = $model->{wikifier}{main_block} or return;
 
-    $block->html_base(@_); # call hash html.
+    $block->html_base($page); # call hash html.
 
     # generate the objective DOM.
     my $main_el = $main_block->html($model) or return;

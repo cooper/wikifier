@@ -32,7 +32,7 @@ sub infobox_parse {
 
 sub infobox_html {
     my ($block, $page, $el) = (shift, @_);
-    $block->html_base(@_); # call hash html.
+    $block->html_base($page); # call hash html.
 
     # display the title if it exists.
     if (length $block->{name}) {
