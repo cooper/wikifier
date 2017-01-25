@@ -15,7 +15,8 @@ use Wikifier::Utilities qw(L);
 our %block_types = (
     hash => {
         init  => \&hash_init,
-        parse => \&hash_parse
+        parse => \&hash_parse,
+        html  => \&hash_html
     }
 );
 
@@ -26,7 +27,7 @@ sub hash_init {
 
 # parse key:value pairs.
 sub hash_parse {
-    my ($block, $page) = @_;
+    my ($block, $page) = (shift, @_);
     my ($key, $value, $in_value, %values) = (q.., q..);
 
     # for each content item...
@@ -91,7 +92,7 @@ sub hash_parse {
 
                 # fix value
                 if (blessed $value) {
-                    $value = $value->html($page)->generate;
+                    $value->parse(@_);
                 }
                 else {
                     $value =~ s/(^\s*)|(\s*$)//g;
@@ -103,10 +104,6 @@ sub hash_parse {
                         $key = $value = '';
                         next CHAR;
                     }
-
-                    # format
-                    $value = $page->parse_formatted_text($value)
-                        unless $block->{no_format_values};
                 }
 
                 # if this key exists, rename it to the next available <key>_key_<n>.
@@ -146,6 +143,24 @@ sub hash_parse {
     $block->{hash} = \%hash;
 
     return 1;
+}
+
+sub hash_html {
+    my ($block, $page) = (shift, @_);
+    foreach (@{ $block->{hash_array} }) {
+        my ($key_title, $value, $key) = @$_;
+        if (blessed $value) {
+            $value = $value->html(@_)->generate;
+        }
+        elsif (!$block->{no_format_values}) {
+            $value = $page->parse_formatted_text($value);
+        }
+        else {
+            next;
+        }
+        $_->[1] = $value;
+        $block->{hash}{$key} = $value;
+    }
 }
 
 __PACKAGE__

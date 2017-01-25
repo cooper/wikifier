@@ -88,20 +88,30 @@ sub list_parse {
 }
 
 sub list_html {
-    my ($block, $page, $el) = @_;
+    my ($block, $page, $el) = (shift, @_);
+    my @new;
 
     # start with a ul.
     $el->{type} = 'ul';
 
     # append each item.
-    foreach my $item (@{ $block->{list_array} }) {
+    foreach my $value (@{ $block->{list_array} }) {
+        if (blessed $value) {
+            $value = $value->html(@_)->generate;
+        }
+        elsif (!$block->{no_format_values}) {
+            $value = $page->parse_formatted_text($value);
+        }
+        push @new, $value;
+
         $el->create_child(
             type       => 'li',
             class      => 'list-item',
-            content    => $item
+            content    => $value
         );
     }
 
+    $block->{list_array} = \@new;
 }
 
 __PACKAGE__

@@ -16,7 +16,7 @@ use strict;
 use Scalar::Util qw(blessed weaken);
 
 # Required properties of blocks.
-#   
+#
 #   parent:     the parent block object. (for main block, undef)
 #   type:       the name type of block, such as 'imagebox', 'paragraph', etc.
 #   content:    the inner content of the block, an arrayref of strings and child blocks.
@@ -43,10 +43,10 @@ sub new {
     $opts{content} ||= [];
     $opts{type} = lc $opts{type};
     my $block = bless \%opts, $class;
-    
+
     # weaken reference to wikifier.
     weaken($block->{wikifier}) if $block->{wikifier};
-    
+
     return $block;
 }
 
@@ -63,13 +63,13 @@ sub parse {
     $block->{parse_done} = {};
     $block->_parse($type, @_);
     delete $block->{parse_done};
-    
+
     # parse child blocks.
     foreach my $block (@{ $block->{content} }) {
         next unless blessed $block;
         $block->parse(@_);
     }
-    
+
 }
 
 # run the base's parse() now instead of afterward.
@@ -84,7 +84,7 @@ sub parse_base {
 # do not call directly.
 sub _parse {
     my ($block, $type) = (shift, shift);
-    
+
     # parse the block hereditarily.
     while ($type) {
         my $type_opts = $Wikifier::BlockManager::block_types{$type};
@@ -106,20 +106,18 @@ sub html {
     my $block = shift;
     my $type  = $block->{type};
     $block->remove_blank;
-    
+
     # create the element.
     $block->{element} = Wikifier::Element->new(
         class => $block->{type},
         ids   => $block->{wikifier}{element_identifiers} ||= {}
     );
-    #$block->{parent}{element}->add($block->{element})
-    #  if $block->{parent}{element};
-    
+
     # generate this block.
     $block->{html_done} = {};
     $block->_html($type, @_);
     delete $block->{html_done};
-    
+
     # do child blocks that haven't been done.
     foreach my $block (@{ $block->{content} }) {
         next unless blessed $block;
@@ -130,7 +128,7 @@ sub html {
     # add classes from the parser.
     my @classes = @{ delete $block->{classes} || [] };
     $block->{element}->add_class("class-$_") foreach @classes;
-    
+
     return $block->{element};
 }
 
