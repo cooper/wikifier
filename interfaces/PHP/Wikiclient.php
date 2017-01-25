@@ -186,6 +186,27 @@ class Wikiclient {
         ));
     }
 
+    function model_save($name, $content, $message) {
+        return $this->command('model_save', array(
+            'name'    => $name,
+            'content' => $content,
+            'message' => $message
+        ));
+    }
+
+    function model_del($name) {
+        return $this->command('model_del', array(
+            'name' => $name
+        ));
+    }
+
+    function model_move($name, $new_name) {
+        return $this->command('model_move', array(
+            'name'     => $name,
+            'new_name' => $new_name
+        ));
+    }
+
 }
 
 ?>
