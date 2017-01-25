@@ -72,7 +72,7 @@ sub handle_stream {
     my (undef, $stream) = @_;
 
     $stream->{connection} = Wikifier::Server::Connection->new($stream);
-    L("New connection $$stream{connection}{id}");
+    $stream->{connection}->l('New connection');
 
     # configure the stream.
     my $close = sub { shift->{connection}->close };
