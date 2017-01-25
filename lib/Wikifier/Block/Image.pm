@@ -213,7 +213,7 @@ sub image_html {
         my $desc = $inner->create_child(class => 'imagebox-description');
         $desc->create_child(
             class   => 'imagebox-description-inner',
-            content => $page->parse_formatted_text($block->{description})
+            content => $block->{description}
         );
     }
 

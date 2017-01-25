@@ -26,7 +26,7 @@ sub hash_init {
 
 # parse key:value pairs.
 sub hash_parse {
-    my $block = shift;
+    my ($block, $page) = @_;
     my ($key, $value, $in_value, %values) = (q.., q..);
 
     # for each content item...
@@ -44,7 +44,7 @@ sub hash_parse {
         # for each character in this string...
         my $escaped; # true if the last was escape character
         my $i = 0;
-        for (split //, $item) { $i++;
+        CHAR: for (split //, $item) { $i++;
             my $char = $_;
 
             # the first colon indicates that we're beginning a value.
@@ -78,22 +78,40 @@ sub hash_parse {
                 # it was escaped.
                 continue if $escaped;
 
-                # remove spaces from key and value.
-                $key   =~ s/(^\s*)|(\s*$)//g; my $key_title = $key;
-                $value =~ s/(^\s*)|(\s*$)//g unless blessed $value;
-
-                # no key.
-                if (!$key) {
-                    $key       = "anon_$i";
+                # fix key
+                my $key_title;
+                if (!length $key) {
+                    $key = "anon_$i";
                     $key_title = undef;
+                }
+                else {
+                    $key =~ s/(^\s*)|(\s*$)//g;
+                    $key_title = $key;
+                }
+
+                # fix value
+                if (!blessed $value) {
+                    $value =~ s/(^\s*)|(\s*$)//g;
+
+                    # special value -no_format_values;
+                    if ($value eq '-no_format_values') {
+                        $block->{no_format_values}++;
+                        $in_value = 0;
+                        $key = $value = '';
+                        next CHAR;
+                    }
+
+                    # format
+                    $value = $page->parse_formatted_text($value)
+                        unless $block->{no_format_values};
                 }
 
                 # if this key exists, rename it to the next available <key>_key_<n>.
-                while (exists $values{$key}) {
+                KEY: while (exists $values{$key}) {
                     my ($key_name, $key_number) = split '_key_', $key;
                     if (!defined $key_number) {
                         $key = "${key}_2";
-                        next;
+                        next KEY;
                     }
                     $key_number++;
                     $key = "${key_name}_${key_number}";
@@ -106,29 +124,15 @@ sub hash_parse {
                 # reset status.
                 $in_value = 0;
                 $key = $value = '';
-
             }
 
             # any other characters.
             default {
-
-                # if we're in a value, append to the value.
-                if ($in_value) {
-                    $value .= $char;
-                }
-
-                # otherwise, append to the key.
-                else {
-                    $key .= $char;
-                }
-
-                # pretty simple stuff.
-
+                $value  .= $char if  $in_value;
+                $key    .= $char if !$in_value;
                 $escaped = 0;
             }
-
         } # end of character loop.
-
     } # end of item loop.
 
     # append/overwrite values found in this parser.

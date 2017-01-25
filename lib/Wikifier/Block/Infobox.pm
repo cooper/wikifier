@@ -20,19 +20,19 @@ our %block_types = (infobox => {
 sub infobox_parse {
     my ($block, $page) = (shift, @_);
     $block->parse_base(@_); # call hash parse.
-    
+
     # search for image{}.
     # apply default width.
     foreach my $item (@{ $block->{content} }) {
         next unless blessed $item && $item->{type} eq 'image';
         $item->{default_width} = '270px';
     }
-    
+
 }
 
 sub infobox_html {
     my ($block, $page, $el) = @_;
-    
+
     # display the title if it exists.
     if (length $block->{name}) {
         $el->create_child(
@@ -40,13 +40,13 @@ sub infobox_html {
             content => $page->parse_formatted_text($block->{name})
         );
     }
-    
+
     # start table.
     my $table = $el->create_child(
         type  => 'table',
         class => 'infobox-table'
     );
-    
+
     # append each pair.
     foreach my $pair (@{ $block->{hash_array} }) {
         my ($key_title, $value, $key) = @$pair;
@@ -55,23 +55,18 @@ sub infobox_html {
         if (blessed $value) {
             $value = $value->html($page);
         }
-        
-        # Parse formatting in the value.
-        else {
-            $value = $page->parse_formatted_text($value);
-        }
-        
+
         # Parse formatting in the key.
         if (length $key_title) {
             $key_title = $page->parse_formatted_text($key_title);
         }
-        
+
         # create the row.
         my $tr = $table->create_child(
             type  => 'tr',
             class => 'infobox-pair'
         );
-        
+
         # append table row with key.
         if (length $key_title) {
             $tr->create_child(
@@ -85,7 +80,7 @@ sub infobox_html {
                 content    => $value
             );
         }
-        
+
         # append table row without key.
         else {
             $tr->create_child(
