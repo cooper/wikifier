@@ -25,7 +25,8 @@ sub write_page {
     close $fh;
 
     # update the page
-    $wiki->display_page($page);
+    my $display_method = $page->{is_model} ? 'display_model' : 'display_page';
+    $wiki->$display_method($page);
 
     # commit the change
     return $wiki->rev_commit(
@@ -71,10 +72,15 @@ sub move_page {
     );
 
     # update the page
-    $wiki->display_page($page);
+    my $display_method = $page->{is_model} ? 'display_model' : 'display_page';
+    $wiki->$display_method($page);
 
     return 1;
 }
+
+*write_model    = \&write_page;
+*delete_model   = \&delete_page;
+*move_model     = \&move_page;
 
 ####################################
 ### LOW-LEVEL REVISION FUNCTIONS ###

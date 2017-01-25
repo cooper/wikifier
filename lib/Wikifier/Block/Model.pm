@@ -26,6 +26,7 @@ sub model_parse {
     my $name  = page_name($block->{name});
     my $path  = Cwd::abs_path($page->wiki_opt('dir.model')."/$name");
     my $model = $block->{model} = Wikifier::Page->new(
+        is_model   => 1,
         file_path  => $path,
         name       => "$name.page",
         model_name => $name,

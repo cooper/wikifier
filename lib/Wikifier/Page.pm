@@ -254,6 +254,8 @@ sub image_round {
 
 sub cache_path {
     my $page = shift;
+    return abs_path($page->{cache_path})
+        if length $page->{cache_path};
     return abs_path($page->wiki_opt('dir.cache').'/'.$page->name.'.cache');
 }
 
