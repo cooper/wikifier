@@ -55,7 +55,7 @@ sub model_html {
     $el->remove_class('main');
     $el->add_class('model');
     $el->add_class("model-$$model{model_name}");
-    $el->add_class("model-$$model_el{id}");
+    $el->add_class($model_el->{id});
 
     # overwrite the model element
     $block->{element} = $el;
