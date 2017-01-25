@@ -51,11 +51,6 @@ sub infobox_html {
     foreach my $pair (@{ $block->{hash_array} }) {
         my ($key_title, $value, $key) = @$pair;
 
-        # value is a block. generate the HTML for it.
-        if (blessed $value) {
-            $value = $value->html($page);
-        }
-
         # Parse formatting in the key.
         if (length $key_title) {
             $key_title = $page->parse_formatted_text($key_title);

@@ -50,7 +50,10 @@ sub list_parse {
 
             # a semicolon indicates the termination of a pair.
             elsif ($char eq ';' && !$escaped) {
-                if (!blessed $value) {
+                if (blessed $value) {
+                    $value = $value->html($page);
+                }
+                else {
                     $value =~ s/(^\s*)|(\s*$)//g;
 
                     # special value -no_format_values;
