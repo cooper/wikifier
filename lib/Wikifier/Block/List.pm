@@ -97,7 +97,7 @@ sub list_html {
     # append each item.
     foreach my $value (@{ $block->{list_array} }) {
         if (blessed $value) {
-            $value = $value->html(@_)->generate;
+            $value = $value->html($page)->generate;
         }
         elsif (!$block->{no_format_values}) {
             $value = $page->parse_formatted_text($value);
