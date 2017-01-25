@@ -32,7 +32,7 @@ sub close : method {
     $connection->{closed} = 1;
     my $stream = delete $connection->{stream};
     delete $stream->{connection};
-    L('Closing connection '.$connection->{id});
+    $connection->l('Connection closed');
     $stream->close;
 }
 
@@ -40,7 +40,7 @@ sub close : method {
 sub error {
     my ($connection, $error, %other) = @_;
     $connection->send(error => { reason => $error, %other });
-    L("Connection error '$error' $$connection{id}");
+    $connection->l("Error: $error");
     $connection->close;
 }
 
@@ -94,10 +94,7 @@ sub handle {
     }
 
     # if the 'close' option exists, close the connection afterward.
-    if ($msg->{close}) {
-        L("Connection $$connection{id} requested close");
-        $connection->close;
-    }
+    $connection->close if $msg->{close};
 
     return $return;
 }
