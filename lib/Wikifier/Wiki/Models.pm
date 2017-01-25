@@ -18,7 +18,7 @@ sub model_named {
     my ($wiki, $name, %opts) = @_;
     (my $no_ext_name = $name) =~ s/\.page$//;
     my $page = Wikifier::Page->new(
-        file_path  => path_for_model($name),
+        file_path  => $wiki->path_for_model($name),
         name       => $name,
         model_name => $no_ext_name,
         #wikifier   => $page->wikifier, FIXME?
