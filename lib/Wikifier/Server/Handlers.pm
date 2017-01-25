@@ -185,6 +185,24 @@ sub handle_page_code {
     $connection->l("Page '$$msg{name}' code requested");
 }
 
+# model code request
+#
+#   name:           the name of the model
+#
+#   display_model:  (optional). 1 to call ->display_model and set its result
+#                   to {display_result} in the response, except for the
+#                   {content}. 2 to do the same except also preserve the content
+#
+sub handle_model_code {
+    my ($connection, $msg) = write_required(@_, 'name') or return;
+    my $result = $connection->{wiki}->display_model_code(
+        $msg->{name},
+        $msg->{display_model}
+    );
+    $connection->send('model_code', $result);
+    $connection->l("Model '$$msg{name}' code requested");
+}
+
 # page list
 #
 #   sort:   method to sort the results
