@@ -36,6 +36,9 @@ sub hash_parse {
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
 
+            # no key set, not even a generated one. skip this.
+            next ITEM if !length $key;
+
             # set the value to the block item itself.
             $value = $values{$key} = $item;
 
