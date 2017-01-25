@@ -134,7 +134,7 @@ sub generate {
     return "$html\n";
 }
 
-sub classes { shift->{classes} }
-sub parent  { shift->{parent}  }
+sub classes { @{ shift->{classes} || [] } }
+sub parent  { shift->{parent} }
 
 1

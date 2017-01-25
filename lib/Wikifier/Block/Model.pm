@@ -42,7 +42,7 @@ sub model_parse {
 }
 
 sub model_html {
-    my ($block, $page) = (shift, @_);
+    my ($block, $page, $model_el) = (shift, @_);
     my $model      = $block->{model} or return;
     my $main_block = $model->{wikifier}{main_block} or return;
 
@@ -54,6 +54,7 @@ sub model_html {
     # add the main page element to our element.
     $el->remove_class('main');
     $el->add_class("model-$$model{model_name}");
+    $el->add_class($_) for $model_el->classes;
 
     # overwrite the model element
     $block->{element} = $el;
