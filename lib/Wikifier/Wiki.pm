@@ -189,7 +189,7 @@ sub all_categories {
 
 # an array of file names in the model directory.
 sub all_models {
-    return files_in_dir(shift->opt('dir.model'), 'page');
+    return files_in_dir(shift->opt('dir.model'), 'page', 'model');
 }
 
 ######################
@@ -290,7 +290,8 @@ sub path_for_model {
 # files in directory.
 # resolves symlinks only counts each file once.
 sub files_in_dir {
-    my ($dir, $ext) = @_;
+    my ($dir, @ext) = @_;
+    my $ext = join '|', @ext;
     my $dh;
     if (!opendir $dh, $dir) {
         L("Cannot open dir '$dir': $!");
@@ -303,7 +304,7 @@ sub files_in_dir {
         next if substr($file, 0, 1) eq '.';
 
         # skip files without desired extension.
-        next if $ext && $file !~ m/.+\.$ext$/;
+        next if $ext && $file !~ m/.+\.($ext)$/;
 
         # resolve symlinks.
         my $file = abs_path("$dir/$file");
