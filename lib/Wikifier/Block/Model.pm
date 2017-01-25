@@ -6,6 +6,7 @@ package Wikifier::Block::Model;
 use warnings;
 use strict;
 
+use Cwd qw(abs_path);
 use Wikifier::Utilities qw(page_name);
 
 our %block_types = (
@@ -23,12 +24,13 @@ sub model_parse {
     $block->parse_base(@_);
 
     # create a page.
-    my $name  = page_name($block->{name});
-    my $path  = Cwd::abs_path($page->wiki_opt('dir.model')."/$name");
+    my $name  = $block->{name};
+    my $file  = page_name($name, '.model');
+    my $path  = abs_path($page->wiki_opt('dir.model')."/$file");
     my $model = $block->{model} = Wikifier::Page->new(
         is_model   => 1,
         file_path  => $path,
-        name       => "$name.page",
+        name       => $file,
         model_name => $name,
         #wikifier   => $page->wikifier,
         wiki       => $page->{wiki}, # (might not exist)
