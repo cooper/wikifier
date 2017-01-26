@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010;
 
-use Wikifier::Utilities qw(page_names_equal align cat_name cat_name_ne L);
+use Wikifier::Utilities qw(page_names_equal cat_name cat_name_ne L);
 use HTTP::Date qw(time2str);
 use JSON::XS ();
 
@@ -291,7 +291,7 @@ sub cat_get_pages {
         # is this category now empty?
         if ($wiki->cat_should_delete($cat_name_ne, \%final_pages)) {
             unlink $cat_file;
-            return (undef, undef, align('Purge', $cat_name));
+            return (undef, undef, 'Purge');
         }
 
         # no, there are still page(s) in it.
