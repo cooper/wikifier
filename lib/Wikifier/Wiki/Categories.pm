@@ -136,7 +136,9 @@ sub cat_add_page {
     my ($wiki, $page, $cat_name, $image_name) = @_;
     $cat_name = cat_name($cat_name);
     my $time = time;
-    my $cat_file = $wiki->path_for_category($cat_name);
+    my $method = $page->{is_model} ?
+        'path_for_model_category'  : 'path_for_category';
+    my $cat_file = $wiki->$method($cat_name);
 
     # fetch page infos.
     my $p_vars = $page->get('page');
@@ -203,7 +205,7 @@ sub cat_add_page {
 # returns a name-to-metadata hash of the pages in the given category.
 # if the category does not exist, returns nothing.
 sub cat_get_pages {
-    my ($wiki, $cat_name) = @_;
+    my ($wiki, $cat_name, $is_model) = @_;
     $cat_name = cat_name($cat_name);
     my $cat_name_ne = cat_name_ne($cat_name);
     # this should read a file for pages of a category.
@@ -214,7 +216,8 @@ sub cat_get_pages {
     # be removed from the cat file.
 
     # this category does not exist.
-    my $cat_file = $wiki->path_for_category($cat_name);
+    my $method = $is_model ? 'path_for_model_category' : 'path_for_category';
+    my $cat_file = $wiki->$method($cat_name);
     if (!-f $cat_file) {
         L("No such category $cat_file");
         return;

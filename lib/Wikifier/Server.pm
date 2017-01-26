@@ -175,6 +175,13 @@ sub gen_wiki {
         L("($cat_name)", sub { L($err) });
     }
 
+    # model categories
+    foreach my $cat_name ($wiki->all_model_categories) {
+        my (undef, undef, $err) = $wiki->cat_get_pages($cat_name, 1);
+        defined $err or next;
+        L("($cat_name)", sub { L($err) });
+    }
+
     back;
 }
 

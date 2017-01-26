@@ -190,6 +190,14 @@ sub all_categories {
     return @files;
 }
 
+# an array of file names in category directory.
+sub all_model_categories {
+    my ($wiki, $cat_type) = @_;
+    my @files = files_in_dir($wiki->opt('dir.m_category'), 'cat');
+    @files = grep m/^\Q$cat_type\E-/, @files if length $cat_type;
+    return @files;
+}
+
 # an array of file names in the model directory.
 sub all_models {
     return files_in_dir(shift->opt('dir.model'), 'page', 'model');
@@ -276,6 +284,13 @@ sub path_for_category {
     my ($wiki, $cat_name) = @_;
     $cat_name = cat_name($cat_name);
     return abs_path($wiki->opt('dir.category')."/$cat_name");
+}
+
+# return abs path for a model category
+sub path_for_model_category {
+    my ($wiki, $cat_name) = @_;
+    $cat_name = cat_name($cat_name);
+    return abs_path($wiki->opt('dir.m_category')."/$cat_name");
 }
 
 # return abs path for an image
