@@ -285,14 +285,14 @@ sub cat_get_pages {
         $final_pages{$page_name} = $page_data;
     }
 
-    # it looks like something has changed. we need to update the cat file.
-    if ($changed) {
+    # is this category now empty?
+    if ($wiki->cat_should_delete($cat_name_ne, \%final_pages)) {
+        unlink $cat_file;
+        return (undef, undef, 'Purge');
+    }
 
-        # is this category now empty?
-        if ($wiki->cat_should_delete($cat_name_ne, \%final_pages)) {
-            unlink $cat_file;
-            return (undef, undef, 'Purge');
-        }
+    # it looks like something has changed. we need to update the cat file.
+    elsif ($changed) {
 
         # no, there are still page(s) in it.
         # update the file.
