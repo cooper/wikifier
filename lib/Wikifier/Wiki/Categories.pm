@@ -196,6 +196,7 @@ sub cat_add_page {
         category   => cat_name_ne($cat_name),
         file       => $cat_name,
         created    => $time,
+        modified   => $time,
         pages      => { $page->{name} => $page_data }
     });
 
@@ -304,9 +305,8 @@ sub cat_get_pages {
 
         # no, there are still page(s) in it.
         # update the file.
-
-        $cat->{updated} = $time;
-        $cat->{pages}   = \%final_pages;
+        $cat->{modified} = $time;
+        $cat->{pages}    = \%final_pages;
 
         # unable to open.
         my $fh;
