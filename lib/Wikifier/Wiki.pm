@@ -17,6 +17,7 @@ use 5.010;
 use HTTP::Date qw(time2str);            # HTTP date formatting
 use Cwd qw(abs_path);                   # resolving symlinks
 use File::Basename qw(basename);        # determining object names
+use File::Path qw(make_path);
 use Scalar::Util qw(blessed);
 
 use Wikifier;
@@ -55,6 +56,9 @@ sub new {
     # if a config file is provided, use it.
     $wiki->read_config($opts{config_file}, $opts{private_file})
         if defined $opts{config_file};
+
+    # make directories when necessary
+    $wiki->check_directories;
 
     return $wiki;
 }
@@ -96,6 +100,36 @@ sub read_config {
     }
 
     return 1;
+}
+
+my @main_dirs   = qw(image page cache model category);
+my @psuedo_cats = qw(data image model);
+
+sub check_directories {
+    my $wiki = shift;
+
+    # main dirs
+    my @directories = map {
+        [ $_, $wiki->opt("dir.$_") ]
+    } @main_dirs;
+
+    # psuedocategory dirs
+    push @directories, map {
+        [ "category/$_", $wiki->opt('dir.category')."/$_" ]
+    } @psuedo_cats;
+
+    foreach my $dir (@directories) {
+        my ($dir, $path) = @$_;
+        next if -d $path;
+        if (-e $path) {
+            L("\@dir.$dir ($path) exists but is not a directory");
+            next;
+        }
+        L("Creating \@dir.$dir ($path)");
+        my $err;
+        next if make_path($path, { err => \$err });
+        L("... Failed: @$err")
+    }
 }
 
 # returns a wiki option.
@@ -190,14 +224,6 @@ sub all_categories {
     return @files;
 }
 
-# an array of file names in category directory.
-sub all_model_categories {
-    my ($wiki, $cat_type) = @_;
-    my @files = files_in_dir($wiki->opt('dir.m_category'), 'cat');
-    @files = grep m/^\Q$cat_type\E-/, @files if length $cat_type;
-    return @files;
-}
-
 # an array of file names in the model directory.
 sub all_models {
     return files_in_dir(shift->opt('dir.model'), 'page', 'model');
@@ -281,16 +307,10 @@ sub path_for_page {
 
 # return abs path for a category
 sub path_for_category {
-    my ($wiki, $cat_name) = @_;
+    my ($wiki, $cat_name, $cat_type) = @_;
     $cat_name = cat_name($cat_name);
-    return abs_path($wiki->opt('dir.category')."/$cat_name");
-}
-
-# return abs path for a model category
-sub path_for_model_category {
-    my ($wiki, $cat_name) = @_;
-    $cat_name = cat_name($cat_name);
-    return abs_path($wiki->opt('dir.m_category')."/$cat_name");
+    $cat_type = length $cat_name ? "$cat_name/" : '';
+    return abs_path($wiki->opt('dir.category')."/$cat_type$cat_name");
 }
 
 # return abs path for an image

@@ -89,6 +89,17 @@ sub trim {
     return $string;
 }
 
+sub hash_maybe($) {
+    my $href = shift;
+    return if ref $href ne 'HASH';
+    return %$href;
+}
+
+sub keys_maybe($) {
+    my %hash = hash_maybe(shift);
+    return keys %hash;
+}
+
 ### LOGGING
 
 our $indent = 0;

@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010;
 
-use Wikifier::Utilities qw(page_names_equal cat_name cat_name_ne L);
+use Wikifier::Utilities qw(page_names_equal cat_name cat_name_ne keys_maybe L);
 use HTTP::Date qw(time2str);
 use JSON::XS ();
 
@@ -110,7 +110,7 @@ sub _is_main_page {
 # deal with categories after parsing a page.
 sub cat_check_page {
     my ($wiki, $page) = @_;
-    $wiki->cat_add_page($page, 'all');
+    $wiki->cat_add_page($page, 'all', 'data');
 
     # actual categories.
     my $cats = $page->get('category');
@@ -120,25 +120,30 @@ sub cat_check_page {
     }
 
     # image categories
-    foreach my $image_name (keys %{ $page->{images} || {} }) {
+    foreach my $image_name (keys_maybe $page->{images}) {
         last if !$wiki->opt('image.enable.tracking');
-        $wiki->cat_add_page($page, "image-$image_name", $image_name);
+        $wiki->cat_add_page($page, $image_name, 'image', {
+            dimensions => $page->{images}{$image_name}
+        });
     }
 
     # model categories
-    foreach my $model_name (keys %{ $page->{models} || {} }) {
-        $wiki->cat_add_page($page, "model-$model_name");
+    foreach my $model_name (keys_maybe $page->{models}) {
+        $wiki->cat_add_page($page, $model_name, 'model');
     }
 }
 
 # add a page to a category if it is not in it already.
+#
+# $cat_name     name of category, with or without extension
+# $cat_type     for psuedocategories, the type, such as 'image' or 'model'
+# $cat_extras   for psuedocategories, a hash ref of additional options
+#
 sub cat_add_page {
-    my ($wiki, $page, $cat_name, $image_name) = @_;
+    my ($wiki, $page, $cat_name, $cat_type, $cat_extras) = @_;
     $cat_name = cat_name($cat_name);
     my $time = time;
-    my $method = $page->{is_model} ?
-        'path_for_model_category'  : 'path_for_category';
-    my $cat_file = $wiki->$method($cat_name);
+    my $cat_file = $wiki->path_for_category($cat_name, $cat_type);
 
     # fetch page infos.
     my $p_vars = $page->get('page');
@@ -151,9 +156,9 @@ sub cat_add_page {
         $page_data->{$var} = $p_vars->{$var};
     }
 
-    # this is an image category, so include the dimensions.
-    if (length $image_name) {
-        $page_data->{dimensions} = $page->{images}{$image_name};
+    # for psuedocategories, additional information may be stored
+    if (ref $cat_extras eq 'HASH') {
+        $page_data->{ keys %$cat_extras } = values %$cat_extras;
     }
 
     # first, check if the category exists yet.
@@ -207,7 +212,7 @@ sub cat_add_page {
 # returns a name-to-metadata hash of the pages in the given category.
 # if the category does not exist, returns nothing.
 sub cat_get_pages {
-    my ($wiki, $cat_name, $is_model) = @_;
+    my ($wiki, $cat_name, $cat_type) = @_;
     $cat_name = cat_name($cat_name);
     my $cat_name_ne = cat_name_ne($cat_name);
     # this should read a file for pages of a category.
@@ -218,8 +223,7 @@ sub cat_get_pages {
     # be removed from the cat file.
 
     # this category does not exist.
-    my $method = $is_model ? 'path_for_model_category' : 'path_for_category';
-    my $cat_file = $wiki->$method($cat_name);
+    my $cat_file = $wiki->path_for_category($cat_name, $cat_type);
     if (!-f $cat_file) {
         L("No such category $cat_file");
         return;
@@ -236,12 +240,11 @@ sub cat_get_pages {
 
     # check each page's modification date.
     my ($time, $changed, %final_pages) = time;
-    PAGE: foreach my $page_name (%{ $cat->{pages} || {} }) {
+    PAGE: foreach my $page_name (keys_maybe $cat->{pages}) {
         my $page_data = $cat->{pages}{$page_name};
 
         # page no longer exists.
-        my $method = $is_model ? 'path_for_model' : 'path_for_page';
-        my $page_path = $wiki->$method($page_name);
+        my $page_path = $wiki->path_for_page($page_name);
         if (!-f $page_path) {
             $changed++;
             next PAGE;
@@ -255,7 +258,6 @@ sub cat_get_pages {
             # the page has since been modified.
             # we will create a page that will stop after reading variables.
             my $page = Wikifier::Page->new(
-                is_model  => $is_model,
                 name      => $page_name,
                 file_path => $page_path,
                 wikifier  => $wiki->{wikifier},

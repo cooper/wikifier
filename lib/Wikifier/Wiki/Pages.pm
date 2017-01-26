@@ -6,7 +6,7 @@ use strict;
 use 5.010;
 
 use HTTP::Date qw(time2str);
-use Wikifier::Utilities qw(page_name align L Lindent back);
+use Wikifier::Utilities qw(page_name align L Lindent back hash_maybe);
 use Scalar::Util qw(blessed);
 use JSON::XS ();
 
@@ -153,7 +153,7 @@ sub _display_page {
         print {$fh} $json->encode({
 
             # page variables
-            %{ $page->get('page') || {} },
+            hash_maybe $page->get('page'),
 
             # generated CSS
             css => $result->{css},
