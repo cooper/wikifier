@@ -22,7 +22,7 @@ sub list_init {
 
 # parse a list.
 sub list_parse {
-    my $block = shift;
+    my ($block, $page) = @_;
     my $value = '';
 
     # for each content item...
