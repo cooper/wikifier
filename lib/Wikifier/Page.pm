@@ -70,10 +70,10 @@ sub new {
 sub parse {
     my $page = shift;
     my $err;
-    L(align('Parse'), sub {
+    L align('Parse'), sub {
         $err = $page->wikifier->parse($page, $page->path);
-    });
-    L(align('Error', $err)) if $err;
+    };
+    L align('Error', $err) if $err;
     return $err;
 }
 

@@ -168,7 +168,7 @@ sub cat_add_page {
 
         # JSON error or the value is not a hash.
         if (!$cat || ref $cat ne 'HASH') {
-            L("Error parsing JSON category '$cat_file': $@");
+            L "Error parsing JSON category '$cat_file': $@";
             return;
         }
 
@@ -179,7 +179,7 @@ sub cat_add_page {
         # open the file or log error.
         my $fh;
         if (!open $fh, '>', $cat_file) {
-            L("Cannot open '$cat_file': $!");
+            L "Cannot open '$cat_file': $!";
             return;
         }
 
@@ -193,7 +193,7 @@ sub cat_add_page {
     # open file or error.
     my $fh;
     if (!open $fh, '>', $cat_file) {
-        L("Cannot open '$cat_file': $!");
+        L "Cannot open '$cat_file': $!";
         return;
     }
 
@@ -226,7 +226,7 @@ sub cat_get_pages {
     # this category does not exist.
     my $cat_file = $wiki->path_for_category($cat_name, $cat_type);
     if (!-f $cat_file) {
-        L("No such category $cat_file");
+        L "No such category $cat_file";
         return;
     }
 
@@ -235,7 +235,7 @@ sub cat_get_pages {
 
     # JSON error or the value is not a hash.
     if (!$cat || ref $cat ne 'HASH') {
-        L("Error parsing JSON category '$cat_file': $@");
+        L "Error parsing JSON category '$cat_file': $@";
         return;
     }
 
@@ -314,7 +314,7 @@ sub cat_get_pages {
         # unable to open.
         my $fh;
         if (!open $fh, '>', $cat_file) {
-            L("Cannot open '$cat_file': $!");
+            L "Cannot open '$cat_file': $!";
             return;
         }
 

@@ -262,7 +262,7 @@ sub handle_model_list {
 #
 sub handle_image {
     my ($connection, $msg) = read_required(@_, 'name') or return;
-    Lindent("Image '$$msg{name}' requested by $$connection{id}");
+    Lindent "Image '$$msg{name}' requested by $$connection{id}";
     my $result = $connection->{wiki}->display_image(
         [ $msg->{name}, $msg->{width} || 0, $msg->{height} || 0 ],
         1 # don't open the image
@@ -298,7 +298,7 @@ sub handle_image_list {
 #
 sub handle_cat_posts {
     my ($connection, $msg) = read_required(@_, 'name') or return;
-    Lindent("Category posts for '$$msg{name}' requested by $$connection{id}");
+    Lindent "Category posts for '$$msg{name}' requested by $$connection{id}";
     my $result = $connection->{wiki}->display_cat_posts($msg->{name});
     back;
     $connection->send('cat_posts', $result);

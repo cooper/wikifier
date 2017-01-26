@@ -74,7 +74,7 @@ sub read_config {
 
     # error.
     if (my $err = $conf->parse) {
-        L("Failed to parse configuration: $err");
+        L "Failed to parse configuration: $err";
         return;
     }
 
@@ -88,7 +88,7 @@ sub read_config {
 
         # error.
         if (my $err = $pconf->parse) {
-            L("Failed to parse private configuration: $err");
+            L "Failed to parse private configuration: $err";
             return;
         }
     }
@@ -127,7 +127,7 @@ sub check_directories {
 
         # exists but not a directory
         if (-e $path) {
-            L("\@dir.$dir ($path) exists but is not a directory");
+            L "\@dir.$dir ($path) exists but is not a directory";
             next;
         }
 
@@ -136,16 +136,16 @@ sub check_directories {
         my (undef, $parent_dir) = fileparse($path);
         if (-e "$parent_dir/wiki.example.conf") {
             $skipped{$dir}++;
-            L("\@dir.$dir is relative to the wikifier dir; skipped");
+            L "\@dir.$dir is relative to the wikifier dir; skipped";
             next;
         }
 
         # create it
-        L("Creating \@dir.$dir ($path)");
+        L "Creating \@dir.$dir ($path)";
         my $err;
         next if make_path($path, { err => \$err });
 
-        L("... Failed: @$err")
+        L "... Failed: @$err"
     }
 }
 
@@ -260,14 +260,14 @@ my %crypts = (
 sub verify_login {
     my ($wiki, $username, $password) = @_;
     if (!$wiki->{pconf}) {
-        L('Attempted verify_login() without configured credentials');
+        L 'Attempted verify_login() without configured credentials';
         return;
     }
 
     # find the user.
     my $user = $wiki->{pconf}->get("admin.$username");
     if (!$user) {
-        L("Attempted to login as '$username' which does not exist");
+        L "Attempted to login as '$username' which does not exist";
         return;
     }
 
@@ -288,13 +288,13 @@ sub verify_login {
 
     # error
     if (!defined $hash) {
-        L("Error with $crypt: $@");
+        L "Error with $crypt: $@";
         return;
     }
 
     # invalid credentials
     if ($hash ne delete $user->{password}) {
-        L("Incorrect password for '$username'");
+        L "Incorrect password for '$username'";
         return;
     }
 
@@ -351,7 +351,7 @@ sub files_in_dir {
     my $dh;
     return if !length $dir;
     if (!opendir $dh, $dir) {
-        L("Cannot open dir '$dir': $!");
+        L "Cannot open dir '$dir': $!";
         return;
     }
     my %files;
@@ -383,7 +383,7 @@ sub file_contents {
     local $/ = undef;
     my $fh;
     if (!open $fh, '<', $file) {
-        L("Cannot open file '$file': $!");
+        L "Cannot open file '$file': $!";
         return;
     }
     binmode $fh if $binary;

@@ -18,7 +18,7 @@ use Wikifier::Utilities qw(L align);
 # Displays an image of the supplied dimensions.
 sub display_image {
     my $result = _display_image(@_);
-    L(align('Error', "$_[1]: $$result{error}"))
+    L align('Error', "$_[1]: $$result{error}")
         if $result->{error};
     return $result;
 }

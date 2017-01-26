@@ -59,13 +59,13 @@ sub load_block {
 
     # does the file exist?
     if (!-f $file && !-l $file) {
-        L("Block ${type}{} does not exist");
+        L "Block ${type}{} does not exist";
         return;
     }
 
     # do the file.
     my $package = do $file
-        or L("Error loading ${type}{} block: ".($@ || $!));
+        or L "Error loading ${type}{} block: ".($@ || $!);
     return unless $package;
 
     # fetch blocks.
@@ -90,7 +90,7 @@ sub load_block {
           if $blocks{$block_type}{base};
 
 
-        L("Loaded block ${block_type}{}");
+        L "Loaded block ${block_type}{}";
     }
 
     return 1;

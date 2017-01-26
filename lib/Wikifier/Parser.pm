@@ -250,7 +250,7 @@ sub handle_character {
 
         # we cannot close the main block.
         if ($current->{block} == $page->{main_block}) {
-            L("Attempted to close main block");
+            L "Attempted to close main block";
             return;
         }
 

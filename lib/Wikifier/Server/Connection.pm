@@ -103,7 +103,7 @@ sub l {
     my $connection = shift;
     my $wiki = $connection->{wiki_name};
     $wiki = length $wiki ? "/$wiki" : '';
-    L("[$$connection{id}$wiki] @_");
+    L "[$$connection{id}$wiki] @_";
 }
 
 1

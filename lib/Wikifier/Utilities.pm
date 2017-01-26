@@ -108,7 +108,7 @@ sub indent () { $indent++ }
 sub back   () { $indent-- }
 
 # log.
-sub L {
+sub L(@) {
     my @lines = @_;
     foreach my $str (@lines) {
         if (ref $str eq 'CODE') {
@@ -123,15 +123,15 @@ sub L {
 }
 
 # log and then indent.
-sub Lindent($) {
-    L(shift);
+sub Lindent(@) {
+    L shift;
     indent;
 }
 
 # go back and then log.
 sub Lback($) {
     back;
-    L(shift);
+    L shift;
 }
 
 sub align {

@@ -34,11 +34,11 @@ sub display_model {
     my ($wiki, $page_name) = (shift, shift);
     my $page = $page_name if blessed $page_name;
     $page_name = page_name($page_name);
-    Lindent("($page_name)");
+    Lindent "($page_name)";
     my $result = $wiki->_display_model($page_name, @_);
-    L(align('Error', $result->{error}))
+    L align('Error', $result->{error})
         if $result->{error} && !$result->{draft} && !$result->{parse_error};
-    L(align('Draft', 'skipped'))
+    L align('Draft', 'skipped')
         if $result->{draft};
     $page->{recent_result} = $result if $page;
     back;
@@ -108,9 +108,9 @@ sub display_model_code {
     my ($wiki, $page_name) = (shift, shift);
     my $page = $page_name if blessed $page_name;
     $page_name = page_name($page_name);
-    Lindent("($page_name)");
+    Lindent "($page_name)";
     my $result = $wiki->_display_model_code($page_name, @_);
-    L(align('Error', $result->{error}))
+    L align('Error', $result->{error})
         if $result->{error};
     back;
     return $result;

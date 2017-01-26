@@ -21,7 +21,7 @@ our ($loop, $conf, %wikis, %files, %sessions);
 # start the server.
 sub start {
     ($loop, my $conf_file) = @_;
-    Lindent('Initializing server');
+    Lindent 'Initializing server';
 
     # load configuration.
     ($conf = Wikifier::Page->new(
@@ -52,7 +52,7 @@ sub start {
 
     # begin listening.
     $listener->listen(handle => $socket);
-    L(align('Listen', $path));
+    L align('Listen', $path);
     back;
 
     # set up handlers.
@@ -63,7 +63,7 @@ sub start {
     pregenerate();
 
     # run forever.
-    L('Done initializing');
+    L 'Done initializing';
     $loop->run;
 }
 
@@ -101,10 +101,10 @@ sub handle_data {
 sub create_wikis {
     my $w = $conf->get('server.wiki');
     my %confwikis = $w && ref $w eq 'HASH' ? %$w : {};
-    Lindent('Initializing wikis');
+    Lindent 'Initializing wikis';
 
     foreach my $name (keys %confwikis) {
-        Lindent("[$name]");
+        Lindent "[$name]";
 
         # load the wiki.
         my $wiki = Wikifier::Wiki->new(
@@ -114,7 +114,7 @@ sub create_wikis {
 
         # it failed.
         unless ($wiki) {
-            L('Failed to initialize');
+            L 'Failed to initialize';
             next;
         }
 
@@ -148,7 +148,7 @@ sub gen_wiki {
         $loop->add($file);
     }
 
-    Lindent("[$$wiki{name}]");
+    Lindent "[$$wiki{name}]";
 
     # pages
     foreach my $page_name ($wiki->all_pages) {
@@ -173,7 +173,7 @@ sub gen_wiki {
     foreach my $cat_name ($wiki->all_categories($cat_type)) {
         my (undef, undef, $err) = $wiki->cat_get_pages($cat_name, $cat_type);
         defined $err or next;
-        L("($cat_name)", sub { L($err) });
+        L "($cat_name)", sub { L $err };
     } }
 
     back;
@@ -183,7 +183,7 @@ sub gen_wiki {
 sub delete_old_sessions {
     foreach my $session_id (keys %sessions) {
         next if time - $sessions{$session_id}[0] < 18000;
-        L("Disposing of old session '$session_id'");
+        L "Disposing of old session '$session_id'";
         delete $sessions{$session_id};
     }
 }

@@ -102,11 +102,11 @@ sub _capture_logs(&$) {
     if ($@ && ref $@ eq 'Git::Wrapper::Exception') {
         my $message = $command.' exited with code '.$@->status.'. ';
         $message .= $@->error.$/.$@->output;
-        L($message);
+        L $message;
         return \$message;
     }
     elsif ($@) {
-        L('Unspecified git error');
+        L 'Unspecified git error';
         return \ 'Unknown error';
     }
     return 1;
@@ -151,7 +151,7 @@ sub _prepare_git {
     if (!$wiki->{git}) {
         my $dir = $wiki->opt('dir.wiki');
         if (!length $dir) {
-            L('Cannot commit; @dir.wiki not set');
+            L 'Cannot commit; @dir.wiki not set';
             return;
         }
         $wiki->{git} = Git::Wrapper->new($dir);
@@ -199,12 +199,12 @@ sub _rev_commit {
 
     # add commit author maybe
     if (length $opts{author}) {
-        L("Using author $opts{author}");
+        L "Using author $opts{author}";
         push @more, author => $opts{author};
     }
 
     # commit operations
-    L("git commit: $opts{message}");
+    L "git commit: $opts{message}";
     capture_logs {
 
         $git->commit({
