@@ -193,7 +193,7 @@ sub cat_add_page {
 
     # the category does not yet exist.
     print {$fh} $json->encode({
-        category   => $cat_name_ne,
+        category   => cat_name_ne($cat_name),
         file       => $cat_name,
         created    => $time,
         pages      => { $page->{name} => $page_data }
