@@ -117,12 +117,16 @@ sub cat_check_page {
         $wiki->cat_add_page($page, $_) for keys %$cats;
     }
 
-    # image and model categories.
-    return unless $wiki->opt('image.enable.tracking');
-    $wiki->cat_add_page($page, "image-$_", $_)
-        for keys %{ $page->{images} || {} };
-    $wiki->cat_add_page($page, "model-$_")
-        for keys %{ $page->{models} || {} };
+    # image categories
+    foreach my $image_name (keys %{ $page->{images} || {} }) {
+        last if !$wiki->opt('image.enable.tracking');
+        $wiki->cat_add_page($page, "image-$iamge_name", $image_name);
+    }
+
+    # model categories
+    foreach my $model_name (keys %{ $page->{models} || {} }) {
+        $wiki->cat_add_page($page, "model-$model_name");
+    }
 }
 
 # add a page to a category if it is not in it already.
@@ -312,13 +316,21 @@ sub cat_get_pages {
 # returns true if a category should be deleted.
 sub cat_should_delete {
     my ($wiki, $category, $final_pages) = @_;
+
+    # don't even consider it if there are still pages
+    return if scalar keys %$final_pages;
+
+    # no pages using the image, and the image doesn't exist
     if ($category =~ m/^image-(.+)/) {
         return !-e $wiki->path_for_image($1);
     }
+
+    # no pages using the model, and the model doesn't exist
     if ($category =~ m/^model-(.+)/) {
         return !-e $wiki->path_for_model($1);
     }
-    return !scalar keys %$final_pages;
+
+    return 1;
 }
 
 1
