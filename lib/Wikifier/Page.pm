@@ -21,6 +21,7 @@ our %wiki_defaults = (
     'dir.page'          => 'pages',
     'dir.cache'         => 'cache',
     'dir.model'         => 'models',
+    'dir.category'      => 'categories',
     'root.image'        => '/images',   # relative to HTTP root.
     'root.page'         => '',          # AKA "/"
     'root.wiki'         => '',          # AKA "/"
