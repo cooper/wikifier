@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010;
 
-use Wikifier::Utilities qw(page_names_equal page_name L);
+use Wikifier::Utilities qw(page_names_equal cat_name L);
 use HTTP::Date qw(time2str);
 use JSON::XS ();
 
@@ -18,7 +18,7 @@ my $json = JSON::XS->new->pretty(1);
 # displays a pages from a category in a blog-like form.
 sub display_cat_posts {
     my ($wiki, $category, $page_n) = @_; my $result = {};
-    $category = page_name($category, '.cat');
+    $category = cat_name($category);
     my ($pages, $title) = $wiki->cat_get_pages($category);
     my $opts = $wiki->opt('cat') || {};
 
@@ -132,7 +132,7 @@ sub cat_check_page {
 # add a page to a category if it is not in it already.
 sub cat_add_page {
     my ($wiki, $page, $category, $image_name) = @_;
-    $category = page_name($category, '.cat');
+    $category = cat_name($category);
     my $time = time;
     my $cat_file = $wiki->path_for_category($category);
 
@@ -202,7 +202,7 @@ sub cat_add_page {
 # if the category does not exist, returns nothing.
 sub cat_get_pages {
     my ($wiki, $category) = @_;
-    $category = page_name($category, '.cat');
+    $category = cat_name($category);
     # this should read a file for pages of a category.
     # it should then check if the 'asof' time is older than the modification
     # date of the page file in question. if it is, it should check the page

@@ -274,7 +274,7 @@ sub path_for_page {
 # return abs path for a category
 sub path_for_category {
     my ($wiki, $cat_name) = @_;
-    $cat_name = page_name($cat_name, '.cat');
+    $cat_name = cat_name($cat_name);
     return abs_path($wiki->opt('dir.category')."/$cat_name");
 }
 

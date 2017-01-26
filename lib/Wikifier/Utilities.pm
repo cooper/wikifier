@@ -62,6 +62,18 @@ sub page_names_equal {
     return page_name($page_name_1, $ext) eq page_name($page_name_2, $ext);
 }
 
+# some_cat -> some_cat.cat
+sub cat_name {
+    my $cat_name = shift;
+
+    # append the extension if it isn't already there.
+    if ($cat_name !~ m/\.cat$/) {
+        $page_name .= '.cat';
+    }
+
+    return $cat_name;
+}
+
 # removes leading and trailing whitespace from a string.
 sub trim {
     my $string = shift;
