@@ -14,9 +14,9 @@ use warnings;
 use strict;
 use 5.010;
 
-use HTTP::Date qw(time2str);            # HTTP date formatting
-use Cwd qw(abs_path);                   # resolving symlinks
-use File::Basename qw(basename);        # determining object names
+use HTTP::Date qw(time2str);
+use Cwd qw(abs_path);
+use File::Basename qw(basename fileparse);
 use File::Path qw(make_path);
 use Scalar::Util qw(blessed);
 
@@ -120,14 +120,28 @@ sub check_directories {
 
     foreach (@directories) {
         my ($dir, $path) = @$_;
+
+        # already exists
         next if -d $path;
+
+        # exists but not a directory
         if (-e $path) {
             L("\@dir.$dir ($path) exists but is not a directory");
             next;
         }
+
+        # looks like we are relative to the wikifier
+        my (undef, $dir) = fileparse($path);
+        if (-e "$dir/wiki.example.conf") {
+            L("\@dir.$dir is relative to the wikifier dir; skipped");
+            next;
+        }
+
+        # create it
         L("Creating \@dir.$dir ($path)");
         my $err;
         next if make_path($path, { err => \$err });
+
         L("... Failed: @$err")
     }
 }
