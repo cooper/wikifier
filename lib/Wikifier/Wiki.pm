@@ -187,7 +187,7 @@ sub all_categories {
     my ($wiki, @cat_types) = @_;
     my @ext = map "$_.cat", @cat_types;
     @ext = 'cat' if !@ext;
-    return files_in_dir(shift->opt('dir.category'), $ext);
+    return files_in_dir(shift->opt('dir.category'), @ext);
 }
 
 # an array of file names in the model directory.
