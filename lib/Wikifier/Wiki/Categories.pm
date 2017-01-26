@@ -280,11 +280,11 @@ sub cat_get_pages {
             }
 
             # page is no longer member of category.
-            if ($cat_name_ne =~ m/^image-(.+)$/) {
-                next PAGE unless $page->{images}{$1};
+            if (length $cat_type && $cat_type eq 'image') {
+                next PAGE unless $page->{images}{$cat_name_ne};
             }
-            elsif ($cat_name_ne =~ m/^model-(.+)$/) {
-                next PAGE unless $page->{models}{$1};
+            elsif (length $cat_type && $cat_type eq 'model') {
+                next PAGE unless $page->{models}{$cat_name_ne};
             }
             else {
                 next PAGE unless $page->get("category.$cat_name_ne");
@@ -297,7 +297,7 @@ sub cat_get_pages {
     }
 
     # is this category now empty?
-    if ($wiki->cat_should_delete($cat_name_ne, \%final_pages)) {
+    if ($wiki->cat_should_delete($cat_name_ne, $cat_type, \%final_pages)) {
         unlink $cat_file;
         return (undef, undef, 'Purge');
     }
@@ -326,19 +326,19 @@ sub cat_get_pages {
 
 # returns true if a category should be deleted.
 sub cat_should_delete {
-    my ($wiki, $cat_name_ne, $final_pages) = @_;
+    my ($wiki, $cat_name_ne, $cat_type, $final_pages) = @_;
 
     # don't even consider it if there are still pages
     return if scalar keys %$final_pages;
 
     # no pages using the image, and the image doesn't exist
-    if ($cat_name_ne =~ m/^image-(.+)/) {
-        return !-e $wiki->path_for_image($1);
+    if (length $cat_type && $cat_type eq 'image') {
+        return !-e $wiki->path_for_image($cat_name_ne);
     }
 
     # no pages using the model, and the model doesn't exist
-    if ($cat_name_ne =~ m/^model-(.+)/) {
-        return !-e $wiki->path_for_model($1);
+    if (length $cat_type && $cat_type eq 'model') {
+        return !-e $wiki->path_for_model($cat_name_ne);
     }
 
     return 1;
