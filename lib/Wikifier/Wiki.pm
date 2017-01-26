@@ -118,7 +118,7 @@ sub check_directories {
         [ "category/$_", $wiki->opt('dir.category')."/$_" ]
     } @psuedo_cats;
 
-    foreach my $dir (@directories) {
+    foreach (@directories) {
         my ($dir, $path) = @$_;
         next if -d $path;
         if (-e $path) {
