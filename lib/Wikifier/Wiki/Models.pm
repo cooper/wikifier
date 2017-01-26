@@ -104,7 +104,7 @@ sub _display_model {
 # Displays the wikifier code for a model.
 # display_model = 1  also include ->display_model result, omitting  {content}
 # display_model = 2  also include ->display_model result, including {content}
-sub display_model {
+sub display_model_code {
     my ($wiki, $page_name) = (shift, shift);
     my $page = $page_name if blessed $page_name;
     $page_name = page_name($page_name);
