@@ -116,11 +116,11 @@ sub cat_check_page {
         $wiki->cat_add_page($page, $_) for keys %$cats;
     }
 
-    # image categories.
+    # image and model categories.
     return unless $wiki->opt('image.enable.tracking');
     $wiki->cat_add_page($page, "image-$_", $_)
         for keys %{ $page->{images} || {} };
-    $wiki->cat_add_page($page, "model-$_", $_)
+    $wiki->cat_add_page($page, "model-$_")
         for keys %{ $page->{models} || {} };
 }
 
