@@ -149,7 +149,7 @@ sub cat_add_page {
 
     # this is an image category, so include the dimensions.
     if (length $image_name) {
-        $page_data->{dimensions} = $page->{images}{$1};
+        $page_data->{dimensions} = $page->{images}{$image_name};
     }
 
     # first, check if the category exists yet.
