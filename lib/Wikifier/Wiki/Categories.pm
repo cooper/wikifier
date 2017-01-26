@@ -17,10 +17,10 @@ my $json = JSON::XS->new->pretty(1);
 
 # displays a pages from a category in a blog-like form.
 sub display_cat_posts {
-    my ($wiki, $cat_name, $page_n) = @_; my $result = {};
+    my ($wiki, $cat_name, $page_n, $cat_type) = @_; my $result = {};
     $cat_name = cat_name($cat_name);
     my $cat_name_ne = cat_name_ne($cat_name);
-    my ($pages, $title) = $wiki->cat_get_pages($cat_name);
+    my ($pages, $title) = $wiki->cat_get_pages($cat_name, $cat_type);
     my $opts = $wiki->opt('cat') || {};
 
     # no pages means no category.
@@ -28,6 +28,7 @@ sub display_cat_posts {
         if !$pages;
 
     $result->{type}     = 'cat_posts';
+    $result->{cat_type} = $cat_type;
     $result->{file}     = $cat_name;
     $result->{category} = $cat_name_ne;
     $result->{title}    = $opts->{title}->{$cat_name} // $title;
