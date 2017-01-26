@@ -120,6 +120,8 @@ sub cat_check_page {
     return unless $wiki->opt('image.enable.tracking');
     $wiki->cat_add_page($page, "image-$_", $_)
         for keys %{ $page->{images} || {} };
+    $wiki->cat_add_page($page, "model-$_", $_)
+        for keys %{ $page->{models} || {} };
 }
 
 # add a page to a category if it is not in it already.
@@ -257,7 +259,10 @@ sub cat_get_pages {
 
             # page is no longer member of category.
             if ($category =~ m/^image-(.+)/) {
-                next PAGE unless defined $page->{images}{$1};
+                next PAGE unless $page->{images}{$1};
+            }
+            elsif ($category =~ m/^model-(.+)/) {
+                next PAGE unless $page->{models}{$1};
             }
             else {
                 next PAGE unless $page->get("category.$category");

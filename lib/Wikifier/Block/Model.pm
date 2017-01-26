@@ -39,6 +39,7 @@ sub model_parse {
 
     # parse the page.
     $model->parse;
+    $page->{models}{$file}++;
 }
 
 sub model_html {
