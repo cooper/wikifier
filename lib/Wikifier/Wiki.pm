@@ -268,13 +268,14 @@ sub display_error {
 sub path_for_page {
     my ($wiki, $page_name) = @_;
     $page_name = page_name($page_name);
-    return abs_path($wiki->opt('dir.page').'/'.$page_name);
+    return abs_path($wiki->opt('dir.page')."/$page_name");
 }
 
 # return abs path for a category
 sub path_for_category {
     my ($wiki, $cat_name) = @_;
-    return abs_path($wiki->opt('dir.category')."/$cat_name.cat");
+    $cat_name = page_name($cat_name, '.cat');
+    return abs_path($wiki->opt('dir.category')."/$cat_name");
 }
 
 # return abs path for an image
