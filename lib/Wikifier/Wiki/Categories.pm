@@ -310,7 +310,7 @@ sub cat_should_delete {
     if ($category =~ m/^image-(.+)/) {
         return !-e $wiki->path_for_image($1);
     }
-    elsif ($category =~ m/^model-(.+)/) {
+    if ($category =~ m/^model-(.+)/) {
         return !-e $wiki->path_for_model($1);
     }
     return !scalar keys %$final_pages;

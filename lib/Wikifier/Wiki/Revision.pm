@@ -44,6 +44,8 @@ sub delete_page {
         rm      => [ $page->path, $page->cache_path ]
     );
 
+    unlink $page->cache_path;
+    unlink $page->path;
     return 1;
 }
 
