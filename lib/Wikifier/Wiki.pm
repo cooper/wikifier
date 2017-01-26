@@ -184,10 +184,10 @@ sub all_pages {
 
 # an array of file names in category directory.
 sub all_categories {
-    my ($wiki, @cat_types) = @_;
-    my @ext = map "$_.cat", @cat_types;
-    @ext = 'cat' if !@ext;
-    return files_in_dir(shift->opt('dir.category'), @ext);
+    my ($wiki, $cat_type) = @_;
+    my @files = files_in_dir(shift->opt('dir.category'), 'cat');
+    @files = grep m/^\Q$cat_type\E-/, @files if length $cat_type;
+    return @files;
 }
 
 # an array of file names in the model directory.
