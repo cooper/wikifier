@@ -132,9 +132,10 @@ sub check_directories {
         }
 
         # looks like we are relative to the wikifier
-        next if $skipped{$dir}++;
+        next if $skipped{$dir};
         my (undef, $parent_dir) = fileparse($path);
         if (-e "$parent_dir/wiki.example.conf") {
+            $skipped{$dir}++;
             L("\@dir.$dir is relative to the wikifier dir; skipped");
             next;
         }
