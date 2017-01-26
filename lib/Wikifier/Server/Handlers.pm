@@ -222,7 +222,7 @@ sub handle_page_list {
     my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
     @pages = sort { $sorter->($a, $b) } @pages;
 
-    $connection->send('page_list', { pages => \@pages });
+    $connection->send(page_list => { pages => \@pages });
     $connection->l("Complete page list requested");
 }
 
@@ -246,7 +246,7 @@ sub handle_model_list {
     my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
     @models = sort { $sorter->($a, $b) } @models;
 
-    $connection->send('model_list', { models => \@models });
+    $connection->send(model_list => { models => \@models });
     $connection->l("Complete model list requested");
 }
 
@@ -268,6 +268,26 @@ sub handle_image {
     delete $result->{content};
     back;
     $connection->send('image', $result);
+}
+
+sub handle_image_list {
+    my ($connection, $msg) = write_required(@_, 'sort') or return;
+
+    # get all images
+    my @cats;
+    foreach my $cat_name ($connection->{wiki}->all_categories('image')) {
+        push @cats, { # FIXME: real info
+            file  => $cat_name,
+            title => $cat_name
+        };
+    }
+
+    # sort
+    my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
+    @cats = sort { $sorter->($a, $b) } @cats;
+
+    $connection->send(image_list => { images => \@cats });
+    $connection->l("Complete image list requested");
 }
 
 # category posts
@@ -302,7 +322,7 @@ sub handle_cat_list {
     my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
     @cats = sort { $sorter->($a, $b) } @cats;
 
-    $connection->send('cat_list', { categories => \@cats });
+    $connection->send(cat_list => { categories => \@cats });
     $connection->l("Complete category list requested");
 }
 

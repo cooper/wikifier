@@ -184,7 +184,9 @@ sub all_pages {
 
 # an array of file names in category directory.
 sub all_categories {
-    return files_in_dir(shift->opt('dir.category'), 'cat');
+    my ($wiki, $cat_type) = @_;
+    my $ext = length $cat_type ? "$cat_type.cat" : 'cat';
+    return files_in_dir(shift->opt('dir.category'), $ext);
 }
 
 # an array of file names in the model directory.

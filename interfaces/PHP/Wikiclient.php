@@ -150,6 +150,13 @@ class Wikiclient {
         ));
     }
 
+    // send an image list request
+    function image_list($sort = 'm-') {
+        return $this->command('image_list', array(
+            'sort' => $sort
+        ));
+    }
+
     // send a category posts request.
     function cat_posts($name, $page_n) {
         return $this->command('cat_posts', array(
