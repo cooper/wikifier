@@ -309,7 +309,7 @@ sub path_for_page {
 sub path_for_category {
     my ($wiki, $cat_name, $cat_type) = @_;
     $cat_name = cat_name($cat_name);
-    $cat_type = length $cat_name ? "$cat_name/" : '';
+    $cat_type = length $cat_type ? "$cat_type/" : '';
     return abs_path($wiki->opt('dir.category')."/$cat_type$cat_name");
 }
 
