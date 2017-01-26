@@ -68,7 +68,7 @@ sub cat_name {
 
     # append the extension if it isn't already there.
     if ($cat_name !~ m/\.cat$/) {
-        $page_name .= '.cat';
+        $cat_name .= '.cat';
     }
 
     return $cat_name;
