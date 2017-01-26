@@ -296,6 +296,7 @@ sub files_in_dir {
     my ($dir, @ext) = @_;
     my $ext = join '|', @ext;
     my $dh;
+    return if !length $dir;
     if (!opendir $dh, $dir) {
         L("Cannot open dir '$dir': $!");
         return;
