@@ -304,7 +304,6 @@ sub cat_get_pages {
 
         print {$fh} $json->encode($cat);
         close $fh;
-
     }
 
     return wantarray ? (\%final_pages, $cat->{title}) : \%final_pages;

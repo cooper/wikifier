@@ -37,10 +37,10 @@ sub page_name {
     return $page_name->name if blessed $page_name;
 
     # replace non-alphanumerics with _ and lowercase.
-    $page_name =~ s/[^\w\.]/_/g;
+    $page_name =~ s/[^\w\.\-]/_/g;
     $page_name = lc $page_name;
 
-    # append .page if it isn't already there.
+    # append the extension if it isn't already there.
     if ($page_name !~ m/\.(page|conf|model|cat)$/) {
         $ext //= '.page';
         $page_name .= $ext;
