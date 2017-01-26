@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010;
 
-use Wikifier::Utilities qw(page_names_equal cat_name cat_name_ne L);
+use Wikifier::Utilities qw(page_names_equal page_log cat_name cat_name_ne L);
 use HTTP::Date qw(time2str);
 use JSON::XS ();
 
@@ -17,18 +17,18 @@ my $json = JSON::XS->new->pretty(1);
 
 # displays a pages from a category in a blog-like form.
 sub display_cat_posts {
-    my ($wiki, $category, $page_n) = @_; my $result = {};
-    $category = cat_name($category);
-    my ($pages, $title) = $wiki->cat_get_pages($category);
+    my ($wiki, $cat_name, $page_n) = @_; my $result = {};
+    $cat_name = cat_name($cat_name);
+    my ($pages, $title) = $wiki->cat_get_pages($cat_name);
     my $opts = $wiki->opt('cat') || {};
 
     # no pages means no category.
-    return display_error("Category '$category' does not exist.")
+    return display_error("Category '$cat_name' does not exist.")
         if !$pages;
 
     $result->{type}     = 'cat_posts';
-    $result->{category} = $category;
-    $result->{title}    = $opts->{title}->{$category} // $title;
+    $result->{category} = $cat_name;
+    $result->{title}    = $opts->{title}->{$cat_name} // $title;
 
     # load each page if necessary.
     my (%times, %reses);
@@ -131,10 +131,10 @@ sub cat_check_page {
 
 # add a page to a category if it is not in it already.
 sub cat_add_page {
-    my ($wiki, $page, $category, $image_name) = @_;
-    $category = cat_name($category);
+    my ($wiki, $page, $cat_name, $image_name) = @_;
+    $cat_name = cat_name($cat_name);
     my $time = time;
-    my $cat_file = $wiki->path_for_category($category);
+    my $cat_file = $wiki->path_for_category($cat_name);
 
     # fetch page infos.
     my $p_vars = $page->get('page');
@@ -189,7 +189,7 @@ sub cat_add_page {
 
     # the category does not yet exist.
     print {$fh} $json->encode({
-        category   => $category,
+        category   => $cat_name,
         created    => $time,
         pages      => { $page->{name} => $page_data }
     });
@@ -201,9 +201,9 @@ sub cat_add_page {
 # returns a name-to-metadata hash of the pages in the given category.
 # if the category does not exist, returns nothing.
 sub cat_get_pages {
-    my ($wiki, $category) = @_;
-    $category = cat_name($category);
-    my $cat_name_ne = cat_name_ne($category);
+    my ($wiki, $cat_name) = @_;
+    $cat_name = cat_name($cat_name);
+    my $cat_name_ne = cat_name_ne($cat_name);
     # this should read a file for pages of a category.
     # it should then check if the 'asof' time is older than the modification
     # date of the page file in question. if it is, it should check the page
@@ -212,7 +212,7 @@ sub cat_get_pages {
     # be removed from the cat file.
 
     # this category does not exist.
-    my $cat_file = $wiki->path_for_category($category);
+    my $cat_file = $wiki->path_for_category($cat_name);
     if (!-f $cat_file) {
         L("No such category $cat_file");
         return;
@@ -290,6 +290,7 @@ sub cat_get_pages {
 
         # is this category now empty?
         if ($wiki->cat_should_delete($cat_name_ne, \%final_pages)) {
+            L(page_log('Purge', $cat_name));
             unlink $cat_file;
             return;
         }
