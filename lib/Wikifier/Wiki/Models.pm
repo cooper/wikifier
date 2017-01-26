@@ -72,12 +72,12 @@ sub _display_model {
     if ($err) {
         $page->{vars_only}++;
         $page->parse;
-        #$wiki->cat_check_page($page); FIXME
+        $wiki->cat_check_page($page);
         return display_error($err, parse_error => 1);
     }
 
     # update categories
-    #$wiki->cat_check_page($page); FIXME
+    $wiki->cat_check_page($page);
 
     # if this is a draft, pretend it doesn't exist.
     if ($page->get('page.draft')) {
@@ -96,7 +96,7 @@ sub _display_model {
     $result->{generated}  = 1;
     $result->{modified}   = time2str(time);
     $result->{mod_unix}   = time;
-    # $result->{categories} = [ _cats_to_list($page->{categories}) ]; FIXME
+    $result->{categories} = [ _cats_to_list($page->{categories}) ];
 
     return $result;
 }
