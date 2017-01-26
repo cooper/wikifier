@@ -184,8 +184,9 @@ sub all_pages {
 
 # an array of file names in category directory.
 sub all_categories {
-    my ($wiki, $cat_type) = @_;
-    my $ext = length $cat_type ? "$cat_type.cat" : 'cat';
+    my ($wiki, @cat_types) = @_;
+    my @ext = map "$_.cat", @cat_types;
+    @ext = 'cat' if !@ext;
     return files_in_dir(shift->opt('dir.category'), $ext);
 }
 

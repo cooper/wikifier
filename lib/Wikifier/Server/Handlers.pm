@@ -270,12 +270,13 @@ sub handle_image {
     $connection->send('image', $result);
 }
 
+my @image_types = qw(jpg jpeg png);
 sub handle_image_list {
     my ($connection, $msg) = write_required(@_, 'sort') or return;
 
     # get all images
     my @cats;
-    foreach my $cat_name ($connection->{wiki}->all_categories('image')) {
+    foreach my $cat_name ($connection->{wiki}->all_categories(@image_types)) {
         push @cats, { # FIXME: real info
             file  => $cat_name,
             title => $cat_name
