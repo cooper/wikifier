@@ -239,7 +239,8 @@ sub cat_get_pages {
         my $page_data = $cat->{pages}{$page_name};
 
         # page no longer exists.
-        my $page_path = $wiki->path_for_page($page_name);
+        my $method = $is_model ? 'path_for_model' : 'path_for_page';
+        my $page_path = $wiki->$method($page_name);
         if (!-f $page_path) {
             $changed++;
             next PAGE;
@@ -253,6 +254,7 @@ sub cat_get_pages {
             # the page has since been modified.
             # we will create a page that will stop after reading variables.
             my $page = Wikifier::Page->new(
+                is_model  => $is_model,
                 name      => $page_name,
                 file_path => $page_path,
                 wikifier  => $wiki->{wikifier},
