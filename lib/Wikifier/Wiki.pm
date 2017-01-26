@@ -115,9 +115,10 @@ sub check_directories {
 
     # psuedocategory dirs
     push @directories, map {
-        [ "category/$_", $wiki->opt('dir.category')."/$_" ]
+        [ 'category', $wiki->opt('dir.category')."/$_" ]
     } @psuedo_cats;
 
+    my %skipped;
     foreach (@directories) {
         my ($dir, $path) = @$_;
 
@@ -131,8 +132,9 @@ sub check_directories {
         }
 
         # looks like we are relative to the wikifier
-        my (undef, $dir) = fileparse($path);
-        if (-e "$dir/wiki.example.conf") {
+        my (undef, $parent_dir) = fileparse($path);
+        if (-e "$parent_dir/wiki.example.conf") {
+            next if $skipped{$dir}++;
             L("\@dir.$dir is relative to the wikifier dir; skipped");
             next;
         }
