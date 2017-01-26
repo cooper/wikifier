@@ -41,7 +41,7 @@ sub page_name {
     $page_name = lc $page_name;
 
     # append the extension if it isn't already there.
-    if ($page_name !~ m/\.(page|conf|model|cat)$/) {
+    if ($page_name !~ m/\.(page|conf|model)$/) {
         $ext //= '.page';
         $page_name .= $ext;
     }
@@ -62,7 +62,7 @@ sub page_names_equal {
     return page_name($page_name_1, $ext) eq page_name($page_name_2, $ext);
 }
 
-# some_cat -> some_cat.cat
+# 'some_cat' -> 'some_cat.cat'
 sub cat_name {
     my $cat_name = shift;
 
@@ -71,6 +71,13 @@ sub cat_name {
         $cat_name .= '.cat';
     }
 
+    return $cat_name;
+}
+
+# 'some_cat.cat' -> 'some_cat'
+sub cat_name_ne {
+    my $cat_name = cat_name(shift);
+    $cat_name =~ s/\.cat$//;
     return $cat_name;
 }
 

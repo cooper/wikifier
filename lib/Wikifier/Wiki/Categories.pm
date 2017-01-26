@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010;
 
-use Wikifier::Utilities qw(page_names_equal cat_name L);
+use Wikifier::Utilities qw(page_names_equal cat_name cat_name_ne L);
 use HTTP::Date qw(time2str);
 use JSON::XS ();
 
@@ -43,7 +43,7 @@ sub display_cat_posts {
 
         # store time.
         # if this is the main page of the category, it should come first.
-        my $main = $wiki->_is_main_page($category, $res, $opts);
+        my $main = $wiki->_is_main_page($cat_name_ne, $res, $opts);
         $times{$page_name}  = $time || 0;
         $times{$page_name} += time  if $main == 1;
         $times{$page_name}  = 'inf' if $main == 2;
@@ -84,23 +84,23 @@ sub display_cat_posts {
 
 # true if the page result is the main page of a category.
 sub _is_main_page {
-    my ($wiki, $category, $res, $opts) = @_;
+    my ($wiki, $cat_name_ne, $res, $opts) = @_;
 
     # if it is defined in the configuration,
     # this always overrides all other pages.
-    return 2 if page_names_equal($res->{file}, $opts->{main}{$category} || '');
+    return 2 if page_names_equal($res->{file}, $opts->{main}{$cat_name_ne} || '');
 
     # in the just-parsed page, something like
     # @category.some_cat.main; # was found
-    return 1 if $res->{page} && $res->{page}->get("category.$category.main");
+    return 1 if $res->{page} && $res->{page}->get("category.$cat_name_ne.main");
 
     # in the JSON data, something like
     # { "categories": { "some_cat": { "main": 1 } } }
     my $cats = $res->{categories};
     return 1 if
         ref $cats eq 'HASH'                 &&
-        ref $cats->{$category} eq 'HASH'    &&
-        $cats->{$category}{main};
+        ref $cats->{$cat_name_ne} eq 'HASH' &&
+        $cats->{$cat_name_ne}{main};
 
     return 0;
 }
@@ -203,6 +203,7 @@ sub cat_add_page {
 sub cat_get_pages {
     my ($wiki, $category) = @_;
     $category = cat_name($category);
+    my $cat_name_ne = cat_name_ne($category);
     # this should read a file for pages of a category.
     # it should then check if the 'asof' time is older than the modification
     # date of the page file in question. if it is, it should check the page
@@ -268,14 +269,14 @@ sub cat_get_pages {
             }
 
             # page is no longer member of category.
-            if ($category =~ m/^image-(.+)/) {
+            if ($cat_name_ne =~ m/^image-(.+)$/) {
                 next PAGE unless $page->{images}{$1};
             }
-            elsif ($category =~ m/^model-(.+)/) {
+            elsif ($cat_name_ne =~ m/^model-(.+)$/) {
                 next PAGE unless $page->{models}{$1};
             }
             else {
-                next PAGE unless $page->get("category.$category");
+                next PAGE unless $page->get("category.$cat_name_ne");
             }
         }
 
@@ -288,7 +289,7 @@ sub cat_get_pages {
     if ($changed) {
 
         # is this category now empty?
-        if ($wiki->cat_should_delete($category, \%final_pages)) {
+        if ($wiki->cat_should_delete($cat_name_ne, \%final_pages)) {
             unlink $cat_file;
             return;
         }
@@ -315,18 +316,18 @@ sub cat_get_pages {
 
 # returns true if a category should be deleted.
 sub cat_should_delete {
-    my ($wiki, $category, $final_pages) = @_;
+    my ($wiki, $cat_name_ne, $final_pages) = @_;
 
     # don't even consider it if there are still pages
     return if scalar keys %$final_pages;
 
     # no pages using the image, and the image doesn't exist
-    if ($category =~ m/^image-(.+)/) {
+    if ($cat_name_ne =~ m/^image-(.+)/) {
         return !-e $wiki->path_for_image($1);
     }
 
     # no pages using the model, and the model doesn't exist
-    if ($category =~ m/^model-(.+)/) {
+    if ($cat_name_ne =~ m/^model-(.+)/) {
         return !-e $wiki->path_for_model($1);
     }
 
