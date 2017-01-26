@@ -102,8 +102,8 @@ sub read_config {
     return 1;
 }
 
-my @main_dirs   = qw(image page cache model category);
-my @psuedo_cats = qw(data image model);
+our @main_dirs   = qw(image page cache model category);
+our @pseudo_cats = qw(data image model);
 
 sub check_directories {
     my $wiki = shift;
@@ -113,10 +113,10 @@ sub check_directories {
         [ $_, $wiki->opt("dir.$_") ]
     } @main_dirs;
 
-    # psuedocategory dirs
+    # pseudocategory dirs
     push @directories, map {
         [ 'category', $wiki->opt('dir.category')."/$_" ]
-    } @psuedo_cats;
+    } @pseudo_cats;
 
     my %skipped;
     foreach (@directories) {
@@ -235,9 +235,9 @@ sub all_pages {
 # an array of file names in category directory.
 sub all_categories {
     my ($wiki, $cat_type) = @_;
-    my @files = files_in_dir($wiki->opt('dir.category'), 'cat');
-    @files = grep m/^\Q$cat_type\E-/, @files if length $cat_type;
-    return @files;
+    my $dir = $wiki->opt('dir.category');
+    $dir .= "/$cat_type" if length $cat_type;
+    return files_in_dir($dir, 'cat');
 }
 
 # an array of file names in the model directory.

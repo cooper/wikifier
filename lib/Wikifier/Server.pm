@@ -169,11 +169,12 @@ sub gen_wiki {
     }
 
     # categories
-    foreach my $cat_name ($wiki->all_categories) {
-        my (undef, undef, $err) = $wiki->cat_get_pages($cat_name);
+    foreach my $cat_type (undef, @Wikifier::Wiki::pseudo_cats) {
+    foreach my $cat_name ($wiki->all_categories($cat_type)) {
+        my (undef, undef, $err) = $wiki->cat_get_pages($cat_name, $cat_type);
         defined $err or next;
         L("($cat_name)", sub { L($err) });
-    }
+    } }
 
     back;
 }

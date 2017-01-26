@@ -136,8 +136,8 @@ sub cat_check_page {
 # add a page to a category if it is not in it already.
 #
 # $cat_name     name of category, with or without extension
-# $cat_type     for psuedocategories, the type, such as 'image' or 'model'
-# $cat_extras   for psuedocategories, a hash ref of additional options
+# $cat_type     for pseudocategories, the type, such as 'image' or 'model'
+# $cat_extras   for pseudocategories, a hash ref of additional options
 #
 sub cat_add_page {
     my ($wiki, $page, $cat_name, $cat_type, $cat_extras) = @_;
@@ -156,7 +156,7 @@ sub cat_add_page {
         $page_data->{$var} = $p_vars->{$var};
     }
 
-    # for psuedocategories, additional information may be stored
+    # for pseudocategories, additional information may be stored
     if (ref $cat_extras eq 'HASH') {
         $page_data->{ keys %$cat_extras } = values %$cat_extras;
     }
