@@ -120,7 +120,7 @@ sub cat_check_page {
     # image categories
     foreach my $image_name (keys %{ $page->{images} || {} }) {
         last if !$wiki->opt('image.enable.tracking');
-        $wiki->cat_add_page($page, "image-$iamge_name", $image_name);
+        $wiki->cat_add_page($page, "image-$image_name", $image_name);
     }
 
     # model categories
