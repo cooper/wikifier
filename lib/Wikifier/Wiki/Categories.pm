@@ -208,7 +208,10 @@ sub cat_get_pages {
 
     # this category does not exist.
     my $cat_file = $wiki->path_for_category($category);
-    return unless -f $cat_file;
+    if (!-f $cat_file) {
+        L("No such category $cat_file");
+        return;
+    }
 
     # it exists; let's see what's inside.
     my $cat = eval { $json->decode(file_contents($cat_file)) };
