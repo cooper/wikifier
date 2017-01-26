@@ -170,8 +170,9 @@ sub gen_wiki {
 
     # categories
     foreach my $cat_name ($wiki->all_categories) {
-        $wiki->cat_get_pages($cat_name) and next;
-        L("($cat_name)");
+        my (undef, undef, $err) = $wiki->cat_get_pages($cat_name);
+        defined $err or next;
+        L("($cat_name)", sub { L($err) });
     }
 
     back;

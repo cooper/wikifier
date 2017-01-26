@@ -290,9 +290,8 @@ sub cat_get_pages {
 
         # is this category now empty?
         if ($wiki->cat_should_delete($cat_name_ne, \%final_pages)) {
-            L(align('Purge', $cat_name));
             unlink $cat_file;
-            return;
+            return (undef, undef, align('Purge', $cat_name));
         }
 
         # no, there are still page(s) in it.
