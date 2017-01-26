@@ -34,6 +34,7 @@ sub start {
         interval => 300,
         on_tick  => \&delete_old_sessions
     );
+    $timer->start;
     $loop->add($timer);
 
     # create a new listener and add it to the loop.
@@ -182,7 +183,7 @@ sub gen_wiki {
 # dispose of sessions older than 5 hours
 sub delete_old_sessions {
     foreach my $session_id (keys %sessions) {
-        next if time - $sessions{$session_id}[0] < 18000;
+        next if time - $sessions{$session_id}{time} < 18000;
         L "Disposing of old session '$session_id'";
         delete $sessions{$session_id};
     }
