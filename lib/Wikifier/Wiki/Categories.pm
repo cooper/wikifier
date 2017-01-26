@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010;
 
-use Wikifier::Utilities qw(page_names_equal page_log cat_name cat_name_ne L);
+use Wikifier::Utilities qw(page_names_equal align cat_name cat_name_ne L);
 use HTTP::Date qw(time2str);
 use JSON::XS ();
 
@@ -290,7 +290,7 @@ sub cat_get_pages {
 
         # is this category now empty?
         if ($wiki->cat_should_delete($cat_name_ne, \%final_pages)) {
-            L(page_log('Purge', $cat_name));
+            L(align('Purge', $cat_name));
             unlink $cat_file;
             return;
         }
