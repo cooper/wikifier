@@ -278,7 +278,7 @@ sub cat_get_pages {
     if ($changed) {
 
         # is this category now empty?
-        if (!scalar keys %final_pages) {
+        if ($wiki->cat_should_delete($category, \%final_pages)) {
             unlink $cat_file;
             return;
         }
@@ -302,6 +302,18 @@ sub cat_get_pages {
     }
 
     return wantarray ? (\%final_pages, $cat->{title}) : \%final_pages;
+}
+
+# returns true if a category should be deleted.
+sub cat_should_delete {
+    my ($wiki, $category, $final_pages) = @_;
+    if ($category =~ m/^image-(.+)/) {
+        return !-e $wiki->path_for_image($1);
+    }
+    elsif ($category =~ m/^model-(.+)/) {
+        return !-e $wiki->path_for_model($1);
+    }
+    return !scalar keys %$final_pages;
 }
 
 1
