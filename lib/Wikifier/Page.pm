@@ -24,6 +24,7 @@ our %wiki_defaults = (
     'dir.category'      => 'categories',
     'dir.m_category'    => 'model-categories',
     'root.image'        => '/images',   # relative to HTTP root.
+    'root.category'     => '/topic',
     'root.page'         => '',          # AKA "/"
     'root.wiki'         => '',          # AKA "/"
     'image.size_method' => 'javascript',
@@ -31,6 +32,7 @@ our %wiki_defaults = (
     'external.root'     => 'http://en.wikipedia.org/wiki',
     'image.rounding'    => 'normal',
     'image.calc'        => \&_default_calculator,
+    'image.sizer'       => \&_default_sizer,
     'var'               => {}
 );
 
@@ -242,6 +244,19 @@ sub _default_calculator {
     }
 
     return ($final_w, $final_h);
+}
+
+sub _default_sizer {
+    my %img = @_;
+    my $page = $img{page};
+
+    # full-sized image.
+    if (!$img{width} || !$img{height}) {
+        return $page->wiki_opt('root.image').'/'.$img{file};
+    }
+
+    # scaled image.
+    return $page->wiki_opt('root.image')."/$img{width}x$img{height}-$img{file}";
 }
 
 # round dimension according to setting.

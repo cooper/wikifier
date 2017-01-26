@@ -64,7 +64,8 @@ sub add_class {
 
 # add an attribute.
 sub add_attribute {
-    shift->{attributes}{+shift} = shift;
+    my ($el, $attr, $val) = @_;
+    $el->{attributes}{$attr} = $val;
 }
 
 # add style.
