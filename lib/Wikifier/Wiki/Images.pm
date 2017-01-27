@@ -252,7 +252,7 @@ sub generate_image {
     if ($wiki->opt('image.enable.restriction')) {
         my $dimension_str = "${width}x${height}";
         return display_error(
-            "Image '$image{name}' does not exist in those dimensions."
+            "Image '$image{name}' does not exist at $dimension_str."
         ) if !$wiki->{allowed_dimensions}{ $image{name} }{$dimension_str};
     }
 
