@@ -112,12 +112,14 @@ sub image_parse {
 
         # find the resized dimensions.
         my $full_size;
+        print "calling image.calc with $block->{width} x $block->{height}\n";
         ($w, $h, $full_size) = $page->wiki_opt('image.calc',
             file   => $block->{file},
             height => $block->{height},
             width  => $block->{width},
             page   => $page
         );
+        print "spit out: $w x $h ", $full_size ? 'full size' : 'scaled', "\n";
 
         # call the image_sizer.
         my $url = $page->wiki_opt('image.sizer',

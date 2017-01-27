@@ -269,7 +269,7 @@ sub generate_image {
         L align(
             'Skip',
             "'$image{name}' at ${width}x${height}" .
-            " >= ${fi_width}x${fi_height}"
+            " >= original ${fi_width}x${fi_height}"
         );
 
         # symlink to the full-sized image.
