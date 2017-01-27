@@ -138,10 +138,13 @@ sub cat_check_page {
 }
 
 # add a page to a category if it is not in it already.
+# update the page data within the category if it is outdated.
 #
 # $cat_name     name of category, with or without extension
 # $cat_type     for pseudocategories, the type, such as 'image' or 'model'
 # $cat_extras   for pseudocategories, a hash ref of additional page data
+#
+# returns true on success. unchanged is also considered success.
 #
 sub cat_add_page {
     my ($wiki, $page, $cat_name, $cat_type, $cat_extras) = @_;
@@ -167,9 +170,15 @@ sub cat_add_page {
             return;
         }
 
+        # the page has not changed since the asof time, so do nothing.
+        my $page_ref = $cat->{pages}{ $page->{name} } ||= {};
+        if ($page_ref->{asof} && $page_ref->{asof} >= $page->modified_time) {
+            return 1;
+        }
+
         # update information for this page,
         # or add it if it is not there already.
-        $cat->{pages}{ $page->{name} } = $page_data;
+        %$page_ref = %$page_data;
 
         # open the file or log error.
         my $fh;
