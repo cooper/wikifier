@@ -248,9 +248,10 @@ sub generate_image {
         if $image{error};
 
     # if we are restricting to only sizes used in the wiki, check.
-    my ($width, $height) = ($image{width}, $image{height});
+    my ($width, $height, $r_width, $r_height) =
+        @image{ qw(width height r_width r_height) };
     if ($wiki->opt('image.enable.restriction')) {
-        my $dimension_str = "${width}x${height}";
+        my $dimension_str = "${r_width}x${r_height}";
         return display_error(
             "Image does not exist at $dimension_str."
         ) if !$wiki->{allowed_dimensions}{ $image{name} }{$dimension_str};
