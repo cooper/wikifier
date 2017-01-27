@@ -9,7 +9,7 @@ use GD;                             # image generation
 use HTTP::Date qw(time2str);        # HTTP date formatting
 use Digest::MD5 qw(md5_hex);        # etags
 use File::Spec ();                  # simplifying symlinks
-use Wikifier::Utilities qw(L align);
+use Wikifier::Utilities qw(L align hash_maybe);
 
 ##############
 ### IMAGES ###
@@ -439,8 +439,39 @@ sub _wiki_default_sizer {
     return $wiki->opt('root.image')."/$img{width}x$img{height}-$img{file}";
 }
 
+# returns a filename-to-metadata hash for all images in the wiki
 sub get_images {
-    
+    my $wiki = shift;
+    my %images;
+    foreach my $filename ($wiki->all_images) {
+
+        # basic info available for all images
+        my @stat = stat $wiki->path_for_image($filename);
+        my $image_data = $images{$filename} = {
+            file        => $filename,
+            created     => $stat[10],   # ctime
+            mod_unix    => $stat[9],    # mtime
+            title       => $filename    # may be overwritten by category
+        };
+
+        # this category does not exist
+        my $cat_file = $wiki->path_for_category($cat_name, $cat_type);
+        next unless -f $cat_file;
+
+        # it exists; let's see what's inside.
+        my %cat = hash_maybe eval { $json->decode(file_contents($cat_file)) };
+        next if !scalar keys %cat;
+
+        # in the category, "file" is the cat filename, and the "category"
+        # is the image filename. remove these to avoid confusion.
+        # "mod_unix" refers to the category modification time, and "created"
+        # is the category creation time. remove these as well.
+        delete @cat{'file', 'category', 'mod_unix', 'created'};
+
+        # inject metadata from category
+        @$image_data{ keys %cat } = values %cat;
+    }
+    return \%images;
 }
 
 1

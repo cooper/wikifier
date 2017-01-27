@@ -110,6 +110,11 @@ sub keys_maybe($) {
     return keys %hash;
 }
 
+sub values_maybe($) {
+    my %hash = hash_maybe(shift);
+    return values %hash;
+}
+
 ### LOGGING
 
 our $indent = 0;
