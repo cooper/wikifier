@@ -154,11 +154,9 @@ sub cat_add_page {
     my $page_data = {
         asof     => $time,
         mod_unix => $page->modified_time,
+        hash_maybe $p_vars,
         hash_maybe $cat_extras
     };
-    foreach my $var (keys %$p_vars) {
-        $page_data->{$var} = $p_vars->{$var};
-    }
 
     # first, check if the category exists yet.
     if (-f $cat_file) {
