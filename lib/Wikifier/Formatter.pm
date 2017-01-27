@@ -279,25 +279,29 @@ sub parse_format_type {
 
     given ($type) {
 
-    # italic, bold, strikethrough.
+    # italic, bold, strikethrough
     when ('i') { return '<span style="font-style: italic;">'            }
     when ('b') { return '<span style="font-weight: bold;">'             }
     when ('s') { return '<span style="text-decoration: line-through;">' }
-    when ('^') { return '<sup>'                                         }
     when (['/s', '/b', '/i']) { return '</span>' }
 
-    # inline quote.
-    when ( 'q') { return '"<span style="font-style: italic;">'  }
-    when ('/q') { return '</span>"'                             }
-    when ('/^') { return '</sup>'                               }
+    # inline quote
+    when ( 'q') { return '<span style="font-style: italic;">"'  }
+    when ('/q') { return '"</span>'                             }
 
-    # generic end span.
+    # subscript and superscript
+    when ( 'v') { return '<sub>'    }
+    when ('/v') { return '</sub>'   }
+    when ( '^') { return '<sup>'    }
+    when ('/^') { return '</sup>'   }
+
+    # generic end span. used for colors
     when ('/') { return '</span>' }
 
-    # new line.
+    # new line
     when (['nl', 'br']) { return '<br />' }
 
-    # dashes.
+    # dashes
     when ('--')  { return '&ndash;' }
     when ('---') { return '&mdash;' }
 

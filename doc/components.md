@@ -12,9 +12,9 @@ several subpackages:
 * __BlockManager__: dynamically loads and creates block objects.
 * __Utilities__: provides convenience functions used throughout the software.
 
-The Wikifier package alone does not provide many functions. It is not intended
-to be used directly. Instead, a Wikifier::Page or Wikifier::Wiki should be
-utilized.
+The Wikifier package alone does not provide high-level functionality. It is not
+intended to be used directly. Instead, a Wikifier::Page or Wikifier::Wiki should
+be utilized.
 
 ## Wikifier::Page
 
@@ -44,13 +44,14 @@ engine or something similar.
 
 Wikifier::Server also features automatic precompilation. In other words, the
 server listens for changes to wiki source files and compiles them on the spot.
+It also pregenerates images in all the sizes that are used in the wiki.
 The result is a much faster loading page, since the Wikifier::Wiki never has
-to generate pages on demand as they are requested.
+to generate pages or images on demand as they are requested.
 
 In addition to autocompiling and serving wiki pages, Wikifier::Server features
 write authentication. This allows frontends such as
 [adminifier](https://github.com/cooper/adminifier) to commit changes to the
-wiki directly from a web browser.
+wiki directly from a web interface.
 
 ## Interfaces
 
