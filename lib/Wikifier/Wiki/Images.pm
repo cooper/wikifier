@@ -444,7 +444,7 @@ sub _wiki_default_sizer {
 
 # returns a filename-to-metadata hash for all images in the wiki
 sub get_images {
-    my ($wiki, %images) = shift;
+    my ($wiki, %images, %done) = shift;
     my @cat_names = map substr($_, 0, -4), $wiki->all_categories('image');
     foreach my $filename ($wiki->all_images, @cat_names) {
         next if $done{$filename}++;
