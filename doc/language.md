@@ -148,7 +148,7 @@ used for text formatting tokens.
 
 **Variables**
 * `[@some.variable]` - normal variable
-* `[%some.variable]` - interpolable variable
+* `[%some.variable]` - interpolable variable (deprecated)
 * See [Variables](#variables) above
 
 **Links**

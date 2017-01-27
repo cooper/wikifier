@@ -19,17 +19,19 @@ root.image                      Default: /images
         @root.page:     [@root.wiki]/page;
         @root.image:    [@root.wiki]/images;
 
-dir.wiki                        Default: none
-dir.page                        Default: pages
-dir.cache                       Default: cache
-dir.image                       Default: images
-dir.category                    Default: categories
-dir.model                       Default: models
+dir.wikifier            the wikifier repository
+dir.wiki                wiki root directory
+dir.page                page files stored here
+dir.image               image originals stored here
+dir.model               models stored here
+dir.cache               generated page and image cache files stored here
+dir.category            generated category files stored here
 
     Directories on the filesystem. It is strongly recommended that they are
     absolute paths; otherwise they will be dictated by whichever directory the
-    script is started from. All are required but have defaults. The directories
-    will be created if they do not exist. Do not include trailing slashes.
+    script is started from. All are required except dir.wikifier and dir.wiki.
+    The directories will be created if they do not exist. Do not include
+    trailing slashes.
 
     It may be useful to use dir.wiki within the definitions of the rest:
         @dir.wiki:      /home/www/mywiki;
@@ -37,7 +39,7 @@ dir.model                       Default: models
         @dir.cache:     [@dir.wiki]/cache;
 
     It is recommended that all of the files related to one wiki exist within
-    a master wiki directory (dir.wiki), but this is not techincally required
+    a master wiki directory (dir.wiki), but this is not technically required
     unless you are using Wikifer::Wiki's built-in revision tracking.
 
 external.name                   Default: Wikipedia
@@ -66,7 +68,7 @@ page.enable.footer              Default: disabled
 image.size_method               Default (Page): javascript
                                 Default (Wiki): server
 
-    The method which the wikifier should use to resize images.
+    The method which the wikifier should use to scale images.
 
     'javascript' = JavaScript-injected (bad)
     'server'     = server-side using image.sizer and image.calc (recommended)
