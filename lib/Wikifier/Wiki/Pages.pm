@@ -153,7 +153,7 @@ sub _display_page {
         print {$fh} $json->encode({
 
             # page variables
-            hash_maybe $page->get('page'),
+            hash_maybe $page->get_href('page'),
 
             # generated CSS
             css => $result->{css},

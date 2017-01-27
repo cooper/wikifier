@@ -176,6 +176,18 @@ sub get {
 
 }
 
+sub get_href {
+    my $val = &get;
+    return {} if ref $val ne 'HASH';
+    return $val;
+}
+
+sub get_aref {
+    my $val = &get;
+    return [] if ref $val ne 'ARRAY';
+    return $val;
+}
+
 # internal use only.
 sub _get_hash {
     my ($hash, $var) = @_;
@@ -285,7 +297,7 @@ sub path {
 
 sub created_time {
     my $page = shift;
-    my $page_data = $page->get('page');
+    my $page_data = $page->get_href('page');
     $page_data = {} if ref $page_data ne 'HASH';
     return $page_data->{created} || $page->{created};
 }

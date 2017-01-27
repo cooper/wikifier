@@ -138,7 +138,7 @@ sub cat_check_page {
 #
 # $cat_name     name of category, with or without extension
 # $cat_type     for pseudocategories, the type, such as 'image' or 'model'
-# $cat_extras   for pseudocategories, a hash ref of additional options
+# $cat_extras   for pseudocategories, a hash ref of additional page data
 #
 sub cat_add_page {
     my ($wiki, $page, $cat_name, $cat_type, $cat_extras) = @_;
@@ -147,13 +147,12 @@ sub cat_add_page {
     my $cat_file = $wiki->path_for_category($cat_name, $cat_type);
 
     # fetch page infos.
-    my $p_vars = $page->get('page');
+    my $p_vars = $page->get_href('page');
     my $page_data = {
         asof     => $time,
         mod_unix => $page->modified_time
     };
     foreach my $var (keys %$p_vars) {
-        last if ref $p_vars ne 'HASH';
         $page_data->{$var} = $p_vars->{$var};
     }
 
@@ -201,6 +200,7 @@ sub cat_add_page {
     print {$fh} $json->encode({
         category   => cat_name_ne($cat_name),
         file       => $cat_name,
+        cat_type   => $cat_type,
         created    => $time,
         modified   => $time,
         pages      => { $page->{name} => $page_data }
@@ -273,7 +273,7 @@ sub cat_get_pages {
             }
 
             # update data.
-            my $p_vars = $page->get('page');
+            my $p_vars = $page->get_href('page');
             $page_data = { asof => $time };
             foreach my $var (keys %$p_vars) {
                 last if ref $p_vars ne 'HASH';
