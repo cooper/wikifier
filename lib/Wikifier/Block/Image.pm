@@ -108,7 +108,7 @@ sub image_parse {
 
         # find the resized dimensions.
         my $full_size;
-        ($w, $h, $full_size) = $page->wiki_opt('image.calc')->(
+        ($w, $h, $full_size) = $page->wiki_opt('image.calc',
             file   => $block->{file},
             height => $block->{height},
             width  => $block->{width},
@@ -116,7 +116,7 @@ sub image_parse {
         );
 
         # call the image_sizer.
-        my $url = $page->wiki_opt('image.sizer')->(
+        my $url = $page->wiki_opt('image.sizer',
             file   => $block->{file},
             height => $full_size ? 0 : $h,
             width  => $full_size ? 0 : $w,

@@ -157,7 +157,7 @@ cat.<name>.main                 Default: no main page; show newest at top
 
     Set the main page for the category by the name of <name>.
     This means that it will be displayed before all other categories, regardless
-    of creation date. The value of this option is the page filename.
+    of their creation dates. The value of this option is the page filename.
 
     You can also mark a page as the main page of a category from within the page
     source itself, like so:
@@ -172,7 +172,7 @@ cat.<name>.title                Default: page filename displayed as title
     Sets the human-readable title for the category by the name of <name>.
 
     You can also set the title of a category from within the category file
-    itsef using the "title" key.
+    itself using the "title" key.
 
 
 Wikifier::Server options

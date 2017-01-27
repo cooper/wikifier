@@ -153,10 +153,13 @@ sub check_directories {
 
 # returns a wiki option.
 sub opt {
-    my ($wiki, $opt) = @_;
+    my ($wiki, $opt, @args) = @_;
     return $wiki->{$opt} if exists $wiki->{$opt};
     my $v = $wiki->{conf}->get($opt);
-    return $v // $wiki_defaults{$opt} // $Wikifier::Page::wiki_defaults{$opt};
+    return Wikifier::Page::_call_wiki_opt(
+        $v // $wiki_defaults{$opt} // $Wikifier::Page::wiki_defaults{$opt},
+        @args
+    );
 }
 
 sub wiki_opt;
