@@ -51,10 +51,6 @@ sub new {
     # using the same wikifier instance over and over makes parsing much faster.
     $wiki->{wikifier} ||= Wikifier->new;
 
-    # if there were no provided options, assume we're reading from /etc
-    $wiki->read_config('/etc/wikifier.conf', '/etc/wikifier_private.conf')
-        if not scalar keys %opts;
-
     # if a config file is provided, use it.
     $wiki->read_config($opts{config_file}, $opts{private_file})
         if defined $opts{config_file};
@@ -79,6 +75,11 @@ sub read_config {
         L "Failed to parse configuration: $err";
         return;
     }
+
+    # global wiki variables
+    my $vars_maybe = $conf->get('var');
+    @#wiki{variables}{ keys %$vars_maybe } = values %$vars_maybe
+        if ref $vars_maybe eq 'HASH';
 
     # private configuration.
     if (length $private_file) {
@@ -154,10 +155,11 @@ sub check_directories {
 # returns a wiki option.
 sub opt {
     my ($wiki, $opt, @args) = @_;
-    return $wiki->{$opt} if exists $wiki->{$opt};
-    my $v = $wiki->{conf}->get($opt);
     return Wikifier::Page::_call_wiki_opt(
-        $v // $wiki_defaults{$opt} // $Wikifier::Page::wiki_defaults{$opt},
+        $wiki->{opts}{$opt}         //          # provided to wiki initializer
+        $wiki->{conf}->get($opt)    //          # defined in configuration
+        $wiki_defaults{$opt}        //          # wiki default value fallback
+        $Wikifier::Page::wiki_defaults{$opt},   # page default value fallback
         @args
     );
 }

@@ -63,9 +63,7 @@ sub display_cat_posts {
     @pages_in_order    = map  { $reses{$_} } @pages_in_order;
 
     # order into PAGES of pages. wow.
-    my $limit = $wiki->opt('cat.per_page')               ||
-                $wiki->opt('enable.category_post_limit') ||
-                'inf';
+    my $limit = $wiki->opt('cat.per_page') || 'inf';
     my $n = 1;
     while (@pages_in_order) {
         $result->{pages}{$n} ||= [];

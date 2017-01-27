@@ -173,7 +173,6 @@ sub get {
     # try global variables.
     ($hash, $name) = _get_hash($page->{wiki}{variables}, $var);
     return $hash->{$name};
-
 }
 
 sub get_href {
@@ -212,7 +211,10 @@ sub parse_formatted_text {
 sub wiki_opt {
     my ($page, $var, @args) = @_;
     return $page->{wiki}->opt($var, @args) if blessed $page->{wiki};
-    return _call_wiki_opt($wiki_defaults{$var}, @args);
+    return _call_wiki_opt(
+        $page->{opts}{$var} // $wiki_defaults{$var},
+        @args
+    );
 }
 
 sub _call_wiki_opt {

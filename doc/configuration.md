@@ -1,7 +1,70 @@
+# Configuration
 
-Wikifier::Page options
---------------------------------------------------------------------------------
+This document describes all of the available configuration options. The options
+are categorized by the lowest-level wikifier interface at which they are used.
+Some are required for the generation of a single page, others for the operation
+of a full wiki, and others yet for the operation of a wiki server.
 
+### Configuration files
+
+The primary method of configuration is to define options in a configuration
+file. All wikifier configuration files are written in the wikifier language:
+```
+@name:          MyWiki;
+@dir.wiki:      /home/www/mywiki;
+@dir.page:      [@dir.wiki]/pages;
+```
+
+If you are using a **wiki server**, you must have a dedicated configuration file
+for the server. This tells it where to listen and where to find the wikis you
+have configured on the server. This is typically called `wikiserver.conf`, and
+it is required as the first argument to the `wikiserver` executable.
+
+**Every wiki** also requires its own configuration file. It may make sense to
+store your wiki configuration file at a path outside of the wiki root, just in
+case it contains sensitive information. If you are using a wiki server, the path
+of each wiki's configuration file is defined in the server configuration using
+the `server.wiki.<name>.config` option. If you are using Wikifier::Wiki
+directly, the path to the wiki configuration must be provided to the
+constructor:
+```
+my $wiki = Wikifier::Wiki->new(config_file => '/home/www/mywiki/wiki.conf');
+```
+
+Each wiki can optionally have a **private configuration** file. This is where
+the credentials of administrators can exist more securely than in the primary
+configuration. This file certainly should not be within the wiki root because
+that would probably allow anyone to download it from the web server. If you are
+using a wiki server, the path of the private configuration is defined by
+`server.wiki.<name>.private`. If you are using Wikifier::Wiki directly, the path
+to the private configuration may be provided to the constructor:
+```
+my $wiki = Wikifier::Wiki->new(
+    config_file  => '/home/www/mywiki/wiki.conf',
+    private_file => '/home/www/mywiki-private.conf',
+);
+```
+
+### Configuration directly from code
+
+Another method of defining configuration values (rather than in a configuration
+file) is to do so directly from the code where you initialize the interface.
+This is probably only useful if you are using Wikifier::Page directly:
+
+```perl
+my $page = Wikifier::Page->new(
+    file_path => $path,
+    opts => {
+        'name' => 'MyWiki',
+        'root.wiki' => '/wiki',
+        'root.page' => '/wiki/page'
+    }
+);
+```
+
+## Wikifier::Page options
+
+```
 name                            Default: Wiki
 
     The name of the wiki.
@@ -108,10 +171,11 @@ image.sizer                     Default (Page): none; custom code required
     (unless using Wikifier::Wiki, which provides its own).
 
     Returns a URL.
+```
 
-Wikifier::Wiki options
---------------------------------------------------------------------------------
+## Wikifier::Wiki options
 
+```
 image.type                      Default: png
 
     The desired file type for generated images. This is used by Wikifier::Wiki
@@ -229,10 +293,11 @@ admin.<username>.password
 
     The password of the administrator <username>. It must be encrypted in
     the crypt set by admin.<username>.crypt.
+```
 
-Wikifier::Server options
---------------------------------------------------------------------------------
+## Wikifier::Server options
 
+```
 server.socket.type              Default: unix
 
     The socket domain to use for listening. Currently, only UNIX is supported.
@@ -267,3 +332,4 @@ server.wiki.<name>.password     Default: none
 
     The read authentication password for the wiki by the name of <name>
     in plain text.
+```
