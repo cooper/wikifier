@@ -439,4 +439,8 @@ sub _wiki_default_sizer {
     return $wiki->opt('root.image')."/$img{width}x$img{height}-$img{file}";
 }
 
+sub get_images {
+    
+}
+
 1

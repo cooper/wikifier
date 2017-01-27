@@ -243,7 +243,12 @@ sub all_categories {
 
 # an array of file names in the model directory.
 sub all_models {
-    return files_in_dir(shift->opt('dir.model'), 'page', 'model');
+    return files_in_dir(shift->opt('dir.model'), 'model');
+}
+
+# an array of file names in the image directory.
+sub all_images {
+    return files_in_dir(shift->opt('dir.image'), 'png', 'jpg', 'jpeg');
 }
 
 ######################
