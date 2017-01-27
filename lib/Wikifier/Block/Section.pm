@@ -82,7 +82,7 @@ sub section_html {
         # if it's not blessed, it's text.
         # sections interpret loose text as paragraphs.
         if (!blessed $item) {
-            TEXT: foreach my $text (split /\n{2}/, $item) {
+            TEXT: foreach my $text (split m/(\s*\n+\s*){2}/, $item) {
 
                 # ignore empty things or spaces, etc.
                 my $trimmed = Wikifier::Utilities::trim($text);
