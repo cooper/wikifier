@@ -8,7 +8,8 @@ package Wikifier::Block::Section;
 use warnings;
 use strict;
 
-use Scalar::Util 'blessed';
+use Scalar::Util qw(blessed);
+use Wikifier::Utilities qw(trim);
 
 our %block_types = (
     section => {
@@ -82,17 +83,16 @@ sub section_html {
         # if it's not blessed, it's text.
         # sections interpret loose text as paragraphs.
         if (!blessed $item) {
-            TEXT: foreach my $text (split m/(\s*\n+\s*){2}/, $item) {
+            TEXT: foreach my $text (split m/(\s*\n+\s*\n+\s*)/, $item) {
 
                 # ignore empty things or spaces, etc.
-                my $trimmed = Wikifier::Utilities::trim($text);
-                next TEXT unless length $trimmed;
+                next TEXT unless length trim($text);
 
                 # create the paragraph.
                 $item = $page->wikifier->create_block(
                     parent  => $block,
                     type    => 'paragraph',
-                    content => [$text]
+                    content => [ $text ]
                 );
 
                 # adopt it.
