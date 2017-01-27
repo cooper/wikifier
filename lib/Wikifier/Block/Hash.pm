@@ -49,12 +49,6 @@ sub hash_parse {
             # the first colon indicates that we're beginning a value.
             when (':') {
 
-                # if there is no key, give up.
-                if (!length $key) {
-                    L "No key for text value in hash-based block ($value)";
-                    $key = "Item $i";
-                }
-
                 # if we're already in a value, this colon belongs to the value.
                 continue if $in_value; # to default.
 
@@ -76,9 +70,13 @@ sub hash_parse {
                 # it was escaped.
                 continue if $escaped;
 
-                # fix key
+                # if there's no key, it is something like:
+                #   : value;
+                # if there is a key but we weren't in the value,
+                # it is something like:
+                #   value;
                 my $key_title;
-                if (!length $key) {
+                if (!length $key || !$in_value) {
                     $key = "anon_$i";
                     $key_title = undef;
                 }

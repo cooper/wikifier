@@ -52,11 +52,6 @@ sub infobox_html {
     foreach my $pair (@{ $block->{hash_array} }) {
         my ($key_title, $value, $key) = @$pair;
 
-        # Parse formatting in the key.
-        if (length $key_title) {
-            $key_title = $page->parse_formatted_text($key_title);
-        }
-
         # create the row.
         my $tr = $table->create_child(
             type  => 'tr',
@@ -65,6 +60,7 @@ sub infobox_html {
 
         # append table row with key.
         if (length $key_title) {
+            $key_title = $page->parse_formatted_text($key_title);
             $tr->create_child(
                 type       => 'td',
                 class      => 'infobox-key',
