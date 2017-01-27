@@ -19,18 +19,18 @@ our %block_types = (
 
 sub parse_invisible {
     my ($block, $page) = @_;
-    foreach my $item (@{ $block->{content} }) {
-        next unless blessed $item;
-        $item->parse($page);
-    }
+    # foreach my $item (@{ $block->{content} }) {
+    #     next unless blessed $item;
+    #     $item->parse($page);
+    # }
 }
 
 sub html_invisible {
     my ($block, $page) = @_;
-    foreach my $item (@{ $block->{content} }) {
-        next unless blessed $item;
-        $item->html($page);
-    }
+    # foreach my $item (@{ $block->{content} }) {
+    #     next unless blessed $item;
+    #     $item->html($page);
+    # }
 }
 
 __PACKAGE__
