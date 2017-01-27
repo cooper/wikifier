@@ -72,7 +72,7 @@ sub section_html {
         my $heading = Wikifier::Element->new(
             type      => "h$l",
             class     => $class,
-            content   => $page->parse_formatted_text($title),
+            content   => $title,
             container => 1
         );
 
@@ -80,21 +80,22 @@ sub section_html {
     }
 
     # add the contained elements.
+    my $line = $block->{line};
     ITEM: foreach my $item (@{ $block->{content} }) {
 
         # if it's not blessed, it's text.
         # sections interpret loose text as paragraphs.
         if (!blessed $item) {
-            use Data::Dumper;
-            print "ITEM: ", Dumper($item), "\n";
+            $line += () = $item =~ /\n/g;
             TEXT: foreach my $text (split $empty_lines, $item) {
-                print "TEXT: ", Dumper($text), "\n";
+
                 # ignore empty things or spaces, etc.
                 next TEXT unless length trim($text);
 
                 # create the paragraph.
                 $item = $page->wikifier->create_block(
                     parent  => $block,
+                    line    => $line,
                     type    => 'paragraph',
                     content => [ $text ]
                 );
@@ -108,6 +109,7 @@ sub section_html {
         # this is blessed, so it's a block.
         # adopt this element.
         $el->add($item->html($page));
+        $line = $item->{end_line} if $item->{end_line};
     }
 }
 

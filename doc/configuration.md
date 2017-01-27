@@ -82,6 +82,13 @@ root.image                      Default: /images
         @root.page:     [@root.wiki]/page;
         @root.image:    [@root.wiki]/images;
 
+    If you are using Wikifier::Wiki (or a wiki server) in conjunction with
+    image.enable.cache and image.enable.pregeneration, you should set root.image
+    to wherever your cache directory can be found on the HTTP root. This is
+    where generated images are cached, and full-sized images are symbolically
+    linked to. This allows the web server to deliver images directly, which is
+    certainly most efficient.
+
 dir.wikifier            the wikifier repository
 dir.wiki                wiki root directory
 dir.page                page files stored here
