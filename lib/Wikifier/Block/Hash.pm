@@ -72,20 +72,29 @@ sub hash_parse {
 
                 # if there's no key, it is something like:
                 #   : value;
+                my $key_title;
+                if (!length $key) {
+                    $key = "anon_$i";
+                    undef $key_title;
+                }
+
                 # if there is a key but we weren't in the value,
                 # it is something like:
                 #   value;
-                my $key_title;
-                if (!length $key || !$in_value) {
+                elsif (!$in_value) {
+                    $value = $key;
                     $key = "anon_$i";
-                    $key_title = undef;
+                    undef $key_title;
                 }
+
+                # otherwise, it's a normal key-value pair.
+                # fix the key
                 else {
                     $key =~ s/(^\s*)|(\s*$)//g;
                     $key_title = $key;
                 }
 
-                # fix value
+                # fix the value
                 if (!blessed $value) {
                     $value =~ s/(^\s*)|(\s*$)//g;
 
