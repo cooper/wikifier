@@ -83,8 +83,10 @@ sub section_html {
         # if it's not blessed, it's text.
         # sections interpret loose text as paragraphs.
         if (!blessed $item) {
+            use Data::Dumper;
+            print "ITEM: ", Dumper($item), "\n";
             TEXT: foreach my $text (split m/(?:[^\S\n]*\n+[^\S\n]*){2,}/, $item) {
-
+                print "TEXT: ", Dumper($text), "\n";
                 # ignore empty things or spaces, etc.
                 next TEXT unless length trim($text);
 
