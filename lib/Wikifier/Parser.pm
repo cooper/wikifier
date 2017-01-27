@@ -83,12 +83,11 @@ sub handle_line {
     return if $page->{vars_only};
 
     # pass on to main parser.
-    my $i = 0;
     my @chars = split(//, $line), "\n";
-    for (0..$#chars) {
-        $current->{col} = ++$i;
+    for my $i (0 .. $#chars) {
+        $current->{col} = $i;
         $current->{next_char} = $chars[$i + 1] // '';
-        my $err = $wikifier->handle_character($_, $page, $current);
+        my $err = $wikifier->handle_character($chars[$i], $page, $current);
         return ($i, $err) if $err;
     }
 
