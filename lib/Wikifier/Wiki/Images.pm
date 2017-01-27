@@ -458,7 +458,10 @@ sub get_images {
 sub get_image {
     my ($wiki, $filename) = @_;
     my $path = $wiki->path_for_image($filename);
-    return if !-e $path;
+    my $cat_path = $wiki->path_for_category($filename, 'image');
+
+    # neither the image nor a category for it exist. this is a ghost
+    next if !-f $path && !-f $cat_path;
 
     # basic info available for all images
     my @stat = stat $path; # might be empty
@@ -469,12 +472,11 @@ sub get_image {
         mod_unix    => $stat[9]     # mtime, probably overwritten
     };
 
-    # this category does not exist
-    my $cat_file = $wiki->path_for_category($filename, 'image');
-    next unless -f $cat_file;
+    # from this point on, we need the category
+    next unless -f $cat_path;
 
     # it exists; let's see what's inside.
-    my %cat = hash_maybe eval { $json->decode(file_contents($cat_file)) };
+    my %cat = hash_maybe eval { $json->decode(file_contents($cat_path)) };
     next if !scalar keys %cat;
 
     # in the category, "file" is the cat filename, and the "category"

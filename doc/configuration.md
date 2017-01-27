@@ -27,7 +27,7 @@ of each wiki's configuration file is defined in the server configuration using
 the `server.wiki.<name>.config` option. If you are using Wikifier::Wiki
 directly, the path to the wiki configuration must be provided to the
 constructor:
-```
+```perl
 my $wiki = Wikifier::Wiki->new(config_file => '/home/www/mywiki/wiki.conf');
 ```
 
@@ -38,7 +38,7 @@ that would probably allow anyone to download it from the web server. If you are
 using a wiki server, the path of the private configuration is defined by
 `server.wiki.<name>.private`. If you are using Wikifier::Wiki directly, the path
 to the private configuration may be provided to the constructor:
-```
+```perl
 my $wiki = Wikifier::Wiki->new(
     config_file  => '/home/www/mywiki/wiki.conf',
     private_file => '/home/www/mywiki-private.conf',
