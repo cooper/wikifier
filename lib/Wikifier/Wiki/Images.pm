@@ -266,8 +266,9 @@ sub generate_image {
     # the request is to generate an image the same or larger than the original.
     if ($width >= $fi_width && $height >= $fi_height) {
         $result->{use_fullsize} = 1;
-        L(
-            "Skipped '$image{name}' ${width}x${height}".
+        L align(
+            'Skip',
+            "'$image{name}' at ${width}x${height}" .
             " >= ${fi_width}x${fi_height}"
         );
 
@@ -332,8 +333,9 @@ sub generate_image {
 
     }
 
-    L(
-        "Generated image '$image{name}' at ${width}x${height}" .
+    L align(
+        'Generate',
+        "'$image{name}' at ${width}x${height}" .
         ($image{retina} ? " (\@$image{retina}x)" : '')
     );
     return; # success
