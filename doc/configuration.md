@@ -263,6 +263,18 @@ cat.<name>.title                Default: page filename displayed as title
     You can also set the title of a category from within the category file
     itself using the "title" key.
 
+var.*
+
+    Global wiki variable space. Variables defined in this space will be
+    available throughout the wiki. However they may be overwritten on a
+    particular page.
+
+    Example (in config):
+        @var.site.url: http://mywiki.example.com
+        @var.site.display_name: MyWiki;
+    (on main page):
+        Welcome to [@site.display_name]!
+
 PRIVATE Wikifier::Wiki options may be in a separation configuration file.
 This is where administrator credentials are stored. You can also put them in the
 primary configuration file, but this is not recommended.
@@ -302,7 +314,7 @@ server.socket.type              Default: unix
 
     The socket domain to use for listening. Currently, only UNIX is supported.
 
-server.socket.path              Default: none
+server.socket.path
 
     The path of a UNIX socket to listen on.
 
@@ -315,12 +327,12 @@ server.enable.pregeneration     Default: disabled (but recommended)
     Requires:
         page.enable.cache
 
-server.wiki.<name>.config       Default: none
+server.wiki.<name>.config
 
     The path to the configuration file for the wiki by the name of <name>.
     Any number of wikis can be configured on a single server using this.
 
-server.wiki.<name>.private       Default: none
+server.wiki.<name>.private
 
     The path to the PRIVATE configuration file for the wiki by the name of
     <name>. This is where administrator credentials are stored. If it is not
@@ -328,7 +340,7 @@ server.wiki.<name>.private       Default: none
     configuration file. Be sure that the private configuration is not inside
     the HTTP server root or has proper permissions to deny access to it.
 
-server.wiki.<name>.password     Default: none
+server.wiki.<name>.password
 
     The read authentication password for the wiki by the name of <name>
     in plain text.
