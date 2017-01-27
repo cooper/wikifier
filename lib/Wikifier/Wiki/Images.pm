@@ -331,7 +331,6 @@ sub generate_image {
 
         # if this image is available in more than 1 scale, symlink.
         $wiki->symlink_scaled_image(\%image) if $image{retina};
-
     }
 
     L align(
@@ -355,7 +354,6 @@ sub symlink_scaled_image {
         $image{ext};
     return 1 if -e $scale_path;
     symlink $image{full_name}, $scale_path;
-
     # note: using full_name rather than $cache_file
     # results in a relative rather than absolute symlink.
 }

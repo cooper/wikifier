@@ -37,13 +37,9 @@ sub image_parse {
 
     # get values from hash.
     $block->{$_} = $block->{hash}{$_} foreach qw(
-        description desc file width height
+        file width height
         align float author license
     );
-
-    # desc = description
-    $block->{description} = delete $block->{desc}
-        if !length $block->{description};
 
     # default values set by something.
     # these of course are not guaranteed to be existent.
@@ -215,15 +211,17 @@ sub image_html {
         q{this.offsetWidth + 'px'; this.style.width = '100%';}
     ) if $block->{javascript};
 
-    # description.
-    if (length $block->{description}) {
-        my $desc = $inner->create_child(class => 'imagebox-description');
-        $desc->create_child(
+    # description. we have to extract this here instead of in ->parse()
+    # because at the time of ->parse() its text is not yet formatted.
+    my $desc = $block->{hash}{description} // $block->{hash}{desc};
+    if (length $desc) {
+        $inner->create_child(
+            class => 'imagebox-description'
+        )->create_child(
             class   => 'imagebox-description-inner',
-            content => $block->{description}
+            content => $desc
         );
     }
-
 }
 
 __PACKAGE__
