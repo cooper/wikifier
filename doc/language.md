@@ -144,6 +144,7 @@ used for text formatting tokens.
 * `[s]strikethrough text[/s]` - ~~strikethrough text~~
 * `[i]italicized text[/i]` - *italicized text*
 * `superscript[^]text[/^]` - superscript<sup>text</sup>
+* `subscript[v]text[/v]` - subscript<sub>text</sub>
 * `[Aquamarine]some colored text[/]`
 
 **Variables**

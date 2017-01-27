@@ -289,11 +289,11 @@ sub parse_format_type {
     when ( 'q') { return '<span style="font-style: italic;">"'  }
     when ('/q') { return '"</span>'                             }
 
-    # subscript and superscript
-    when ( 'v') { return '<sub>'    }
-    when ('/v') { return '</sub>'   }
+    # superscript and subscript
     when ( '^') { return '<sup>'    }
     when ('/^') { return '</sup>'   }
+    when ( 'v') { return '<sub>'    }
+    when ('/v') { return '</sub>'   }
 
     # generic end span. used for colors
     when ('/') { return '</span>' }
@@ -388,8 +388,7 @@ sub parse_format_type {
     } # end switch
 
     # leave out anything else, I guess.
-    return q..;
-
+    return '';
 }
 
 1
