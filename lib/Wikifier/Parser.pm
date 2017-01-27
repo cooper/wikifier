@@ -84,8 +84,10 @@ sub handle_line {
 
     # pass on to main parser.
     my $i = 0;
-    for (split(//, $line), "\n") {
+    my @chars = split(//, $line), "\n";
+    for (0..$#chars) {
         $current->{col} = ++$i;
+        $current->{next_char} = $chars[$i + 1] // '';
         my $err = $wikifier->handle_character($_, $page, $current);
         return ($i, $err) if $err;
     }
@@ -121,15 +123,13 @@ sub handle_character {
     for ($char) {
 
     # comment entrance and closure.
-    if (defined $last->{char} and $char eq '*' || $char eq '/') {
-        if ($char eq '*' && $last->{char} eq '/') {
-            $current->{in_comment} = 1;
-            last;
-        }
-        if ($char eq '/' && $last->{char} eq '*') {
-            delete $current->{in_comment};
-            last;
-        }
+    if ($char eq '/' && $current->{next_char} eq '*') {
+        $current->{in_comment} = 1;
+        last;
+    }
+    if ($char eq '*' && $current->{next_char} eq '/') {
+        delete $current->{in_comment};
+        last;
     }
 
     # inside a comment.
