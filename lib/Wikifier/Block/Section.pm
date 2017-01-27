@@ -50,7 +50,7 @@ sub section_html {
 
     # disable the footer if necessary.
     # this only works if the section is the last item in the main block.
-    if ($page->wiki_opt('enable.last_section_footer') &&
+    if ($page->wiki_opt('page.enable.section_footer') &&
     $page->{wikifier}{main_block}{content}[-1] == $block) {
         $el->configure(no_close_tag => 1);
         $block->{parent}{element}->configure(no_close_tag => 1);
@@ -61,7 +61,7 @@ sub section_html {
        $title = $page->get('page.title') if $is_intro && !length $title;
 
     # if we have a title and this type of title is enabled.
-    if (length $title and $is_intro ? $page->wiki_opt('enable.page_titles') : 1) {
+    if (length $title and $is_intro ? $page->wiki_opt('page.enable.titles') : 1) {
 
         # create the heading.
         my $heading = Wikifier::Element->new(

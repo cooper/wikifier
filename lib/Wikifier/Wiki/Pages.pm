@@ -64,7 +64,7 @@ sub _display_page {
     $result->{mime} = 'text/html';
 
     # caching is enabled, so let's check for a cached copy.
-    if ($wiki->opt('enable.cache.page') && -f $cache_path) {
+    if ($wiki->opt('page.enable.cache') && -f $cache_path) {
         my ($page_modify, $cache_modify) =
             map { (stat $_)[9] } $path, $cache_path;
 
@@ -146,7 +146,7 @@ sub _display_page {
     $result->{categories} = [ _cats_to_list($page->{categories}) ];
 
     # caching is enabled, so let's save this for later.
-    if ($wiki->opt('enable.cache.page')) {
+    if ($wiki->opt('page.enable.cache')) {
         open my $fh, '>', $cache_path;
 
         # save prefixing data.

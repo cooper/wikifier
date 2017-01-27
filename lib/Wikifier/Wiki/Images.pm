@@ -118,7 +118,7 @@ sub _display_image {
     #============================#
 
     # if caching is enabled, check if this exists in cache.
-    if ($wiki->opt('enable.cache.image') && -f $cache_file) {
+    if ($wiki->opt('image.enable.cache') && -f $cache_file) {
         my ($image_modify, $cache_modify) = ($stat[9], (stat $cache_file)[9]);
 
         # if the image's file is more recent than the cache file,
@@ -149,7 +149,7 @@ sub _display_image {
     }
 
     # if image generation is disabled, we must supply the full-sized image data.
-    if (!$wiki->opt('enable.cache.image')) {
+    if (!$wiki->opt('image.enable.cache')) {
         return $wiki->display_image($result, $image_name, 0, 0);
     }
 
@@ -334,7 +334,7 @@ sub generate_image {
 
     # caching is enabled, so let's save this for later.
     my $cache_file = $result->{cache_path};
-    if ($wiki->opt('enable.cache.image')) {
+    if ($wiki->opt('image.enable.cache')) {
 
         open my $fh, '>', $cache_file;
         print {$fh} $result->{content};
@@ -448,32 +448,43 @@ sub get_images {
     my @cat_names = map substr($_, 0, -4), $wiki->all_categories('image');
     foreach my $filename ($wiki->all_images, @cat_names) {
         next if $done{$filename}++;
-
-        # basic info available for all images
-        my @stat = stat $wiki->path_for_image($filename); # might be empty
-        my $image_data = $images{$filename} = {
-            file        => $filename,
-            title       => $filename,   # may be overwritten by category
-            created     => $stat[10],   # ctime, probably overwritten
-            mod_unix    => $stat[9]     # mtime, probably overwritten
-        };
-
-        # this category does not exist
-        my $cat_file = $wiki->path_for_category($filename, 'image');
-        next unless -f $cat_file;
-
-        # it exists; let's see what's inside.
-        my %cat = hash_maybe eval { $json->decode(file_contents($cat_file)) };
-        next if !scalar keys %cat;
-
-        # in the category, "file" is the cat filename, and the "category"
-        # is the image filename. remove these to avoid confusion.
-        delete @cat{'file', 'category'};
-
-        # inject metadata from category
-        @$image_data{ keys %cat } = values %cat;
+        my $image_data = $wiki->get_image($filename) or next;
+        $images{$filename} = $image_data;
     }
     return \%images;
+}
+
+# returns metadata for an image
+sub get_image {
+    my ($wiki, $filename) = @_;
+    my $path = $wiki->path_for_image($filename);
+    return if !-e $path;
+
+    # basic info available for all images
+    my @stat = stat $path; # might be empty
+    my $image_data = {
+        file        => $filename,
+        title       => $filename,   # may be overwritten by category
+        created     => $stat[10],   # ctime, probably overwritten
+        mod_unix    => $stat[9]     # mtime, probably overwritten
+    };
+
+    # this category does not exist
+    my $cat_file = $wiki->path_for_category($filename, 'image');
+    next unless -f $cat_file;
+
+    # it exists; let's see what's inside.
+    my %cat = hash_maybe eval { $json->decode(file_contents($cat_file)) };
+    next if !scalar keys %cat;
+
+    # in the category, "file" is the cat filename, and the "category"
+    # is the image filename. remove these to avoid confusion.
+    delete @cat{'file', 'category'};
+
+    # inject metadata from category
+    @$image_data{ keys %cat } = values %cat;
+
+    return $image_data;
 }
 
 1

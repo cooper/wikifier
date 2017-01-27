@@ -15,25 +15,26 @@ use Wikifier::Utilities qw(page_name align L);
 
 # default options.
 our %wiki_defaults = (
-    'name'              => 'Wiki',
-    'dir.wikifier'      => '.',
-    'dir.image'         => 'images',
-    'dir.page'          => 'pages',
-    'dir.cache'         => 'cache',
-    'dir.model'         => 'models',
-    'dir.category'      => 'categories',
-    'dir.m_category'    => 'model-categories',
-    'root.image'        => '/images',   # relative to HTTP root.
-    'root.category'     => '/topic',
-    'root.page'         => '',          # AKA "/"
-    'root.wiki'         => '',          # AKA "/"
-    'image.size_method' => 'javascript',
-    'external.name'     => 'Wikipedia',
-    'external.root'     => 'http://en.wikipedia.org/wiki',
-    'image.rounding'    => 'normal',
-    'image.calc'        => \&_default_calculator,
-    'image.sizer'       => \&_default_sizer,
-    'var'               => {}
+    'name'                  => 'Wiki',
+    'dir.wikifier'          => '.',
+    'dir.image'             => 'images',
+    'dir.page'              => 'pages',
+    'dir.cache'             => 'cache',
+    'dir.model'             => 'models',
+    'dir.category'          => 'categories',
+    'dir.m_category'        => 'model-categories',
+    'root.image'            => '/images',   # relative to HTTP root.
+    'root.category'         => '/topic',
+    'root.page'             => '',          # AKA "/"
+    'root.wiki'             => '',          # AKA "/"
+    'image.size_method'     => 'javascript',
+    'page.enable.titles'    => 1,
+    'external.name'         => 'Wikipedia',
+    'external.root'         => 'http://en.wikipedia.org/wiki',
+    'image.rounding'        => 'normal',
+    'image.calc'            => \&_default_calculator,
+    'image.sizer'           => \&_default_sizer,
+    'var'                   => {}
 );
 
 # create a new page.

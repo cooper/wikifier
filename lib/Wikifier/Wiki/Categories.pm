@@ -35,6 +35,7 @@ sub display_cat_posts {
     $result->{file}     = $cat_name;
     $result->{category} = $cat_name_ne;
     $result->{title}    = $opts->{title}->{$cat_name} // $title;
+    $result->{all_css}  = '';
 
     # load each page if necessary.
     my (%times, %reses);
@@ -79,8 +80,7 @@ sub display_cat_posts {
             push @{ $result->{pages}{$n} }, $page;
 
             # add the CSS.
-            ($result->{all_css} ||= '') .= $page->{css} if length $page->{css};
-
+            $result->{all_css} .= $page->{css} if length $page->{css};
         }
         $n++;
     }
@@ -94,11 +94,16 @@ sub _is_main_page {
 
     # if it is defined in the configuration,
     # this always overrides all other pages.
-    return 2 if page_names_equal($res->{file}, $opts->{main}{$cat_name_ne} || '');
+    return 2 if page_names_equal(
+        $res->{file},
+        $opts->{main}{$cat_name_ne} || ''
+    );
 
     # in the just-parsed page, something like
     # @category.some_cat.main; # was found
-    return 1 if $res->{page} && $res->{page}->get("category.$cat_name_ne.main");
+    return 1 if
+        $res->{page} &&
+        $res->{page}->get("category.$cat_name_ne.main");
 
     # in the JSON data, something like
     # { "categories": { "some_cat": { "main": 1 } } }

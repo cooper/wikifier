@@ -30,14 +30,16 @@ use Wikifier::Utilities qw(L);
 
 # default options.
 our %wiki_defaults = (
-    'image.enable.restriction'  => 1,
-    'enable.cache.image'        => 1,
-    'enable.cache.page'         => 1,
-    'image.enable.retina'       => 1,
-    'image.rounding'            => 'up',
-    'image.size_method'         => 'server',
-    'image.sizer'               => \&_wiki_default_sizer,   # from Images
-    'image.calc'                => \&_wiki_default_calc     # from Images
+    'image.enable.restriction'      => 1,
+    'image.enable.cache'            => 1,
+    'page.enable.cache'             => 1,
+    'image.enable.retina'           => 2,
+    'image.enable.tracking'         => 1,
+    'image.enable.pregeneration'    => 1,
+    'image.rounding'                => 'up',
+    'image.size_method'             => 'server',
+    'image.sizer'                   => \&_wiki_default_sizer,   # from Images
+    'image.calc'                    => \&_wiki_default_calc     # from Images
 );
 
 # create a new wiki object.

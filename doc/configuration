@@ -31,15 +31,14 @@ external.root                   Default: http://en.wikipedia.org/wiki
     name = the name to be displayed in link tooltips.
     root = the HTTP root for articles.
 
-enable.page_titles              Default: disabled
+page.enable.titles              Default: enabled
 
     If enabled, the first section's title will be the title of the page.
 
-enable.last_section_footer      Default: disabled
+page.enable.section_footer      Default: disabled
 
     If enabled, the closing </div> tags will be omitted from the final section
     and wiki block. This allows a footer to be injected before closing them off.
-
 
 image.size_method               Default (Page): javascript
                                 Default (Wiki): server
@@ -48,6 +47,12 @@ image.size_method               Default (Page): javascript
 
     'javascript' = JavaScript-injected (bad)
     'server'     = server-side using image.sizer and image.calc (recommended)
+
+    When set to 'server', the options image.calc and image.sizer are required.
+    If using Wikifier::Page directly, image.calc is provided but requires that
+    you install Image::Size. In that case, you are required to provide a
+    custom image.sizer routine. If using Wikifier::Wiki, image.calc and
+    image.sizer are both provided, but GD must be installed from CPAN.
 
 image.calc                      Default (Page): built in, uses Image::Size
                                 Default (Wiki): built in, uses GD
@@ -96,16 +101,16 @@ image.quality                   Default: 100
     The desired quality of generated images. This is only utilized if image.type
     is set to jpeg.
 
-image.enable.retina             Default: enabled for @2x
+image.enable.retina             Default: 2
 
     Enable retina display support. Wikifier::Wiki will interpret and properly
-    handle @2x versions of images.
+    handle @2x or larger scaled versions of images.
 
-    This option can also take a comma-separated list of scales, such as
+    This option is a comma-separated list of scales, such as
         @image.enable.retina: 2,3;
     to support @2x and @3x scaling both.
 
-image.enable.pregeneration      Default: disabled
+image.enable.pregeneration      Default: enabled
 
     Enable pregeneration of images. Images will be generated as pages that
     require them are generated. This contrasts from the default behavior in
@@ -119,9 +124,9 @@ image.enable.pregeneration      Default: disabled
     added since the last generation time.
 
     Requires:
-        enable.cache.image
+        image.enable.cache
 
-image.enable.tracking           Default: disabled
+image.enable.tracking           Default: enabled
 
     If enabled, Wikifier::Wiki will create page categories that track image
     usage. This is particularly useful for a Wikifier::Server feature that
@@ -132,7 +137,7 @@ image.enable.restriction        Default: enabled
     If enabled, Wikifier::Wiki will only generate images in dimensions used by
     pages on the wiki. This prevents useless resource usage and abuse.
 
-enable.cache.image              Default: enabled
+image.enable.cache              Default: enabled
 
     Enable caching of generated images.
 
@@ -140,7 +145,7 @@ enable.cache.image              Default: enabled
         image.enable.pregeneration
         image.enable.restriction
 
-enable.cache.page               Default: enabled
+page.enable.cache               Default: enabled
 
     Enable caching of generated pages.
 
@@ -173,7 +178,7 @@ cat.title.<name>                Default: page filename displayed as title
 Wikifier::Server options
 --------------------------------------------------------------------------------
 
-server.socket.type              Default: unix                           Require
+server.socket.type              Default: unix
 
     The socket domain to use for listening. Currently, only UNIX is supported.
 
@@ -181,14 +186,14 @@ server.socket.path              Default: none
 
     The path of a UNIX socket to listen on.
 
-server.enable.pregeneration     Default: disabled
+server.enable.pregeneration     Default: disabled (but recommended)
 
     If enabled, the Wikifier::Server will generate all pages upon the first
     start. It will then monitor all page files and regenerate them as soon as
     they are modified, greatly reducing the first page load time.
 
     Requires:
-        enable.cache.page
+        page.enable.cache
 
 server.wiki.<name>.config       Default: none
 
