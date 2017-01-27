@@ -6,7 +6,7 @@ use strict;
 
 use Digest::SHA  'sha1_hex';
 use Scalar::Util 'weaken';
-use Wikifier::Utilities qw(Lindent back notice);
+use Wikifier::Utilities qw(Lindent back notice values_maybe);
 
 my ($loop, $conf);
 
