@@ -10,6 +10,9 @@ use HTTP::Date qw(time2str);        # HTTP date formatting
 use Digest::MD5 qw(md5_hex);        # etags
 use File::Spec ();                  # simplifying symlinks
 use Wikifier::Utilities qw(L align hash_maybe);
+use JSON::XS ();
+
+my $json = JSON::XS->new->pretty(1);
 
 ##############
 ### IMAGES ###
@@ -455,7 +458,7 @@ sub get_images {
         };
 
         # this category does not exist
-        my $cat_file = $wiki->path_for_category($cat_name, $cat_type);
+        my $cat_file = $wiki->path_for_category($filename, 'image');
         next unless -f $cat_file;
 
         # it exists; let's see what's inside.
