@@ -22,6 +22,8 @@ our %block_types = (
     }
 );
 
+my $empty_lines = qr/(?:[^\S\n]*\n+[^\S\n]*){2,}/;
+
 # this counts how many sections there are.
 # this is then compared in section_html to see if it's the last section.
 # if it is and page.enable.footer is enabled, the </div> is omitted
@@ -85,7 +87,7 @@ sub section_html {
         if (!blessed $item) {
             use Data::Dumper;
             print "ITEM: ", Dumper($item), "\n";
-            TEXT: foreach my $text (split m/(?:[^\S\n]*\n+[^\S\n]*){2,}/, $item) {
+            TEXT: foreach my $text (split $empty_lines, $item) {
                 print "TEXT: ", Dumper($text), "\n";
                 # ignore empty things or spaces, etc.
                 next TEXT unless length trim($text);

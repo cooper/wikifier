@@ -46,7 +46,6 @@ sub parse {
     while (my $line = <$fh>) {
         $line =~ s/[\r\n\0]//g;     # remove returns and newlines.
         $line = trim($line);        # remove prefixing and suffixing whitespace.
-        next if !length $line;
         $current->{line} = $.;
         my ($i, $err) = $wikifier->handle_line($line, $page, $current);
         return "Line $.:$i: $err" if $err;
