@@ -26,7 +26,7 @@ sub display_cat_posts {
     my ($pages, $title) = $wiki->cat_get_pages($cat_name, $cat_type);
 
     # no pages means no category.
-    return display_error("Category '$cat_name' does not exist.")
+    return display_error("Category does not exist.")
         if !$pages;
 
     $result->{type}     = 'cat_posts';

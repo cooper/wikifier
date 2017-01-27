@@ -57,7 +57,7 @@ sub _display_model {
     my $path   = $page->path;
 
     # file does not exist.
-    return display_error("Model '$page_name' does not exist.")
+    return display_error("Model does not exist.")
         if !-f $path;
 
     # set path, file, and meme type.
@@ -82,7 +82,7 @@ sub _display_model {
     # if this is a draft, pretend it doesn't exist.
     if ($page->get('page.draft')) {
         return display_error(
-            "Model '$page_name' has not yet been published.",
+            "Model has not yet been published.",
             draft => 1
         );
     }
@@ -123,13 +123,13 @@ sub _display_model_code {
 
     # file does not exist.
     if (!-f $path) {
-        return display_error("Model '$page_name' does not exist.");
+        return display_error("Model does not exist.");
     }
 
     # read.
     my $code = file_contents($path);
     if (!defined $code) {
-        return display_error("Failed to read '$page_name'");
+        return display_error("Failed to read model.");
     }
 
     # set path, file, and meme type.

@@ -21,7 +21,7 @@ my $json = JSON::XS->new->pretty(1);
 # Displays an image of the supplied dimensions.
 sub display_image {
     my $result = _display_image(@_);
-    L align('Error', "$_[1]: $$result{error}")
+    L align('Error', "'$_[1]': $$result{error}")
         if $result->{error};
     return $result;
 }
@@ -215,7 +215,7 @@ sub parse_image_name {
     # check if the file exists.
     my $image_path = $wiki->path_for_image($image_name);
     if (!-f $image_path) {
-        return { error => "Image '$image_name' does not exist." };
+        return { error => "Image does not exist." };
     }
 
     return {
@@ -252,7 +252,7 @@ sub generate_image {
     if ($wiki->opt('image.enable.restriction')) {
         my $dimension_str = "${width}x${height}";
         return display_error(
-            "Image '$image{name}' does not exist at $dimension_str."
+            "Image does not exist at $dimension_str."
         ) if !$wiki->{allowed_dimensions}{ $image{name} }{$dimension_str};
     }
 
