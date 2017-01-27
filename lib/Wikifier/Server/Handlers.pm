@@ -276,7 +276,7 @@ sub handle_image_list {
     my ($connection, $msg) = write_required(@_, 'sort') or return;
 
     # get all images
-    my @cats = values_maybe $wiki->get_images;
+    my @cats = values_maybe $connection->{wiki}->get_images;
 
     # sort
     my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
