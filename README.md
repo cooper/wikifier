@@ -80,7 +80,7 @@ sec [Components] {
 
 ## Documentation
 
-* [Configuration](doc/configuration) - Configuration options
+* [Configuration](doc/configuration.md) - Configuration options
 * [Language](doc/language.md) - Specification for the Wikifier source language
 * [Blocks](doc/blocks.md) - Built-in block types
 * [Parsing](doc/parsing.md) - Wikifier parsing stages
