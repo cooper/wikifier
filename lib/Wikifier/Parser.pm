@@ -83,7 +83,7 @@ sub handle_line {
     return if $page->{vars_only};
 
     # pass on to main parser.
-    my @chars = split(//, $line), "\n";
+    my @chars = (split(//, $line), "\n");
     for my $i (0 .. $#chars) {
         next if delete $current->{skip_next_char};
         $current->{col} = $i;
