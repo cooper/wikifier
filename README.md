@@ -61,9 +61,9 @@ sec [Components] {
     sec [Wikifier::Server] {
 
         imagebox {
-            file:           wikiserver-logo.png;
-            width:          200px;
-            description:    Wikifier::Server logo;
+            file:   wikiserver-logo.png;
+            width:  200px;
+            desc:   Wikifier::Server logo;
         }
 
         This one does the actual serving of pages and stuff. Well, not really.
@@ -80,6 +80,7 @@ sec [Components] {
 
 ## Documentation
 
+* [Configuration](doc/configuration) - Configuration options
 * [Language](doc/language.md) - Specification for the Wikifier source language
 * [Blocks](doc/blocks.md) - Built-in block types
 * [Parsing](doc/parsing.md) - Wikifier parsing stages

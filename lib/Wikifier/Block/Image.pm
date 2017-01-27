@@ -37,9 +37,13 @@ sub image_parse {
 
     # get values from hash.
     $block->{$_} = $block->{hash}{$_} foreach qw(
-        description file width height
+        description desc file width height
         align float author license
     );
+
+    # desc = description
+    $block->{description} = delete $block->{desc}
+        if !length $block->{description};
 
     # default values set by something.
     # these of course are not guaranteed to be existent.

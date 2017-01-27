@@ -88,7 +88,7 @@ However, `image{}` is often used inside other block types.
 infobox [Planet Earth] {
     image {
         file: planet-earth.jpg;
-        description: Earth from space;
+        desc: Earth from space;
     };
     Type: Planet;
     Population: 23 billion;
@@ -104,10 +104,10 @@ full-sized image.
 
 ```
 imagebox {
-    file: planet-earth.jpg;
-    width: 300px;
-    align: right;
-    description: Earth from space;
+    file:   planet-earth.jpg;
+    width:  300px;
+    align:  right;
+    desc:   Earth from space;
 }
 ```
 
@@ -122,7 +122,7 @@ per article, and it occurs before the first section.
 infobox [Planet Earth] {
     image {
         file: planet-earth.jpg;
-        description: Earth from space;
+        desc: Earth from space;
     };
     Type: [b]Planet[/b];
     Population: 23 billion;
