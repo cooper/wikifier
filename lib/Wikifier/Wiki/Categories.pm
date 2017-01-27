@@ -150,11 +150,10 @@ sub cat_add_page {
     my $cat_file = $wiki->path_for_category($cat_name, $cat_type);
 
     # fetch page infos.
-    my $p_vars = $page->get_href('page');
     my $page_data = {
         asof     => $time,
         mod_unix => $page->modified_time,
-        hash_maybe $p_vars,
+        hash_maybe $page->get_href('page'),
         hash_maybe $cat_extras
     };
 
@@ -271,12 +270,10 @@ sub cat_get_pages {
             }
 
             # update data.
-            my $p_vars = $page->get_href('page');
-            $page_data = { asof => $time };
-            foreach my $var (keys %$p_vars) {
-                last if ref $p_vars ne 'HASH';
-                $page_data->{$var} = $p_vars->{$var};
-            }
+            $page_data = {
+                asof => $time,
+                hash_maybe $page->get_href('page')
+            };
 
             # page is no longer member of category.
             if (length $cat_type && $cat_type eq 'image') {
