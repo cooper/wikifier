@@ -111,7 +111,7 @@ sub _is_main_page {
 # deal with categories after parsing a page.
 sub cat_check_page {
     my ($wiki, $page) = @_;
-    $wiki->cat_add_page($page, 'all', 'data');
+    $wiki->cat_add_page($page, 'pages', 'data');
 
     # actual categories.
     my $cats = $page->get('category');
@@ -212,6 +212,7 @@ sub cat_add_page {
 
 # returns a name-to-metadata hash of the pages in the given category.
 # if the category does not exist, returns nothing.
+# returns (page data, category title, error)
 sub cat_get_pages {
     my ($wiki, $cat_name, $cat_type) = @_;
     $cat_name = cat_name($cat_name);

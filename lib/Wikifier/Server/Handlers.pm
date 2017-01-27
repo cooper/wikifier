@@ -211,7 +211,7 @@ sub handle_page_list {
     my ($connection, $msg) = write_required(@_, 'sort') or return;
 
     # get all pages
-    my $all = $connection->{wiki}->cat_get_pages('all', 'data');
+    my $all = $connection->{wiki}->cat_get_pages('pages', 'data');
     return if !$all || ref $all ne 'HASH';
     my %pages = %$all;
     my @pages = map {

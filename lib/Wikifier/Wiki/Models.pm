@@ -72,12 +72,12 @@ sub _display_model {
     if ($err) {
         $page->{vars_only}++;
         $page->parse;
-        # $wiki->cat_check_page($page); # FIXME
+        $wiki->cat_add_page($page, 'models', 'data');
         return display_error($err, parse_error => 1);
     }
 
-    # update categories
-    # $wiki->cat_check_page($page); # FIXME
+    # update models category
+    $wiki->cat_add_page($page, 'models', 'data');
 
     # if this is a draft, pretend it doesn't exist.
     if ($page->get('page.draft')) {
