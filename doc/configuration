@@ -153,7 +153,7 @@ cat.per_page                    Default: unlimited
 
     Number of pages to display on a single category posts page.
 
-cat.main.<name>                 Default: no main page; show newest at top
+cat.<name>.main                 Default: no main page; show newest at top
 
     Set the main page for the category by the name of <name>.
     This means that it will be displayed before all other categories, regardless
@@ -167,7 +167,7 @@ cat.main.<name>                 Default: no main page; show newest at top
     the most recent creation time is preferred. If this option is provided,
     however, the page specified by it will always be preferred.
 
-cat.title.<name>                Default: page filename displayed as title
+cat.<name>.title                Default: page filename displayed as title
 
     Sets the human-readable title for the category by the name of <name>.
 

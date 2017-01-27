@@ -24,7 +24,6 @@ sub display_cat_posts {
     $cat_name = cat_name($cat_name);
     my $cat_name_ne = cat_name_ne($cat_name);
     my ($pages, $title) = $wiki->cat_get_pages($cat_name, $cat_type);
-    my $opts = $wiki->opt('cat') || {};
 
     # no pages means no category.
     return display_error("Category '$cat_name' does not exist.")
@@ -34,7 +33,7 @@ sub display_cat_posts {
     $result->{cat_type} = $cat_type;
     $result->{file}     = $cat_name;
     $result->{category} = $cat_name_ne;
-    $result->{title}    = $opts->{title}->{$cat_name} // $title;
+    $result->{title}    = $wiki->opt("cat.$cat_name_ne.title") // $title;
     $result->{all_css}  = '';
 
     # load each page if necessary.
@@ -50,7 +49,7 @@ sub display_cat_posts {
 
         # store time.
         # if this is the main page of the category, it should come first.
-        my $main = $wiki->_is_main_page($cat_name_ne, $res, $opts);
+        my $main = $wiki->_is_main_page($cat_name_ne, $res);
         $times{$page_name}  = $time || 0;
         $times{$page_name} += time  if $main == 1;
         $times{$page_name}  = 'inf' if $main == 2;
@@ -90,13 +89,13 @@ sub display_cat_posts {
 
 # true if the page result is the main page of a category.
 sub _is_main_page {
-    my ($wiki, $cat_name_ne, $res, $opts) = @_;
+    my ($wiki, $cat_name_ne, $res) = @_;
 
     # if it is defined in the configuration,
     # this always overrides all other pages.
     return 2 if page_names_equal(
         $res->{file},
-        $opts->{main}{$cat_name_ne} || ''
+        $wiki->opt("cat.$cat_name_ne.main") || ''
     );
 
     # in the just-parsed page, something like
