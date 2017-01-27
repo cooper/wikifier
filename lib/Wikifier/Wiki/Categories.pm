@@ -5,9 +5,12 @@ use warnings;
 use strict;
 use 5.010;
 
-use Wikifier::Utilities qw(page_names_equal cat_name cat_name_ne keys_maybe L);
 use HTTP::Date qw(time2str);
 use JSON::XS ();
+use Wikifier::Utilities qw(
+    page_names_equal cat_name cat_name_ne
+    keys_maybe hash_maybe L
+);
 
 my $json = JSON::XS->new->pretty(1);
 
@@ -150,15 +153,11 @@ sub cat_add_page {
     my $p_vars = $page->get_href('page');
     my $page_data = {
         asof     => $time,
-        mod_unix => $page->modified_time
+        mod_unix => $page->modified_time,
+        hash_maybe $cat_extras
     };
     foreach my $var (keys %$p_vars) {
         $page_data->{$var} = $p_vars->{$var};
-    }
-
-    # for pseudocategories, additional information may be stored
-    if (ref $cat_extras eq 'HASH') {
-        @$page_data{ keys %$cat_extras } = values %$cat_extras;
     }
 
     # first, check if the category exists yet.
