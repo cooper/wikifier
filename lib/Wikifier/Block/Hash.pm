@@ -36,8 +36,8 @@ sub hash_parse {
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
             $item->parse(@_);
-            $key = $item; # this will actually become the value,
-                          # when we realize we don't have one
+            $key   = $item if !$in_value; # this will actually become the value,
+            $value = $item if  $in_value; # when we realize we don't have one
             next ITEM;
         }
 
