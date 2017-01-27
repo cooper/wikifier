@@ -19,6 +19,8 @@ our %block_types = (
 
 sub history_html {
     my ($block, $page, $el) = @_;
+    $block->html_base($page); # call hash html.
+
     my $table = $el->create_child(
         type  => 'table',
         class => 'history-table'
