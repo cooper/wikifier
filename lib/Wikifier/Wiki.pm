@@ -30,9 +30,9 @@ use Wikifier::Utilities qw(L);
 
 # default options.
 our %wiki_defaults = (
+    'page.enable.cache'             => 1,
     'image.enable.restriction'      => 1,
     'image.enable.cache'            => 1,
-    'page.enable.cache'             => 1,
     'image.enable.retina'           => 2,
     'image.enable.tracking'         => 1,
     'image.enable.pregeneration'    => 1,

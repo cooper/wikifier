@@ -23,7 +23,7 @@ our %block_types = (
 
 # this counts how many sections there are.
 # this is then compared in section_html to see if it's the last section.
-# if it is and last_section_footer is enabled, the </div> is omitted
+# if it is and page.enable.footer is enabled, the </div> is omitted
 # in order to leave room for a footer.
 sub section_parse {
     my ($block, $page) = @_;
@@ -50,7 +50,9 @@ sub section_html {
 
     # disable the footer if necessary.
     # this only works if the section is the last item in the main block.
-    if ($page->wiki_opt('page.enable.section_footer') &&
+    # FIXME: this needs to be somewhere other than here, since pages might
+    # not have a section or might not end with a section
+    if ($page->wiki_opt('page.enable.footer') &&
     $page->{wikifier}{main_block}{content}[-1] == $block) {
         $el->configure(no_close_tag => 1);
         $block->{parent}{element}->configure(no_close_tag => 1);

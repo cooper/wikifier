@@ -7,20 +7,38 @@ name                            Default: Wiki
     The name of the wiki.
 
 root.wiki                       Default: '' (i.e. /)
-root.page                       Default: '' (i.e. /)
+root.page                       Default: /page
 root.image                      Default: /images
 
-    HTTP roots. These are typically relative. For example, /images, images,
-    article, /wiki/article, etc. Do not include the trailing slash.
+    HTTP roots. These are relative to the server HTTP root, NOT the wiki root.
+    They are used for link targets and image URLs; they will never be used to
+    locate content on the filesystem. Do not include trailing slashes.
 
+    It may be useful to use root.wiki within the definitions of the rest:
+        @root.wiki:     /mywiki;
+        @root.page:     [@root.wiki]/page;
+        @root.image:    [@root.wiki]/images;
+
+dir.wiki                        Default: none
 dir.page                        Default: pages
 dir.cache                       Default: cache
 dir.image                       Default: images
 dir.category                    Default: categories
 dir.model                       Default: models
 
-    Directories on the filesystem without trailing slashes. For example,
-    /home/wiki/pages, cache, etc.
+    Directories on the filesystem. It is strongly recommended that they are
+    absolute paths; otherwise they will be dictated by whichever directory the
+    script is started from. All are required but have defaults. The directories
+    will be created if they do not exist. Do not include trailing slashes.
+
+    It may be useful to use dir.wiki within the definitions of the rest:
+        @dir.wiki:      /home/www/mywiki;
+        @dir.page:      [@dir.wiki]/pages;
+        @dir.cache:     [@dir.wiki]/cache;
+
+    It is recommended that all of the files related to one wiki exist within
+    a master wiki directory (dir.wiki), but this is not techincally required
+    unless you are using Wikifer::Wiki's built-in revision tracking.
 
 external.name                   Default: Wikipedia
 external.root                   Default: http://en.wikipedia.org/wiki
@@ -31,11 +49,16 @@ external.root                   Default: http://en.wikipedia.org/wiki
     name = the name to be displayed in link tooltips.
     root = the HTTP root for articles.
 
+    Page names will be translated to URLs in a format compatible with MediaWiki.
+    Currently this is non-configurable.
+
 page.enable.titles              Default: enabled
 
-    If enabled, the first section's title will be the title of the page.
+    If enabled, the first section's title will be the title of the page. You
+    may want to disable this if your wiki content is embedded within a template
+    that has its own place for the page title.
 
-page.enable.section_footer      Default: disabled
+page.enable.footer              Default: disabled
 
     If enabled, the closing </div> tags will be omitted from the final section
     and wiki block. This allows a footer to be injected before closing them off.
@@ -174,6 +197,36 @@ cat.<name>.title                Default: page filename displayed as title
     You can also set the title of a category from within the category file
     itself using the "title" key.
 
+PRIVATE Wikifier::Wiki options may be in a separation configuration file.
+This is where administrator credentials are stored. You can also put them in the
+primary configuration file, but this is not recommended.
+
+admin.<username>.name
+
+    The real name for the administrator <username>. This is used to attribute
+    page creation, image upload, etc. to the user. It may be displayed to the
+    public as the author or maintainer of a page or the owner of some file.
+    It is also used for Wikifier::Wiki's built-in revision tracking.
+
+admin.<username>.email
+
+    The email address of the administrator <username>. Currently this is used
+    only for Wikifier::Wiki's built-in revision tracking.
+
+admin.<username>.crypt
+
+    The type of encryption used for the password of administrator <username>.
+
+    Accepted values:
+        none    (plain text)
+        sha1    (default)
+        sha256
+        sha512
+
+admin.<username>.password
+
+    The password of the administrator <username>. It must be encrypted in
+    the crypt set by admin.<username>.crypt.
 
 Wikifier::Server options
 --------------------------------------------------------------------------------
@@ -197,9 +250,18 @@ server.enable.pregeneration     Default: disabled (but recommended)
 
 server.wiki.<name>.config       Default: none
 
-    The path to a configuration file for the wiki by the name of <name>.
+    The path to the configuration file for the wiki by the name of <name>.
     Any number of wikis can be configured on a single server using this.
+
+server.wiki.<name>.private       Default: none
+
+    The path to the PRIVATE configuration file for the wiki by the name of
+    <name>. This is where administrator credentials are stored. If it is not
+    provided, it will be assumed that this information is in the primary
+    configuration file. Be sure that the private configuration is not inside
+    the HTTP server root or has proper permissions to deny access to it.
 
 server.wiki.<name>.password     Default: none
 
-    The authentication password for the wiki by the name of <name>.
+    The read authentication password for the wiki by the name of <name>
+    in plain text.
