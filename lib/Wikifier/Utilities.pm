@@ -36,9 +36,7 @@ sub page_name {
     my ($page_name, $ext) = @_;
     return $page_name->name if blessed $page_name;
 
-    # replace non-alphanumerics with _ and lowercase.
-    $page_name =~ s/[^\w\.\-]/_/g;
-    $page_name = lc $page_name;
+    $page_name = page_name_link($page_name);
 
     # append the extension if it isn't already there.
     if ($page_name !~ m/\.(page|conf|model)$/) {
@@ -49,7 +47,19 @@ sub page_name {
     return $page_name;
 }
 
-# 'Some_Article.page' -> 'Some_Article'
+# 'Some Article' -> 'some_article'
+# 'Some Article' -> 'Some_Article' (with $no_lc)
+sub page_name_link {
+    my ($page_name, $no_lc) = @_;
+
+    # replace non-alphanumerics with _ and lowercase.
+    $page_name =~ s/[^\w\.\-]/_/g;
+    $page_name = lc $page_name unless $no_lc;
+
+    return $page_name;
+}
+
+# 'Some_Article.page' -> 'some_article'
 sub page_name_ne {
     my $page_name = page_name(shift, '');
     $page_name =~ s/\.(page|conf|model)$//;

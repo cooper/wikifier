@@ -12,7 +12,7 @@ use 5.010;
 
 use Scalar::Util   ();
 use HTML::Entities ();
-use Wikifier::Utilities qw(page_name trim);
+use Wikifier::Utilities qw(page_name_link trim);
 
 our %colors = (
     AliceBlue               => '#F0F8FF',
@@ -321,9 +321,9 @@ sub parse_format_type {
 
     # a link in the form of [[link]], [!link!], or [$link$]
     when (/^([\!\[\$\~]+?)(.+)([\!\]\$\~]+?)$/) { # inner match should be most greedy.
-
         my ($link_char, $inner, $link_type) = (trim($1), trim($2));
         my ($target, $text, $title) = ($inner, $inner, '');
+        my $name_link = page_name_link($target);
 
         # format is <text>|<target>
         if ($inner =~ m/^(.+?)\|(.+)$/) {
@@ -335,21 +335,22 @@ sub parse_format_type {
         if ($link_char eq '[') {
             $link_type = 'internal';
             $title     = ucfirst $target;
-            $target    = $page->wiki_opt('root.page').'/'.page_name($target);
+            $target    = $page->wiki_opt('root.page')."/$name_link";
         }
 
         # category wiki link [~category~]
         elsif ($link_char eq '~') {
             $link_type = 'category';
             $title     = ucfirst $target;
-            $target    = $page->wiki_opt('root.category').'/'.page_name($target);
+            $target    = $page->wiki_opt('root.category')."/$name_link";
         }
 
         # external wiki link [!article!]
         elsif ($link_char eq '!') {
+            my $external_link = page_name_link($target, 1);
             $link_type = 'external';
             $title     = $page->wiki_opt('external.name').': '.ucfirst($target);
-            $target    = $page->wiki_opt('external.root').'/'.page_name($target);
+            $target    = $page->wiki_opt('external.root')."/$external_link";
         }
 
         # other non-wiki link [$url$]
