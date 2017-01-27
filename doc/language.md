@@ -115,9 +115,11 @@ else {
 `@page` contains information about the current page. Its attributes are set at
 the very top of a page source file.
 
-* `@page.name` - Human-readable page name. Utilized internally by the Wikifier,
-  so it is required for most purposes. Often used as the `<title>` of the
-  page, as well as in the `<h1>` above the first `section{}` block.
+* `@page.title` - Human-readable page title. Utilized internally by the
+  Wikifier, so it is required for most purposes. Often used as the `<title>` of
+  the page, as well as in the `<h1>` above the first `section{}` block. The
+  title can contain [formatted text](#text-formatting), but it may be stripped
+  down to plaintext in certain places.
 * `@page.created` - UNIX timestamp of the page creation time. This is not used
   in the Wikifier itself, but can be used in frontends for sorting the page list
   by creation date.
@@ -131,7 +133,7 @@ of it is a boolean. If present, the page belongs to that category. Example:
 * `@category.news;`
 * `@category.important;`
 
-`@m` is a special variable used only in [models](models.md). Its attributes are
+`@m` is a special variable used in [models](models.md). Its attributes are
 mapped to any options provided in the model block.
 
 ## Text formatting
