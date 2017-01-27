@@ -240,7 +240,6 @@ sub handle_character {
             name    => $block_name,
             classes => \@block_classes
         );
-
     }
 
     # right bracket indicates the closing of a block.
@@ -284,11 +283,14 @@ sub handle_character {
             @add_contents = $current->{block};
         }
 
-        # close the block, returning to its parent.
-        $current->{block}{closed} = 1;
+        # close the block
+        $current->{block}{closed}       = 1;
+        $current->{block}{end_line}     = $current->{line};
+        $current->{block}{end_column}   = $current->{column};
+
+        # return to the parent
         push @{ $current->{block}{parent}{content} }, @add_contents;
         $current->{block} = $current->{block}{parent};
-
     }
 
     # ignore backslashes - they are handled later below.

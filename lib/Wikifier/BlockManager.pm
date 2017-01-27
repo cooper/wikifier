@@ -35,12 +35,11 @@ sub create_block {
         %opts
     ) if !$block_types{$type};
 
-    # it does exist at this point.
+    # Safe point - the block type is real and is loaded.
 
     # is this an alias?
-    if ($block_types{$type}{alias}) {
-        $opts{type} = $block_types{$type}{alias};
-        $type       = $opts{type};
+    if (my $alias = $block_types{$type}{alias}) {
+        $opts{type} = $type = $alias;
     }
 
     # call init sub.

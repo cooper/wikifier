@@ -58,6 +58,7 @@ sub new {
 
     # create the page's main block.
     $page->{main_block} = $wikifier->{main_block} = $wikifier->create_block(
+        line   => 1,
         wdir   => $page->wiki_opt('dir.wikifier'),
         type   => 'main',
         parent => undef     # main block has no parent.
