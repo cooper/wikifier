@@ -36,7 +36,8 @@ sub hash_parse {
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
             $item->parse(@_);
-            $value = $item;
+            $key = $item; # this will actually become the value,
+                          # when we realize we don't have one
             next ITEM;
         }
 
@@ -90,6 +91,7 @@ sub hash_parse {
                 # otherwise, it's a normal key-value pair.
                 # fix the key
                 else {
+                    $key = "$key" if blessed $key; # just in case
                     $key =~ s/(^\s*)|(\s*$)//g;
                     $key_title = $key;
                 }
