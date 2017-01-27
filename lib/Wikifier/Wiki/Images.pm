@@ -100,8 +100,8 @@ sub _display_image {
             # ignore scale 1 and non-integers
             s/^\s*//;
             s/\s*$//;
-            next if $_ == 1;
             next if m/\D/;
+            next if $_ == 1;
 
             my $retina_file = "$image{f_name_ne}\@${_}x.$image{ext}";
             $wiki->display_image($retina_file, 1);
@@ -150,13 +150,15 @@ sub _display_image {
 
     # if image generation is disabled, we must supply the full-sized image data.
     if (!$wiki->opt('image.enable.cache')) {
+        # XXX: what is this?!?!?! so confused
         return $wiki->display_image($result, $image_name, 0, 0);
     }
 
     #==========================#
     #=== Generate the image ===#
     #==========================#
-    $wiki->generate_image(\%image, $result);
+    my $err = $wiki->generate_image(\%image, $result);
+    return $err if $err;
 
     # the generator says to use the full-sized image.
     if (delete $result->{use_fullsize}) {
@@ -233,10 +235,7 @@ sub parse_image_name {
 }
 
 # generate an image of a certain size.
-#
-# $result is to be passed only from an existing display_image() request.
-# if this is called from outside of a request, do not specify $result.
-#
+# returns error on fail, nothing on success
 sub generate_image {
     my ($wiki, $_image, $result) = @_;
 
@@ -247,26 +246,6 @@ sub generate_image {
     # an error occurred.
     return display_error($image{error})
         if $image{error};
-
-    # no result hash reference; create one with default values.
-    $result ||= do {
-
-        # determine image short name, extension, and mime type.
-        my $mime = $image{ext} eq 'png' ? 'image/png' : 'image/jpeg';
-        my $type = $mime eq 'image/png' ? 'png'       : 'jpeg';
-
-        # base $result
-        {
-            type          => 'image',
-            file          => $image{name},
-            path          => $image{path} || $image{big_path},
-            fullsize_path => $image{big_path},
-            cache_path    => $wiki->opt('dir.cache').'/'.$image{full_name},
-            image_type    => $type,
-            mime          => $mime
-        }
-    };
-
 
     # if we are restricting to only sizes used in the wiki, check.
     my ($width, $height) = ($image{width}, $image{height});
@@ -296,7 +275,7 @@ sub generate_image {
         $image{full_name} = $image{name};
         $wiki->symlink_scaled_image(\%image) if $image{retina};
 
-        return $result;
+        return; # success
     }
 
     # create resized image.
@@ -357,7 +336,7 @@ sub generate_image {
         "Generated image '$image{name}' at ${width}x${height}" .
         ($image{retina} ? " (\@$image{retina}x)" : '')
     );
-    return $result;
+    return; # success
 }
 
 # symlink an image to its scaled version
