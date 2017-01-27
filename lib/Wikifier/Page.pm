@@ -213,7 +213,7 @@ sub parse_formatted_text {
 sub wiki_opt {
     my ($page, $var, @args) = @_;
     return $page->{wiki}->opt($var) if blessed $page->{wiki};
-    return _call_wiki_opt($wiki_defaults{$var});
+    return _call_wiki_opt($wiki_defaults{$var}, @args);
 }
 
 sub _call_wiki_opt {
