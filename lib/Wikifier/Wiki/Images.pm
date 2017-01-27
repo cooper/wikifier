@@ -452,9 +452,9 @@ sub get_images {
         my @stat = stat $wiki->path_for_image($filename);
         my $image_data = $images{$filename} = {
             file        => $filename,
-            created     => $stat[10],   # ctime
-            mod_unix    => $stat[9],    # mtime
-            title       => $filename    # may be overwritten by category
+            title       => $filename,   # may be overwritten by category
+            created     => $stat[10],   # ctime, probably overwritten
+            mod_unix    => $stat[9]     # mtime, probably overwritten
         };
 
         # this category does not exist
@@ -467,9 +467,7 @@ sub get_images {
 
         # in the category, "file" is the cat filename, and the "category"
         # is the image filename. remove these to avoid confusion.
-        # "mod_unix" refers to the category modification time, and "created"
-        # is the category creation time. remove these as well.
-        delete @cat{'file', 'category', 'mod_unix', 'created'};
+        delete @cat{'file', 'category'};
 
         # inject metadata from category
         @$image_data{ keys %cat } = values %cat;
