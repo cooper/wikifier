@@ -158,7 +158,7 @@ sub cat_add_page {
 
     # for pseudocategories, additional information may be stored
     if (ref $cat_extras eq 'HASH') {
-        $page_data->{ keys %$cat_extras } = values %$cat_extras;
+        @$page_data{ keys %$cat_extras } = values %$cat_extras;
     }
 
     # first, check if the category exists yet.
