@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2014, Mitchell Cooper
 #
-# code blocks display a block of code or other unformatted text. 
+# code blocks display a block of code or other unformatted text.
 #
 package Wikifier::Block::Code;
 
@@ -19,7 +19,7 @@ sub code_html {
     $el->configure(
         type    => 'pre',
         class   => 'code',
-        content => $page->parse_formatted_text($block->{content}[0])
+        content => $block->{content}[0]
     );
 }
 
