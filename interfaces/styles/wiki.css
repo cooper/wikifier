@@ -189,20 +189,21 @@ table.wiki-history-table {
     border: none;
     border-collapse: separate;
     border-spacing: 5px;
-    font-size: 12px;
+    font-size: 0.9em;
 }
 
 tr.wiki-history-pair {
 }
 
 td.wiki-history-key {
-    min-width: 200px;
     font-weight: bold;
-    max-width: 80px;
+    white-space: nowrap;
+    padding-right: 15px;
 }
 
 td.wiki-history-value {
     padding: 2px;
+    width: 100%;
 }
 
 /* code */
