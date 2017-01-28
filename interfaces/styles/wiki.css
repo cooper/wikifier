@@ -122,13 +122,13 @@ div.wiki-imagebox img {
 div.wiki-imagebox-left {
     float: left;
     clear: left;
-    margin: .5em 1.4em 1.3em 0;
+    margin: .5em 1.4em .5em 0;
 }
 
 div.wiki-imagebox-right {
     float: right;
     clear: right;
-    margin: .5em 0 1.3em 1.4em;
+    margin: .5em 0 .5em 1.4em;
 }
 
 div.wiki-imagebox-description {
