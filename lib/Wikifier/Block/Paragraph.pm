@@ -21,7 +21,7 @@ sub paragraph_html {
     my ($block, $page, $el) = @_;
     $el->configure(type => 'p');
 
-    foreach my $item (@{ $block->{content} }) {
+    foreach my $item ($block->content) {
         next if blessed $item; # paragraphs cannot currently contain anything.
 
         # trim.

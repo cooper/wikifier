@@ -23,7 +23,7 @@ sub infobox_parse {
 
     # search for image{}.
     # apply default width.
-    foreach my $item (@{ $block->{content} }) {
+    foreach my $item ($block->content) {
         next unless blessed $item && $item->{type} eq 'image';
         $item->{default_width} = '270px';
     }

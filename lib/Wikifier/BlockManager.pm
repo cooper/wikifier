@@ -27,13 +27,15 @@ sub create_block {
     $opts{wikifier} = $wikifier;
 
     # if this block type doesn't exist, try loading its module.
-    $wikifier->load_block($type, $dir) if !$block_types{$type};
+    my $type_ref = $block_types{$type};
+    $wikifier->load_block($type, $dir) if !$type_ref;
 
     # if it still doesn't exist, make a dummy.
+    $type_ref = $block_types{$type};
     return Wikifier::Block->new(
         type => 'dummy',
         %opts
-    ) if !$block_types{$type};
+    ) if !$type_ref;
 
     # Safe point - the block type is real and is loaded.
 
@@ -43,7 +45,11 @@ sub create_block {
     }
 
     # call init sub.
-    my $block = Wikifier::Block->new(%opts, wdir => $dir);
+    my $block = Wikifier::Block->new(
+        type_ref => $type_ref,  # reference to the block type
+        %opts,                  # options passed to ->create_block
+        wdir => $dir            # wikifier directory
+    );
     $block_types{$type}{init}->($block) if $block_types{$type}{init};
 
     return $block;

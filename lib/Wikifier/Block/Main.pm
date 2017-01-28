@@ -21,21 +21,20 @@ our %block_types = (
 
 sub main_parse {
     my $block = shift;
-    
+
     # filter out blank items.
     $block->remove_blank();
-    
+
     return 1;
 }
 
 sub main_html {
     my ($block, $page, $el) = @_;
-    
+
     # generate a better ID.
     $el->{id} = 'main-'.time.substr(md5_hex($page->path), 0, 5);
-    
-    foreach my $item (@{ $block->{content} }) {
-        next unless blessed $item;
+
+    foreach my $item ($block->content_blocks) {
         $el->add($item->html($page));
     }
 }

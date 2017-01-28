@@ -17,7 +17,7 @@ our %block_types = (
 
 sub html_html {
     my ($format, $block, $page, $el) = @_;
-    foreach my $item (@{ $block->{content} }) {
+    foreach my $item ($block->content_visible) {
         if (blessed $item) {
             $item = $item->html($page);
         }

@@ -81,7 +81,8 @@ sub section_html {
 
     # add the contained elements.
     my $line = $block->{line};
-    ITEM: foreach my $item (@{ $block->{content} }) {
+    ITEM: foreach my $item ($block->content) {
+        # don't use ->content_visible because we are tracking line numbers
 
         # if it's not blessed, it's text.
         # sections interpret loose text as paragraphs.
@@ -106,8 +107,9 @@ sub section_html {
             next ITEM;
         }
 
-        # this is blessed, so it's a block.
+        # this is blessed, so it's a block. manually skip invisible ones.
         # adopt this element.
+        next ITEM if $item->{type_ref}{invis};
         $el->add($item->html($page));
         $line = $item->{end_line} if $item->{end_line};
     }

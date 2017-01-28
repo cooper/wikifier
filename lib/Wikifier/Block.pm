@@ -66,8 +66,7 @@ sub parse {
     delete $block->{parse_done};
 
     # parse child blocks.
-    foreach my $block (@{ $block->{content} }) {
-        next unless blessed $block;
+    foreach my $block ($block->content_blocks) {
         $block->parse(@_);
     }
 }
@@ -77,7 +76,7 @@ sub parse {
 # SUPER::parse() at the beginning of a parse().
 sub parse_base {
     my $block = shift;
-    my $type  = $Wikifier::BlockManager::block_types{ $block->{type} }{base};
+    my $type  = $block->{type_ref}{base};
     if (!defined $type) {
         L "$$block->{type}\{} called ->parse_base(), but it has no base";
         return;
@@ -108,7 +107,6 @@ sub _parse {
 sub html {
     my $block   = shift;
     my $type    = $block->{type};
-    my $typeref = $Wikifier::BlockManager::block_types{$type};
 
     # strip excess whitespace
     $block->remove_blank;
@@ -117,7 +115,7 @@ sub html {
     $block->{element} = Wikifier::Element->new(
         class => $block->{type},
         ids   => $block->{wikifier}{element_identifiers} ||= {}
-    ) unless $typeref->{invis};
+    ) unless $block->{type_ref}{invis};
 
     # generate this block.
     $block->{html_done} = {};
@@ -125,8 +123,7 @@ sub html {
     delete $block->{html_done};
 
     # do child blocks that haven't been done.
-    foreach my $block (@{ $block->{content} }) {
-        next unless blessed $block;
+    foreach my $block ($block->content_blocks) {
         next if $block->{called_html};
         $block->html(@_);
     }
@@ -145,7 +142,7 @@ sub html {
 # SUPER::html() at the beginning of a html().
 sub html_base {
     my $block = shift;
-    my $type  = $Wikifier::BlockManager::block_types{ $block->{type} }{base};
+    my $type  = $block->{type_ref}{base};
     if (!defined $type) {
         L "$$block->{type}\{} called ->html_base(), but it has no base";
         return;
@@ -169,6 +166,30 @@ sub _html {
     }
 }
 
+########################
+### FETCHING CONTENT ###
+########################
+
+# returns all content. this is a list of mixed strings and blocks.
+sub content {
+    return @{ shift->{content} };
+}
+
+# same as ->content except it skips blocks that don't produce HTML.
+sub content_visible {
+    return grep { !blessed $_ || !$_->{type_ref}{invis} } shift->content;
+}
+
+# returns only child blocks, ignoring text content.
+sub content_blocks {
+    return grep { blessed $_ } shift->content;
+}
+
+# returns only text content, ignoring child blocks.
+sub content_text {
+    return grep { !blessed $_ } shift->content;
+}
+
 #############
 ### OTHER ###
 #############
@@ -177,7 +198,7 @@ sub _html {
 sub remove_blank {
     my $block = shift;
     my @new;
-    foreach my $item (@{ $block->{content} }) {
+    foreach my $item ($block->content) {
         push @new, $item and next if blessed $item;
         my $trimmed = Wikifier::Utilities::trim($item);
         push @new, $item if length $trimmed;

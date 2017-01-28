@@ -31,7 +31,7 @@ sub hash_parse {
     my ($key, $value, $in_value, %values) = (q.., q..);
 
     # for each content item...
-    ITEM: foreach my $item (@{ $block->{content} }) {
+    ITEM: foreach my $item ($block->content_visible) {
 
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
