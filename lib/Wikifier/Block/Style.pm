@@ -11,7 +11,7 @@ use Scalar::Util 'blessed';
 our %block_types = (style => {
     base   => 'hash',
     parse  => \&style_parse,
-    html   => \&style_html
+    html   => \&style_html,
     invis  => 1
 });
 
@@ -62,7 +62,7 @@ sub style_parse {
 }
 
 sub style_html {
-    my ($block, $page, $el) = (shift, @_);
+    my ($block, $page) = (shift, @_);
     my %style   = %{ $block->{style} };
     my $main_el = $block->{parent}{element};
     my @apply;
