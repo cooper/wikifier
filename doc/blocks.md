@@ -39,15 +39,15 @@ format {
 }
 ```
 
-## Hash
+## Map
 
-A hash data type. It can be used for the parameters of other blocks. Many other
-block types inherit from this when they accept key-value options.
+A key-value map data type. It can be used for the parameters of other blocks.
+Many other block types inherit from this when they accept key-value options.
 
 Yields no HTML.
 
 ```
-hash {
+map {
     key: value;
     other key: another value;
 }

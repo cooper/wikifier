@@ -27,7 +27,7 @@ sub history_html {
     );
 
     # append each pair.
-    foreach my $pair (@{ $block->{hash_array} }) {
+    foreach my $pair (@{ $block->{map_array} }) {
         my ($key, $value) = @$pair;
         my $tr = $table->create_child(
             type  => 'tr',

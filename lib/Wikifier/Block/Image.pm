@@ -27,7 +27,7 @@ our %block_types = (
     }
 );
 
-# Hash handles the actual parsing; this assigns
+# Map handles the actual parsing; this assigns
 # properties to the imagebox from the found values.
 sub image_parse {
     my ($block, $page) = (shift, @_);

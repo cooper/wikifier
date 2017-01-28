@@ -48,7 +48,7 @@ sub infobox_html {
     );
 
     # append each pair.
-    foreach my $pair (@{ $block->{hash_array} }) {
+    foreach my $pair (@{ $block->{map_array} }) {
         my ($key_title, $value, $key, $is_block) = @$pair;
 
         # create the row.

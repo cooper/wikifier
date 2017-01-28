@@ -42,6 +42,7 @@ sub create_block {
     # is this an alias?
     if (my $alias = $block_types{$type}{alias}) {
         $opts{type} = $type = $alias;
+        $type_ref = $block_types{$type};
     }
 
     # call init sub.
@@ -50,7 +51,7 @@ sub create_block {
         %opts,                  # options passed to ->create_block
         wdir => $dir            # wikifier directory
     );
-    $block_types{$type}{init}->($block) if $block_types{$type}{init};
+    $type_ref->{init}($block) if $type_ref->{init};
 
     return $block;
 }
