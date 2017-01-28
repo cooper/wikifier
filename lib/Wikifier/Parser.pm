@@ -55,8 +55,9 @@ sub parse {
         $current->{line} = $.;
         my ($i, $err) = $wikifier->handle_line($line, $page, $current);
         next unless $err;
+        $err = "Line $.:$i: $err";
         close $fh;
-        return "Line $.:$i: $err";
+        return $err;
     }
 
     close $fh;
