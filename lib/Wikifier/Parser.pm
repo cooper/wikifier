@@ -23,7 +23,12 @@ use Wikifier::Utilities qw(trim L);
 # parse a wiki file.
 sub parse {
     my ($wikifier, $page, $file) = @_;
-    $file = $page->path if $page;
+
+    # if a page is provided, use ->{source} or ->path
+    if ($page) {
+        $file = $page->path;
+        $file = \$page->{source} if $page->{source};
+    }
 
     # no file given.
     if (!defined $file) {
@@ -48,18 +53,22 @@ sub parse {
         $line = trim($line);        # remove prefixing and suffixing whitespace.
         $current->{line} = $.;
         my ($i, $err) = $wikifier->handle_line($line, $page, $current);
-        return "Line $.:$i: $err" if $err;
+        next unless $err;
+        close $fh;
+        return "Line $.:$i: $err";
     }
 
     # some block was not closed.
     if ($current->{block} != $page->{main_block}) {
         my ($type, $line, $col) = @{ $current->{block} }{ qw(type line col) };
+        close $fh;
         return "Line $line:$col: $type\{} still open at EOF";
     }
 
     # run ->parse on children.
     $page->{main_block}->parse($page);
 
+    close $fh;
     return;
 }
 
