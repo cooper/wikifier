@@ -34,7 +34,7 @@ sub model_parse {
         model_name => $name,
         #wikifier   => $page->wikifier,
         wiki       => $page->{wiki}, # (might not exist)
-        variables  => { 'm' => $block->{hash} }
+        variables  => { 'm' => $block->{map} }
     );
 
     # parse the page.

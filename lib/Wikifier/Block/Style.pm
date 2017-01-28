@@ -24,7 +24,7 @@ sub style_parse {
 
     my %style = (
         apply_to => [],
-        rules    => $block->{hash}
+        rules    => $block->{map}
     );
 
     # if the block has a name, it applies to child class(es).
