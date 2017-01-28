@@ -59,7 +59,7 @@ sub new {
     # create the page's main block.
     $page->{main_block} = $wikifier->{main_block} = $wikifier->create_block(
         line   => 1,
-        wdir   => $page->wiki_opt('dir.wikifier'),
+        wdir   => $page->{wdir} // $page->wiki_opt('dir.wikifier'),
         type   => 'main',
         parent => undef     # main block has no parent.
     );
@@ -83,10 +83,10 @@ sub html {
     my $page = shift;
     my $res;
     L('HTML', sub {
-        $page->{wikifier}{main_block}->html($page);
+        $res = $page->{wikifier}{main_block}->html($page);
     });
     L('Generate', sub {
-        $res = $page->{wikifier}{main_block}{element}->generate;
+        $res = $res->generate;
     });
     return $res;
 }

@@ -49,7 +49,7 @@ sub infobox_html {
 
     # append each pair.
     foreach my $pair (@{ $block->{hash_array} }) {
-        my ($key_title, $value, $key) = @$pair;
+        my ($key_title, $value, $key, $is_block) = @$pair;
 
         # create the row.
         my $tr = $table->create_child(
@@ -80,7 +80,7 @@ sub infobox_html {
                 attributes => { colspan => 2 },
                 content    => $value
             );
-            $td->add_class('infobox-text') if !ref $value;
+            $td->add_class('infobox-text') if !$is_block;
         }
 
     } # pair

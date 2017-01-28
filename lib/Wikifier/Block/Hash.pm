@@ -97,7 +97,8 @@ sub hash_parse {
                 }
 
                 # fix the value
-                if (!blessed $value) {
+                my $is_block = blessed $value;
+                if (!$is_block) {
                     $value =~ s/(^\s*)|(\s*$)//g;
 
                     # special value -no-format-values;
@@ -122,7 +123,12 @@ sub hash_parse {
 
                 # store the value.
                 $values{$key} = $value;
-                push @{ $block->{hash_array} }, [$key_title, $value, $key];
+                push @{ $block->{hash_array} }, [
+                    $key_title,     # displayed key
+                    $value,         # value, at this stage text or block
+                    $key,           # actual hash key
+                    $is_block       # true if value originally was a block
+                ];
 
                 # reset status.
                 $in_value = 0;
@@ -164,7 +170,7 @@ sub hash_html {
         else {
             next;
         }
-        $_->[1] = $value;
+        $_->[1] = $value; # overwrite the block value with HTML
         $block->{hash}{$key} = $value;
     }
 }
