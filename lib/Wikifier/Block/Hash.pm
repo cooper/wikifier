@@ -130,6 +130,8 @@ sub hash_parse {
             }
 
             # any other characters.
+            # TODO: produce a warning if $key or $value is blessed and we are
+            # trying to append it. they likely forgot a semicolon after a block.
             default {
                 $value  .= $char if  $in_value;
                 $key    .= $char if !$in_value;

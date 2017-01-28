@@ -92,6 +92,11 @@ td.wiki-infobox-anon {
     padding: 0;
 }
 
+td.wiki-infobox-anon.wiki-infobox-text {
+    padding: 5px;
+    text-align: center;
+}
+
 /* imageboxes */
 
 div.wiki-imagebox {

@@ -71,6 +71,8 @@ sub list_parse {
             }
 
             # any other characters.
+            # TODO: produce a warning if $value is blessed and we are
+            # trying to append it. they likely forgot a semicolon after a block.
             else {
                 $value .= $char;
                 $escaped = 0;

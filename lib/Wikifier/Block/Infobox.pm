@@ -23,11 +23,10 @@ sub infobox_parse {
 
     # search for image{}.
     # apply default width.
-    foreach my $item ($block->content) {
+    foreach my $item ($block->content_visible) {
         next unless blessed $item && $item->{type} eq 'image';
         $item->{default_width} = '270px';
     }
-
 }
 
 sub infobox_html {
@@ -75,12 +74,13 @@ sub infobox_html {
 
         # append table row without key.
         else {
-            $tr->create_child(
+            my $td = $tr->create_child(
                 type       => 'td',
                 class      => 'infobox-anon',
                 attributes => { colspan => 2 },
                 content    => $value
             );
+            $td->add_class('infobox-text') if !ref $value;
         }
 
     } # pair
