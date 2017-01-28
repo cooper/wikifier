@@ -194,6 +194,10 @@ sub content_text {
 ### OTHER ###
 #############
 
+sub parent { shift->{parent} }
+sub type   { shift->{type}   }
+sub name   { shift->{name}   }
+
 # remove empty content items.
 sub remove_blank {
     my $block = shift;

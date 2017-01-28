@@ -27,7 +27,7 @@ sub parse {
     # if a page is provided, use ->{source} or ->path
     if ($page) {
         $file = $page->path;
-        $file = \$page->{source} if $page->{source};
+        $file = \$page->{source} if defined $page->{source};
     }
 
     # no file given.
@@ -42,10 +42,10 @@ sub parse {
     }
 
     # set initial parse info.
-    my $current = {
-        block => $wikifier->{main_block},
-        last  => {}
-    };
+    my $current = bless {
+        block       => $wikifier->{main_block},
+        warnings    => []
+    }, 'Wikifier::Parser::Current';
 
     # read it line-by-line.
     while (my $line = <$fh>) {
@@ -74,7 +74,7 @@ sub parse {
 
 # parse a single line.
 sub handle_line {
-    my ($wikifier, $line, $page, $current) = @_;
+    my ($wikifier, $line, $page, $c) = @_;
 
     # illegal regex filters out variable declaration.
     if ($line =~ m/^\s*\@([\w\.]+):\s*(.+);\s*$/) {
@@ -93,11 +93,11 @@ sub handle_line {
 
     # pass on to main parser.
     my @chars = (split(//, $line), "\n");
-    for my $i (0 .. $#chars) {
-        next if delete $current->{skip_next_char};
-        $current->{col} = $i;
-        $current->{next_char} = $chars[$i + 1] // '';
-        my $err = $wikifier->handle_character($chars[$i], $page, $current);
+    CHAR: for my $i (0 .. $#chars) {
+        next CHAR if delete $c->{skip_next_char};
+        $c->{col} = $i;
+        $c->{next_char} = $chars[$i + 1] // '';
+        my $err = $wikifier->handle_character($chars[$i], $page, $c);
         return ($i, $err) if $err;
     }
 
@@ -106,67 +106,47 @@ sub handle_line {
 
 # % current
 #   char:       the current character.
-#   word:       the current word. (may not yet be complete.)
 #   escaped:    true if the current character was escaped. (last character = \)
 #   block:      the current block object.
 #   ignored:    true if the character is a master parser character({, }, etc.).
 #   line:       current line number
 #   col:        current column number (actually column + 1)
-#
-# %last
-#   char:       the last parsed character.
-#   word:       the last full word.
-#   escaped:    true if the last character was escaped. (2nd last character = \)
-#   block:      the current block object's parent block object.
-
 
 # parse a single character.
 # note: never return from this method; instead last from for loop.
 sub handle_character {
-    my ($wikifier, $char, $page, $current) = @_;
-    my $last = $current->{last};
+    my ($wikifier, $char, $page, $c) = @_;
 
     # set current character.
-    $current->{char} = $char;
+    $c->{char} = $char;
 
-    for ($char) {
+    CHAR:    for ($char) {
+    DEFAULT: for ($char) {  my $use_default;
 
     # comment entrance and closure.
-    if ($char eq '/' && $current->{next_char} eq '*') {
-        $current->{in_comment}++;
-        last;
+    if ($char eq '/' && $c->{next_char} eq '*') {
+        $c->mark_comment;
+        next CHAR;
     }
-    if ($char eq '*' && $current->{next_char} eq '/') {
-        delete $current->{in_comment};
-        $current->{skip_next_char}++;
-        last;
+    if ($char eq '*' && $c->{next_char} eq '/') {
+        $c->clear_comment;
+        $c->{skip_next_char}++;
+        next CHAR;
     }
 
     # inside a comment.
-    last if $current->{in_comment};
-
-    # space. terminates a word.
-    # delete the current word, setting its value to the last word.
-    when (' ') {
-
-        # that is, unless the current word a space.
-        # note: I can't remember why I felt the need for this code.
-        if (!(defined $current->{word} && $current->{word} eq ' ')) {
-            $last->{word} = delete $current->{word};
-            continue;
-        }
-    }
+    next CHAR if $c->is_comment;
 
     # left bracket indicates the start of a block.
-    when ('{') {
-        $current->{ignored} = 1;
-        continue if $current->{escaped}; # this character was escaped; continue.
+    if ($char eq '{') {
+        $c->mark_ignored;
+        next DEFAULT if $c->is_escaped;
 
         # now we must remove the new block type from the
         # current block's last content element.
 
         # set some initial variables for the loop.
-        my $content       = $current->{block}{content}[-1];
+        my $content       = $c->last_content;
         my $block_type    = my $block_name    = '';
         my $in_block_name = my $chars_scanned = 0;
 
@@ -174,17 +154,17 @@ sub handle_character {
             if !length $content;
 
         # chop one character at a time from the end of the content.
-        while (my $last_char = chop $content) { $chars_scanned++;
+        BACKCHAR: while (my $last_char = chop $content) { $chars_scanned++;
 
             # entering block name.
             if ($last_char eq ']') {
-                next if !$in_block_name++;
+                next BACKCHAR if !$in_block_name++;
                 # if it was at 0, we just entered the block name.
             }
 
             # exiting block name.
             elsif ($last_char eq '[') {
-                next if !--$in_block_name;
+                next BACKCHAR if !--$in_block_name;
                 # if it was 1 or more, we're still in it.
             }
 
@@ -199,20 +179,19 @@ sub handle_character {
             # append to the block type.
             elsif ($last_char =~ m/[\w\-\$\.]/) {
                 $block_type = $last_char.$block_type;
-                next;
+                next BACKCHAR;
             }
 
             # this could be a space between things.
             elsif ($last_char =~ m/\s/ && !length $block_type) {
-                next;
+                next BACKCHAR;
             }
 
             # I give up. bail!
             else {
                 $chars_scanned--; # we do not possess this character.
-                last;
+                last BACKCHAR;
             }
-
         }
 
         #
@@ -221,8 +200,7 @@ sub handle_character {
         # note: it is very likely that a single space will remain, but this will later
         # be trimmed out by a further cleanup.
         #
-        $current->{block}{content}[-1] =
-            substr($current->{block}{content}[-1], 0, -$chars_scanned);
+        $c->last_content = substr($c->last_content, 0, -$chars_scanned);
 
         # if the block type contains dot(s), it has classes.
         my @block_classes;
@@ -241,10 +219,10 @@ sub handle_character {
         }
 
         # create the new block.
-        $current->{block} = $wikifier->create_block(
-            line    => $current->{line},
-            col     => $current->{col},
-            parent  => $current->{block},
+        $c->block = $wikifier->create_block(
+            line    => $c->{line},
+            col     => $c->{col},
+            parent  => $c->block,
             type    => $block_type,
             name    => $block_name,
             classes => \@block_classes
@@ -252,20 +230,20 @@ sub handle_character {
     }
 
     # right bracket indicates the closing of a block.
-    when ('}') {
-        $current->{ignored} = 1;
-        continue if $current->{escaped}; # this character was escaped; continue;
+    elsif ($char eq '}') {
+        $c->mark_ignored;
+        next DEFAULT if $c->is_escaped;
 
         # we cannot close the main block.
-        if ($current->{block} == $page->{main_block}) {
+        if ($c->block == $page->{main_block}) {
             L "Attempted to close main block";
             return;
         }
 
         # this is an if statement.
         my @add_contents;
-        if ($current->{block}{type} eq 'if') {
-            my $conditional = $current->{block}{name};
+        if ($c->block->type eq 'if') {
+            my $conditional = $c->block->name;
 
             # variable.
             if ($conditional =~ /^@([\w.]+)$/) {
@@ -273,111 +251,151 @@ sub handle_character {
             }
 
             # add everything from within the if block IF conditional is true.
-            @add_contents = @{ $current->{block}{content} } if $conditional;
-            $current->{conditional} = !!$conditional;
-
+            @add_contents = $c->content if $conditional;
+            $c->{conditional} = !!$conditional;
         }
 
         # this is an else statement.
-        elsif ($current->{block}{type} eq 'else') {
+        elsif ($c->block->type eq 'else') {
 
             # the conditional was false. add the contents of the else.
-            @add_contents = @{ $current->{block}{content} }
-                unless $current->{conditional};
-
+            @add_contents = $c->content unless $c->{conditional};
         }
 
         # normal block. add the block itself.
         else {
-            @add_contents = $current->{block};
+            @add_contents = $c->block;
         }
 
         # close the block
-        $current->{block}{closed}       = 1;
-        $current->{block}{end_line}     = $current->{line};
-        $current->{block}{end_column}   = $current->{column};
+        $c->block->{closed}++;
+        $c->block->{end_line}   = $c->{line};
+        $c->block->{end_column} = $c->{column};
 
         # return to the parent
-        push @{ $current->{block}{parent}{content} }, @add_contents;
-        $current->{block} = $current->{block}{parent};
+        $c->push_content(@add_contents);
+        $c->block = $c->block->parent;
     }
 
     # ignore backslashes - they are handled later below.
-    when ('\\') {
-        # this character should NEVER be ignored.
-        # if it's escaped, continue to default.
-        continue if $current->{escaped};
+    elsif ($char eq '\\') {
+        next DEFAULT if $c->is_escaped;
+        next CHAR;
     }
 
-    # any other character.
-    default {
+    else { $use_default++ }
+    print "MOVING ON $char\n" if !$use_default;
+    next CHAR unless $use_default;
 
-        # at this point, anything that needs escaping should have been handled by now.
-        # so, if this character is escaped and reached all the way to here, we will
-        # pretend it's not escaped by reinjecting a backslash. this allows further parsers
-        # to handle escapes (in particular, the formatting parser.)
-        my $append = $char;
-        if (!$current->{ignored} && $current->{escaped}) {
-            $append = "$$last{char}$char";
-        }
+    } # End of DEFAULT loop
 
-        # if it's not a space or newline, append to current word.
-        if ($char ne ' ' && $char ne "\n") {
-            $current->{word}  = '' if !defined $current->{word};
-            $current->{word} .= $append;
-        }
+print "MADE IT TO DEFAULT For $char\n";
+    # DEFAULT:
+    # OK, this is the second half of the CHAR loop, which is only reached
+    # if the if chain above reaches else{} or next DEFAULT is used.
 
-        # append character to current block's content.
-
-        # if the current block's content array is empty, push the character.
-        if (!scalar @{ $current->{block}{content} }) {
-            push @{ $current->{block}{content} }, $append;
-        }
-
-        # array is not empty.
-        else {
-
-            # if last element of the block's content is blessed, it's a child block.
-            my $last_value = $current->{block}{content}[-1];
-            if (blessed($last_value)) {
-
-                # push the character to the content array, creating a new string element.
-                push @{ $current->{block}{content} }, $append;
-
-            }
-
-            # not blessed, so simply append the character to the string.
-            else {
-                $current->{block}{content}[-1] .= $append;
-            }
-
-        }
-
-
-    } # end of default
-
-    } # end of switch
-
-    # set last stuff for next character.
-    $last->{char}       = $char;
-    $last->{escaped}    = $current->{escaped};
-    $current->{ignored} = 0;
-
-    # the current character is \, so set $current->{escaped} for the next character.
-    # unless, of course, this escape itself is escaped. (determined with current{escaped})
-    if ($char eq '\\' && !$current->{escaped}) {
-        $current->{escaped} = 1;
+    # at this point, anything that needs escaping should have been handled
+    # by now. so, if this character is escaped and reached all the way to
+    # here, we will pretend it's not escaped by reinjecting a backslash.
+    # this allows further parsers to handle escapes (in particular,
+    # the formatting parser.)
+    my $append = $char;
+    if (!$c->is_ignored && $c->is_escaped) {
+        $append = "$$c{last_char}$char";
     }
 
-    # otherwise, set current{escaped} to 0.
+    # append character to current block's content.
+
+    # if the current block's content array is empty, push the character.
+    if (!scalar $c->content) {
+        $c->push_content($append);
+    }
+
+    # array is not empty. push or append it.
     else {
-        $current->{escaped} = 0;
+
+        # if last element of the block's content is blessed,
+        # it's a child block.
+        my $last_value = $c->last_content;
+        if (blessed($last_value)) {
+
+            # push the character to the content array,
+            # creating a new string element.
+            $c->push_content($append);
+        }
+
+        # not blessed, so simply append the character to the string.
+        else { $c->append_content($append) }
     }
 
-    ### do not do anything below that depends on $current->{escaped} ###
-    ###   because it has already been modified for the next char   ###
+    } # End of CHAR
+
+    #=== Update stuff for next character ===#
+
+    $c->clear_ignored;
+    $c->{last_char} = $char;
+
+    # the current character is \, so set $c->{escaped} for the next
+    # character. unless, of course, this escape itself is escaped.
+    # (determined with current{escaped})
+    if ($char eq '\\' && !$c->is_escaped) {
+        $c->mark_escaped;
+    }
+    else {
+        $c->clear_escaped;
+    }
 
     return;
+}
+
+package Wikifier::Parser::Current;
+
+use warnings;
+use strict;
+use 5.010;
+
+# escaped characters
+sub is_escaped    {        shift->{escaped}   }
+sub mark_escaped  {        shift->{escaped}++ }
+sub clear_escaped { delete shift->{escaped}   }
+
+# /* block comments */
+sub is_comment    {        shift->{comment}   }
+sub mark_comment  {        shift->{comment}++ }
+sub clear_comment { delete shift->{comment}   }
+
+# ignored characters
+sub is_ignored    {        shift->{ignored}   }
+sub mark_ignored  {        shift->{ignored}++ }
+sub clear_ignored { delete shift->{ignored}   }
+
+# the current block
+sub block : lvalue {
+    return shift->{block};
+}
+
+# return the content of the current block
+sub content {
+    my $c = shift;
+    return @{ $c->{block}{content} };
+}
+
+# push content to the current block
+sub push_content {
+    my $c = shift;
+    push @{ $c->{block}{content} }, @_;
+}
+
+# return the last element in the current block's content
+sub last_content : lvalue {
+    my $c = shift;
+    return $c->{block}{content}[-1];
+}
+
+# append a string to the last element in the current block's content
+sub append_content {
+    my ($c, $append) = @_;
+    $c->last_content .= $append;
 }
 
 1
