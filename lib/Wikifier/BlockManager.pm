@@ -29,21 +29,21 @@ sub create_block {
     # if this block type doesn't exist, try loading its module.
     my $type_ref = $block_types{$type};
     $wikifier->load_block($type, $dir) if !$type_ref;
+    $type_ref = $block_types{$type};
+
+    # is this an alias?
+    if ($type_ref && length $type_ref->{alias}) {
+        $opts{type} = $type = $type_ref->{alias};
+        $type_ref = $block_types{$type};
+    }
 
     # if it still doesn't exist, make a dummy.
-    $type_ref = $block_types{$type};
     return Wikifier::Block->new(
         type => 'dummy',
         %opts
     ) if !$type_ref;
 
     # Safe point - the block type is real and is loaded.
-
-    # is this an alias?
-    if (my $alias = $block_types{$type}{alias}) {
-        $opts{type} = $type = $alias;
-        $type_ref = $block_types{$type};
-    }
 
     # call init sub.
     my $block = Wikifier::Block->new(
@@ -84,12 +84,6 @@ sub load_block {
     # register blocks.
     foreach my $block_type (keys %blocks) {
         $block_types{$block_type} = $blocks{$block_type};
-
-        # create aliases.
-        if (my $aliases = delete $blocks{$block_type}{alias}) {
-            $aliases = [$aliases] unless ref $aliases; # single alias.
-            $block_types{$_} = { alias => $block_type } foreach @$aliases;
-        }
 
         # if this depends on a base, load it.
         $wikifier->load_block($blocks{$block_type}{base}, $dir)

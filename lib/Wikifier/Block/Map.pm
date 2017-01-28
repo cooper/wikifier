@@ -150,11 +150,11 @@ sub map_parse {
     } # end of item loop.
 
     # append/overwrite values found in this parser.
-    my %hash = $block->{hash} ? %{ $block->{hash} } : ();
+    my %hash = $block->{map} ? %{ $block->{map} } : ();
     @hash{ keys %values } = values %values;
 
     # reassign the hash.
-    $block->{hash} = \%hash;
+    $block->{map} = \%hash;
 
     return 1;
 }
@@ -174,7 +174,7 @@ sub map_html {
             next;
         }
         $_->[1] = $value; # overwrite the block value with HTML
-        $block->{hash}{$key} = $value;
+        $block->{map}{$key} = $value;
     }
 }
 

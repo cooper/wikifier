@@ -12,8 +12,10 @@ use Scalar::Util 'blessed';
 
 our %block_types = (
     paragraph => {
-        html  => \&paragraph_html,
-        alias => 'p'
+        html => \&paragraph_html
+    },
+    p => {
+        alias => 'paragraph'
     }
 );
 

@@ -14,8 +14,10 @@ use Wikifier::Utilities qw(trim);
 our %block_types = (
     section => {
         parse => \&section_parse,
-        html  => \&section_html,
-        alias => 'sec'
+        html  => \&section_html
+    },
+    sec => {
+        alias => 'section',
     },
     clear => {
         html => \&clear_html
