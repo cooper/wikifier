@@ -4,8 +4,9 @@
 # The parser separates the file into block types and then passes those to
 # Wikifier::BlockManager for block class loading and object creation.
 #
-# This class is never to be used on its own. You must use Wikifier::Wiki for a high-level
-# Wiki manager or the medium-level Wikifier::Page for managing a single page.
+# This class is never to be used on its own. You must use Wikifier::Wiki for a
+# high-level Wiki manager or the medium-level Wikifier::Page for managing a
+# single page.
 #
 package Wikifier::Parser;
 
@@ -58,17 +59,17 @@ sub parse {
         return "Line $.:$i: $err";
     }
 
+    close $fh;
+
     # some block was not closed.
     if ($current->{block} != $page->{main_block}) {
         my ($type, $line, $col) = @{ $current->{block} }{ qw(type line col) };
-        close $fh;
         return "Line $line:$col: $type\{} still open at EOF";
     }
 
     # run ->parse on children.
     $page->{main_block}->parse($page);
 
-    close $fh;
     return;
 }
 
@@ -104,7 +105,7 @@ sub handle_line {
     return;
 }
 
-# % current
+# %current
 #   char:       the current character.
 #   escaped:    true if the current character was escaped. (last character = \)
 #   block:      the current block object.
@@ -197,8 +198,8 @@ sub handle_character {
         #
         # remove the block type and name from the current block's content.
         #
-        # note: it is very likely that a single space will remain, but this will later
-        # be trimmed out by a further cleanup.
+        # note: it is very likely that a single space will remain, but this will
+        # later be trimmed out by a further cleanup.
         #
         $c->last_content = substr($c->last_content, 0, -$chars_scanned);
 
@@ -236,8 +237,7 @@ sub handle_character {
 
         # we cannot close the main block.
         if ($c->block == $page->{main_block}) {
-            L "Attempted to close main block";
-            return;
+            return "Attempted to close main block";
         }
 
         # this is an if statement.
@@ -273,8 +273,8 @@ sub handle_character {
         $c->block->{end_column} = $c->{column};
 
         # return to the parent
-        $c->push_content(@add_contents);
         $c->block = $c->block->parent;
+        $c->push_content(@add_contents);
     }
 
     # ignore backslashes - they are handled later below.
@@ -284,13 +284,13 @@ sub handle_character {
     }
 
     else { $use_default++ }
-    print "MOVING ON $char\n" if !$use_default;
     next CHAR unless $use_default;
 
     } # End of DEFAULT loop
 
-print "MADE IT TO DEFAULT For $char\n";
     # DEFAULT:
+    # next DEFAULT goes here
+    #
     # OK, this is the second half of the CHAR loop, which is only reached
     # if the if chain above reaches else{} or next DEFAULT is used.
 
@@ -329,6 +329,7 @@ print "MADE IT TO DEFAULT For $char\n";
     }
 
     } # End of CHAR
+    # next CHAR goes here
 
     #=== Update stuff for next character ===#
 
