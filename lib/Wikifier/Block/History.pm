@@ -12,7 +12,7 @@ use Scalar::Util 'blessed';
 
 our %block_types = (
     history => {
-        base   => 'hash',
+        base   => 'map',
         html   => \&history_html
     }
 );

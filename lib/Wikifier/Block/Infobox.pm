@@ -12,7 +12,7 @@ use Scalar::Util 'blessed';
 use HTML::Entities 'encode_entities';
 
 our %block_types = (infobox => {
-    base  => 'hash',
+    base  => 'map',
     parse => \&infobox_parse,
     html  => \&infobox_html
 });

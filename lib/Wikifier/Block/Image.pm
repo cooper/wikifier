@@ -16,12 +16,12 @@ use Wikifier::Utilities qw(L);
 
 our %block_types = (
     image => {
-        base  => 'hash',
+        base  => 'map',
         parse => \&image_parse,
         html  => sub { image_html(0, @_) }
     },
     imagebox => {
-        base  => 'hash',
+        base  => 'map',
         parse => \&image_parse,
         html  => sub { image_html(1, @_) }
     }

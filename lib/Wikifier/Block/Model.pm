@@ -11,7 +11,7 @@ use Wikifier::Utilities qw(page_name);
 
 our %block_types = (
     model => {
-        base   => 'hash',
+        base   => 'map',
         parse  => \&model_parse,
         html   => \&model_html
     }

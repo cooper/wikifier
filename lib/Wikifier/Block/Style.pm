@@ -9,7 +9,7 @@ use strict;
 use Scalar::Util 'blessed';
 
 our %block_types = (style => {
-    base   => 'hash',
+    base   => 'map',
     parse  => \&style_parse,
     html   => \&style_html,
     invis  => 1
