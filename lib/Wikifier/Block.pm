@@ -14,6 +14,7 @@ use warnings;
 use strict;
 
 use Scalar::Util qw(blessed weaken);
+use Wikifier::Utilities qw(L);
 
 # Required properties of blocks.
 #
@@ -69,7 +70,6 @@ sub parse {
         next unless blessed $block;
         $block->parse(@_);
     }
-
 }
 
 # run the base's parse() now instead of afterward.
@@ -78,6 +78,10 @@ sub parse {
 sub parse_base {
     my $block = shift;
     my $type  = $Wikifier::BlockManager::block_types{ $block->{type} }{base};
+    if (!defined $type) {
+        L "$$block->{type}\{} called ->parse_base(), but it has no base";
+        return;
+    }
     $block->_parse($type, @_);
 }
 
@@ -94,7 +98,6 @@ sub _parse {
         }
         $type = $type_opts->{base};
     }
-
 }
 
 ############
@@ -103,15 +106,18 @@ sub _parse {
 
 # HTML contents.
 sub html {
-    my $block = shift;
-    my $type  = $block->{type};
+    my $block   = shift;
+    my $type    = $block->{type};
+    my $typeref = $Wikifier::BlockManager::block_types{$type};
+
+    # strip excess whitespace
     $block->remove_blank;
 
-    # create the element.
+    # create the element, unless this is an invisible block type
     $block->{element} = Wikifier::Element->new(
         class => $block->{type},
         ids   => $block->{wikifier}{element_identifiers} ||= {}
-    );
+    ) unless $typeref->{invis};
 
     # generate this block.
     $block->{html_done} = {};
@@ -126,10 +132,12 @@ sub html {
     }
 
     # add classes from the parser.
-    my @classes = @{ delete $block->{classes} || [] };
-    $block->{element}->add_class("class-$_") foreach @classes;
+    if ($block->{element}) {
+        my @classes = @{ delete $block->{classes} || [] };
+        $block->{element}->add_class("class-$_") foreach @classes;
+    }
 
-    return $block->{element};
+    return $block->{element}; # may be undef
 }
 
 # run the base's html() now instead of afterward.
@@ -138,6 +146,10 @@ sub html {
 sub html_base {
     my $block = shift;
     my $type  = $Wikifier::BlockManager::block_types{ $block->{type} }{base};
+    if (!defined $type) {
+        L "$$block->{type}\{} called ->html_base(), but it has no base";
+        return;
+    }
     $block->_html($type, @_);
 }
 
@@ -155,7 +167,6 @@ sub _html {
         $type = $type_opts->{base};
         $block->{called_html}++;
     }
-
 }
 
 #############

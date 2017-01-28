@@ -12,6 +12,7 @@ our %block_types = (style => {
     base   => 'hash',
     parse  => \&style_parse,
     html   => \&style_html
+    invis  => 1
 });
 
 sub style_parse {

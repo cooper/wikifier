@@ -13,7 +13,8 @@ use Scalar::Util 'blessed';
 our %block_types = (
     invisible => {
         parse => \&parse_invisible,
-        html  => \&html_invisible
+        html  => \&html_invisible,
+        invis => 1
     }
 );
 
