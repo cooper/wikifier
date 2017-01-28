@@ -50,10 +50,9 @@ sub list_parse {
 
             # a semicolon indicates the termination of a pair.
             elsif ($char eq ';' && !$escaped) {
-                if (blessed $value) {
-                    $value = $value->html($page)->generate;
-                }
-                else {
+
+                # fix the value
+                if (!blessed $value) {
                     $value =~ s/(^\s*)|(\s*$)//g;
 
                     # special value -no-format-values;
@@ -93,7 +92,8 @@ sub list_html {
     # append each item.
     foreach my $value (@{ $block->{list_array} }) {
         if (blessed $value) {
-            $value = $value->html($page)->generate;
+            my $their_el = $value->html($page);
+            $value = $their_el ? $their_el->generate : "$value";
         }
         elsif (!$block->{no_format_values}) {
             $value = $page->parse_formatted_text($value);

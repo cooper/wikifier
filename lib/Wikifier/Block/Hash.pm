@@ -153,7 +153,8 @@ sub hash_html {
     foreach (@{ $block->{hash_array} }) {
         my ($key_title, $value, $key) = @$_;
         if (blessed $value) {
-            $value = $value->html($page)->generate;
+            my $their_el = $value->html($page);
+            $value = $their_el ? $their_el->generate : "$value";
         }
         elsif (!$block->{no_format_values}) {
             $value = $page->parse_formatted_text($value);

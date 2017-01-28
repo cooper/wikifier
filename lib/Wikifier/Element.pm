@@ -53,6 +53,7 @@ sub create_child {
 # add a child or text node.
 sub add {
     my ($el, $child) = @_;
+    return if !$child;
     $child->{parent} = $el if blessed $child;
     push @{ $el->{content} }, $child;
 }
