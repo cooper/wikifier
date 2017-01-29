@@ -198,7 +198,7 @@ sub content_pos {
     for (0..$#content) {
         push @content_pos, [ $content[$_], $block->{positions}[$_] ];
     }
-    return @content_posl
+    return @content_pos;
 }
 
 # same as ->content except it skips blocks that don't produce HTML.
