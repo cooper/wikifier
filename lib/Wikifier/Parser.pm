@@ -222,6 +222,7 @@ sub handle_character {
 
         # create the new block.
         $c->block($wikifier->create_block(
+            current => $c,
             line    => $c->{line},
             col     => $c->{col},
             parent  => $c->block,
@@ -249,6 +250,9 @@ sub handle_character {
             # variable.
             if ($conditional =~ /^@([\w.]+)$/) {
                 $conditional = $page->get($1);
+            }
+            else {
+                $c->warning('Invalid conditional expression');
             }
 
             # add everything from within the if block IF conditional is true.
@@ -413,6 +417,7 @@ sub line_info {
     return $line;
 }
 
+# parser warning at current position
 sub warning {
     my ($c, $warn) = @_;
     $warn = $c->line_info.$warn;
@@ -420,6 +425,7 @@ sub warning {
     return $warn;
 }
 
+# parser fatal error at current position
 sub error {
     my ($c, $err) = @_;
     return $c->{error} = $c->line_info.$err;

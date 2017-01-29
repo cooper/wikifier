@@ -20,6 +20,7 @@ our %block_types = (
 
 sub create_block {
     my ($wikifier, %opts) = @_;
+    my $c_maybe = delete $opts{current};
     my $type = $opts{type};
     my $dir  = _dir(\%opts);
 
@@ -38,10 +39,13 @@ sub create_block {
     }
 
     # if it still doesn't exist, make a dummy.
-    return Wikifier::Block->new(
-        type => 'dummy',
-        %opts
-    ) if !$type_ref;
+    if (!$type_ref) {
+        $c_maybe->warning("Unknown block type $type\{}") if $c_maybe;
+        return Wikifier::Block->new(
+            type => 'dummy',
+            %opts
+        );
+    }
 
     # Safe point - the block type is real and is loaded.
 
