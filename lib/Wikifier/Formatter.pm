@@ -180,17 +180,14 @@ sub parse_formatted_text {
     # parse character-by-character.
     CHAR: foreach my $char (split '', $text) {
         $next_escaped = 0;
-        given ($char) {
 
         # escapes.
-        when ('\\') {
-            continue if $escaped; # this backslash was escaped.
+        if ($char eq '\\' && !$escaped) {
             $next_escaped = 1;
         }
 
         # [ marks the beginning of a formatting element.
-        when ('[') {
-            continue if $escaped;
+        elsif ($char eq '[' && !$escaped) {
 
             # if we're in format already, it's a [[link]].
             if ($in_format && $last_char eq '[') {
@@ -199,7 +196,6 @@ sub parse_formatted_text {
                 # skip to next character.
                 $last_char = $char;
                 next CHAR;
-
             }
 
             # we are now inside the format type.
@@ -211,12 +207,10 @@ sub parse_formatted_text {
                 push @items, [ $no_html_entities, $string ];
                 $string = '';
             }
-
         }
 
         # ] marks the end of a formatting element.
-        when (']') {
-            continue if $escaped;
+        elsif ($char eq ']' && !$escaped) {
 
             # ignore it for now if it starts with [ and doesn't end with ].
             # this means it's a [[link]] which hasn't yet handled the second ].
@@ -236,34 +230,25 @@ sub parse_formatted_text {
                 ];
                 $in_format = 0;
             }
-
         }
 
         # any other character.
-        default {
+        else {
 
             # if we're in the format type, append to it.
-            if ($in_format) {
-                $format_type .= $char;
-            }
+            if ($in_format) { $format_type .= $char }
 
             # it's any regular character, either within or outside of a format.
-            else {
-                $string .= $char;
-            }
-
+            else { $string .= $char }
         }
-
-        } # end of switch
 
         # set last character and escape for next character.
         $last_char = $char;
         $escaped   = $next_escaped;
-
     }
 
     # final string item.
-    push @items, [ $no_html_entities, $string] if length $string;
+    push @items, [ $no_html_entities, $string ] if length $string;
 
     # join them together, adding HTML entities when necessary.
     return join '', map {
@@ -272,59 +257,57 @@ sub parse_formatted_text {
     } @items;
 }
 
+my %static_formats = (
+    'i'     => '<span style="font-style: italic;">',            # italic
+    'b'     => '<span style="font-weight: bold;">',             # bold
+    's'     => '<span style="text-decoration: line-through;">', # strike
+    '/s'    => '</span>',
+    '/b'    => '</span>',
+    '/i'    => '</span>',
+    'q'     => '<span style="font-style: italic;">"',           # inline quote
+    '/q'    => '"</span>',
+    '^'     => '<sup>',                                         # superscript
+    '/^'    => '</sup>',
+    'v'     => '<sub>',                                         # subscript
+    '/v'    => '</sub>',
+    '/'     => '</span>',
+    'nl'    => '<br />',                                        # line break
+    'br'    => '<br />',
+    '--'    => '&ndash;',                                       # en dash
+    '---'   => '&mdash;'                                        # em dash
+);
+
 # parses an individual format type, aka the content in [brackets].
 # for example, 'i' for italic. returns the string generated from it.
 sub parse_format_type {
     my ($wikifier, $page, $type, $careful) = @_;
 
-    given ($type) {
-
-    # italic, bold, strikethrough
-    when ('i') { return '<span style="font-style: italic;">'            }
-    when ('b') { return '<span style="font-weight: bold;">'             }
-    when ('s') { return '<span style="text-decoration: line-through;">' }
-    when (['/s', '/b', '/i']) { return '</span>' }
-
-    # inline quote
-    when ( 'q') { return '<span style="font-style: italic;">"'  }
-    when ('/q') { return '"</span>'                             }
-
-    # superscript and subscript
-    when ( '^') { return '<sup>'    }
-    when ('/^') { return '</sup>'   }
-    when ( 'v') { return '<sub>'    }
-    when ('/v') { return '</sub>'   }
-
-    # generic end span. used for colors
-    when ('/') { return '</span>' }
-
-    # new line
-    when (['nl', 'br']) { return '<br />' }
-
-    # dashes
-    when ('--')  { return '&ndash;' }
-    when ('---') { return '&mdash;' }
+    # static format from above
+    if (my $fmt = $static_formats{$type}) {
+        return $fmt;
+    }
 
     # interpolable variable.
-    when ($_ =~ /^%([\w.]+)$/ && !$careful) {
+    if ($type =~ /^%([\w.]+)$/ && !$careful) {
         my $var = $page->get($1);
         return defined $var ?
             $wikifier->parse_formatted_text($page, $var, 0, 1) : '(null)';
     }
 
     # variable.
-    when (/^@([\w.]+)$/) {
+    if ($type =~ /^@([\w.]+)$/) {
         my $var = $page->get($1);
         return defined $var ? $var : '(null)';
     }
 
     # html entity.
-    when (/^&(.+)$/) {
+    if ($type =~ /^&(.+)$/) {
         return "&$1;";
     }
 
     # a link in the form of [[link]], [!link!], or [$link$]
-    when (/^([\!\[\$\~]+?)(.+)([\!\]\$\~]+?)$/) { # inner match should be most greedy.
+    # inner match should be most greedy.
+    if ($type =~ /^([\!\[\$\~]+?)(.+)([\!\]\$\~]+?)$/) {
         my ($link_char, $inner, $link_type) = (trim($1), trim($2));
         my ($target, $text, $title) = ($inner, $inner, '');
         my $name_link = page_name_link($target);
@@ -368,24 +351,22 @@ sub parse_format_type {
     }
 
     # fake references.
-    when ('ref') {
+    if ($type eq 'ref') {
         $page->{reference_number} ||= 1;
         my $ref = $page->{reference_number}++;
         return qq{<sup style="font-size: 75%"><a href="#">[$ref]</a></sup>};
     }
 
     # colors.
-    when (exists $colors{ +lc }) {
-        my $color = $colors{ +lc };
+    if (exists $colors{ lc $type }) {
+        my $color = $colors{ lc $type };
         return "<span style=\"color: $color;\">";
     }
 
     # real references.
-    when (\&Scalar::Util::looks_like_number) {
+    if ($type =~ m/^\d+$/) {
         return qq{<sup style="font-size: 75%"><a href="#wiki-ref-$type">[$type]</a></sup>};
     }
-
-    } # end switch
 
     # leave out anything else, I guess.
     return '';
