@@ -25,6 +25,12 @@ sub main_parse {
     # filter out blank items.
     $block->remove_blank();
 
+    # produce warnings for stray text.
+    foreach ($block->content_text_pos) {
+        my ($text, $pos) = @$_;
+        $block->warning($pos, "Stray text '$text' will be ignored");
+    }
+
     return 1;
 }
 
