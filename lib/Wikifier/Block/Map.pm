@@ -46,12 +46,14 @@ sub map_parse {
     # get human readable keys and values
     my $get_hr_kv = sub {
         my @stuff = map {
-            my $thing = blessed $_ : $_ : trim($_);
-            !length $thing      ?
-            undef               :
-            blessed $thing      ?
-            "$$thing{type}\{}"  :
-            q(').truncate_hr($thing, 30).q(');
+            my $thing = blessed $_ ? $_ : trim($_);
+            my $res   =
+                !length $thing      ?
+                undef               :
+                blessed $thing      ?
+                "$$thing{type}\{}"  :
+                q(').truncate_hr($thing, 30).q(');
+            $res;
         } @_;
         return wantarray ? (@stuff) : $stuff[0];
     };
