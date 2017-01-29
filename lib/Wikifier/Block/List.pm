@@ -118,10 +118,21 @@ sub list_parse {
                 $escaped = 0;
             }
 
+            # increment line position maybe
+            $pos->{line}++ if $char eq "\n";
+
         }   # end of character loop.
     }       # end of item loop.
 
+    # warning stuff
     $warn_bad_maybe->();
+    $pos->{line} = $block->{line};
+    my $value_text = $get_hr->($value);
+
+    # unterminated value warning
+    $block->warning($pos, "Value $value_text not terminated")
+        if $value_text;
+
     return 1;
 }
 

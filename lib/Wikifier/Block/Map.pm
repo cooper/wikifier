@@ -252,7 +252,7 @@ sub map_parse {
 
     # key warnings come later because $key will always be set unless there was a
     # semicolon to terminate the pair
-    elsif (length $key_text) {
+    elsif ($key_text) {
         $block->warning($pos, "Stray key $key_text ignored");
     }
 
