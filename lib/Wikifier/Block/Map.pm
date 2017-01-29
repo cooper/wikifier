@@ -51,7 +51,7 @@ sub map_parse {
             undef               :
             blessed $thing      ?
             "$$thing{type}\{}"  :
-            q(').truncate_hr(trim($thing)), 30).q(');
+            q(').truncate_hr(trim($thing), 30).q(');
         } @_;
         return wantarray ? (@stuff) : $stuff[0];
     };
