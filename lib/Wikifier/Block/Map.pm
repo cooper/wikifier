@@ -79,7 +79,7 @@ sub map_parse {
                 elsif (!$in_value) {
                     $block->warning($pos,
                         "Standalone text should be prefixed with ':'"
-                    ) if !blessed $key && index($key, '-');
+                    ) if !blessed $key && index(trim($key), '-');
                     $value = $key;
                     $key = "anon_$i";
                     undef $key_title;
