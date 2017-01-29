@@ -8,7 +8,7 @@ currently no way to escape the comment syntax.
 2. __Line parsing__ (preparsing): data is parsed line by line. This is the stage
 in which variable declarations are parsed. For this reason, variable
 declarations must exist only one-per-line and occupy the entire line. This stage
-terminates upon the end of the file or the first occurence of \__END__.
+terminates upon the end of the file.
 
 3. __Master parser__: data is parsed character-by-character to separate it into
 several blocks.

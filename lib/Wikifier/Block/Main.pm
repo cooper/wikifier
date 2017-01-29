@@ -10,8 +10,9 @@ package Wikifier::Block::Main;
 use warnings;
 use strict;
 
-use Scalar::Util 'blessed';
-use Digest::MD5  'md5_hex';
+use Scalar::Util qw(blessed);
+use Digest::MD5 qw(md5_hex);
+use Wikifier::Utilities qw(trim);
 
 our %block_types = (
     main => {
@@ -29,6 +30,8 @@ sub main_parse {
     # produce warnings for stray text.
     foreach ($block->content_text_pos) {
         my ($text, $pos) = @$_;
+        $text = trim($text);
+        next unless length $text;
         $block->warning($pos, "Stray text '$text' will be ignored");
     }
 

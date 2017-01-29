@@ -69,6 +69,7 @@ sub parse {
 
     # run ->parse on children.
     $page->{main_block}->parse($page);
+    return $c->{error} if $c->{error};
 
     return wantarray ? (undef, $c) : undef;
 }

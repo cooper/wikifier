@@ -13,7 +13,7 @@ infobox [NoTrollPlzNet Library] {
         file:   library.png;
         width:  250px;
     };
- 
+
     Established:        1800 with the support of[nl] Troll-Free-Gov
                         ([[wmcso]])[nl]as Troll-Free-Library;
     Number of books:    [@stats.library.books] (2013);
@@ -64,7 +64,7 @@ section [History] {
         height:         150px;
         file:           library_construction.png;
     }
-    
+
     /* Kim Jong-il */
     imagebox {
         description:    Kim Jong-il;
@@ -72,14 +72,14 @@ section [History] {
         align:          left;
         file:           Kim-Jong-il.png;
     }
-    
+
     p {
         NoTrollPlzNet Library, originally named Troll-Free-Library, was built
         singlehandedly by [[Foxy]] with a $60,000,000,000 grant from the
         [!Chinese Government | Government of the People's Republic of China!].
         The money was donated by request of [[Kim Jong-il]], former supreme leader of the
         [!Democratic People's Republic of Korea!] and dear friend of Foxy.[ref] The
-        construction of the library lasted merely two weeks due to Foxy's surreal muscular 
+        construction of the library lasted merely two weeks due to Foxy's surreal muscular
         capabilities. The building's design is often described as [q]open with
         limitations,[/q] making it easy to get around in without providing a one-room
         feel. This allows privacy in areas such as the Foxy lounge (shown below.) Kim
@@ -91,7 +91,7 @@ section [History] {
         since the time of its construction, and today it outshines the national library of
         the DPRK (not to mention, the rest of the libraries in the world as well) by a landslide.
     }
-    
+
     /* DPRK Library */
     imagebox {
         description:    [!Grand People's Study House!], the national library in Pyongyang,
@@ -99,11 +99,11 @@ section [History] {
         width:          275px;
         file:           DPRK_GPSH.png;
     }
-    
-    
+
+
     /* History tables lay out a set of dates and events associated with them. The dates */
     /* appear in bold to the left of the event description.                             */
-    
+
     history {
         1799: $60 billion donated by [!China | People's Republic of China!] for construction
               by request of [[Foxy]]'s friend, [[Kim Jong-il]];
@@ -117,7 +117,7 @@ section [History] {
         1843: Exterior redesigned to be "monumental," uplifted with over 200 tons of marble;
         2013: Interior remodeled by [b]Foxy Interior Design and Furnishings, Sc.O.[/b];
     }
-    
+
 }
 
 section [Statistics] {
@@ -142,14 +142,14 @@ section [Management and Employment] {
         file:           foxy2.png;
         width:          150px;
     }
-    
+
     /* image of Foxy's hangout */
     imagebox {
         description:    Foxy's hangout;
         file:           foxy-hangout.png;
         width:          200px;
     }
-    
+
     p {
         Today, the NoTrollPlzNet Library is managed by [[NoTrollPlzNet]] and is
         governed by a management board alongside [[Foxy]].
@@ -160,7 +160,7 @@ section [Management and Employment] {
         have low-end occupations here. Librarians are considered to be the top of the
         library's social ladder and earn an average yearly salary of $250,000.[ref]
     }
-    
+
     p {
         [[Foxy]] herself has described the library as her [q]second home,[/q][ref] claiming
         that the library is the focal point of all of the world's knowledge. She enjoys
@@ -171,7 +171,7 @@ section [Management and Employment] {
         library's workforce, stating that the library would be nothing without the
         [@staff.count] honorable employees who live up to its glorious name.[ref]
     }
-    
+
     /* image of the crew */
     imagebox {
         description:    a group of members from the library management crew;
@@ -179,7 +179,7 @@ section [Management and Employment] {
         file:           the_crew.jpg;
         height:         200px;
     }
-    
+
     p {
         The library system is a government within itself,
         consisting of a management board, elected officials, and other branches. The
@@ -187,7 +187,7 @@ section [Management and Employment] {
         Major decisions must be approved by the management board and may also be vetoed
         by [[Foxy]].[ref]
     }
-    
+
     p {
         The library sponsors a program which aims to provide jobs for those in need.[ref] At
         least one hundred new positions are created each year, making room for even more
@@ -213,7 +213,7 @@ section [Facility] {
         author:         Carol M. Highsmith;
         license:        Creative Commons Attribution-Share Alike 3.0 Unported;
     }
-    
+
     /* people's hall */
     imagebox {
         description:    the People's Hall;
@@ -223,7 +223,7 @@ section [Facility] {
         author:         Carol M. Highsmith;
         license:        public domain;
     }
-    
+
     paragraph {
         The NoTrollPlzNet Library is a famous global icon, known for its impressive beauty,
         design, and architecture. Although it has been renovated multiple times throughout
@@ -234,10 +234,4 @@ section [Facility] {
         Sc.O. and recently was uplifted by an interior remodeling. Futher plans have been
         made to modernize the facility's interior.[ref]
     }
-    
 }
-
-__END__ /* indicates end of parsing. */
-
-This article was written by Foxy, General Librarian of the People's Knowledgebase.
-As a work of the NoTrollPlzNet Government, this file is in the People's domain.
