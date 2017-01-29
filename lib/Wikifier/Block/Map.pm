@@ -31,10 +31,11 @@ sub map_init {
 # parse key:value pairs.
 sub map_parse {
     my ($block, $page) = (shift, @_);
-    my ($key, $value, $in_value, %values) = (q.., q..);
+    my ($pos, $key, $value, $in_value, %values) = (q.., q..);
 
     # for each content item...
-    ITEM: foreach my $item ($block->content_visible) {
+    ITEM: foreach ($block->content_visible_c) {
+        (my $item, $pos) = @$_;
 
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
@@ -123,7 +124,7 @@ sub map_parse {
                 ];
 
                 # keys spanning multiple lines are fishy
-                $block->warning("Suspicious key '$key'") if $key =~ m/\n/;
+                $block->warning($pos, "Suspicious key '$key'") if $key =~ m/\n/;
 
                 # reset status.
                 $in_value = 0;
@@ -145,7 +146,7 @@ sub map_parse {
     $key = trim($key); $value = trim($value);
     $warn = "Stray text '$key' ignored"     if length $key;
     $warn = "Value '$value' not terminated" if length $value;
-    $block->warning($warn) if $warn;
+    $block->warning($pos, $warn) if $warn;
 
     # append/overwrite values found in this parser.
     my %hash = $block->{map} ? %{ $block->{map} } : ();

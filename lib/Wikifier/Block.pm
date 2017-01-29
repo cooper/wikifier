@@ -41,7 +41,8 @@ use Wikifier::Utilities qw(L);
 #
 sub new {
     my ($class, %opts) = @_;
-    $opts{content} ||= [];
+    $opts{content}     ||= [];
+    $opts{content_pos} ||= [];
     $opts{type} = lc $opts{type};
     my $block = bless \%opts, $class;
 
@@ -190,6 +191,28 @@ sub content_text {
     return grep { !blessed $_ } shift->content;
 }
 
+# returns all content. this is a list of mixed strings and blocks.
+sub content_pos {
+    return @{ shift->{content_pos} };
+}
+
+# same as ->content except it skips blocks that don't produce HTML.
+sub content_visible_pos {
+    return grep {
+        !blessed $_->[0] || !$_->[0]{type_ref}{invis}
+    } shift->content_pos;
+}
+
+# returns only child blocks, ignoring text content.
+sub content_blocks_pos {
+    return grep { blessed $_->[0] } shift->content_pos;
+}
+
+# returns only text content, ignoring child blocks.
+sub content_text_pos {
+    return grep { !blessed $_->[0] } shift->content_pos;
+}
+
 #############
 ### OTHER ###
 #############
@@ -200,10 +223,14 @@ sub name   { shift->{name}   }
 
 # produce a parser warning
 sub warning {
-    my ($block, $warn) = @_;
+    my ($block, $pos, $warn) = @_;
+    if (!defined $warn) {
+        $warn = $pos;
+        $pos  = $block;
+    }
     my $c = $block->{current} or return;
-    $c->{temp_line} = $block->{line};
-    $c->{temp_col}  = $block->{col};
+    $c->{temp_line} = $pos->{line};
+    $c->{temp_col}  = $pos->{col};
     $c->warning($warn);
 }
 
