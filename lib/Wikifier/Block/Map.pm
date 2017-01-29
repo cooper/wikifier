@@ -34,7 +34,7 @@ sub map_parse {
     my ($pos, $key, $value, $in_value, %values) = (q.., q..);
 
     # for each content item...
-    ITEM: foreach ($block->content_visible_c) {
+    ITEM: foreach ($block->content_visible_pos) {
         (my $item, $pos) = @$_;
 
         # if blessed, it's a block value, such as an image.
