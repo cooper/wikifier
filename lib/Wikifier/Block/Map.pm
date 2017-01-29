@@ -84,14 +84,14 @@ sub map_parse {
                 # fix the key
                 else {
                     $key = "$key" if blessed $key; # just in case
-                    $key =~ s/(^\s*)|(\s*$)//g;
+                    $key = trim($key);
                     $key_title = $key;
                 }
 
                 # fix the value
                 my $is_block = blessed $value;
                 if (!$is_block) {
-                    $value =~ s/(^\s*)|(\s*$)//g;
+                    $value = trim($value);
 
                     # special value -no-format-values;
                     if ($value eq '-no-format-values') {
@@ -122,6 +122,9 @@ sub map_parse {
                     $is_block       # true if value originally was a block
                 ];
 
+                # keys spanning multiple lines are fishy
+                $block->warning("Suspicious key '$key'") if $key =~ m/\n/;
+
                 # reset status.
                 $in_value = 0;
                 $key = $value = '';
@@ -139,6 +142,7 @@ sub map_parse {
     } # end of item loop.
 
     my $warn;
+    $key = trim($key); $value = trim($value);
     $warn = "Stray text '$key' ignored"     if length $key;
     $warn = "Value '$value' not terminated" if length $value;
     $block->warning($warn) if $warn;
