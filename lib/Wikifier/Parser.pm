@@ -53,6 +53,7 @@ sub parse {
         $line =~ s/[\r\n\0]//g;     # remove returns and newlines.
         $line = trim($line);        # remove prefixing and suffixing whitespace.
         $current->{line} = $.;
+        print "handle_line($line)\n";
         my ($i, $err) = $wikifier->handle_line($line, $page, $current);
         next unless $err;
         $err = "Line $.:$i: $err";
@@ -99,6 +100,7 @@ sub handle_line {
         next CHAR if delete $c->{skip_next_char};
         $c->{col} = $i;
         $c->{next_char} = $chars[$i + 1] // '';
+        print "handle_character($chars[$i])\n";
         my $err = $wikifier->handle_character($chars[$i], $page, $c);
         return ($i, $err) if $err;
     }
@@ -138,11 +140,13 @@ sub handle_character {
 
     # inside a comment.
     next CHAR if $c->is_comment;
+    print "$char: not a comment\n";
 
     # left bracket indicates the start of a block.
     if ($char eq '{') {
         $c->mark_ignored;
         next DEFAULT if $c->is_escaped;
+        print "$char: not escaped\n";
 
         # now we must remove the new block type from the
         # current block's last content element.
@@ -156,7 +160,9 @@ sub handle_character {
             if !length $content;
 
         # chop one character at a time from the end of the content.
-        BACKCHAR: while (my $last_char = chop $content) { $chars_scanned++;
+        BACKCHAR: while (length(my $last_char = chop $content)) {
+            $chars_scanned++;
+            print "backchar: $last_char; $block_name\n";
 
             # entering block name.
             if ($last_char eq ']') {
@@ -202,7 +208,9 @@ sub handle_character {
         # note: it is very likely that a single space will remain, but this will
         # later be trimmed out by a further cleanup.
         #
+        print "last_content: ", $c->last_content, " -> ";
         $c->last_content = substr($c->last_content, 0, -$chars_scanned);
+        print $c->last_content, "\n";
 
         # if the block type contains dot(s), it has classes.
         my @block_classes;
@@ -221,7 +229,7 @@ sub handle_character {
         }
 
         # create the new block.
-        $c->block = $wikifier->create_block(
+        $c->block = my $block = $wikifier->create_block(
             line    => $c->{line},
             col     => $c->{col},
             parent  => $c->block,
@@ -229,12 +237,14 @@ sub handle_character {
             name    => $block_name,
             classes => \@block_classes
         );
+        print "created block: ", $block->type, " (hopefully the same as ", $c->block->type, ")\n";
     }
 
     # right bracket indicates the closing of a block.
     elsif ($char eq '}') {
         $c->mark_ignored;
         next DEFAULT if $c->is_escaped;
+        print "$char: not escaped\n";
 
         # we cannot close the main block.
         if ($c->block == $page->{main_block}) {
