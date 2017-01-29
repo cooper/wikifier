@@ -23,13 +23,11 @@ use Wikifier::Utilities qw(trim L);
 
 # parse a wiki file.
 sub parse {
-    my ($wikifier, $page, $file) = @_;
+    my ($wikifier, $page) = @_;
 
-    # if a page is provided, use ->{source} or ->path
-    if ($page) {
-        $file = $page->path;
-        $file = \$page->{source} if defined $page->{source};
-    }
+    # use ->{source} or ->path
+    my $file = $page->path;
+    $file = \$page->{source} if defined $page->{source};
 
     # no file given.
     if (!defined $file) {
@@ -43,10 +41,13 @@ sub parse {
     }
 
     # set initial parse info
+    my $main_block = $page->{main_block};
     my $c = bless {
-        block       => $wikifier->{main_block},
+        block       => $main_block,
         warnings    => []
     }, 'Wikifier::Parser::Current';
+    $page->{warnings} = $c->{warnings};
+    $main_block->{current} = $c;
 
     # read it line-by-line.
     while (my $line = <$fh>) {
@@ -62,13 +63,13 @@ sub parse {
     close $fh;
 
     # some block was not closed.
-    if ($c->{block} != $page->{main_block}) {
+    if ($c->{block} != $main_block) {
         my ($type, $line, $col) = @{ $c->{block} }{ qw(type line col) };
         return "Line $line:$col: $type\{} still open at EOF";
     }
 
     # run ->parse on children.
-    $page->{main_block}->parse($page);
+    $main_block->parse($page);
     return $c->{error} if $c->{error};
 
     return wantarray ? (undef, $c) : undef;

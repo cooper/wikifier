@@ -99,7 +99,6 @@ sub _display_page {
             }
 
             $result->{content} .= shift @data;
-            $result->{all_css}  = $result->{css} if length $result->{css};
             $result->{cached}   = 1;
             $result->{modified} = $time_str;
             $result->{mod_unix} = $cache_modify;
@@ -115,7 +114,7 @@ sub _display_page {
     # parse the page.
     # if an error occurs, parse it again in variable-only mode.
     # then hopefully we can at least get the metadata and categories.
-    my ($err, $parse_info) = $page->parse;
+    my $err = $page->parse;
     if ($err) {
         $page->{vars_only}++;
         $page->parse;
@@ -124,7 +123,7 @@ sub _display_page {
     }
 
     # extract warnings from parser info
-    $result->{warnings} = $parse_info->{warnings};
+    $result->{warnings} = $page->{warnings};
 
     # update categories
     $wiki->cat_check_page($page);
@@ -141,7 +140,6 @@ sub _display_page {
     $result->{type}       = 'page';
     $result->{content}    = $page->html;
     $result->{css}        = $page->css;
-    $result->{all_css}    = $result->{css};
     $result->{length}     = length $result->{content};
     $result->{generated}  = 1;
     $result->{modified}   = time2str(time);
