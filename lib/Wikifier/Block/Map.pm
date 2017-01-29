@@ -36,9 +36,7 @@ sub map_parse {
     # for each content item...
     ITEM: foreach ($block->content_visible_pos) {
         (my $item, $pos) = @$_;
-
-        # account for newlines in the item
-        $pos->{line} += () = $item =~ /\n/g unless blessed $item;
+        $pos = { %$pos }; # copy because we are modifying it
 
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
@@ -53,6 +51,7 @@ sub map_parse {
         my $i = 0;
         CHAR: for (split //, $item) { $i++;
             my $char = $_;
+            $pos->{line}++ if $char eq "\n";
 
             # the first colon indicates that we're beginning a value.
             if ($char eq ':' && !$in_value && !$escaped) {
