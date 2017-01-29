@@ -72,7 +72,7 @@ sub map_parse {
 
         # tried to append an object value
         if ($ap_value) {
-            my (undef, $ap_value_text) = $get_hr_kv->(undef, $ap_value);
+            my $ap_value_text = $get_hr_kv->($ap_value);
             my $warn = "Stray text after $ap_value_text";
             $warn .= " for key $key_text" if length $key_text;
             $block->warning($pos, "$warn ignored");
