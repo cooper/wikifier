@@ -53,16 +53,16 @@ sub map_parse {
         # tried to append an object key
         if ($bad_key) {
             $block->warning($pos,
-                "Attempted to append text to block $$bad_key{type}\{}"
+                "Stray text after $$bad_key{type}\{} ignored"
             );
             undef $bad_key;
         }
 
         # tried to append an object value
         if ($bad_value) {
-            my $warn = "Attempted to append text to block $$bad_value{type}\{}";
+            my $warn = "Stray text after $$bad_value{type}\{}";
             $warn .= " for '$key_text'" if length $key_text;
-            $block->warning($pos, $warn);
+            $block->warning($pos, "$warn ignored");
             undef $bad_value;
         }
     };
@@ -201,20 +201,20 @@ sub map_parse {
 
     # value warnings
     if (blessed $value) {
-        my $warn = "Stray block $$value{type}\{}";
+        my $warn = "Value $$value{type}\{}";
         $warn .= " for '$key_text'" if length $key_text;
-        $block->warning($pos, $warn);
+        $block->warning($pos, "$warn not terminated");
     }
     elsif (length $value_text) {
-        my $warn = "Value '$value_text' not terminated";
+        my $warn = "Value '$value_text'";
         $warn .= " for '$key_text'" if length $key_text;
-        $block->warning($pos, $warn);
+        $block->warning($pos, "$warn not terminated");
     }
 
     # key warnings come later because $key will always be set unless there was a
     # semicolon to terminate the pair
     elsif (blessed $key) {
-        $block->warning($pos, "Stray block $$key{type}\{}");
+        $block->warning($pos, "Stray $$key{type}\{} ignored");
     }
     elsif (length $key_text) {
         $block->warning($pos, "Stray text '$key_text' ignored");
