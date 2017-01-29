@@ -43,11 +43,10 @@ sub map_parse {
 
     # check if we have bad keys or values and produce warnings
     my $warn_bad_maybe = sub {
-        my $key_text = truncate_hr(trim($key),   30) unless blessed $key;
+        my $key_text = truncate_hr(trim($key), 30) unless blessed $key;
 
         # keys spanning multiple lines are fishy
-        if (!blessed $key && $key =~ m/\n/) {
-            my $key_text = truncate_hr($key, 30);
+        if (length $key_text && $key_text =~ m/\n/) {
             $block->warning($pos, "Suspicious key '$key_text'");
         }
 
@@ -62,7 +61,7 @@ sub map_parse {
         # tried to append an object value
         if ($bad_value) {
             my $warn = "Attempted to append text to block $$bad_value{type}\{}";
-            $warn .= "for '$key_text'" if length $key_text;
+            $warn .= " for '$key_text'" if length $key_text;
             $block->warning($pos, $warn);
             undef $bad_value;
         }
