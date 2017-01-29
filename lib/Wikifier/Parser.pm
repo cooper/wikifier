@@ -274,8 +274,8 @@ sub handle_character {
 
         # close the block
         $c->block->{closed}++;
-        $c->block->{end_line}   = $c->{line};
-        $c->block->{end_column} = $c->{column};
+        $c->block->{end_line} = $c->{line};
+        $c->block->{end_col}  = $c->{col};
 
         # return to the parent
         $c->block($c->block->parent);
@@ -394,7 +394,7 @@ sub push_content {
     my $c = shift;
     my $pos = {
         line => $c->{line},
-        col  => $c->{column}
+        col  => $c->{col}
     };
     push @{ $c->{block}{positions} }, $pos for 0..$#_;
     push @{ $c->{block}{content}   }, @_;
@@ -417,7 +417,7 @@ sub append_content {
 sub line_info {
     my $c    = shift;
     my $line = delete $c->{temp_line} // $c->{line};
-    my $col  = delete $c->{temp_col}  // $c->{column};
+    my $col  = delete $c->{temp_col}  // $c->{col};
     $line    = defined $line ? "Line $line:" : '';
     $line   .= "$col:" if defined $col;
     $line   .= ' ' if length $line;
