@@ -12,7 +12,7 @@ use strict;
 
 use Scalar::Util qw(blessed);
 use Digest::MD5 qw(md5_hex);
-use Wikifier::Utilities qw(trim);
+use Wikifier::Utilities qw(trim_count);
 
 our %block_types = (
     main => {
@@ -24,15 +24,17 @@ our %block_types = (
 sub main_parse {
     my $block = shift;
 
-    # filter out blank items.
-    $block->remove_blank;
-
     # produce warnings for stray text.
     foreach ($block->content_text_pos) {
         my ($text, $pos) = @$_;
-        $text = trim($text);
+        $pos = { %$pos }; # copy
+
+        # trim the text and increment the line number appropriately
+        ($text, my $removed) = trim_count($text);
+        $pos->{line} += $removed;
+
         next unless length $text;
-        $block->warning($pos, "Stray text '$text' will be ignored");
+        $block->warning($pos, "Stray text '$text' ignored");
     }
 
     return 1;

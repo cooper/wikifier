@@ -100,6 +100,21 @@ sub trim {
     return $string;
 }
 
+# removes leading and trailing whitespace from a string, returning the
+# new string and the number of newlines removed from front and back.
+sub trim_count {
+    my $string = shift;
+    return if !defined $string;
+    my ($front, $back) = (0, 0);
+    while ($string =~ s/^(\s+)//) {
+        $front += () = $1 =~ /\n/g;
+    }
+    while ($string =~ s/(\s+)$//) {
+        $back += () = $1 =~ /\n/g;
+    }
+    return wantarray ? ($string, $front, $back) : $string;
+}
+
 sub hash_maybe($) {
     my $href = shift;
     return if ref $href ne 'HASH';
