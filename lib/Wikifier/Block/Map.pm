@@ -51,28 +51,17 @@ sub map_parse {
             my $char = $_;
 
             # the first colon indicates that we're beginning a value.
-            when (':') {
-
-                # if we're already in a value, this colon belongs to the value.
-                continue if $in_value; # to default.
-
-                # this was escaped.
-                continue if $escaped;
-
-                # we're now inside the value.
-                $in_value = 1;
+            if ($char eq ':' && !$in_value && !$escaped) {
+                $in_value++;
             }
 
-            when ("\\") {
-                continue if $escaped; # this backslash was escaped.
-                $escaped = 1;
+            # escape
+            elsif ($char eq "\\" && !$escaped) {
+                $escaped++;
             }
 
             # a semicolon indicates the termination of a pair.
-            when (';') {
-
-                # it was escaped.
-                continue if $escaped;
+            elsif ($char eq ';' && !$escaped) {
 
                 # if there's no key, it is something like:
                 #   : value;
@@ -141,13 +130,18 @@ sub map_parse {
             # any other characters.
             # TODO: produce a warning if $key or $value is blessed and we are
             # trying to append it. they likely forgot a semicolon after a block.
-            default {
+            else {
                 $value  .= $char if  $in_value;
                 $key    .= $char if !$in_value;
                 $escaped = 0;
             }
         } # end of character loop.
     } # end of item loop.
+
+    my $warn;
+    $warn = "Stray text '$key' ignored"     if length $key;
+    $warn = "Value '$value' not terminated" if length $value;
+    $block->warning($warn) if $warn;
 
     # append/overwrite values found in this parser.
     my %hash = $block->{map} ? %{ $block->{map} } : ();
