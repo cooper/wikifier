@@ -31,7 +31,42 @@ sub map_init {
 # parse key:value pairs.
 sub map_parse {
     my ($block, $page) = (shift, @_);
-    my ($pos, $key, $value, $in_value, %values) = (q.., q..);
+    my (
+        $key,       # key
+        $value,     # value
+        $pos,       # position
+        $in_value,  # true if in value (between : and ;)
+        $bad_key,   # an object which we tried to append key text to
+        $bad_value, # an object which we tried to append value text to
+        %values     # new hash values
+    ) = ('', '');
+
+    # check if we have bad keys or values and produce warnings
+    my $warn_bad_maybe = sub {
+        my $key_text = truncate_hr(trim($key),   30) unless blessed $key;
+
+        # keys spanning multiple lines are fishy
+        if (!blessed $key && $key =~ m/\n/) {
+            my $key_text = truncate_hr($key, 30);
+            $block->warning($pos, "Suspicious key '$key_text'");
+        }
+
+        # tried to append an object key
+        if ($bad_key) {
+            $block->warning($pos,
+                "Attempted to append text to block $$bad_key{type}\{}"
+            );
+            undef $bad_key;
+        }
+
+        # tried to append an object value
+        if ($bad_value) {
+            my $warn = "Attempted to append text to block $$bad_value{type}\{}";
+            $warn .= "for '$key_text'" if length $key_text;
+            $block->warning($pos, $warn);
+            undef $bad_value;
+        }
+    };
 
     # for each content item...
     ITEM: foreach ($block->content_visible_pos) {
@@ -128,11 +163,8 @@ sub map_parse {
                     $is_block       # true if value originally was a block
                 ];
 
-                # keys spanning multiple lines are fishy
-                if ($key =~ m/\n/) {
-                    my $key_text = truncate_hr($key, 30);
-                    $block->warning($pos, "Suspicious key '$key_text'");
-                }
+                # warn bad keys and values
+                $warn_bad_maybe->();
 
                 # reset status.
                 $in_value = 0;
@@ -144,8 +176,18 @@ sub map_parse {
             # trying to append it. they likely forgot a semicolon after a block.
             else {
                 $escaped = 0;
-                $value  .= $char if  $in_value;
-                $key    .= $char if !$in_value;
+
+                # this is part of the value
+                if ($in_value) {
+                    $bad_value = $value and next CHAR if blessed $value;
+                    $value .= $char;
+                }
+
+                # this must be part of the key
+                else {
+                    $bad_key = $key and next CHAR if blessed $key;
+                    $key .= $char;
+                }
             }
 
             $pos->{line}++ if $char eq "\n";
@@ -153,10 +195,10 @@ sub map_parse {
     } # end of item loop.
 
     # warning stuff
+    $warn_bad_maybe->();
     $pos->{line}   = $block->{line};
     my $key_text   = truncate_hr(trim($key),   30) unless blessed $key;
     my $value_text = truncate_hr(trim($value), 30) unless blessed $value;
-
 
     # value warnings
     if (blessed $value) {
