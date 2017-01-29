@@ -51,7 +51,6 @@ sub map_parse {
         my $i = 0;
         CHAR: for (split //, $item) { $i++;
             my $char = $_;
-            $pos->{line}++ if $char eq "\n";
 
             # the first colon indicates that we're beginning a value.
             if ($char eq ':' && !$in_value && !$escaped) {
@@ -141,6 +140,8 @@ sub map_parse {
                 $value  .= $char if  $in_value;
                 $key    .= $char if !$in_value;
             }
+
+            $pos->{line}++ if $char eq "\n";
         } # end of character loop.
     } # end of item loop.
 
