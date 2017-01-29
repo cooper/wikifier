@@ -411,9 +411,10 @@ sub warning {
 
 sub error {
     my ($c, $err) = @_;
-    $err = "Line $$c{line}:$$c{col}: $err" if defined $c->{col};
-    $err = "Line $$c{line}: $err" if defined $c->{line};
-    return $c->{error} = $err;
+    my $line = defined $c->{line} ? "Line $$c{line}:" : '';
+    $line   .= "$$c{col}:" if defined $c->{col};
+    $line   .= ' ' if length $line;
+    return $c->{error} = $line.$err;
 }
 
 1
