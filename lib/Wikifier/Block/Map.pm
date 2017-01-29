@@ -202,7 +202,7 @@ sub map_parse {
 
     # value warnings
     if (blessed $value) {
-        my $warn = "Stray block $$key{type}\{}";
+        my $warn = "Stray block $$value{type}\{}";
         $warn .= " for '$key_text'" if length $key_text;
         $block->warning($pos, $warn);
     }
