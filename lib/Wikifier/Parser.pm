@@ -401,7 +401,8 @@ sub push_content {
 # return the last element in the current block's content
 sub last_content : lvalue {
     my $c = shift;
-    return $c->{block}{content}[-1];
+    my $content = $c->{block}{content};
+    return $content->[$#$content];
 }
 
 # append a string to the last element in the current block's content
