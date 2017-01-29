@@ -45,18 +45,17 @@ sub map_parse {
 
     # get human readable keys and values
     my $get_hr_kv = sub {
-        my @stuff = @_ ? (@_) : ($key, $value);
-        @stuff = map {
+        my @stuff = map {
             blessed $_      ?
             "$$_{type}\{}"  :
             addquote(truncate_hr(trim($_)), 30);
-        } grep defined, @stuff;
+        } grep defined, @_;
         return wantarray ? (@stuff) : $stuff[0];
     };
 
     # check if we have bad keys or values and produce warnings
     my $warn_bad_maybe = sub {
-        my $key_text = $get_hr_kv->();
+        my $key_text = $get_hr_kv->($key);
 
         # keys spanning multiple lines are fishy
         if (!blessed $key && length $key_text && $key_text =~ m/\n/) {
@@ -232,7 +231,7 @@ sub map_parse {
     # warning stuff
     $warn_bad_maybe->();
     $pos->{line} = $block->{line};
-    my ($key_text, $value_text) = $get_hr_kv->();
+    my ($key_text, $value_text) = $get_hr_kv->($key, $value);
 
     # value warnings
     if ($value_text) {
