@@ -9,6 +9,7 @@ use strict;
 use lib 'lib';
 
 use Wikifier;
+use Wikifier::Utilities qw(L);
 
 my $path = shift @ARGV;
 die "Need page file path" if !length $path;
@@ -20,6 +21,9 @@ my $page = Wikifier::Page->new(file_path => $path);
 # parse the page.
 my $err = $page->parse;
 die $err if $err;
+
+# print warnings.
+L "Warning: $_\n" for @{ $page->{warnings} };
 
 # print the generated HTML.
 print $page->html;

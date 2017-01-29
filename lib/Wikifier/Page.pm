@@ -72,7 +72,7 @@ sub parse {
     my $page = shift;
     my ($err, $c);
     L align('Parse'), sub {
-        ($err, $c) = $page->wikifier->parse($page, $page->path);
+        ($err, $c) = $page->wikifier->parse($page);
     };
     L align('Error', $err) if $err;
     return wantarray ? ($err, $c) : $err;

@@ -98,6 +98,7 @@ sub section_html {
                 # create the paragraph.
                 $item = $page->wikifier->create_block(
                     parent  => $block,
+                    current => $block->{current},
                     line    => $line,
                     type    => 'paragraph',
                     content => [ $text ]

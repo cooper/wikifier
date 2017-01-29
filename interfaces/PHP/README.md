@@ -58,7 +58,6 @@ Returns an object with properties:
 * __->title__ - human-readable title, as defined by `@page.title`.
 * __->content__ - HTML page content.
 * __->css__ - CSS page content.
-* __->all_css__ - for pages, this is the same as `->css`.
 * __->categories__ - array of category names the page belongs to.
 * __->modified__ - time string at which the page was last modified. this is
   formatted for use in a `Last-Modified` header.
