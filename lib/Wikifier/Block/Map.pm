@@ -152,12 +152,27 @@ sub map_parse {
         } # end of character loop.
     } # end of item loop.
 
-    my $warn;
-    my $key_text   = truncate_hr(trim($key), 30);
-    my $value_text = truncate_hr(trim($value), 30);
-    $warn = "Stray text '$key_text' ignored"        if length $key_text;
-    $warn = "Value '$value_text' not terminated"    if length $value_text;
-    $block->warning($pos, $warn) if $warn;
+    # key warnings
+    if (blessed $key) {
+        $block->warning($pos, "Stray block $$key{type}\{}");
+    }
+    elsif (length $key) {
+        my $key_text = truncate_hr(trim($key), 30);
+        $block->warning($pos, "Stray text '$key_text' ignored");
+    }
+
+    # value warnings
+    if (blessed $value) {
+        my $warn = "Stray block $$key{type}\{}";
+        $warn .= "for '$key'" if !blessed $key && length $key;
+        $block->warning($pos, $warn);
+    }
+    elsif (length $value) {
+        my $value_text = truncate_hr(trim($value), 30);
+        my $warn = "Value '$value_text' not terminated";
+        $warn .= "for '$key'" if !blessed $key && length $key;
+        $block->warning($pos, $warn);
+    }
 
     # append/overwrite values found in this parser.
     my %hash = $block->{map} ? %{ $block->{map} } : ();
