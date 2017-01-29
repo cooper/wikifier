@@ -36,34 +36,60 @@ sub map_parse {
         $value,     # value
         $pos,       # position
         $in_value,  # true if in value (between : and ;)
-        $bad_key,   # an object which we tried to append key text to
-        $bad_value, # an object which we tried to append value text to
+        $ap_key,    # an object which we tried to append key text to
+        $ap_value,  # an object which we tried to append value text to
+        $ow_key,    # a key we overwrote with a block
+        $ow_value,  # a value we overwrote with a block
         %values     # new hash values
     ) = ('', '');
 
+    # get human readable keys and values
+    my $get_hr_kv = sub {
+        my ($key, $value) = (shift || $key, shift || $value);
+        my $key_text = blessed $key ?
+            "$$key{type}\{}" : addquote(truncate_hr(trim($key)), 30);
+        my $value_text = blessed $value ?
+            "$$value{type}\{}" : addquote(truncate_hr(trim($value)), 30);
+        return ($key_text, $value_text);
+    };
+
     # check if we have bad keys or values and produce warnings
     my $warn_bad_maybe = sub {
-        my $key_text = truncate_hr(trim($key), 30) unless blessed $key;
+        my ($key_text) = $get_hr_kv->();
 
         # keys spanning multiple lines are fishy
-        if (length $key_text && $key_text =~ m/\n/) {
-            $block->warning($pos, "Suspicious key '$key_text'");
+        if (!blessed $key && length $key_text && $key_text =~ m/\n/) {
+            $block->warning($pos, "Suspicious key $key_text");
         }
 
         # tried to append an object key
-        if ($bad_key) {
-            $block->warning($pos,
-                "Stray text after $$bad_key{type}\{} ignored"
-            );
-            undef $bad_key;
+        if ($ap_key) {
+            my ($ap_key_text) = $get_hr_kv->($ap_key);
+            $block->warning($pos, "Stray text after $ap_key_text ignored");
+            undef $ap_key;
         }
 
         # tried to append an object value
-        if ($bad_value) {
-            my $warn = "Stray text after $$bad_value{type}\{}";
-            $warn .= " for '$key_text'" if length $key_text;
+        if ($ap_value) {
+            my (undef, $ap_value_text) = $get_hr_kv->(undef, $ap_value);
+            my $warn = "Stray text after $ap_value_text";
+            $warn .= " for $key_text" if length $key_text;
             $block->warning($pos, "$warn ignored");
-            undef $bad_value;
+            undef $ap_value;
+        }
+
+        # overwrote a key
+        if (length $ow_key) {
+            my ($ow_key_text) = $get_hr_kv->($ow_key);
+            $block->warning($pos, "Overwrote key $ow_key_text");
+            undef $ow_key;
+        }
+
+        # overwrote a value
+        if (length $ow_value) {
+            my (undef, $ow_value_text) = $get_hr_kv->(undef, $ow_value);
+            $block->warning($pos, "Overwrote value $ow_value_text");
+            undef $ow_value;
         }
     };
 
@@ -74,9 +100,15 @@ sub map_parse {
 
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
-            # $item->parse(@_);
-            $key   = $item if !$in_value; # this will actually become the value,
-            $value = $item if  $in_value; # when we realize we don't have one
+            if ($in_value) {
+                $ow_value = $value;
+                $value = $item;
+            }
+            else {
+                $ow_key = $key;
+                $key = $item;
+            }
+            $warn_bad_maybe->();
             next ITEM;
         }
 
@@ -178,13 +210,13 @@ sub map_parse {
 
                 # this is part of the value
                 if ($in_value) {
-                    $bad_value = $value and next CHAR if blessed $value;
+                    $ap_value = $value and next CHAR if blessed $value;
                     $value .= $char;
                 }
 
                 # this must be part of the key
                 else {
-                    $bad_key = $key and next CHAR if blessed $key;
+                    $ap_key = $key and next CHAR if blessed $key;
                     $key .= $char;
                 }
             }
@@ -195,29 +227,20 @@ sub map_parse {
 
     # warning stuff
     $warn_bad_maybe->();
-    $pos->{line}   = $block->{line};
-    my $key_text   = truncate_hr(trim($key),   30) unless blessed $key;
-    my $value_text = truncate_hr(trim($value), 30) unless blessed $value;
+    $pos->{line} = $block->{line};
+    my ($key_text, $value_text) = $get_hr_kv->();
 
     # value warnings
-    if (blessed $value) {
-        my $warn = "Value $$value{type}\{}";
-        $warn .= " for '$key_text'" if length $key_text;
-        $block->warning($pos, "$warn not terminated");
-    }
-    elsif (length $value_text) {
-        my $warn = "Value '$value_text'";
-        $warn .= " for '$key_text'" if length $key_text;
+    if ($value_text) {
+        my $warn = "Value $value_text";
+        $warn .= " for $key_text" if length $key_text;
         $block->warning($pos, "$warn not terminated");
     }
 
     # key warnings come later because $key will always be set unless there was a
     # semicolon to terminate the pair
-    elsif (blessed $key) {
-        $block->warning($pos, "Stray $$key{type}\{} ignored");
-    }
     elsif (length $key_text) {
-        $block->warning($pos, "Stray text '$key_text' ignored");
+        $block->warning($pos, "Stray key $key_text ignored");
     }
 
     # append/overwrite values found in this parser.
@@ -247,6 +270,12 @@ sub map_html {
         $_->[1] = $value; # overwrite the block value with HTML
         $block->{map}{$key} = $value;
     }
+}
+
+sub addquote {
+    my $str = shift;
+    return '' if !length $str;
+    return "'$str'";
 }
 
 __PACKAGE__
