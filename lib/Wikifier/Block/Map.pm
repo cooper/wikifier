@@ -47,11 +47,11 @@ sub map_parse {
     my $get_hr_kv = sub {
         my @stuff = map {
             my $thing = $_;
-            !defined $thing     ?
+            !length  $thing     ?
             undef               :
             blessed $thing      ?
             "$$thing{type}\{}"  :
-            addquote(truncate_hr(trim($thing)), 30);
+            q(').truncate_hr(trim($thing)), 30).q(');
         } @_;
         return wantarray ? (@stuff) : $stuff[0];
     };
@@ -281,12 +281,6 @@ sub map_html {
         $_->[1] = $value; # overwrite the block value with HTML
         $block->{map}{$key} = $value;
     }
-}
-
-sub addquote {
-    my $str = shift;
-    return '' if !length $str;
-    return "'$str'";
 }
 
 __PACKAGE__
