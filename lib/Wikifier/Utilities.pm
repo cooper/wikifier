@@ -134,7 +134,7 @@ sub L(@) {
             next;
         }
         chomp $str;
-        say(('    ' x $indent).$str);
+        say STDERR (('    ' x $indent).$str);
     }
 }
 
