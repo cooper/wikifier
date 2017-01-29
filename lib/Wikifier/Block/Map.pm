@@ -156,8 +156,8 @@ sub map_parse {
     if (blessed $key) {
         $block->warning($pos, "Stray block $$key{type}\{}");
     }
-    elsif (length $key) {
-        my $key_text = truncate_hr(trim($key), 30);
+    elsif (length(my $key_text = trim($key))) {
+        $key_text = truncate_hr($key_text, 30);
         $block->warning($pos, "Stray text '$key_text' ignored");
     }
 
@@ -167,8 +167,8 @@ sub map_parse {
         $warn .= "for '$key'" if !blessed $key && length $key;
         $block->warning($pos, $warn);
     }
-    elsif (length $value) {
-        my $value_text = truncate_hr(trim($value), 30);
+    elsif (length(my $value_text = trim($value))) {
+        my $value_text = truncate_hr($value_text, 30);
         my $warn = "Value '$value_text' not terminated";
         $warn .= "for '$key'" if !blessed $key && length $key;
         $block->warning($pos, $warn);
