@@ -41,8 +41,7 @@ use Wikifier::Utilities qw(L);
 #
 sub new {
     my ($class, %opts) = @_;
-    $opts{content}     ||= [];
-    $opts{content_pos} ||= [];
+    $opts{content} ||= [];
     $opts{type} = lc $opts{type};
     my $block = bless \%opts, $class;
 
@@ -193,7 +192,13 @@ sub content_text {
 
 # returns all content. this is a list of mixed strings and blocks.
 sub content_pos {
-    return @{ shift->{content_pos} };
+    my $block   = shift;
+    my @content = $block->content;
+    my @content_pos;
+    for (0..$#content) {
+        push @content_pos, [ $content[$_], $block->{positions}[$_] ];
+    }
+    return @content_posl
 }
 
 # same as ->content except it skips blocks that don't produce HTML.

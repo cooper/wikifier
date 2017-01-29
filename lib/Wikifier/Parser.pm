@@ -396,8 +396,8 @@ sub push_content {
         line => $c->{line},
         col  => $c->{column}
     };
-    push @{ $c->{block}{content_pos} }, map { [ $_, $pos ] } @_;
-    push @{ $c->{block}{content} }, @_;
+    push @{ $c->{block}{positions} }, $pos for 0..$#_;
+    push @{ $c->{block}{content}   }, @_;
 }
 
 # return the last element in the current block's content

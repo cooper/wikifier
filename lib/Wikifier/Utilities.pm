@@ -94,6 +94,7 @@ sub cat_name_ne {
 # removes leading and trailing whitespace from a string.
 sub trim {
     my $string = shift;
+    return if !defined $string;
     $string =~ s/^\s*//g;     # remove leading whitespace.
     $string =~ s/\s*$//g;     # remove trailing whitespace.
     return $string;
