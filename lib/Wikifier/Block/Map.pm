@@ -45,12 +45,12 @@ sub map_parse {
 
     # get human readable keys and values
     my $get_hr_kv = sub {
-        my @stuff = @_ ? (@_) : ($key, $value);
+        my @stuff = scalar @_ ? (@_) : ($key, $value);
         return map {
             blessed $_      ?
             "$$_{type}\{}"  :
             addquote(truncate_hr(trim($_)), 30);
-        } grep defined, @stuff;
+        } grep { defined } @stuff;
     };
 
     # check if we have bad keys or values and produce warnings
