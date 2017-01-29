@@ -380,9 +380,8 @@ sub clear_ignored { delete shift->{ignored}   }
 # the current block
 sub block {
     my $c = shift;
-    my $ref = \$c->{block};
-    return $$ref if !@_;
-    $$ref = shift;
+    return $c->{block} = shift if @_;
+    return $c->{block};
 }
 
 # return the content of the current block
@@ -405,9 +404,8 @@ sub push_content {
 # return the last element in the current block's content
 sub last_content {
     my $c = shift;
-    my $ref = \$c->{block}{content}[-1];
-    return $$ref if !@_;
-    $$ref = shift;
+    return $c->{block}{content}[-1] = shift if @_;
+    return $c->{block}{content}[-1];
 }
 
 # append a string to the last element in the current block's content
