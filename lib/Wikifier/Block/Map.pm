@@ -9,7 +9,7 @@ use strict;
 use 5.010;
 
 use Scalar::Util qw(blessed);
-use Wikifier::Utilities qw(L trim);
+use Wikifier::Utilities qw(L trim truncate_hr);
 
 our %block_types = (
     map => {
@@ -129,7 +129,10 @@ sub map_parse {
                 ];
 
                 # keys spanning multiple lines are fishy
-                $block->warning($pos, "Suspicious key '$key'") if $key =~ m/\n/;
+                if ($key =~ m/\n/) {
+                    my $key_text = truncate_hr($key, 30);
+                    $block->warning($pos, "Suspicious key '$key_text'");
+                }
 
                 # reset status.
                 $in_value = 0;
@@ -150,9 +153,10 @@ sub map_parse {
     } # end of item loop.
 
     my $warn;
-    $key = trim($key); $value = trim($value);
-    $warn = "Stray text '$key' ignored"     if length $key;
-    $warn = "Value '$value' not terminated" if length $value;
+    my $key_text   = truncate_hr(trim($key), 30);
+    my $value_text = truncate_hr(trim($value), 30);
+    $warn = "Stray text '$key_text' ignored"        if length $key_text;
+    $warn = "Value '$value_text' not terminated"    if length $value_text;
     $block->warning($pos, $warn) if $warn;
 
     # append/overwrite values found in this parser.

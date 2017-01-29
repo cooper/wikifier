@@ -115,6 +115,13 @@ sub trim_count {
     return wantarray ? ($string, $front, $back) : $string;
 }
 
+# human-readable truncation
+sub truncate_hr {
+    my ($string, $max_chars) = @_;
+    return $string if length $string <= $max_chars;
+    return substr($string, 0, $max_chars - 3).'...';
+}
+
 sub hash_maybe($) {
     my $href = shift;
     return if ref $href ne 'HASH';

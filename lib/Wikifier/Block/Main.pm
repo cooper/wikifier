@@ -12,7 +12,7 @@ use strict;
 
 use Scalar::Util qw(blessed);
 use Digest::MD5 qw(md5_hex);
-use Wikifier::Utilities qw(trim_count);
+use Wikifier::Utilities qw(trim_count truncate_hr);
 
 our %block_types = (
     main => {
@@ -34,6 +34,7 @@ sub main_parse {
         $pos->{line} += $removed;
 
         next unless length $text;
+        $text = truncate_hr($text, 30);
         $block->warning($pos, "Stray text '$text' ignored");
     }
 
