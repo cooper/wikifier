@@ -209,7 +209,7 @@ sub handle_character {
         # later be trimmed out by a further cleanup.
         #
         print "last_content: ", $c->last_content, " -> ";
-        $c->last_content = substr($c->last_content, 0, -$chars_scanned);
+        $c->{block}{content}[-1] = substr($c->last_content, 0, -$chars_scanned);
         print $c->last_content, "\n";
 
         # if the block type contains dot(s), it has classes.
@@ -229,7 +229,7 @@ sub handle_character {
         }
 
         # create the new block.
-        $c->block = my $block = $wikifier->create_block(
+        $c->{block} = my $block = $wikifier->create_block(
             line    => $c->{line},
             col     => $c->{col},
             parent  => $c->block,
@@ -284,7 +284,7 @@ sub handle_character {
         $c->block->{end_column} = $c->{column};
 
         # return to the parent
-        $c->block = $c->block->parent;
+        $c->{block} = $c->block->parent;
         $c->push_content(@add_contents);
     }
 
