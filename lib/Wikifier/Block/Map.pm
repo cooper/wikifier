@@ -46,10 +46,12 @@ sub map_parse {
     # get human readable keys and values
     my $get_hr_kv = sub {
         my @stuff = map {
+            !defined()      ?
+            undef           :
             blessed $_      ?
             "$$_{type}\{}"  :
             addquote(truncate_hr(trim($_)), 30);
-        } grep defined, @_;
+        } @_;
         return wantarray ? (@stuff) : $stuff[0];
     };
 
@@ -87,8 +89,7 @@ sub map_parse {
 
         # overwrote a value
         if ($ow_value) {
-            my ($assoc_key) = $get_hr_kv->(pop @$ow_value);
-            my ($old, $new) = $get_hr_kv->(@$ow_value);
+            my ($old, $new, $assoc_key) = $get_hr_kv->(@$ow_value);
             my $warn = "Overwrote value $old with $new";
             $warn .= " for key $assoc_key" if length $assoc_key;
             $block->warning($pos, $warn);
