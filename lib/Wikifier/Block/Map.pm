@@ -45,12 +45,12 @@ sub map_parse {
 
     # get human readable keys and values
     my $get_hr_kv = sub {
-        my @stuff = scalar @_ ? (@_) : ($key, $value);
+        my @stuff = @_ ? (@_) : ($key, $value);
         return map {
             blessed $_      ?
             "$$_{type}\{}"  :
             addquote(truncate_hr(trim($_)), 30);
-        } @stuff;
+        } grep defined, @stuff;
     };
 
     # check if we have bad keys or values and produce warnings
@@ -73,7 +73,7 @@ sub map_parse {
         if ($ap_value) {
             my (undef, $ap_value_text) = $get_hr_kv->(undef, $ap_value);
             my $warn = "Stray text after $ap_value_text";
-            $warn .= " for $key_text" if length $key_text;
+            $warn .= " for key $key_text" if length $key_text;
             $block->warning($pos, "$warn ignored");
             undef $ap_value;
         }
@@ -81,14 +81,17 @@ sub map_parse {
         # overwrote a key
         if ($ow_key) {
             my ($old, $new) = $get_hr_kv->(@$ow_key);
-            $block->warning($pos, "Overwrote key $old with $new");
+            $block->warning($pos, "Overwrote $old with $new");
             undef $ow_key;
         }
 
         # overwrote a value
         if ($ow_value) {
+            my $assoc_key   = $get_hr_kv->(pop @$ow_value);
             my ($old, $new) = $get_hr_kv->(@$ow_value);
-            $block->warning($pos, "Overwrote value $old with $new");
+            my $warn = "Overwrote value $old with $new";
+            $warn .= " for key $assoc_key" if length $assoc_key;
+            $block->warning($pos, $warn);
             undef $ow_value;
         }
     };
@@ -101,7 +104,7 @@ sub map_parse {
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
             if ($in_value) {
-                $ow_value = [ $value, $item ]
+                $ow_value = [ $value, $item, $key ]
                     if length trim($value);
                 $value = $item;
             }
@@ -178,7 +181,7 @@ sub map_parse {
 
                 # if this key exists, rename it to the next available <key>_key_<n>.
                 KEY: while (exists $values{$key}) {
-                    my ($key_name, $key_number) = split '_key_', $key;
+                    my ($key_name, $key_number) = split '_key_', $key, 2;
                     if (!defined $key_number) {
                         $key = "${key}_2";
                         next KEY;
@@ -204,9 +207,7 @@ sub map_parse {
                 $key = $value = '';
             }
 
-            # any other characters.
-            # TODO: produce a warning if $key or $value is blessed and we are
-            # trying to append it. they likely forgot a semicolon after a block.
+            # any other character
             else {
                 $escaped = 0;
 
@@ -235,7 +236,7 @@ sub map_parse {
     # value warnings
     if ($value_text) {
         my $warn = "Value $value_text";
-        $warn .= " for $key_text" if length $key_text;
+        $warn .= " for key $key_text" if length $key_text;
         $block->warning($pos, "$warn not terminated");
     }
 
