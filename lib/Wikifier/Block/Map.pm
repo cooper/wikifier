@@ -132,9 +132,8 @@ sub map_parse {
             # trying to append it. they likely forgot a semicolon after a block.
             else {
                 $escaped = 0;
-                next if $char =~ m/\s/;
                 $value  .= $char if  $in_value;
-                $key    .= $char if !$in_value;
+                $key    .= $char if !$in_value && $char !~ m/\s/;
             }
         } # end of character loop.
     } # end of item loop.
