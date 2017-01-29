@@ -213,18 +213,24 @@ sub map_parse {
 
                 # this is part of the value
                 if ($in_value) {
-                    $ap_value = $value and next CHAR if blessed $value;
-                    $value .= $char;
+                    if (blessed $value && $char !~ m/\s/) {
+                        $ap_value = $value;
+                    }
+                    else { $value .= $char }
                 }
 
                 # this must be part of the key
                 else {
-                    $ap_key = $key and next CHAR if blessed $key;
-                    $key .= $char;
+                    if (blessed $key && $char !~ m/\s/) {
+                        $ap_key = $key;
+                    }
+                    else { $key .= $char }
                 }
             }
 
+            # increment line position maybe
             $pos->{line}++ if $char eq "\n";
+
         } # end of character loop.
     } # end of item loop.
 
