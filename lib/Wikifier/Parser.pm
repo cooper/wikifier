@@ -405,16 +405,24 @@ sub append_content {
     $c->{block}{content}[-1] .= $append;
 }
 
-sub warning {
+sub line_info {
+    my $c    = shift;
+    my $line = defined $c->{line} ? "Line $$c{line}:" : '';
+    $line   .= "$$c{col}:" if defined $c->{col};
+    $line   .= ' ' if length $line;
+    return $line;
+}
 
+sub warning {
+    my ($c, $warn) = @_;
+    $warn = $c->line_info.$warn;
+    push @{ $c->{warnings} }, $warn;
+    return $warn;
 }
 
 sub error {
     my ($c, $err) = @_;
-    my $line = defined $c->{line} ? "Line $$c{line}:" : '';
-    $line   .= "$$c{col}:" if defined $c->{col};
-    $line   .= ' ' if length $line;
-    return $c->{error} = $line.$err;
+    return $c->{error} = $c->line_info.$err;
 }
 
 1
