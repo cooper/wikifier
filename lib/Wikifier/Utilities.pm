@@ -118,6 +118,7 @@ sub trim_count {
 # human-readable truncation
 sub truncate_hr {
     my ($string, $max_chars) = @_;
+    return undef if !defined $string || !$max_chars;
     return $string if length $string <= $max_chars;
     return substr($string, 0, $max_chars - 3).'...';
 }
