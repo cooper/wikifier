@@ -45,12 +45,12 @@ sub map_parse {
 
     # get human readable keys and values
     my $get_hr_kv = sub {
-        my ($key, $value) = (shift || $key, shift || $value);
-        my $key_text = blessed $key ?
-            "$$key{type}\{}" : addquote(truncate_hr(trim($key)), 30);
-        my $value_text = blessed $value ?
-            "$$value{type}\{}" : addquote(truncate_hr(trim($value)), 30);
-        return ($key_text, $value_text);
+        my @stuff = scalar @_ ? (@_) : ($key, $value);
+        return map {
+            blessed $_      ?
+            "$$_{type}\{}"  :
+            addquote(truncate_hr(trim($_)), 30);
+        } @stuff;
     };
 
     # check if we have bad keys or values and produce warnings
@@ -79,16 +79,16 @@ sub map_parse {
         }
 
         # overwrote a key
-        if (length $ow_key) {
-            my ($ow_key_text) = $get_hr_kv->($ow_key);
-            $block->warning($pos, "Overwrote key $ow_key_text");
+        if ($ow_key) {
+            my ($old, $new) = $get_hr_kv->(@$ow_key);
+            $block->warning($pos, "Overwrote key $old with $new");
             undef $ow_key;
         }
 
         # overwrote a value
-        if (length $ow_value) {
-            my (undef, $ow_value_text) = $get_hr_kv->(undef, $ow_value);
-            $block->warning($pos, "Overwrote value $ow_value_text");
+        if ($ow_value) {
+            my ($old, $new) = $get_hr_kv->(@$ow_value);
+            $block->warning($pos, "Overwrote value $old with $new");
             undef $ow_value;
         }
     };
@@ -101,11 +101,11 @@ sub map_parse {
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
             if ($in_value) {
-                $ow_value = $value;
+                $ow_value = [ $value, $item ] if length $value;
                 $value = $item;
             }
             else {
-                $ow_key = $key;
+                $ow_key = [ $key, $item ] if length $key;
                 $key = $item;
             }
             $warn_bad_maybe->();
