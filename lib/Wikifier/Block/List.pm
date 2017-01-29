@@ -6,7 +6,8 @@ package Wikifier::Block::List;
 use warnings;
 use strict;
 
-use Scalar::Util 'blessed';
+use Scalar::Util qw(blessed);
+use Wikifier::Utilities qw(trim truncate_hr);
 
 our %block_types = (list => {
     init   => \&list_init,
@@ -23,15 +24,51 @@ sub list_init {
 # parse a list.
 sub list_parse {
     my ($block, $page) = @_;
-    my $value = '';
+    my ($value, $pos, $ow_value, $ap_value) = '';
+
+    # get human readable values
+    my $get_hr = sub {
+        my @stuff = map {
+            my $thing = blessed $_ ? $_ : trim($_);
+            my $res   =
+                !length $thing      ?
+                undef               :
+                blessed $thing      ?
+                "$$thing{type}\{}"  :
+                q(').truncate_hr($thing, 30).q(');
+            $res;
+        } @_;
+        return wantarray ? (@stuff) : $stuff[0];
+    };
+
+    # check if we have bad values and produce warnings
+    my $warn_bad_maybe = sub {
+
+        # tried to append an object value
+        if ($ap_value) {
+            my $ap_value_text = $get_hr->($ap_value);
+            $block->warning($pos, "Stray text after $ap_value_text ignored");
+            undef $ap_value;
+        }
+
+        # overwrote a value
+        if ($ow_value) {
+            my ($old, $new) = $get_hr->(@$ow_value);
+            $block->warning($pos, "Overwrote value $old with $new");
+            undef $ow_value;
+        }
+    };
 
     # for each content item...
-    ITEM: foreach my $item ($block->content_visible) {
+    ITEM: foreach ($block->content_visible_pos) {
+        (my $item, $pos) = @$_;
 
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
 
             # set the value to the block item itself.
+            $ow_value = [ $value, $item ]
+                if length trim($value);
             $value = $item;
 
             next ITEM;
@@ -65,23 +102,26 @@ sub list_parse {
                 }
 
                 # store the value.
+                $warn_bad_maybe->();
                 push @{ $block->{list_array} }, $value;
 
                 # reset status.
                 $value = '';
             }
 
-            # any other characters.
-            # TODO: produce a warning if $value is blessed and we are
-            # trying to append it. they likely forgot a semicolon after a block.
+            # any other character
             else {
-                $value .= $char;
+                if (blessed $value) {
+                    $ap_value = $value unless $char =~ m/\s/;
+                }
+                else { $value .= $char }
                 $escaped = 0;
             }
 
         }   # end of character loop.
     }       # end of item loop.
 
+    $warn_bad_maybe->();
     return 1;
 }
 
