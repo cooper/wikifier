@@ -115,13 +115,16 @@ sub _display_page {
     # parse the page.
     # if an error occurs, parse it again in variable-only mode.
     # then hopefully we can at least get the metadata and categories.
-    my $err = $page->parse;
+    my ($err, $parse_info) = $page->parse;
     if ($err) {
         $page->{vars_only}++;
         $page->parse;
         $wiki->cat_check_page($page);
         return display_error($err, parse_error => 1);
     }
+
+    # extract warnings from parser info
+    $result->{warnings} = $parse_info->{warnings};
 
     # update categories
     $wiki->cat_check_page($page);

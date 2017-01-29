@@ -70,12 +70,12 @@ sub new {
 # parses the file.
 sub parse {
     my $page = shift;
-    my $err;
+    my ($err, $c);
     L align('Parse'), sub {
-        $err = $page->wikifier->parse($page, $page->path);
+        ($err, $c) = $page->wikifier->parse($page, $page->path);
     };
     L align('Error', $err) if $err;
-    return $err;
+    return wantarray ? ($err, $c) : $err;
 }
 
 # returns the generated page HTML.

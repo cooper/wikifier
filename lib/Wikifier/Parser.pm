@@ -70,7 +70,7 @@ sub parse {
     # run ->parse on children.
     $page->{main_block}->parse($page);
 
-    return;
+    return wantarray ? (undef, $c) : undef;
 }
 
 # parse a single line.
