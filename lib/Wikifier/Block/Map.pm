@@ -49,7 +49,7 @@ sub map_parse {
         return map {
             blessed $_      ?
             "$$_{type}\{}"  :
-            q(').truncate_hr(trim($_)), 30).q(');
+            addquote(truncate_hr(trim($_)), 30);
         } @stuff;
     };
 
@@ -272,6 +272,12 @@ sub map_html {
         $_->[1] = $value; # overwrite the block value with HTML
         $block->{map}{$key} = $value;
     }
+}
+
+sub addquote {
+    my $str = shift;
+    return '' if !length $str;
+    return "'$str'";
 }
 
 __PACKAGE__
