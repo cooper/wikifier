@@ -49,7 +49,7 @@ sub map_parse {
         return map {
             blessed $_      ?
             "$$_{type}\{}"  :
-            addquote(truncate_hr(trim($_)), 30);
+            q(').truncate_hr(trim($_)), 30).q(');
         } @stuff;
     };
 
@@ -102,12 +102,12 @@ sub map_parse {
         if (blessed($item)) {
             if ($in_value) {
                 $ow_value = [ $value, $item ]
-                    if $value || length trim($value);
+                    if blessed $value || length trim($value);
                 $value = $item;
             }
             else {
                 $ow_key = [ $key, $item ]
-                    if $key || length trim($key);
+                    if blessed $key || length trim($key);
                 $key = $item;
             }
             $warn_bad_maybe->();
@@ -272,12 +272,6 @@ sub map_html {
         $_->[1] = $value; # overwrite the block value with HTML
         $block->{map}{$key} = $value;
     }
-}
-
-sub addquote {
-    my $str = shift;
-    return '' if !length $str;
-    return "'$str'";
 }
 
 __PACKAGE__
