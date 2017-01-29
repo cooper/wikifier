@@ -213,16 +213,16 @@ sub map_parse {
 
                 # this is part of the value
                 if ($in_value) {
-                    if (blessed $value && $char !~ m/\s/) {
-                        $ap_value = $value;
+                    if (blessed $value) {
+                        $ap_value = $value unless $char =~ m/\s/;
                     }
                     else { $value .= $char }
                 }
 
                 # this must be part of the key
                 else {
-                    if (blessed $key && $char !~ m/\s/) {
-                        $ap_key = $key;
+                    if (blessed $key) {
+                        $ap_key = $key unless $char =~ m/\s/;
                     }
                     else { $key .= $char }
                 }
