@@ -57,7 +57,8 @@ sub list_parse {
 
                     # special value -no-format-values;
                     if ($value eq '-no-format-values') {
-                        $block->{no_format_values}++;
+                        $block->warning($pos, 'Redundant -no-format-values')
+                            if $block->{no_format_values}++;
                         $value = '';
                         next CHAR;
                     }

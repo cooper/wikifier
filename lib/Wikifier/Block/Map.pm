@@ -100,7 +100,8 @@ sub map_parse {
 
                     # special value -no-format-values;
                     if ($value eq '-no-format-values') {
-                        $block->{no_format_values}++;
+                        $block->warning($pos, 'Redundant -no-format-values')
+                            if $block->{no_format_values}++;
                         $in_value = 0;
                         $key = $value = '';
                         next CHAR;
