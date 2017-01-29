@@ -162,7 +162,10 @@ sub _display_page {
             css => $result->{css},
 
             # categories
-            categories => $page->{categories} || {}
+            categories => $page->{categories} || {},
+
+            # warnings
+            warnings => $result->{warnings}
 
         }), "\n";
 
