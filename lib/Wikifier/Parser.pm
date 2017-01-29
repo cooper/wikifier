@@ -42,8 +42,8 @@ sub parse {
         return "Couldn't open '$file': $!";
     }
 
-    # set initial parse info.
-    my $current = bless {
+    # set initial parse info
+    my $c = bless {
         block       => $wikifier->{main_block},
         warnings    => []
     }, 'Wikifier::Parser::Current';
@@ -52,19 +52,18 @@ sub parse {
     while (my $line = <$fh>) {
         $line =~ s/[\r\n\0]//g;     # remove returns and newlines.
         $line = trim($line);        # remove prefixing and suffixing whitespace.
-        $current->{line} = $.;
-        my ($i, $err) = $wikifier->handle_line($line, $page, $current);
-        next unless $err;
-        $err = "Line $.:$i: $err";
+        $c->{line} = $.;
+        $wikifier->handle_line($line, $page, $c);
+        next if !$c->{error};
         close $fh;
-        return $err;
+        return $c->{error};
     }
 
     close $fh;
 
     # some block was not closed.
-    if ($current->{block} != $page->{main_block}) {
-        my ($type, $line, $col) = @{ $current->{block} }{ qw(type line col) };
+    if ($c->{block} != $page->{main_block}) {
+        my ($type, $line, $col) = @{ $c->{block} }{ qw(type line col) };
         return "Line $line:$col: $type\{} still open at EOF";
     }
 
@@ -99,8 +98,8 @@ sub handle_line {
         next CHAR if delete $c->{skip_next_char};
         $c->{col} = $i;
         $c->{next_char} = $chars[$i + 1] // '';
-        my $err = $wikifier->handle_character($chars[$i], $page, $c);
-        return ($i, $err) if $err;
+        $wikifier->handle_character($chars[$i], $page, $c);
+        return $c->{error} if $c->{error};
     }
 
     return;
@@ -152,7 +151,7 @@ sub handle_character {
         my $block_type    = my $block_name    = '';
         my $in_block_name = my $chars_scanned = 0;
 
-        return "Block has no type"
+        return $c->error("Block has no type")
             if !length $content;
 
         # chop one character at a time from the end of the content.
@@ -239,7 +238,7 @@ sub handle_character {
 
         # we cannot close the main block.
         if ($c->block == $page->{main_block}) {
-            return "Attempted to close main block";
+            return $c->error("Attempted to close main block");
         }
 
         # this is an if statement.
@@ -404,6 +403,17 @@ sub last_content {
 sub append_content {
     my ($c, $append) = @_;
     $c->{block}{content}[-1] .= $append;
+}
+
+sub warning {
+
+}
+
+sub error {
+    my ($c, $err) = @_;
+    $err = "Line $$c{line}:$$c{col}: $err" if defined $c->{col};
+    $err = "Line $$c{line}: $err" if defined $c->{line};
+    return $c->{error} = $err;
 }
 
 1
