@@ -45,17 +45,18 @@ sub map_parse {
 
     # get human readable keys and values
     my $get_hr_kv = sub {
-        my @stuff = scalar @_ ? (@_) : ($key, $value);
-        return map {
+        my @stuff = @_ ? (@_) : ($key, $value);
+        @stuff = map {
             blessed $_      ?
             "$$_{type}\{}"  :
             addquote(truncate_hr(trim($_)), 30);
-        } grep { defined } @stuff;
+        } grep defined, @stuff;
+        return wantarray ? (@stuff) : $stuff[0];
     };
 
     # check if we have bad keys or values and produce warnings
     my $warn_bad_maybe = sub {
-        my ($key_text) = $get_hr_kv->();
+        my $key_text = $get_hr_kv->();
 
         # keys spanning multiple lines are fishy
         if (!blessed $key && length $key_text && $key_text =~ m/\n/) {
@@ -64,7 +65,7 @@ sub map_parse {
 
         # tried to append an object key
         if ($ap_key) {
-            my ($ap_key_text) = $get_hr_kv->($ap_key);
+            my $ap_key_text = $get_hr_kv->($ap_key);
             $block->warning($pos, "Stray text after $ap_key_text ignored");
             undef $ap_key;
         }
@@ -87,7 +88,7 @@ sub map_parse {
 
         # overwrote a value
         if ($ow_value) {
-            my $assoc_key   = $get_hr_kv->(pop @$ow_value);
+            my ($assoc_key) = $get_hr_kv->(pop @$ow_value);
             my ($old, $new) = $get_hr_kv->(@$ow_value);
             my $warn = "Overwrote value $old with $new";
             $warn .= " for key $assoc_key" if length $assoc_key;
