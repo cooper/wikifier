@@ -375,7 +375,7 @@ sub clear_ignored { delete shift->{ignored}   }
 # the current block
 sub block {
     my $c = shift;
-    my $ref = \shift->{block};
+    my $ref = \$c->{block};
     return $$ref if !@_;
     $$ref = shift;
 }
