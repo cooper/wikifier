@@ -382,7 +382,7 @@ sub mark_ignored  {        shift->{ignored}++ }
 sub clear_ignored { delete shift->{ignored}   }
 
 # the current block
-sub block : lvalue {
+sub block {
     return shift->{block};
 }
 
@@ -399,7 +399,7 @@ sub push_content {
 }
 
 # return the last element in the current block's content
-sub last_content : lvalue {
+sub last_content {
     my $c = shift;
     my $content = $c->{block}{content};
     return $content->[$#$content];
@@ -408,7 +408,7 @@ sub last_content : lvalue {
 # append a string to the last element in the current block's content
 sub append_content {
     my ($c, $append) = @_;
-    $c->last_content .= $append;
+    $c->{block}{content}[-1] .= $append;
 }
 
 1
