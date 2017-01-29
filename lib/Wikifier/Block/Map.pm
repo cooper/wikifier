@@ -102,12 +102,12 @@ sub map_parse {
         if (blessed($item)) {
             if ($in_value) {
                 $ow_value = [ $value, $item ]
-                    if blessed $value || length trim($value);
+                    if length trim($value);
                 $value = $item;
             }
             else {
                 $ow_key = [ $key, $item ]
-                    if blessed $key || length trim($key);
+                    if length trim($key);
                 $key = $item;
             }
             $warn_bad_maybe->();
