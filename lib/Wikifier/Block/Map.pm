@@ -9,7 +9,7 @@ use strict;
 use 5.010;
 
 use Scalar::Util qw(blessed);
-use Wikifier::Utilities qw(L);
+use Wikifier::Utilities qw(L trim);
 
 our %block_types = (
     map => {
@@ -131,9 +131,10 @@ sub map_parse {
             # TODO: produce a warning if $key or $value is blessed and we are
             # trying to append it. they likely forgot a semicolon after a block.
             else {
+                $escaped = 0;
+                next if $char =~ m/\s/;
                 $value  .= $char if  $in_value;
                 $key    .= $char if !$in_value;
-                $escaped = 0;
             }
         } # end of character loop.
     } # end of item loop.
