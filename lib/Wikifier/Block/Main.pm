@@ -15,6 +15,7 @@ use Digest::MD5  'md5_hex';
 
 our %block_types = (
     main => {
+        parse => \&main_parse,
         html  => \&main_html
     }
 );
@@ -23,7 +24,7 @@ sub main_parse {
     my $block = shift;
 
     # filter out blank items.
-    $block->remove_blank();
+    $block->remove_blank;
 
     # produce warnings for stray text.
     foreach ($block->content_text_pos) {
