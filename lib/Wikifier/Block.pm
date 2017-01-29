@@ -198,6 +198,15 @@ sub parent { shift->{parent} }
 sub type   { shift->{type}   }
 sub name   { shift->{name}   }
 
+# produce a parser warning
+sub warning {
+    my ($block, $warn) = @_;
+    my $c = $block->{current} or return;
+    $c->{temp_line} = $block->{line};
+    $c->{temp_col}  = $block->{col};
+    $c->warning($warn);
+}
+
 # remove empty content items.
 sub remove_blank {
     my $block = shift;

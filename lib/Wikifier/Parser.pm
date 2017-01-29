@@ -411,8 +411,10 @@ sub append_content {
 
 sub line_info {
     my $c    = shift;
-    my $line = defined $c->{line} ? "Line $$c{line}:" : '';
-    $line   .= "$$c{col}:" if defined $c->{col};
+    my $line = delete $c->{temp_line} // $c->{line};
+    my $col  = delete $c->{temp_col}  // $c->{column};
+    my $line = defined $line ? "Line $line:" : '';
+    $line   .= "$col:" if defined $col;
     $line   .= ' ' if length $line;
     return $line;
 }

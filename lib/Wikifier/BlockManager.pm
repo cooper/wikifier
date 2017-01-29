@@ -20,7 +20,7 @@ our %block_types = (
 
 sub create_block {
     my ($wikifier, %opts) = @_;
-    my $c_maybe = delete $opts{current};
+    my $c_maybe = $opts{current};
     my $type = $opts{type};
     my $dir  = _dir(\%opts);
 
