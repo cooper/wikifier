@@ -37,6 +37,9 @@ sub map_parse {
     ITEM: foreach ($block->content_visible_pos) {
         (my $item, $pos) = @$_;
 
+        # account for newlines in the item
+        $pos->{line} += () = $item =~ /\n/g unless blessed $item;
+
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
             # $item->parse(@_);
