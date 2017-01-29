@@ -157,13 +157,6 @@ sub map_parse {
     my $key_text   = truncate_hr(trim($key),   30) unless blessed $key;
     my $value_text = truncate_hr(trim($value), 30) unless blessed $value;
 
-    # key warnings
-    if (blessed $key) {
-        $block->warning($pos, "Stray block $$key{type}\{}");
-    }
-    elsif (length $key_text) {
-        $block->warning($pos, "Stray text '$key_text' ignored");
-    }
 
     # value warnings
     if (blessed $value) {
@@ -175,6 +168,15 @@ sub map_parse {
         my $warn = "Value '$value_text' not terminated";
         $warn .= " for '$key_text'" if length $key_text;
         $block->warning($pos, $warn);
+    }
+
+    # key warnings come later because $key will always be set unless there was a
+    # semicolon to terminate the pair
+    elsif (blessed $key) {
+        $block->warning($pos, "Stray block $$key{type}\{}");
+    }
+    elsif (length $key_text) {
+        $block->warning($pos, "Stray text '$key_text' ignored");
     }
 
     # append/overwrite values found in this parser.
