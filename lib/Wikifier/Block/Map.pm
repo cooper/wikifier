@@ -133,7 +133,7 @@ sub map_parse {
             else {
                 $escaped = 0;
                 $value  .= $char if  $in_value;
-                $key    .= $char if !$in_value && $char !~ m/\s/;
+                $key    .= $char if !$in_value;
             }
         } # end of character loop.
     } # end of item loop.
