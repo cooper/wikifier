@@ -297,7 +297,11 @@ sub parse_format_type {
     # variable.
     if ($type =~ /^@([\w.]+)$/) {
         my $var = $page->get($1);
-        return defined $var ? $var : '(null)';
+        if (!defined $var) {
+            # TODO: make a warning
+            return '(null)';
+        }
+        return $var;
     }
 
     # html entity.

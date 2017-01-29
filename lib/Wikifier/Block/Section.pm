@@ -112,8 +112,8 @@ sub section_html {
 
         # this is blessed, so it's a block. manually skip invisible ones.
         # adopt this element.
-        next ITEM if $item->{type_ref}{invis};
-        $el->add($item->html($page));
+        my $html = $item->html($page);
+        $el->add($html) unless $item->{type_ref}{invis};
         $line = $item->{end_line} if $item->{end_line};
     }
 }
