@@ -392,13 +392,11 @@ sub content {
 # push content to the current block
 sub push_content {
     my $c = shift;
-    push @{ $c->{block}{content_pos} }, [
-        $_,
-        {
-            line => $c->{line},
-            col  => $c->{column}
-        }
-    ] for @_;
+    my $pos = {
+        line => $c->{line},
+        col  => $c->{column}
+    };
+    push @{ $c->{block}{content_pos} }, map { [ $_, $pos ] } @_;
     push @{ $c->{block}{content} }, @_;
 }
 
