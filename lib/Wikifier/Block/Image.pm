@@ -61,13 +61,13 @@ sub image_parse {
     # no float; default to right.
     $block->{float} ||= $block->{align} || 'right';
 
+    $block->{image_root} = $page->wiki_opt('root.image');
+
     # no file - this is mandatory.
     if (!length $block->{file}) {
-        L "No file specified for image";
+        $block->warning("No file specified");
         return;
     }
-
-    $block->{image_root} = $page->wiki_opt('root.image');
 
     ##############
     ### SIZING ###
