@@ -101,11 +101,13 @@ sub map_parse {
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
             if ($in_value) {
-                $ow_value = [ $value, $item ] if length $value;
+                $ow_value = [ $value, $item ]
+                    if $value || length trim($value);
                 $value = $item;
             }
             else {
-                $ow_key = [ $key, $item ] if length $key;
+                $ow_key = [ $key, $item ]
+                    if $key || length trim($key);
                 $key = $item;
             }
             $warn_bad_maybe->();
