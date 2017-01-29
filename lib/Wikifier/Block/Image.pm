@@ -65,7 +65,7 @@ sub image_parse {
 
     # no file - this is mandatory.
     if (!length $block->{file}) {
-        $block->warning("No file specified");
+        $block->warning("No file specified for image\{}");
         return;
     }
 

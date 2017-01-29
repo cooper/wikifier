@@ -46,11 +46,12 @@ sub map_parse {
     # get human readable keys and values
     my $get_hr_kv = sub {
         my @stuff = map {
-            !defined()      ?
-            undef           :
-            blessed $_      ?
-            "$$_{type}\{}"  :
-            addquote(truncate_hr(trim($_)), 30);
+            my $thing = $_;
+            !defined $thing     ?
+            undef               :
+            blessed $thing      ?
+            "$$thing{type}\{}"  :
+            addquote(truncate_hr(trim($thing)), 30);
         } @_;
         return wantarray ? (@stuff) : $stuff[0];
     };
