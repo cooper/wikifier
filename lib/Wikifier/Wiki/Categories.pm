@@ -14,7 +14,6 @@ use Wikifier::Utilities qw(
 );
 
 my $json = JSON::XS->new->pretty(1);
-my $stripper = HTML::Strip->new;
 
 ##################
 ### CATEGORIES ###
@@ -157,17 +156,14 @@ sub cat_add_page {
     my $cat_file = $wiki->path_for_category($cat_name, $cat_type);
 
     # set page infos.
-    my $formatted_title = $page->get('page.title');
-    my $stripped_title  = defined $formatted_title ?
-        $stripper->parse($formatted_title) : undef;
     my $page_data = {
         asof        => $time,
         mod_unix    => $page->modified_time,
-        fmt_title   => $formatted_title,
-        title       => $stripped_title,
-        created     => $page->get('page.created'),
-        author      => $page->get('page.author'),
-        draft       => $page->get('page.draft'),
+        fmt_title   => $page->fmt_title,
+        title       => $page->title,
+        created     => $page->created,
+        author      => $page->author,
+        draft       => $page->draft,
         hash_maybe $cat_extras
     };
 

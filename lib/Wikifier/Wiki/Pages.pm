@@ -12,7 +12,6 @@ use JSON::XS ();
 use HTML::Strip;
 
 my $json = JSON::XS->new->pretty(1);
-my $stripper = HTML::Strip->new;
 
 #############
 ### PAGES ###
@@ -120,11 +119,10 @@ sub _display_page {
     $result->{length}     = length $result->{content};
     $result->{css}        = $page->css;
     $result->{categories} = [ _cats_to_list($page->{categories}) ];
-    $result->{author}     = $page->get('page.author');
-    $result->{created}    = $page->get('page.created');
-    $result->{fmt_title}  = $page->get('page.title');
-    $result->{title}      = defined $result->{fmt_title} ?
-        $stripper->parse($result->{fmt_title}) : undef;
+    $result->{author}     = $page->author;
+    $result->{created}    = $page->created;
+    $result->{fmt_title}  = $page->fmt_title;
+    $result->{title}      = $page->title;
 
     # caching is enabled, so let's save this for later.
     $result = $wiki->write_page_cache($page, $result)

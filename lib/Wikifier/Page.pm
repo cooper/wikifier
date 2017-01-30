@@ -11,7 +11,10 @@ use strict;
 use Scalar::Util qw(blessed);
 use File::Basename qw(basename);
 use Cwd qw(abs_path);
+use HTML::Strip;
 use Wikifier::Utilities qw(page_name align L);
+
+my $stripper = HTML::Strip->new;
 
 # default options.
 our %wiki_defaults = (
@@ -256,13 +259,13 @@ sub _default_calculator {
     if ($width) {
         $scale_factor = $big_w / $width;
         $final_w = $img{width};
-        $final_h = $img{page}->image_round($big_h / $scale_factor);
+        $final_h = $img{page}->_image_round($big_h / $scale_factor);
     }
 
     # height was given; calculate width.
     elsif ($height) {
         $scale_factor = $big_h / $height;
-        $final_w = $img{page}->image_round($big_w / $scale_factor);
+        $final_w = $img{page}->_image_round($big_w / $scale_factor);
         $final_h = $img{height};
     }
 
@@ -283,7 +286,7 @@ sub _default_sizer {
 }
 
 # round dimension according to setting.
-sub image_round {
+sub _image_round {
     my ($page, $size) = @_;
     my $round = $page->wiki_opt('image.rounding');
     return int($size + 0.5 ) if $round eq 'normal';
@@ -292,6 +295,7 @@ sub image_round {
     return $size; # fallback.
 }
 
+# abs path to cache file
 sub cache_path {
     my $page = shift;
     return abs_path($page->{cache_path})
@@ -299,6 +303,7 @@ sub cache_path {
     return abs_path($page->wiki_opt('dir.cache').'/'.$page->name.'.cache');
 }
 
+# abs path to page
 sub path {
     my $page = shift;
     return abs_path($page->{file_path})
@@ -306,25 +311,47 @@ sub path {
     return abs_path($page->wiki_opt('dir.page').'/'.$page->name);
 }
 
+# page creation time from @page.created
 sub created_time {
     my $page = shift;
     my $page_data = $page->get_href('page');
-    $page_data = {} if ref $page_data ne 'HASH';
     return $page_data->{created} || $page->{created};
 }
 
+# page modification time from stat()
 sub modified_time {
     my $page = shift;
     return (stat $page->path)[9];
 }
 
+# page filename, with extension
 sub name {
     return shift->{name};
 }
 
+# page draft from @page.draft
+sub draft {
+    my $page = shift;
+    return $page->get('page.draft');
+}
+
+# page author from @page.author
+sub author {
+    my $page = shift;
+    return $page->get('page.author');
+}
+
+# formatted title from @page.title
+sub fmt_title {
+    my $page = shift;
+    my $page_data = $page->get_href('page');
+    return $page_data->{title} // $page->{title} // $page->name;
+}
+
+# tag-stripped version of page title
 sub title {
     my $page = shift;
-    return length $page->{title} ? $page->{title} : $page->name;
+    return $stripper->parse($page->fmt_title);
 }
 
 sub wikifier { shift->{wikifier} }
