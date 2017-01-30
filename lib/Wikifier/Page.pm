@@ -309,8 +309,9 @@ sub path {
 # page creation time from @page.created
 sub created {
     my $page = shift;
-    my $page_data = $page->get_href('page');
-    return $page_data->{created} || $page->{created};
+    my $created = trim $page->get('page.created');
+    return undef if !length $created || $created =~ m/\D/;
+    return $created + 0;
 }
 
 # page modification time from stat()
