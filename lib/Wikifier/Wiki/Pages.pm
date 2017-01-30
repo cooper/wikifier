@@ -67,18 +67,16 @@ sub _display_page {
 
     # caching is enabled, so let's check for a cached copy.
     if ($wiki->opt('page.enable.cache') && -f $cache_path) {
-        my ($page_modify, $cache_modify) =
-            map { (stat $_)[9] } $path, $cache_path;
 
         # the page's file is more recent than the cache file.
         # discard the outdated cached copy.
-        if ($page_modify > $cache_modify) {
+        if ($page->modified > $page->cache_modified) {
             unlink $cache_path;
         }
 
         # the cached file is newer, so use it.
         else {
-            $result = $wiki->get_page_cache($page, $result, $cache_modify);
+            $result = $wiki->get_page_cache($page, $result);
         }
     }
 
@@ -119,13 +117,13 @@ sub _display_page {
     $result->{length}     = length $result->{content};
     $result->{css}        = $page->css;
     $result->{categories} = [ _cats_to_list($page->{categories}) ];
-    $result->{author}     = $page->author;
-    $result->{created}    = $page->created;
-    $result->{fmt_title}  = $page->fmt_title;
-    $result->{title}      = $page->title;
+
+    # title, author, etc.
+    my $page_info = $page->page_info;
+    @$result{ keys %$page_info } = values %$page_info;
 
     # caching is enabled, so let's save this for later.
-    $result = $wiki->write_page_cache($page, $result)
+    $result = $wiki->write_page_cache($page, $result, $page_info)
         if $wiki->opt('page.enable.cache');
 
     return $result;
@@ -133,7 +131,8 @@ sub _display_page {
 
 # get page from cache
 sub get_page_cache {
-    my ($wiki, $page, $result, $cache_modify) = @_;
+    my ($wiki, $page, $result) = @_;
+    my $cache_modify = $page->cache_modified;
     my $time_str = time2str($cache_modify);
 
     $result->{content}  = "<!-- cached page dated $time_str -->\n\n";
@@ -168,17 +167,14 @@ sub get_page_cache {
 
 # write page to cache
 sub write_page_cache {
-    my ($wiki, $page, $result) = @_;
+    my ($wiki, $page, $result, $page_info) = @_;
     open my $fh, '>', $page->cache_path;
 
     # save prefixing data.
     print {$fh} $json->encode({
 
-        # page variables
-        fmt_title   => $result->{fmt_title},
-        title       => $result->{title},
-        created     => $result->{created},
-        author      => $result->{author},
+        # page info
+        %$page_info,
 
         # generated CSS
         css => $result->{css},
@@ -196,9 +192,8 @@ sub write_page_cache {
     close $fh;
 
     # overwrite modified date to actual.
-    my $modified = (stat $page->cache_path)[9];
-    $result->{modified}  = time2str($modified);
-    $result->{mod_unix}  = $modified;
+    $result->{mod_unix}  = $page->cache_modified;
+    $result->{modified}  = time2str($result->{mod_unix});
     $result->{cache_gen} = 1;
 
     return $result;

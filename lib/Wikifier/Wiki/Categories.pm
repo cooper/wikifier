@@ -157,13 +157,8 @@ sub cat_add_page {
 
     # set page infos.
     my $page_data = {
-        asof        => $time,
-        mod_unix    => $page->modified_time,
-        fmt_title   => $page->fmt_title,
-        title       => $page->title,
-        created     => $page->created,
-        author      => $page->author,
-        draft       => $page->draft,
+        asof => $time,
+        hash_maybe $page->page_info,
         hash_maybe $cat_extras
     };
 
@@ -179,7 +174,7 @@ sub cat_add_page {
 
         # the page has not changed since the asof time, so do nothing.
         my $page_ref = $cat->{pages}{ $page->{name} } ||= {};
-        if ($page_ref->{asof} && $page_ref->{asof} >= $page->modified_time) {
+        if ($page_ref->{asof} && $page_ref->{asof} >= $page->modified) {
             return 1;
         }
 
@@ -288,7 +283,7 @@ sub cat_get_pages {
             # update data.
             $page_data = {
                 asof => $time,
-                hash_maybe $page->get_href('page')
+                hash_maybe $page->page_info
             };
 
             # page is no longer member of category.

@@ -295,14 +295,6 @@ sub _image_round {
     return $size; # fallback.
 }
 
-# abs path to cache file
-sub cache_path {
-    my $page = shift;
-    return abs_path($page->{cache_path})
-        if length $page->{cache_path};
-    return abs_path($page->wiki_opt('dir.cache').'/'.$page->name.'.cache');
-}
-
 # abs path to page
 sub path {
     my $page = shift;
@@ -312,16 +304,42 @@ sub path {
 }
 
 # page creation time from @page.created
-sub created_time {
+sub created {
     my $page = shift;
     my $page_data = $page->get_href('page');
     return $page_data->{created} || $page->{created};
 }
 
 # page modification time from stat()
-sub modified_time {
+sub modified {
     my $page = shift;
     return (stat $page->path)[9];
+}
+
+# abs path to cache file
+sub cache_path {
+    my $page = shift;
+    return abs_path($page->{cache_path})
+        if length $page->{cache_path};
+    return abs_path($page->wiki_opt('dir.cache').'/'.$page->name.'.cache');
+}
+
+# cache file modification time from stat()
+sub cache_modified {
+    return (stat $page->cache_path)[9];
+}
+
+# page info to be used in results, stored in cats/cache files
+sub page_info {
+    my $page = shift;
+    return {
+        mod_unix    => $page->modified,
+        fmt_title   => $page->fmt_title,
+        title       => $page->title,
+        created     => $page->created,
+        author      => $page->author,
+        draft       => $page->draft
+    };
 }
 
 # page filename, with extension
