@@ -9,8 +9,10 @@ use HTTP::Date qw(time2str);
 use Wikifier::Utilities qw(page_name align L Lindent back);
 use Scalar::Util qw(blessed);
 use JSON::XS ();
+use HTML::Strip;
 
 my $json = JSON::XS->new->pretty(1);
+my $stripper = HTML::Strip->new;
 
 #############
 ### PAGES ###
@@ -59,9 +61,10 @@ sub _display_page {
         if !-f $path;
 
     # set path, file, and meme type.
+    $result->{type} = 'page';
+    $result->{mime} = 'text/html';
     $result->{file} = $page_name;
     $result->{path} = $path;
-    $result->{mime} = 'text/html';
 
     # caching is enabled, so let's check for a cached copy.
     if ($wiki->opt('page.enable.cache') && -f $cache_path) {
@@ -76,40 +79,14 @@ sub _display_page {
 
         # the cached file is newer, so use it.
         else {
-            my $time_str = time2str($cache_modify);
-            $result->{type}     = 'page';
-            $result->{content}  = "<!-- cached page dated $time_str -->\n\n";
-
-            # fetch the prefixing data.
-            my $cache_data = file_contents($cache_path);
-            my @data = split /\n\n/, $cache_data, 2;
-
-            # decode.
-            my $jdata = eval { $json->decode(shift @data) };
-            if (ref $jdata eq 'HASH') {
-                $result->{$_} = $jdata->{$_} for keys %$jdata;
-            }
-
-            # if this is a draft, pretend it doesn't exist.
-            if ($result->{draft}) {
-                return display_error(
-                    "Page has not yet been published.",
-                    draft => 1
-                );
-            }
-
-            $result->{content} .= shift @data;
-            $result->{cached}   = 1;
-            $result->{modified} = $time_str;
-            $result->{mod_unix} = $cache_modify;
-            $result->{length}   = length $result->{content};
-
-            return $result;
+            $result = $wiki->get_page_cache($page, $result, $cache_modify);
         }
     }
 
-    # cache was not used. generate a new copy.
-    $result->{page} = $page;
+    # if we just retrieved a cached version, we're done...
+    return $result if $result->{cached};
+
+    # Safe point - we will be generating the page right now.
 
     # parse the page.
     # if an error occurs, parse it again in variable-only mode.
@@ -121,9 +98,6 @@ sub _display_page {
         $wiki->cat_check_page($page);
         return display_error($err, parse_error => 1);
     }
-
-    # extract warnings from parser info
-    $result->{warnings} = $page->{warnings};
 
     # update categories
     $wiki->cat_check_page($page);
@@ -137,46 +111,97 @@ sub _display_page {
     }
 
     # generate the HTML and headers.
-    $result->{type}       = 'page';
-    $result->{content}    = $page->html;
-    $result->{css}        = $page->css;
-    $result->{length}     = length $result->{content};
     $result->{generated}  = 1;
-    $result->{modified}   = time2str(time);
+    $result->{page}       = $page;
+    $result->{warnings}   = $page->{warnings};
     $result->{mod_unix}   = time;
+    $result->{modified}   = time2str($result->{mod_unix});
+    $result->{content}    = $page->html;
+    $result->{length}     = length $result->{content};
+    $result->{css}        = $page->css;
     $result->{categories} = [ _cats_to_list($page->{categories}) ];
+    $result->{author}     = $page->get('page.author');
+    $result->{created}    = $page->get('page.created');
+    $result->{fmt_title}  = $page->get('page.title');
+    $result->{title}      = defined $result->{fmt_title} ?
+        $stripper->parse($result->{fmt_title}) : undef;
 
     # caching is enabled, so let's save this for later.
-    if ($wiki->opt('page.enable.cache')) {
-        open my $fh, '>', $cache_path;
+    $result = $wiki->write_page_cache($page, $result)
+        if $wiki->opt('page.enable.cache');
 
-        # save prefixing data.
-        print {$fh} $json->encode({
+    return $result;
+}
 
-            # page variables
-            %{ $page->get_href('page') },
+# get page from cache
+sub get_page_cache {
+    my ($wiki, $page, $result, $cache_modify) = @_;
+    my $time_str = time2str($cache_modify);
 
-            # generated CSS
-            css => $result->{css},
+    $result->{content}  = "<!-- cached page dated $time_str -->\n\n";
 
-            # categories
-            categories => $page->{categories} || {},
+    # fetch the prefixing data.
+    my $cache_data = file_contents($page->cache_path);
+    my @data = split /\n\n/, $cache_data, 2;
 
-            # warnings
-            warnings => $result->{warnings}
-
-        }), "\n";
-
-        # save the content.
-        print {$fh} $result->{content};
-        close $fh;
-
-        # overwrite modified date to actual.
-        my $modified = (stat $cache_path)[9];
-        $result->{modified}  = time2str($modified);
-        $result->{mod_unix}  = $modified;
-        $result->{cache_gen} = 1;
+    # decode.
+    my $jdata = eval { $json->decode(shift @data) };
+    if (ref $jdata eq 'HASH') {
+        @$result{ keys %$jdata } = values %$jdata;
     }
+
+    # if this is a draft, pretend it doesn't exist.
+    if ($result->{draft}) {
+        return display_error(
+            "Page has not yet been published.",
+            draft  => 1,
+            cached => 1
+        );
+    }
+
+    $result->{cached}   = 1;
+    $result->{content} .= shift @data;
+    $result->{length}   = length $result->{content};
+    $result->{mod_unix} = $cache_modify;
+    $result->{modified} = $time_str;
+
+    return $result;
+}
+
+# write page to cache
+sub write_page_cache {
+    my ($wiki, $page, $result) = @_;
+    open my $fh, '>', $page->cache_path;
+
+    # save prefixing data.
+    print {$fh} $json->encode({
+
+        # page variables
+        fmt_title   => $result->{fmt_title},
+        title       => $result->{title},
+        created     => $result->{created},
+        author      => $result->{author},
+
+        # generated CSS
+        css => $result->{css},
+
+        # categories
+        categories => $page->{categories} || {},
+
+        # warnings
+        warnings => $result->{warnings}
+
+    }), "\n";
+
+    # save the content.
+    print {$fh} $result->{content};
+    close $fh;
+
+    # overwrite modified date to actual.
+    my $modified = (stat $page->cache_path)[9];
+    $result->{modified}  = time2str($modified);
+    $result->{mod_unix}  = $modified;
+    $result->{cache_gen} = 1;
 
     return $result;
 }
