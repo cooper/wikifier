@@ -336,14 +336,14 @@ sub cache_modified {
 # page info to be used in results, stored in cats/cache files
 sub page_info {
     my $page = shift;
-    return filter_defined {
+    return filter_defined({
         mod_unix    => $page->modified,
         created     => $page->created,
         draft       => $page->draft,
         fmt_title   => $page->fmt_title,
         title       => $page->title,
         author      => $page->author
-    };
+    });
 }
 
 # page filename, with extension
