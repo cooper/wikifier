@@ -12,7 +12,7 @@ use Scalar::Util qw(blessed);
 use File::Basename qw(basename);
 use Cwd qw(abs_path);
 use HTML::Strip;
-use Wikifier::Utilities qw(page_name align L);
+use Wikifier::Utilities qw(page_name align trim L);
 
 my $stripper = HTML::Strip->new;
 
@@ -357,14 +357,14 @@ sub draft {
 # page author from @page.author
 sub author {
     my $page = shift;
-    return $page->get('page.author');
+    return trim $page->get('page.author');
 }
 
 # formatted title from @page.title
 sub fmt_title {
-    my $page = shift;
-    my $page_data = $page->get_href('page');
-    return $page_data->{title} // $page->{title} // $page->name;
+    my $page  = shift;
+    my $title = trim $page->get('page.title');
+    return length $title ? $title : $page->name;
 }
 
 # tag-stripped version of page title

@@ -94,7 +94,7 @@ embedded variables:
 
 Also, variables can have attributes. This helps to organize things:
 ```
-@page.name: Hello World!;
+@page.title: Hello World!;
 @page.author: John Doe;
 ```
 

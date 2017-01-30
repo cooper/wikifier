@@ -92,7 +92,7 @@ sub cat_name_ne {
 }
 
 # removes leading and trailing whitespace from a string.
-sub trim {
+sub trim ($) {
     my $string = shift;
     return undef if !defined $string;
     $string =~ s/^\s*//g;     # remove leading whitespace.
@@ -102,7 +102,7 @@ sub trim {
 
 # removes leading and trailing whitespace from a string, returning the
 # new string and the number of newlines removed from front and back.
-sub trim_count {
+sub trim_count ($) {
     my $string = shift;
     return wantarray ? (undef, 0, 0) : undef if !defined $string;
     my ($front, $back) = (0, 0);
