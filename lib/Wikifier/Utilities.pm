@@ -115,6 +115,24 @@ sub trim_count ($) {
     return wantarray ? ($string, $front, $back) : $string;
 }
 
+sub no_length_undef ($) {
+    my $str = shift;
+    return undef if !length $str;
+    return $str;
+}
+
+sub filter_defined ($) {
+    my $hash = shift;
+    return $hash eq 'HASH' or return {};
+    my %new;
+    foreach my $key (keys %$hash) {
+        my $value = $hash->{$key};
+        next unless defined $value;
+        $new{$key} = $value;
+    }
+    return \%new;
+}
+
 # human-readable truncation
 sub truncate_hr {
     my ($string, $max_chars) = @_;

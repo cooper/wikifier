@@ -12,7 +12,10 @@ use Scalar::Util qw(blessed);
 use File::Basename qw(basename);
 use Cwd qw(abs_path);
 use HTML::Strip;
-use Wikifier::Utilities qw(page_name align trim L);
+use Wikifier::Utilities qw(
+    L align page_name trim
+    no_length_undef filter_defined
+);
 
 my $stripper = HTML::Strip->new;
 
@@ -333,13 +336,13 @@ sub cache_modified {
 # page info to be used in results, stored in cats/cache files
 sub page_info {
     my $page = shift;
-    return {
+    return filter_defined {
         mod_unix    => $page->modified,
+        created     => $page->created,
+        draft       => $page->draft,
         fmt_title   => $page->fmt_title,
         title       => $page->title,
-        created     => $page->created,
-        author      => $page->author,
-        draft       => $page->draft
+        author      => $page->author
     };
 }
 
@@ -357,20 +360,26 @@ sub draft {
 # page author from @page.author
 sub author {
     my $page = shift;
-    return trim $page->get('page.author');
+    return no_length_undef trim $page->get('page.author');
 }
 
 # formatted title from @page.title
 sub fmt_title {
-    my $page  = shift;
-    my $title = trim $page->get('page.title');
-    return length $title ? $title : $page->name;
+    my $page = shift;
+    return no_length_undef trim $page->get('page.title');
 }
 
 # tag-stripped version of page title
 sub title {
     my $page = shift;
-    return $stripper->parse($page->fmt_title);
+    my $title = $page->fmt_title;
+    return length $title ? $stripper->parse($title) : undef;
+}
+
+# title if available; otherwise filename
+sub title_or_name {
+    my $page = shift;
+    return $page->title // $page->name;
 }
 
 sub wikifier { shift->{wikifier} }
