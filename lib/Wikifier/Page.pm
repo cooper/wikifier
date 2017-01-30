@@ -326,6 +326,7 @@ sub cache_path {
 
 # cache file modification time from stat()
 sub cache_modified {
+    my $page = shift;
     return (stat $page->cache_path)[9];
 }
 
