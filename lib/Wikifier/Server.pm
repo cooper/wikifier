@@ -156,10 +156,13 @@ sub gen_wiki {
         my $page_file  = "$page_dir/$page_name";
         my $cache_file = "$cache_dir/$page_name.cache";
 
+        # determine modification times.
+        my $page_modified  = (stat $page_file )[9];
+        my $cache_modified = (stat $cache_file)[9] if $cache_file;
 
         # cached copy is newer; skip this page.
-        if ($page->modified && $page->cache_modified) {
-            next if $page->cache_modified >= $page->modified;
+        if ($page_modified && $cache_modified) {
+            next if $cache_modified >= $page_modified;
         }
 
         # page is not cached or has changed since cache time.
