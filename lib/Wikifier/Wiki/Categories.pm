@@ -7,12 +7,14 @@ use 5.010;
 
 use HTTP::Date qw(time2str);
 use JSON::XS ();
+use HTML::Strip;
 use Wikifier::Utilities qw(
     page_names_equal cat_name cat_name_ne
     keys_maybe hash_maybe L
 );
 
 my $json = JSON::XS->new->pretty(1);
+my $stripper = HTML::Strip->new;
 
 ##################
 ### CATEGORIES ###
@@ -154,11 +156,18 @@ sub cat_add_page {
     my $time = time;
     my $cat_file = $wiki->path_for_category($cat_name, $cat_type);
 
-    # fetch page infos.
+    # set page infos.
+    my $formatted_title = $page->get('page.title');
+    my $stripped_title  = defined $formatted_title ?
+        $stripper->parse($formatted_title) : undef;
     my $page_data = {
-        asof     => $time,
-        mod_unix => $page->modified_time,
-        hash_maybe $page->get_href('page'),
+        asof        => $time,
+        mod_unix    => $page->modified_time,
+        fmt_title   => $formatted_title,
+        title       => $stripped_title,
+        created     => $page->get('page.created'),
+        author      => $page->get('page.author'),
+        draft       => $page->get('page.draft'),
         hash_maybe $cat_extras
     };
 
