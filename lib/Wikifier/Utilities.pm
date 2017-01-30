@@ -123,7 +123,7 @@ sub no_length_undef ($) {
 
 sub filter_defined ($) {
     my $hash = shift;
-    return $hash eq 'HASH' or return {};
+    ref $hash eq 'HASH' or return {};
     my %new;
     foreach my $key (keys %$hash) {
         my $value = $hash->{$key};
