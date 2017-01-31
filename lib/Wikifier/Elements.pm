@@ -63,7 +63,7 @@ sub classes {
 
 sub generate {
     my ($els, $str) = (shift, '');
-    $str .= $_->generate."\n" for $els->elements;
+    $str .= $_->generate for $els->elements;
     return $str;
 }
 

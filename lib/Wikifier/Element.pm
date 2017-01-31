@@ -27,13 +27,6 @@ sub configure {
     $el->{styles}     ||= {};
     $el->{ids}        ||= \%identifiers;
 
-    # create an ID.
-    if (!length $el->{id}) {
-        my $it = $el->{classes}[0] || 'generic';
-        my $id = $el->{ids}{$it}++;
-        $el->{id} = "$it-$id";
-    }
-
     # classes
     my @classes;
     push @classes, $el->{class}
@@ -41,6 +34,13 @@ sub configure {
     push @classes, @{ $el->{classes} }
         if ref $el->{classes} eq 'ARRAY';   # additional classes
     $el->{classes} = \@classes;
+
+    # create an ID based on the primary class
+    if (!length $el->{id}) {
+        my $it = $el->{classes}[0] || 'generic';
+        my $id = $el->{ids}{$it}++;
+        $el->{id} = "$it-$id";
+    }
 
     # content must an array of items.
     $el->{content} = defined $el->{content} ? (

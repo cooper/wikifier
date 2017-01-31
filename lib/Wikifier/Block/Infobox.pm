@@ -22,7 +22,7 @@ our %block_types = (
         base  => 'map',
         parse => \&infosec_parse,
         html  => \&infosec_html,
-        invis => 1, # the html is added manually in infobox_html
+        #invis => 1, # the html is added manually in infobox_html
         multi => 1  # infosec{} produces more than one element
     }
 );
@@ -63,9 +63,31 @@ sub infobox_html {
 # append each pair.
 # note that $table might actually be a Wikifier::Elements container
 sub table_add_rows {
-    my ($table, $page, $block) = @_;
-        foreach my $pair (@{ $block->{map_array} }) {
-        my ($key_title, $value, $key, $is_block) = @$pair;
+    my ($table, $page, $block, $opts_) = @_;
+    my %opts  = hash_maybe $opts_;
+use Data::Dumper;
+print Dumper(\%opts), "\n";    my @pairs = @{ $block->{map_array} };
+    for (0..$#pairs) {
+        my ($key_title, $value, $key, $is_block) = @{ $pairs[$_] };
+
+        # options based on position in the infosec
+        my %row_opts = (is_block => $is_block);
+        if ($#pairs == 0) {
+            my %only_opts = hash_maybe $opts{only_row_opts};
+            @row_opts{ keys %only_opts } = values %only_opts;
+        }
+        elsif ($_ == 0) {
+            my %first_opts = hash_maybe $opts{first_row_opts};
+            @row_opts{ keys %first_opts } = values %first_opts;
+        }
+        elsif ($_ == $#pairs) {
+            my %last_opts = hash_maybe $opts{last_row_opts};
+            @row_opts{ keys %last_opts } = values %last_opts;
+        }
+        else {
+            my %middle_opts = hash_maybe $opts{middle_row_opts};
+            @row_opts{ keys %middle_opts } = values %middle_opts;
+        }
 
         # if the value is from infosec{}, add each row
         if (blessed $value && $value->{is_infosec}) {
@@ -73,10 +95,10 @@ sub table_add_rows {
             next;
         }
 
+print "ROW OPTS: ", Dumper(\%row_opts), "\n";
+
         # not an infosec{}; this is a top-level pair
-        table_add_row($table, $page, $key_title, $value, {
-            is_block => $is_block
-        });
+        table_add_row($table, $page, $key_title, $value, \%row_opts);
     }
 }
 
@@ -85,7 +107,7 @@ sub table_add_rows {
 sub table_add_row {
     my ($table, $page, $key_title, $value, $opts_) = @_;
     my %opts = hash_maybe $opts_;
-
+print "ADD ROW OPTS: ", Dumper(\%opts), "\n";
     # create the row.
     my $tr = $table->create_child(
         type  => 'tr',
@@ -126,9 +148,6 @@ sub table_add_row {
 sub infosec_parse {
     my ($infosec, $page) = (shift, @_);
     $infosec->parse_base(@_); # call hash parse.
-    if ($infosec->parent->type ne 'infobox') {
-        $infosec->warning('infosec{} outside of infobox{} does nothing');
-    }
 }
 
 sub infosec_html {
@@ -136,7 +155,26 @@ sub infosec_html {
     $infosec->html_base($page); # call hash html.
     $els->{is_infosec}++;
 
-    table_add_rows($els, $page, $infosec);
+    # not in an infobox{}
+    if ($infosec->parent->type ne 'infobox') {
+        $infosec->warning('infosec{} outside of infobox{} does nothing');
+        return;
+    }
+
+    table_add_rows($els, $page, $infosec, {
+        only_row_opts => {
+            tr_opts => { classes => ['infosec-first', 'infosec-last'] }
+        },
+        first_row_opts => {
+            tr_opts => { classes => ['infosec-first'] }
+        },
+        middle_row_opts => {
+            tr_opts => { classes => ['infosec-middle'] }
+        },
+        last_row_opts => {
+            tr_opts => { classes => ['infosec-last'] }
+        }
+    });
 }
 
 __PACKAGE__

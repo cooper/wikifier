@@ -20,7 +20,10 @@ infobox [NoTrollPlzNet Library] {
     Founder:            [[Foxy]];
     Operated by:        [[NoTrollPlzNet]], Sc.O.;
     General Librarian:  [[Foxy]];
-    Employees:          [@staff.count] ([@staff.asof]);
+    Employees: infosec {
+        Count: [@staff.count];
+        As of: [@staff.asof];
+    };
 }
 
 section {
