@@ -24,6 +24,7 @@ h1.wiki-section-page-title {
     clear: left;
     border-bottom: 1px solid #ccc;
     line-height: 40px;
+    overflow: hidden;
 }
 
 h2.wiki-section-title {
@@ -38,6 +39,7 @@ h4.wiki-section-title,
 h5.wiki-section-title,
 h6.wiki-section-title {
     margin-top: 15px;
+    overflow: hidden;
 }
 
 /* infoboxes */
