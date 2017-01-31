@@ -70,6 +70,7 @@ tr.wiki-infobox-pair {
 
 th.wiki-infobox-key {
     vertical-align: top;
+    text-align: left;
     font-weight: bold;
     max-width: 100px;
     padding: 5px 10px;
@@ -209,7 +210,6 @@ td.wiki-history-key {
     font-weight: bold;
     white-space: nowrap;
     padding-right: 15px;
-    text-align: left;
 }
 
 td.wiki-history-value {
