@@ -47,7 +47,7 @@ sub infobox_html {
     # display the title if it exists.
     if (length $infobox->{name}) {
         $table->create_child(type => 'tr')->create_child(
-            type        => 'td',
+            type        => 'th',
             class       => 'infobox-title',
             attributes  => { colspan => 2 },
             content     => $page->parse_formatted_text($infobox->{name})
@@ -108,7 +108,7 @@ sub table_add_row {
     if (length $key_title) {
         $key_title = $page->parse_formatted_text($key_title);
         $tr->create_child(
-            type       => 'td',
+            type       => 'th',
             class      => 'infobox-key',
             content    => $key_title,
             %td_opts

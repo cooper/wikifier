@@ -56,7 +56,7 @@ table.wiki-infobox {
     padding: 0;
 }
 
-td.wiki-infobox-title {
+th.wiki-infobox-title {
     text-align: center;
     background-color: #eee;
     font-size: 1.25em;
@@ -68,7 +68,7 @@ td.wiki-infobox-title {
 tr.wiki-infobox-pair {
 }
 
-td.wiki-infobox-key {
+th.wiki-infobox-key {
     vertical-align: top;
     font-weight: bold;
     max-width: 100px;
