@@ -65,6 +65,7 @@ sub table_add_rows {
     my $has_title = 0;
     for (0..$#pairs) {
         my ($key_title, $value, $key, $is_block, $is_title) = @{ $pairs[$_] };
+        my $next = $pairs[$_ + 1];
 
         # if the value is from infosec{}, add each row
         if (blessed $value && $value->{is_infosec}) {
@@ -78,7 +79,9 @@ sub table_add_rows {
         my @classes;
         push @classes, 'infosec-title' and $has_title++ if $is_title;
         push @classes, 'infosec-first' if $_ == $has_title;
-        push @classes, 'infosec-last'  if $_ == $#pairs && !$is_title;
+        my $next_infosec = $next && blessed $next->[1] && $next->{is_infosec};
+        push @classes, 'infosec-last'
+            if !$is_title && ($next_infosec || $_ == $#pairs);
 
         my %row_opts = (
             is_block => $is_block,
