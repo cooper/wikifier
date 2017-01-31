@@ -90,19 +90,19 @@ td.wiki-infobox-anon.wiki-infobox-text {
     line-height: 1.5em;
 }
 
-td.wiki-infosec-title {
+.wiki-infosec-title {
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
     background-color: #eee;
     font-weight: bold;
 }
 
-td.wiki-infosec-first {
+.wiki-infosec-first {
     padding-top: 10px !important;
     border-top: 1px solid #ccc;
 }
 
-td.wiki-infosec-last {
+.wiki-infosec-last {
     padding-bottom: 10px !important;
     border-bottom: 1px solid #ccc;
 }
