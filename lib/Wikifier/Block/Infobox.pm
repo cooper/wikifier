@@ -59,6 +59,11 @@ sub infobox_html {
     # append each pair.
     foreach my $pair (@{ $infobox->{map_array} }) {
         my ($key_title, $value, $key, $is_block) = @$pair;
+
+        # if the value is an infosec{}, add each row from it
+        
+
+        # not an infosec{}; this is a top-level pair
         infobox_add_row($infobox, $page, $table, $key_title, $value, {
             is_block => $is_block
         });

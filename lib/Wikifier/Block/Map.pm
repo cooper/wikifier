@@ -272,7 +272,7 @@ sub map_html {
         my ($key_title, $value, $key) = @$_;
         if (blessed $value) {
             my $their_el = $value->html($page);
-            $value = $their_el ? $their_el->generate : "$value";
+            $value = $their_el || "$value";
         }
         elsif (!$block->{no_format_values}) {
             $value = $page->parse_formatted_text($value);
