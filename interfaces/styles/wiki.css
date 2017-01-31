@@ -64,12 +64,11 @@ div.wiki-infobox-title {
 table.wiki-infobox-table {
     border: none;
     font-size: 0.8em;
-    border-collapse: separate;
+    border-collapse: collapse;
     border-spacing: 5px 0;
-    margin: 0;
+    margin: 5px;
     padding: 0;
     width: 100%;
-    padding: 5px 0;
 }
 
 tr.wiki-infobox-pair {
