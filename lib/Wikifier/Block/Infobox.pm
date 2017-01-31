@@ -65,6 +65,7 @@ sub infobox_html {
 sub table_add_rows {
     my ($table, $page, $block) = @_;
     my @pairs = @{ $block->{map_array} };
+    my $has_title = 0;
     for (0..$#pairs) {
         my ($key_title, $value, $key, $is_block, $is_title) = @{ $pairs[$_] };
 
@@ -78,9 +79,9 @@ sub table_add_rows {
 
         # options based on position in the infosec
         my @classes;
-        push @classes, 'infosec-title' if $is_title;
-        push @classes, 'infosec-first' if $_ == 0;
-        push @classes, 'infosec-last'  if $_ == $#pairs;
+        push @classes, 'infosec-title' and $has_title++ if $is_title;
+        push @classes, 'infosec-first' if $_ == $has_title;
+        push @classes, 'infosec-last'  if $_ == $#pairs && !$is_title;
 
         my %row_opts = (
             is_block => $is_block,
