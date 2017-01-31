@@ -128,7 +128,7 @@ sub table_add_row {
             class      => 'infobox-anon',
             attributes => { colspan => 2 },
             content    => $value,
-            hash_maybe $opts{anon_opts}
+            %td_opts
         );
         $td->add_class('infobox-text') if !$opts{is_block};
     }
