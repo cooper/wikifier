@@ -50,23 +50,21 @@ div.wiki-infobox {
     background-color: #f7f7f7;
 }
 
-div.wiki-infobox-title {
-    text-align: center;
-    background-color: #eee;
-    font-weight: bold;
-    border-bottom: 1px solid #ccc;
-    padding: 5px;
-}
-
 table.wiki-infobox-table {
     border: 1px solid #ccc;
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
     font-size: 0.8em;
     border-collapse: collapse;
     margin: 0;
     padding: 0;
     width: 100%;
+}
+
+tr.wiki-infobox-title td {
+    text-align: center;
+    background-color: #eee;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+    padding: 5px;
 }
 
 tr.wiki-infobox-pair {

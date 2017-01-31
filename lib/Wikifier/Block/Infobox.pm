@@ -43,19 +43,23 @@ sub infobox_html {
     my ($infobox, $page, $el) = @_;
     $infobox->html_base($page); # call hash html.
 
-    # display the title if it exists.
-    if (length $infobox->{name}) {
-        $el->create_child(
-            class   => 'infobox-title',
-            content => $page->parse_formatted_text($infobox->{name})
-        );
-    }
-
     # start table.
     my $table = $el->create_child(
         type  => 'table',
         class => 'infobox-table'
     );
+
+    # display the title if it exists.
+    if (length $infobox->{name}) {
+        $table->create_child(
+            type    => 'tr',
+            class   => 'infobox-title'
+        )->create_child(
+            type        => 'td',
+            attributes  => { colspan => 2 },
+            content     => $page->parse_formatted_text($infobox->{name})
+        );
+    }
 
     table_add_rows($table, $page, $infobox);
 }
