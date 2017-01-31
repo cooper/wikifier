@@ -105,8 +105,8 @@ sub _parse {
 
 # HTML contents.
 sub html {
-    my $block   = shift;
-    my $type    = $block->{type};
+    my $block = shift;
+    my $type  = $block->{type};
 
     # strip excess whitespace
     $block->remove_blank;

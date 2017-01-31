@@ -7,13 +7,15 @@ use warnings;
 use strict;
 use 5.010;
 
+use Scalar::Util qw(blessed);
 use Wikifier::Utilities qw(L);
 
 sub new {
-    my ($class, @elements) = @_;
+    my ($class, %opts) = @_;
     return bless {
-        elements => \@elements,
-        contents => []
+        elements => [],
+        contents => [],
+        %opts
     }, $class;
 }
 

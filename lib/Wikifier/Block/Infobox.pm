@@ -65,10 +65,17 @@ sub infobox_html {
 sub table_add_rows {
     my ($table, $page, $block, $opts_) = @_;
     my %opts  = hash_maybe $opts_;
-use Data::Dumper;
-print Dumper(\%opts), "\n";    my @pairs = @{ $block->{map_array} };
+    my @pairs = @{ $block->{map_array} };
     for (0..$#pairs) {
         my ($key_title, $value, $key, $is_block) = @{ $pairs[$_] };
+
+        # if the value is from infosec{}, add each row
+        if (blessed $value && $value->{is_infosec}) {
+            #warning("Key associated with infosec{} ignored")
+            #    if length $key_title;
+            $table->add($value);
+            next;
+        }
 
         # options based on position in the infosec
         my %row_opts = (is_block => $is_block);
@@ -89,14 +96,6 @@ print Dumper(\%opts), "\n";    my @pairs = @{ $block->{map_array} };
             @row_opts{ keys %middle_opts } = values %middle_opts;
         }
 
-        # if the value is from infosec{}, add each row
-        if (blessed $value && $value->{is_infosec}) {
-            $table->add($value);
-            next;
-        }
-
-print "ROW OPTS: ", Dumper(\%row_opts), "\n";
-
         # not an infosec{}; this is a top-level pair
         table_add_row($table, $page, $key_title, $value, \%row_opts);
     }
@@ -107,7 +106,7 @@ print "ROW OPTS: ", Dumper(\%row_opts), "\n";
 sub table_add_row {
     my ($table, $page, $key_title, $value, $opts_) = @_;
     my %opts = hash_maybe $opts_;
-print "ADD ROW OPTS: ", Dumper(\%opts), "\n";
+
     # create the row.
     my $tr = $table->create_child(
         type  => 'tr',
@@ -161,18 +160,26 @@ sub infosec_html {
         return;
     }
 
+    # inject the title
+    my @first_classes = 'infosec-first';
+    if (length(my $title = $infosec->{name})) {
+        unshift @{ $infosec->{map_array} }, [
+            undef,              # no key title
+            $title,             # value, may be formatted later
+            '_infosec_title_'   # the real key
+        ];
+        push @first_classes, 'infosec-title';
+    }
+
     table_add_rows($els, $page, $infosec, {
         only_row_opts => {
-            tr_opts => { classes => ['infosec-first', 'infosec-last'] }
+            tr_opts => { classes => [ @first_classes, 'infosec-last' ] }
         },
         first_row_opts => {
-            tr_opts => { classes => ['infosec-first'] }
-        },
-        middle_row_opts => {
-            tr_opts => { classes => ['infosec-middle'] }
+            tr_opts => { classes => \@first_classes }
         },
         last_row_opts => {
-            tr_opts => { classes => ['infosec-last'] }
+            tr_opts => { classes => [ 'infosec-last' ] }
         }
     });
 }
