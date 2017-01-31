@@ -65,7 +65,6 @@ table.wiki-infobox-table {
     border: none;
     font-size: 0.8em;
     border-collapse: collapse;
-    border-spacing: 5px 0;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -96,6 +95,8 @@ td.wiki-infobox-anon.wiki-infobox-text {
 }
 
 tr.wiki-infosec-title {
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
     background-color: #ddd;
     font-weight: bold;
 }

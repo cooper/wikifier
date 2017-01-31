@@ -63,11 +63,10 @@ sub infobox_html {
 # append each pair.
 # note that $table might actually be a Wikifier::Elements container
 sub table_add_rows {
-    my ($table, $page, $block, $opts_) = @_;
-    my %opts  = hash_maybe $opts_;
+    my ($table, $page, $block) = @_;
     my @pairs = @{ $block->{map_array} };
     for (0..$#pairs) {
-        my ($key_title, $value, $key, $is_block) = @{ $pairs[$_] };
+        my ($key_title, $value, $key, $is_block, $is_title) = @{ $pairs[$_] };
 
         # if the value is from infosec{}, add each row
         if (blessed $value && $value->{is_infosec}) {
@@ -78,23 +77,15 @@ sub table_add_rows {
         }
 
         # options based on position in the infosec
-        my %row_opts = (is_block => $is_block);
-        if ($#pairs == 0) {
-            my %only_opts = hash_maybe $opts{only_row_opts};
-            @row_opts{ keys %only_opts } = values %only_opts;
-        }
-        elsif ($_ == 0) {
-            my %first_opts = hash_maybe $opts{first_row_opts};
-            @row_opts{ keys %first_opts } = values %first_opts;
-        }
-        elsif ($_ == $#pairs) {
-            my %last_opts = hash_maybe $opts{last_row_opts};
-            @row_opts{ keys %last_opts } = values %last_opts;
-        }
-        else {
-            my %middle_opts = hash_maybe $opts{middle_row_opts};
-            @row_opts{ keys %middle_opts } = values %middle_opts;
-        }
+        push @classes, 'infosec-title' if $is_title;
+        push @classes, 'infosec-first' if $_ == 0;
+        push @classes, 'infosec-last'  if $_ == $#pairs;
+
+        my %row_opts = (
+            is_block => $is_block,
+            is_title => $is_title,
+            tr_opts  => { classes => \@classes }
+        );
 
         # not an infosec{}; this is a top-level pair
         table_add_row($table, $page, $key_title, $value, \%row_opts);
@@ -166,22 +157,14 @@ sub infosec_html {
         unshift @{ $infosec->{map_array} }, [
             undef,              # no key title
             $page->parse_formatted_text($title),
-            '_infosec_title_'   # the real key
+            '_infosec_title_',  # the real key
+            undef,              # block?
+            1                   # title?
         ];
         push @first_classes, 'infosec-title';
     }
 
-    table_add_rows($els, $page, $infosec, {
-        only_row_opts => {
-            tr_opts => { classes => [ @first_classes, 'infosec-last' ] }
-        },
-        first_row_opts => {
-            tr_opts => { classes => \@first_classes }
-        },
-        last_row_opts => {
-            tr_opts => { classes => [ 'infosec-last' ] }
-        }
-    });
+    table_add_rows($els, $page, $infosec);
 }
 
 __PACKAGE__
