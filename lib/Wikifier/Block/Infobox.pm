@@ -59,14 +59,14 @@ sub infobox_html {
     # append each pair.
     foreach my $pair (@{ $infobox->{map_array} }) {
         my ($key_title, $value, $key, $is_block) = @$pair;
-        infobox_add_row($infobox, $table, $key_title, $value, {
+        infobox_add_row($infobox, $page, $table, $key_title, $value, {
             is_block => $is_block
         });
     } # pair
 }
 
 sub infobox_add_row {
-    my ($infobox, $table, $key_title, $value, $opts_) = @_;
+    my ($infobox, $page, $table, $key_title, $value, $opts_) = @_;
     my %opts = hash_maybe $opts_;
 
     # create the row.
