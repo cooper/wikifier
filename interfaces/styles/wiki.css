@@ -66,7 +66,7 @@ table.wiki-infobox-table {
     font-size: 0.8em;
     border-collapse: collapse;
     border-spacing: 5px 0;
-    margin: 5px;
+    margin: 0;
     padding: 0;
     width: 100%;
 }
@@ -78,21 +78,20 @@ td.wiki-infobox-key {
     vertical-align: top;
     font-weight: bold;
     max-width: 100px;
-    padding: 5px;
+    padding: 10px;
     white-space: nowrap;
 }
 
-
 td.wiki-infobox-value {
-    padding: 5px;
+    padding: 10px;
 }
 
 td.wiki-infobox-anon {
-    padding: 0;
+    padding: 5px;
 }
 
 td.wiki-infobox-anon.wiki-infobox-text {
-    padding: 5px;
+    padding: 10px;
     text-align: center;
 }
 
