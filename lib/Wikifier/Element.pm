@@ -111,7 +111,7 @@ sub generate {
         $classes .= "wiki-$class ";
     }
     chop $classes;
-    $html .= " class=\"$classes\"" if defined $classes;
+    $html .= " class=\"$classes\"" if length $classes;
 
     # add styles.
     my $styles;

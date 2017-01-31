@@ -62,9 +62,10 @@ table.wiki-infobox-table {
 tr.wiki-infobox-title td {
     text-align: center;
     background-color: #eee;
+    font-size: 1.25em;
     font-weight: bold;
     border-bottom: 1px solid #ccc;
-    padding: 5px;
+    padding: 8px;
 }
 
 tr.wiki-infobox-pair {
