@@ -79,9 +79,9 @@ sub table_add_rows {
         my @classes;
         push @classes, 'infosec-title' and $has_title++ if $is_title;
         push @classes, 'infosec-first' if $_ == $has_title;
-        my $next_infosec = $next && blessed $next->[1] && $next->{is_infosec};
+        my $b4_infosec = $next && blessed $next->[1] && $next->[1]{is_infosec};
         push @classes, 'infosec-last'
-            if !$is_title && ($next_infosec || $_ == $#pairs);
+            if !$is_title && ($b4_infosec || $_ == $#pairs);
 
         my %row_opts = (
             is_block => $is_block,
