@@ -77,6 +77,7 @@ sub table_add_rows {
         }
 
         # options based on position in the infosec
+        my @classes;
         push @classes, 'infosec-title' if $is_title;
         push @classes, 'infosec-first' if $_ == 0;
         push @classes, 'infosec-last'  if $_ == $#pairs;
@@ -152,7 +153,6 @@ sub infosec_html {
     }
 
     # inject the title
-    my @first_classes = 'infosec-first';
     if (length(my $title = $infosec->{name})) {
         unshift @{ $infosec->{map_array} }, [
             undef,              # no key title
@@ -161,7 +161,6 @@ sub infosec_html {
             undef,              # block?
             1                   # title?
         ];
-        push @first_classes, 'infosec-title';
     }
 
     table_add_rows($els, $page, $infosec);
