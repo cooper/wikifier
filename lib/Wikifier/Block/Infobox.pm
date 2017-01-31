@@ -40,14 +40,9 @@ sub infobox_parse {
 }
 
 sub infobox_html {
-    my ($infobox, $page, $el) = @_;
+    my ($infobox, $page, $table) = @_;
     $infobox->html_base($page); # call hash html.
-
-    # start table.
-    my $table = $el->create_child(
-        type  => 'table',
-        class => 'infobox-table'
-    );
+    $table->configure(type => 'table');
 
     # display the title if it exists.
     if (length $infobox->{name}) {

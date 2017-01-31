@@ -42,21 +42,16 @@ h6.wiki-section-title {
 
 /* infoboxes */
 
-div.wiki-infobox {
+table.wiki-infobox {
     width: 280px;
     margin: 0.5em 0 0.5em 1em;
     float: right;
     clear: right;
     background-color: #f7f7f7;
-}
-
-table.wiki-infobox-table {
     border: 1px solid #ccc;
     font-size: 0.8em;
     border-collapse: collapse;
-    margin: 0;
     padding: 0;
-    width: 100%;
 }
 
 tr.wiki-infobox-title td {
