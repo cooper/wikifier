@@ -3,6 +3,7 @@ package Wikifier::Element;
 
 use warnings;
 use strict;
+use 5.010;
 
 use Scalar::Util qw(blessed);
 use HTML::Entities qw(encode_entities);
@@ -53,7 +54,7 @@ sub create_child {
 # add a child or text node.
 sub add {
     my ($el, $child) = @_;
-    return if !$child;
+    return if !length $child;
     $child->{parent} = $el if blessed $child;
     push @{ $el->{content} }, $child;
 }

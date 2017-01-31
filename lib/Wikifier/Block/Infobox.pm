@@ -60,18 +60,20 @@ sub infobox_html {
     foreach my $pair (@{ $infobox->{map_array} }) {
         my ($key_title, $value, $key, $is_block) = @$pair;
 
-        # if the value is an infosec{}, add each row from it
-        
+        # if the value is from infosec{}, add each row
+        if (blessed $value && $value->{is_infosec}) {
+            next;
+        }
 
         # not an infosec{}; this is a top-level pair
-        infobox_add_row($infobox, $page, $table, $key_title, $value, {
+        table_add_row($table, $page, $key_title, $value, {
             is_block => $is_block
         });
-    } # pair
+    }
 }
 
-sub infobox_add_row {
-    my ($infobox, $page, $table, $key_title, $value, $opts_) = @_;
+sub table_add_row {
+    my ($table, $page, $key_title, $value, $opts_) = @_;
     my %opts = hash_maybe $opts_;
 
     # create the row.
