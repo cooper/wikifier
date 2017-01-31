@@ -103,10 +103,12 @@ tr.wiki-infosec-title {
 
 tr.wiki-infosec-first td {
     padding-top: 10px;
+    border-top: 1px solid #ccc;
 }
 
 tr.wiki-infosec-last td {
     padding-bottom: 10px;
+    border-bottom: 1px solid #ccc;
 }
 
 /* imageboxes */
