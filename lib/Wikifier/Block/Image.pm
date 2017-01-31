@@ -41,10 +41,10 @@ sub image_parse {
         align float author license
     );
 
-    # default values set by something.
-    # these of course are not guaranteed to be existent.
-    $block->{width}  ||= $block->{default_width};
-    $block->{height} ||= $block->{default_height};
+    # no dimensions; might be able to get them from a container
+    if (!$block->{width} && !$block->{height}) {
+        $block->{width} = 270 if $block->first_parent('infobox');
+    }
 
     # force numeric value.
     $block->{width}  =~ s/px// if length $block->{width};

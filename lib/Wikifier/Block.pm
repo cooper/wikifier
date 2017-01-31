@@ -235,6 +235,15 @@ sub parent { shift->{parent} }
 sub type   { shift->{type}   }
 sub name   { shift->{name}   }
 
+# find the first parent of a type
+sub first_parent {
+    my ($block, $type) = @_;
+    while ($block = $block->parent) {
+        return $block if $block->type eq $type;
+    }
+    return;
+}
+
 # produce a parser warning
 sub warning {
     my ($block, $pos, $warn) = @_;

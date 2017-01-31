@@ -30,13 +30,6 @@ our %block_types = (
 sub infobox_parse {
     my ($infobox, $page) = (shift, @_);
     $infobox->parse_base(@_); # call hash parse.
-
-    # search for image{}.
-    # apply default width.
-    foreach my $item ($infobox->content_visible) {
-        next unless blessed $item && $item->{type} eq 'image';
-        $item->{default_width} = '270px';
-    }
 }
 
 sub infobox_html {
