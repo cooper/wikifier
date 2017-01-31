@@ -23,7 +23,6 @@ sub configure {
     my ($el, %opts) = @_;
     $el->{$_} = $opts{$_} foreach keys %opts;
     $el->{type}       ||= 'div';
-    $el->{classes}    ||= defined $el->{class} ? [ $el->{class} ] : [];
     $el->{attributes} ||= {};
     $el->{styles}     ||= {};
     $el->{ids}        ||= \%identifiers;
@@ -35,9 +34,21 @@ sub configure {
         $el->{id} = "$it-$id";
     }
 
+    # classes
+    my @classes;
+    push @classes, $el->{class}
+        if defined $el->{class};            # primary class
+    push @classes, @{ $el->{classes} }
+        if ref $el->{classes} eq 'ARRAY';   # additional classes
+    $el->{classes} = \@classes;
+
     # content must an array of items.
-    $el->{content} //= [];
-    $el->{content}   = ref $el->{content} eq 'ARRAY' ? $el->{content} : [ $el->{content} ];
+    $el->{content} = defined $el->{content} ? (
+            ref $el->{content} eq 'ARRAY'   ?
+            $el->{content}                  :
+            [ $el->{content} ]
+        ) : [];
+
     $el->{container} = 1 if $el->{type} eq 'div';
 
     return $el;

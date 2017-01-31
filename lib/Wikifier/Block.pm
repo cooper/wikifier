@@ -111,11 +111,20 @@ sub html {
     # strip excess whitespace
     $block->remove_blank;
 
-    # create the element, unless this is an invisible block type
-    $block->{element} = Wikifier::Element->new(
-        class => $block->{type},
-        ids   => $block->{wikifier}{element_identifiers} ||= {}
-    ) unless $block->{type_ref}{invis};
+    # block with multiple elements
+    if ($block->{type_ref}{multi}) {
+        $block->{element} = Wikifier::Elements->new;
+    }
+
+    # invisible block. this must come after {multi}
+    elsif ($block->{type_ref}{invis}) {
+        # do nothing
+    }
+
+    # normal element
+    else {
+        $block->{element} = Wikifier::Element->new(class => $block->{type});
+    }
 
     # generate this block.
     $block->{html_done} = {};

@@ -22,7 +22,8 @@ our %block_types = (
         base  => 'map',
         parse => \&infosec_parse,
         html  => \&infosec_html,
-        invis => 1
+        invis => 1, # the html is added manually in infobox_html
+        multi => 1  # infosec{} produces more than one element
     }
 );
 
@@ -56,12 +57,19 @@ sub infobox_html {
         class => 'infobox-table'
     );
 
-    # append each pair.
-    foreach my $pair (@{ $infobox->{map_array} }) {
+    table_add_rows($table, $page, $infobox);
+}
+
+# append each pair.
+# note that $table might actually be a Wikifier::Elements container
+sub table_add_rows {
+    my ($table, $page, $block) = @_;
+        foreach my $pair (@{ $block->{map_array} }) {
         my ($key_title, $value, $key, $is_block) = @$pair;
 
         # if the value is from infosec{}, add each row
         if (blessed $value && $value->{is_infosec}) {
+            $table->add($value);
             next;
         }
 
@@ -72,6 +80,8 @@ sub infobox_html {
     }
 }
 
+# add a row.
+# note that $table might actually be a Wikifier::Elements container
 sub table_add_row {
     my ($table, $page, $key_title, $value, $opts_) = @_;
     my %opts = hash_maybe $opts_;
@@ -122,7 +132,11 @@ sub infosec_parse {
 }
 
 sub infosec_html {
+    my ($infosec, $page, $els) = @_;
+    $infosec->html_base($page); # call hash html.
+    $els->{is_infosec}++;
 
+    table_add_rows($els, $page, $infosec);
 }
 
 __PACKAGE__
