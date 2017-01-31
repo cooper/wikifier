@@ -56,7 +56,7 @@ table.wiki-infobox {
     padding: 0;
 }
 
-tr.wiki-infobox-title td {
+td.wiki-infobox-title {
     text-align: center;
     background-color: #eee;
     font-size: 1.25em;
@@ -87,21 +87,22 @@ td.wiki-infobox-anon {
 td.wiki-infobox-anon.wiki-infobox-text {
     padding: 5px 10px;
     text-align: center;
+    line-height: 1.5em;
 }
 
-tr.wiki-infosec-title {
+td.wiki-infosec-title {
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
     background-color: #eee;
     font-weight: bold;
 }
 
-tr.wiki-infosec-first td {
+td.wiki-infosec-first {
     padding-top: 10px;
     border-top: 1px solid #ccc;
 }
 
-tr.wiki-infosec-last td {
+td.wiki-infosec-last {
     padding-bottom: 10px;
     border-bottom: 1px solid #ccc;
 }

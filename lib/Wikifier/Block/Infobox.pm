@@ -46,11 +46,9 @@ sub infobox_html {
 
     # display the title if it exists.
     if (length $infobox->{name}) {
-        $table->create_child(
-            type    => 'tr',
-            class   => 'infobox-title'
-        )->create_child(
+        $table->create_child(type => 'tr')->create_child(
             type        => 'td',
+            class       => 'infobox-title',
             attributes  => { colspan => 2 },
             content     => $page->parse_formatted_text($infobox->{name})
         );
@@ -85,7 +83,7 @@ sub table_add_rows {
         my %row_opts = (
             is_block => $is_block,
             is_title => $is_title,
-            tr_opts  => { classes => \@classes }
+            td_opts  => { classes => \@classes }
         );
 
         # not an infosec{}; this is a top-level pair
@@ -97,13 +95,13 @@ sub table_add_rows {
 # note that $table might actually be a Wikifier::Elements container
 sub table_add_row {
     my ($table, $page, $key_title, $value, $opts_) = @_;
-    my %opts = hash_maybe $opts_;
+    my %opts    = hash_maybe $opts_;
+    my %td_opts = hash_maybe $opts{td_opts};
 
     # create the row.
     my $tr = $table->create_child(
         type  => 'tr',
-        class => 'infobox-pair',
-        hash_maybe $opts{tr_opts}
+        class => 'infobox-pair'
     );
 
     # append table row with key.
@@ -113,13 +111,13 @@ sub table_add_row {
             type       => 'td',
             class      => 'infobox-key',
             content    => $key_title,
-            hash_maybe $opts{key_opts}
+            %td_opts
         );
         $tr->create_child(
             type       => 'td',
             class      => 'infobox-value',
             content    => $value,
-            hash_maybe $opts{value_opts}
+            %td_opts
         );
     }
 
