@@ -165,7 +165,7 @@ sub infosec_html {
     if (length(my $title = $infosec->{name})) {
         unshift @{ $infosec->{map_array} }, [
             undef,              # no key title
-            $title,             # value, may be formatted later
+            $page->parse_formatted_text($title),
             '_infosec_title_'   # the real key
         ];
         push @first_classes, 'infosec-title';
