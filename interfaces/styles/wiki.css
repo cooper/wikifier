@@ -83,7 +83,7 @@ td.wiki-infobox-key {
 }
 
 td.wiki-infobox-value {
-    padding: 10px;
+    padding: 5px 10px;
 }
 
 td.wiki-infobox-anon {
@@ -91,7 +91,7 @@ td.wiki-infobox-anon {
 }
 
 td.wiki-infobox-anon.wiki-infobox-text {
-    padding: 10px;
+    padding: 5px 10px;
     text-align: center;
 }
 
