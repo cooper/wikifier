@@ -98,12 +98,12 @@ td.wiki-infosec-title {
 }
 
 td.wiki-infosec-first {
-    padding-top: 10px;
+    padding-top: 10px !important;
     border-top: 1px solid #ccc;
 }
 
 td.wiki-infosec-last {
-    padding-bottom: 10px;
+    padding-bottom: 10px !important;
     border-bottom: 1px solid #ccc;
 }
 
