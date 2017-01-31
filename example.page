@@ -27,6 +27,7 @@ infobox [NoTrollPlzNet Library] {
 }
 
 section {
+    style { border: 1px solid red; }
 
     The [b]NoTrollPlzNet Library[/b] (officially titled the [b]People's Knowledgebase[/b];
     also referred to as [b]the library[/b], [b]notroll library[/b], or [b]/paranoia/[/b]

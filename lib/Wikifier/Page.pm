@@ -125,9 +125,9 @@ sub _css_apply_string {
     return join ",\n", map {
         my $string = $page->_css_set_string(@$_);
         my $start  = substr $string, 0, 10;
-        if (!$start || $start ne '.wiki-main') {
+        if (!$start || $start ne '#wiki-main') {
             my $id  = $page->{wikifier}{main_block}{element}{id};
-            $string = ".wiki-$id $string";
+            $string = "#wiki-$id $string";
         }
         $string
     } @sets;
@@ -140,7 +140,7 @@ sub _css_set_string {
 
 sub _css_item_string {
     my ($page, @chars) = @_;
-    my ($string, $in_class, $in_el_type) = '';
+    my ($string, $in_class, $in_id, $in_el_type) = '';
     foreach my $char (@chars) {
 
         # we're starting a class.
@@ -150,9 +150,16 @@ sub _css_item_string {
             next;
         }
 
+        # we're starting an ID.
+        if ($char eq '#') {
+            $in_id++;
+            $string .= '#wiki-';
+            next;
+        }
+
         # we're in neither a class nor an element type.
         # assume that this is the start of element type.
-        if (!$in_class && !$in_el_type && $char ne '*') {
+        if (!$in_class && !$in_id && !$in_el_type && $char ne '*') {
             $in_el_type = 1;
             $string .= '.wiki-';
         }

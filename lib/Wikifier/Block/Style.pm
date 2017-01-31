@@ -66,6 +66,7 @@ sub style_html {
     my %style   = %{ $block->{style} };
     my $main_el = $block->{parent}{element};
     my @apply;
+    $main_el->{need_id}++;
 
     # if we're applying to main, add that.
     push @apply, [ $main_el->{id} ] if $style{apply_to_main};

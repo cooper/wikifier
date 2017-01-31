@@ -29,7 +29,7 @@ sub configure {
 
     # classes
     my @classes;
-    push @classes, $el->{class}
+    push @classes, delete $el->{class}
         if defined $el->{class};            # primary class
     push @classes, @{ $el->{classes} }
         if ref $el->{classes} eq 'ARRAY';   # additional classes
@@ -105,12 +105,12 @@ sub generate {
     $el->{container} ||= scalar @{ $el->{content} };
 
     # add classes.
-    my $classes;
-    push @{ $el->{classes} }, $el->{id};
+    my $classes = '';
+    push @{ $el->{classes} }, $el->{id} if $el->{need_id};
     foreach my $class (@{ $el->{classes} }) {
-        $classes .= " wiki-$class" if     defined $classes;
-        $classes  = "wiki-$class"  if not defined $classes;
+        $classes .= "wiki-$class ";
     }
+    chop $classes;
     $html .= " class=\"$classes\"" if defined $classes;
 
     # add styles.

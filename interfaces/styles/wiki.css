@@ -97,8 +97,16 @@ td.wiki-infobox-anon.wiki-infobox-text {
 tr.wiki-infosec-title {
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
-    background-color: #ddd;
+    background-color: #eee;
     font-weight: bold;
+}
+
+tr.wiki-infosec-first td {
+    padding-top: 10px;
+}
+
+tr.wiki-infosec-last td {
+    padding-bottom: 10px;
 }
 
 /* imageboxes */

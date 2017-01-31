@@ -23,7 +23,9 @@ my $err = $page->parse;
 die $err if $err;
 
 # print warnings.
-L "Warning: $_\n" for @{ $page->{warnings} };
+L "Warning: $_" for @{ $page->{warnings} };
 
 # print the generated HTML.
-print $page->html;
+my ($html, $css) = ($page->html, $page->css);
+L "CSS: $css" if length $css;
+print $html if length $html;
