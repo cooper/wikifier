@@ -14,6 +14,7 @@ use warnings;
 use strict;
 use 5.010;
 
+use Scalar::Util qw(blessed);
 use Wikifier::Utilities qw(trim L);
 
 ###############
@@ -297,36 +298,56 @@ sub handle_character {
         next DEFAULT if $c->is_escaped;
 
         # starts a variable name
-        if ($char eq '@') {
+        if ($char eq '@' && $c->catch->{is_block}) {
             $c->catch(
+                name        => 'var_name',
                 hr_name     => 'variable name',
                 valid_chars => qr/[\w\.]/,
                 location    => $c->{variable_name} = []
             ) and next CHAR;
         }
 
-        elsif ($char eq ':' && $c->catch) {
+        # starts a variable value
+        elsif ($char eq ':' && $c->catch->{name} eq 'var_name') {
             $c->clear_catch;
-            my $name_str = delete $c->{variable_name};
 
             # no length? no variable name
-            if (!length $name_str) {
-                return $c->error("Variable has no name");
-            }
+            my $var = $c->{variable_name}[-1];
+            return $c->error("Variable has no name")
+                if !length $var;
 
             # now catch the value
             $c->catch(
+                name        => 'var_value',
                 hr_name     => 'variable value',
-                valid_chars => qr/./m,
+                valid_chars => qr/./s,
                 location    => $c->{variable_value} = []
             ) and next CHAR;
         }
 
-        elsif ($char eq ';' && $c->catch) {
+        # ends a variable name (for booleans) or value
+        elsif ($char eq ';' && $c->{catch}{name} =~ m/^var_name|var_value$/) {
             $c->clear_catch;
-            delete $c->{variable_name};
-            my $value_str = delete $c->{variable_value};
+            my ($var, $val) =
+                _get_var_parts(delete @$c{'variable_name', 'variable_value'});
 
+            # more than one content? not allowed in variables
+            return $c->error("Variable can't contain both text and blocks")
+                if @$var > 1 || @$val > 1;
+            $var = shift @$var;
+            $val = shift @$val;
+
+            # no length? no variable name
+            return $c->error("Variable has no name")
+                if !length $var;
+
+            # string
+            if (length $val) {
+                $page->set($var, $wikifier->parse_formatted_text($page, $val));
+            }
+
+            # boolean
+            else { $page->set($var, 1) }
         }
 
         else { $use_default++ }
@@ -394,6 +415,19 @@ sub handle_character {
     return;
 }
 
+sub _get_var_parts {
+    my @new;
+    for my $part (@_) {
+        if (ref $part ne 'ARRAY') {
+            push @new, [];
+            next;
+        }
+        @$part = grep length, map { blessed $_ ? $_ : trim($_) } @$part;
+        push @new, $part;
+    }
+    return @new;
+}
+
 package Wikifier::Parser::Current;
 
 use warnings;
@@ -423,6 +457,7 @@ sub block {
     return $c->{block} if !$block;
     $c->{block} = $block;
     $c->catch(
+        name        => $block->{type},
         hr_name     => "$$block{type}\{}",
         location    => $block->{content}  ||= [],
         position    => $block->{position} ||= [],
@@ -449,7 +484,7 @@ sub push_content {
     push @{ $c->{catch}{location} }, @_;
 }
 
-# return the last element in the current block's content
+# return the last element in the current catch
 sub last_content {
     my $c = shift;
     return $c->{catch}{location}[-1] = shift if @_;
@@ -477,10 +512,11 @@ sub append_content {
 
 # set the current catch
 # %opts = (
-#   hr_name     Human-readable description of the catch, used in warnings/errors
-#   valid_chars Regex for characters that are allowed in the catch
-#   location    A scalar reference to where text will be appended
-#   nested_ok   True if we should allow this catch elsewhere than top-level
+#   name        type of catch
+#   hr_name     human-readable description of the catch, used in warnings/errors
+#   valid_chars regex for characters that are allowed in the catch
+#   location    an array reference to where content will be pushed
+#   nested_ok   true if we should allow this catch elsewhere than top-level
 # )
 sub catch {
     my ($c, %opts) = (shift, @_);
@@ -500,12 +536,14 @@ sub catch {
     return; # success
 }
 
+# set the catch back to the parent
 sub clear_catch {
     my $c = shift;
     $c->block($c->block->parent, 1) if $c->{catch}{is_block};
     $c->{catch} = $c->{catch}{parent};
 }
 
+# position info for warnings and errors
 sub line_info {
     my $c    = shift;
     my $line = delete $c->{temp_line} // $c->{line};
