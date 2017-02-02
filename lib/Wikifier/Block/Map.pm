@@ -285,4 +285,14 @@ sub map_html {
     }
 }
 
+sub get_attribute {
+    my ($map, $attr) = @_;
+    return $map->{map}{$attr};
+}
+
+sub set_attribute {
+    my ($map, $attr, $val) = @_;
+    return $map->{map}{$attr} = $val;
+}
+
 __PACKAGE__

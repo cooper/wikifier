@@ -50,7 +50,7 @@ sub create_block {
     # Safe point - the block type is real and is loaded.
 
     # call init sub.
-    my $block = Wikifier::Block->new(
+    my $block = ($type_ref->{package} || 'Wikifier::Block')->new(
         type_ref => $type_ref,  # reference to the block type
         %opts,                  # options passed to ->create_block
         wdir => $dir            # wikifier directory
@@ -82,17 +82,19 @@ sub load_block {
     my %blocks;
     {
         no strict 'refs';
+        unshift @{ "${package}::ISA" }, 'Wikifier::Block';
         %blocks = %{ "${package}::block_types" };
     }
 
     # register blocks.
     foreach my $block_type (keys %blocks) {
-        $block_types{$block_type} = $blocks{$block_type};
+        my $type_ref = $blocks{$block_type};
+        $type_ref->{package} = $package;
+        $block_types{$block_type} = $type_ref;
 
         # if this depends on a base, load it.
-        $wikifier->load_block($blocks{$block_type}{base}, $dir)
-          if $blocks{$block_type}{base};
-
+        $wikifier->load_block($type_ref->{base}, $dir)
+            if $type_ref->{base};
 
         L "Loaded block ${block_type}{}";
     }
