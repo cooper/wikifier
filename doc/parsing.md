@@ -1,22 +1,17 @@
 ## Parsing stages
 
-The parsing process is divided into several stages in the following order.
+The parsing process is divided into stages in the following order.
 
-1. __Comment removal__: comments are removed before anything else. There is
-currently no way to escape the comment syntax.
+1. __Master parser__: Data is parsed character-by-character to separate it into
+several blocks. Additionally, variable definitions are handled, and comments are
+removed. Anything within a block (besides comments and other blocks) is
+untouched by the master parser.
 
-2. __Line parsing__ (preparsing): data is parsed line by line. This is the stage
-in which variable declarations are parsed. For this reason, variable
-declarations must exist only one-per-line and occupy the entire line. This stage
-terminates upon the end of the file.
+2. __Block parsers__: Each block type implements its own parser which parses the
+data within the block. Block types can be hereditary, in which case they may
+rely on another block type for parsing. [Map](blocks.md#map) and
+[List](blocks.md#list) are the most common parent block types.
 
-3. __Master parser__: data is parsed character-by-character to separate it into
-several blocks.
-
-4. __Block parsers__: each block type implements its own parser which parses the
-data within the block. Container blocks, such as sections, may also make use of
-the master parser one or more additional times.
-
-5. __Formatting parser__: many block parsers make use of a formatting parser
+3. __Formatting parser__: Many block parsers make use of a formatting parser
 afterwards, the one which converts text formatting such as [b] and [i] to bold
-and italic text, etc.
+and italic text, etc. Variables are also formatted.
