@@ -141,7 +141,7 @@ sub infosec_html {
     $els->{is_infosec}++;
 
     # not in an infobox{}
-    if ($infosec->parent->type ne 'infobox') {
+    if ($infosec->parent->type ne 'infobox' && !$infosec->{is_variable}) {
         $infosec->warning('infosec{} outside of infobox{} does nothing');
         return;
     }

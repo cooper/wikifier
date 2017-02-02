@@ -108,6 +108,7 @@ sub html {
                 next if !blessed $val;
 
                 # it's a block. ->html it
+                $val->{is_variable}++;
                 $val->html($page);
             }
         };
