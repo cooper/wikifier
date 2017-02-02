@@ -140,7 +140,7 @@ sub handle_character {
         next CHAR;
     }
     if ($char eq '*' && $c->{next_char} eq '/') {
-        next DEFAULT if $c->is_escaped;
+        next DEFAULT if !$c->is_comment;
         $c->clear_comment;
         $c->{skip_next_char}++;
         next CHAR;
