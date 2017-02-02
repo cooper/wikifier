@@ -14,7 +14,7 @@ use warnings;
 use strict;
 use 5.010;
 
-use Wikifier::Utilities qw(trim L);
+use Wikifier::Utilities qw(trim truncate_hr L);
 
 ###############
 ### PARSING ###
@@ -323,9 +323,10 @@ sub handle_character {
                 if !length $var;
 
             # now catch the value
+            my $hr_var = truncate_hr($var, 30);
             $c->catch(
                 name        => 'var_value',
-                hr_name     => "variable \@$var value",
+                hr_name     => "variable \@$hr_var value",
                 valid_chars => qr/./s,
                 location    => $c->{variable_value} = []
             ) and next CHAR;
@@ -466,9 +467,11 @@ sub block {
     my ($c, $block, $no_catch) = @_;
     return $c->{block} if !$block;
     $c->{block} = $block;
+    my $title = truncate_hr($block->{name}, 30) if length $block->{name};
+       $title = length $title ? "[$title]" : '';
     $c->catch(
         name        => $block->{type},
-        hr_name     => "$$block{type}\{}",
+        hr_name     => "$$block{type}$title\{}",
         location    => $block->{content}  ||= [],
         position    => $block->{position} ||= [],
         is_block    => 1,
