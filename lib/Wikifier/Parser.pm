@@ -325,7 +325,7 @@ sub handle_character {
             # now catch the value
             $c->catch(
                 name        => 'var_value',
-                hr_name     => 'variable value',
+                hr_name     => "variable \@$var value",
                 valid_chars => qr/./s,
                 location    => $c->{variable_value} = []
             ) and next CHAR;
