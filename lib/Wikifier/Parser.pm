@@ -447,6 +447,8 @@ use warnings;
 use strict;
 use 5.010;
 
+use Wikifier::Utilities qw(trim truncate_hr L);
+
 # escaped characters
 sub is_escaped    {        shift->{escaped}   }
 sub mark_escaped  {        shift->{escaped}++ }
