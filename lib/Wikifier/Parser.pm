@@ -467,7 +467,7 @@ sub block {
     my ($c, $block, $no_catch) = @_;
     return $c->{block} if !$block;
     $c->{block} = $block;
-    my $title = truncate_hr($block->{name}, 30) if length $block->{name};
+    my $title = truncate_hr($block->{name}, 30);
        $title = length $title ? "[$title]" : '';
     $c->catch(
         name        => $block->{type},
