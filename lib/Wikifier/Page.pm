@@ -88,38 +88,8 @@ sub parse {
 sub html {
     my $page = shift;
     my $res;
-
-    L('HTML', sub {
-
-        # run ->html on variables. they will continue to hold the block
-        # afterward, but the element will be generated if we try to display it
-        my $html_vars; $html_vars = sub {
-            my $hash = shift;
-            for my $var (keys %$hash) {
-                my $val = $hash->{$var};
-
-                # another hash
-                if (ref $val eq 'HASH') {
-                    $html_vars->($val);
-                    next;
-                }
-
-                # text node
-                next if !blessed $val;
-
-                # it's a block. ->html it
-                $val->{is_variable}++;
-                $val->html($page);
-            }
-        };
-        $html_vars->($page->{variables});
-
-        # run ->html on main block
-        $res = $page->{wikifier}{main_block}->html($page);
-    });
-    L('Generate', sub {
-        $res = $res->generate;
-    });
+    L('HTML',     sub { $res = $page->{wikifier}{main_block}->html($page)   });
+    L('Generate', sub { $res = $res->generate                               });
     return $res;
 }
 
@@ -361,8 +331,8 @@ sub _set_attr {
 
 # returns HTML for formatting.
 sub parse_formatted_text {
-    my ($page, $text, $no_html_entities) = @_;
-    return $page->wikifier->parse_formatted_text($page, $text, $no_html_entities);
+    my $page = shift;
+    return $page->wikifier->parse_formatted_text($page, @_);
 }
 
 # returns a wiki option or the default.

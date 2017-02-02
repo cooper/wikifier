@@ -325,8 +325,8 @@ sub handle_character {
 
             # string
             if (length $val) {
-                $val = $wikifier->parse_formatted_text($page, $val)
-                    if !delete $c->{var_no_interpolate} && !ref $val;
+                $val = $wikifier->parse_formatted_text($page, $val, 0, 0, 1)
+                if !delete $c->{var_no_interpolate} && !ref $val;
             }
 
             # boolean
@@ -336,7 +336,8 @@ sub handle_character {
             $val = $page->set($var => $val);
 
             # run ->parse if necessary
-            _parse_vars($page, $val) if defined $val;
+            _parse_vars($page, 'parse', $val);
+            _parse_vars($page, 'html',  $val);
         }
 
         # should never reach this, but just in case
@@ -407,6 +408,7 @@ sub handle_character {
     return;
 }
 
+# returns an arrayref of parts of an array value, ignoring extra whitespace.
 sub _get_var_parts {
     my @new;
     for my $part (@_) {
@@ -420,18 +422,32 @@ sub _get_var_parts {
     return @new;
 }
 
+# recursively call ->parse on the contents of a variable
+# consider: this doesn't work for object attributes that don't use ->to_data
 sub _parse_vars {
-    my ($page, $val) = @_;
+    my ($page, $method, $val) = @_;
+    return if !defined $val;
 
     # this is a block. parse it
-    if (blessed $val && $val->can('parse')) {
-        $val->parse($page);
-        return;
+    if (blessed $val && $val->can($method)) {
+        $val->$method($page);
+        $val->{is_variable}++;
     }
 
-    # consider: this doesn't work for object attributes
-    if (ref $val eq 'HASH')  { _parse_vars($_) for values %$val }
-    if (ref $val eq 'ARRAY') { _parse_vars($_) for @$val        }
+    # this is a block or something else that has ->to_data
+    if (blessed $val && $val->can('to_data')) {
+        _parse_vars($page, $method, $val->to_data);
+    }
+
+    # hash ref
+    if (ref $val eq 'HASH') {
+        _parse_vars($page, $method, $_) for values %$val;
+    }
+
+    # array ref
+    if (ref $val eq 'ARRAY') {
+        _parse_vars($page, $method, $_) for @$val;
+    }
 }
 
 1

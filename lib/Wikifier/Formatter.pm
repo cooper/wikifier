@@ -163,14 +163,18 @@ our %colors = (
 ### FORMAT PARSING ###
 ######################
 #
-# $careful prevents recursion
-# don't use it directly
+# $no_entities      disables HTML entity conversion
+#
+# $careful          prevents recursion
+#
+# $no_html          says we should not call ->to_html, preserve object for now
 #
 sub parse_formatted_text {
-    my ($wikifier, $page, $text, $no_html_entities, $careful) = @_;
-    my @items;
-    my $string = '';
+    my ($wikifier, $page, $text) = splice @_, 0, 3;
+    my ($no_entities, $careful, $to_html) = @_;
 
+    my @items;
+    my $string       = '';
     my $last_char    = '';   # the last parsed character.
     my $in_format    = 0;    # inside a formatting element.
     my $format_type  = '';   # format name such as 'i' or '/b'
@@ -203,8 +207,8 @@ sub parse_formatted_text {
             $format_type = '';
 
             # store the string we have so far.
-            if (defined $string) {
-                push @items, [ $no_html_entities, $string ];
+            if (length $string) {
+                push @items, [ $no_entities, $string ];
                 $string = '';
             }
         }
@@ -226,7 +230,7 @@ sub parse_formatted_text {
             else {
                 push @items, [
                     1,
-                    $wikifier->parse_format_type($page, $format_type, $careful)
+                    $wikifier->parse_format_type($page, $format_type, @_)
                 ];
                 $in_format = 0;
             }
@@ -248,7 +252,10 @@ sub parse_formatted_text {
     }
 
     # final string item.
-    push @items, [ $no_html_entities, $string ] if length $string;
+    push @items, [ $no_entities, $string ] if length $string;
+
+    # might be a blessed object
+    return $items[0][1] if $#items == 0 && blessed $items[0][1];
 
     # join them together, adding HTML entities when necessary.
     return join '', map {
@@ -280,7 +287,7 @@ my %static_formats = (
 # parses an individual format type, aka the content in [brackets].
 # for example, 'i' for italic. returns the string generated from it.
 sub parse_format_type {
-    my ($wikifier, $page, $type, $careful) = @_;
+    my ($wikifier, $page, $type, $no_entities, $careful, $no_html) = @_;
 
     # static format from above
     if (my $fmt = $static_formats{$type}) {
@@ -290,10 +297,20 @@ sub parse_format_type {
     # variable.
     if ($type =~ /^([@%])([\w.]+)$/ && !$careful) {
         my $var = $page->get($2);
-        return '(null)' if !defined $var; # TODO: make a warning
+
+        # undefined variable
+        # TODO: make a warning
+        return '(null)'
+            if !defined $var;
+
+        # format text unless this is %var
         $var = $wikifier->parse_formatted_text($page, $var, 0, 1)
             if !ref $var && $1 ne '%';
-        $var = $var->to_html if blessed $var && $var->can('to_html');
+
+        # convert object to html when necessary
+        $var = $var->to_html
+            if !$no_html && blessed $var && $var->can('to_html');
+
         return $var;
     }
 

@@ -147,10 +147,14 @@ sub list_html {
     foreach my $value (@{ $block->{list_array} }) {
         if (blessed $value) {
             my $their_el = $value->html($page);
-            $value = $their_el ? $their_el->generate : "$value";
+            $value = $their_el || "$value";
         }
         elsif (!$block->{no_format_values}) {
-            $value = $page->parse_formatted_text($value);
+            $value = $page->parse_formatted_text($value, 0, 0, 1);
+            if (blessed $value) {
+                my $their_el = $value->html($page);
+                $value = $their_el || "$value";
+            }
         }
         push @new, $value;
 

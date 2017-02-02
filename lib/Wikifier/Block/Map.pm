@@ -277,7 +277,11 @@ sub map_html {
             $value = $their_el || "$value";
         }
         elsif (!$block->{no_format_values}) {
-            $value = $page->parse_formatted_text($value);
+            $value = $page->parse_formatted_text($value, 0, 0, 1);
+            if (blessed $value) {
+                my $their_el = $value->html($page);
+                $value = $their_el || "$value";
+            }
         }
         else {
             next;

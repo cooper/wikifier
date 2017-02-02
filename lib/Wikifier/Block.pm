@@ -258,7 +258,7 @@ sub to_html {
     return $block->{element}->generate if $block->{element};
     $block->warning(
         "Tried to display $$block{type}\{} ".
-        'which has no element asssociated with it'
+        'which has no element associated with it'
     );
     return "$$block{type}\{}";
 }
