@@ -63,14 +63,18 @@ sub parse {
 
     # some catch was not terminated.
     my $catch = $c->catch;
-    if ($catch && $c->block->type ne 'main') {
+    if ($catch && $catch->{name} ne 'main') {
         my ($type, $line, $col) = @$catch{ qw(hr_name line col) };
         return "Line $line:$col: $type still open at EOF";
     }
 
+    # run ->parse on variables TODO
+
     # run ->parse on children.
-    $main_block->parse($page);
-    return $c->{error} if $c->{error};
+    unless ($page->{vars_only}) {
+        $main_block->parse($page);
+        return $c->{error} if $c->{error};
+    }
 
     return wantarray ? (undef, $c) : undef;
 }
@@ -78,23 +82,6 @@ sub parse {
 # parse a single line.
 sub handle_line {
     my ($wikifier, $line, $page, $c) = @_;
-
-    # # illegal regex filters out variable declaration.
-    # if ($line =~ m/^\s*\@([\w\.]+):\s*(.+);\s*$/) {
-    #     $page->set($1, $wikifier->parse_formatted_text($page, $2));
-    #     return;
-    # }
-    #
-    # # variable boolean.
-    # elsif ($line =~ m/^\s*\@([\w\.]+);\s*$/) {
-    #     $page->set($1, 1);
-    #     return;
-    # }
-
-    # only parsing variables.
-    return if $page->{vars_only};
-
-    # pass on to main parser.
     my @chars = (split(//, $line), "\n");
     CHAR: for my $i (0 .. $#chars) {
         next CHAR if delete $c->{skip_next_char};
@@ -103,7 +90,6 @@ sub handle_line {
         $wikifier->handle_character($chars[$i], $page, $c);
         return $c->{error} if $c->{error};
     }
-
     return;
 }
 
@@ -343,11 +329,13 @@ sub handle_character {
 
             # string
             if (length $val) {
-                $page->set($var, $wikifier->parse_formatted_text($page, $val));
+                $val = $wikifier->parse_formatted_text($page, $val);
             }
 
             # boolean
-            else { $page->set($var, 1) }
+            else { $val = 1 }
+
+            $page->set($var => $val);
         }
 
         else { $use_default++ }

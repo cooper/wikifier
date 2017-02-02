@@ -88,6 +88,8 @@ sub parse {
 sub html {
     my $page = shift;
     my $res;
+    # TODO ->html on variables. they will continue to hold the block afterward,
+    # but the element will be generated if we try to display the variable
     L('HTML', sub {
         $res = $page->{wikifier}{main_block}->html($page);
     });
