@@ -452,19 +452,28 @@ use 5.010;
 use Wikifier::Utilities qw(trim truncate_hr L);
 
 # escaped characters
-sub is_escaped    {        shift->{escaped}   }
-sub mark_escaped  {        shift->{escaped}++ }
-sub clear_escaped { delete shift->{escaped}   }
+sub is_escaped    { shift->{escaped}   }
+sub mark_escaped  { shift->{escaped}++ }
+sub clear_escaped {
+    my $c = shift;
+    $c->{escaped}-- if ($c->{escaped} || 0) > 0;
+}
 
 # /* block comments */
-sub is_comment    {        shift->{comment}   }
-sub mark_comment  {        shift->{comment}++ }
-sub clear_comment { delete shift->{comment}   }
+sub is_comment    { shift->{comment}   }
+sub mark_comment  { shift->{comment}++ }
+sub clear_comment {
+    my $c = shift;
+    $c->{comment}-- if ($c->{comment} || 0) > 0;
+}
 
 # ignored characters
-sub is_ignored    {        shift->{ignored}   }
-sub mark_ignored  {        shift->{ignored}++ }
-sub clear_ignored { delete shift->{ignored}   }
+sub is_ignored    { shift->{ignored}   }
+sub mark_ignored  { shift->{ignored}++ }
+sub clear_ignored {
+    my $c = shift;
+    $c->{ignored}-- if ($c->{ignored} || 0) > 0;
+}
 
 # the current block
 sub block {
