@@ -205,7 +205,7 @@ sub content_pos {
     my @content = $block->content;
     my @content_pos;
     for (0..$#content) {
-        push @content_pos, [ $content[$_], $block->{positions}[$_] ];
+        push @content_pos, [ $content[$_], $block->{position}[$_] ];
     }
     return @content_pos;
 }

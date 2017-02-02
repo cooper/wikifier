@@ -14,7 +14,6 @@ use warnings;
 use strict;
 use 5.010;
 
-use Scalar::Util qw(blessed);
 use Wikifier::Utilities qw(trim L);
 
 ###############
@@ -42,12 +41,11 @@ sub parse {
 
     # set initial parse info
     my $main_block = $page->{main_block};
-    my $c = bless {
-        block       => $main_block,
-        warnings    => []
-    }, 'Wikifier::Parser::Current';
-    $page->{warnings} = $c->{warnings};
-    $main_block->{current} = $c;
+    my $c = bless { warnings => [] }, 'Wikifier::Parser::Current';
+    $page->{warnings} = $c->{warnings}; # store parser warnings in the page
+    $main_block->{current} = $c;        # manually set {current} for main block
+    $c->block($main_block);             # set the current block to the main one
+    $c->{catch}{is_toplevel}++;         # mark the main block as top-level catch
 
     # read it line-by-line.
     while (my $line = <$fh>) {
@@ -63,15 +61,10 @@ sub parse {
     close $fh;
 
     # some catch was not terminated.
-    if (my $catch = $c->catch) {
+    my $catch = $c->catch;
+    if ($catch && $c->block->type ne 'main') {
         my ($type, $line, $col) = @$catch{ qw(hr_name line col) };
-        return "Line $line:$col: ".ucfirst($type).' still open at EOF';
-    }
-
-    # some block was not closed.
-    if ($c->{block} != $main_block) {
-        my ($type, $line, $col) = @{ $c->{block} }{ qw(type line col) };
-        return "Line $line:$col: $type\{} still open at EOF";
+        return "Line $line:$col: $type still open at EOF";
     }
 
     # run ->parse on children.
@@ -288,8 +281,9 @@ sub handle_character {
         $c->block->{end_col}  = $c->{col};
 
         # return to the parent
-        $c->block($c->block->parent);
-        $c->push_content(@add_contents);
+        #$c->block($c->block->parent);
+        $c->clear_catch;
+        $c->append_content(@add_contents);
     }
 
     # ignore backslashes - they are handled later below.
@@ -297,7 +291,6 @@ sub handle_character {
         next DEFAULT if $c->is_escaped;
         next CHAR;
     }
-
 
     elsif ($c->block->type eq 'main' && $variable_tokens{$char}) {
         $c->mark_ignored;
@@ -308,7 +301,7 @@ sub handle_character {
             $c->catch(
                 hr_name     => 'variable name',
                 valid_chars => qr/[\w\.]/,
-                location    => \$c->{variable_name}
+                location    => $c->{variable_name} = []
             ) and next CHAR;
         }
 
@@ -325,13 +318,15 @@ sub handle_character {
             $c->catch(
                 hr_name     => 'variable value',
                 valid_chars => qr/./m,
-                location    => \$c->{variable_value}
+                location    => $c->{variable_value} = []
             ) and next CHAR;
         }
 
         elsif ($char eq ';' && $c->catch) {
             $c->clear_catch;
+            delete $c->{variable_name};
             my $value_str = delete $c->{variable_value};
+
         }
 
         else { $use_default++ }
@@ -362,39 +357,20 @@ sub handle_character {
     if (my $catch = $c->catch) {
 
         # make sure the char is acceptable
-        if ($char !~ $catch->{valid_chars}) {
-            my $loc = $catch->{location};
+        if (defined $catch->{valid_chars} && $char !~ $catch->{valid_chars}) {
+            my $loc = $catch->{location}[-1];
             my $err = "Invalid character '$char' in $$catch{hr_name}.";
-            $err   .= " Partial: $$loc" if length $$loc;
+            $err   .= " Partial: $loc" if length $loc;
             return $c->error($err);
         }
 
         # append
-        ${ $catch->{location} } .= $append;
+        $c->append_content($append);
     }
 
-    # otherwise, append character to current block's content.
-
-    # if the current block's content array is empty, push the character.
-    elsif (!scalar $c->content) {
-        $c->push_content($append);
-    }
-
-    # array is not empty. push or append it.
+    # nothing to catch!
     else {
-
-        # if last element of the block's content is blessed,
-        # it's a child block.
-        my $last_value = $c->last_content;
-        if (blessed($last_value)) {
-
-            # push the character to the content array,
-            # creating a new string element.
-            $c->push_content($append);
-        }
-
-        # not blessed, so simply append the character to the string.
-        else { $c->append_content($append) }
+        return $c->error("Nothing to catch $char!"); # FIXME
     }
 
     } # End of CHAR
@@ -424,6 +400,8 @@ use warnings;
 use strict;
 use 5.010;
 
+use Scalar::Util qw(blessed);
+
 # escaped characters
 sub is_escaped    {        shift->{escaped}   }
 sub mark_escaped  {        shift->{escaped}++ }
@@ -441,9 +419,17 @@ sub clear_ignored { delete shift->{ignored}   }
 
 # the current block
 sub block {
-    my $c = shift;
-    return $c->{block} = shift if @_;
-    return $c->{block};
+    my ($c, $block, $no_catch) = @_;
+    return $c->{block} if !$block;
+    $c->{block} = $block;
+    $c->catch(
+        hr_name     => "$$block{type}\{}",
+        location    => $block->{content}  ||= [],
+        position    => $block->{position} ||= [],
+        is_block    => 1,
+        nested_ok   => 1
+    ) unless $no_catch;
+    return $block;
 }
 
 # return the content of the current block
@@ -452,28 +438,41 @@ sub content {
     return @{ $c->{block}{content} };
 }
 
-# push content to the current block
+# push content to the current catch
 sub push_content {
     my $c = shift;
     my $pos = {
         line => $c->{line},
         col  => $c->{col}
     };
-    push @{ $c->{block}{positions} }, $pos for 0..$#_;
-    push @{ $c->{block}{content}   }, @_;
+    push @{ $c->{catch}{position} }, $pos for 0..$#_;
+    push @{ $c->{catch}{location} }, @_;
 }
 
 # return the last element in the current block's content
 sub last_content {
     my $c = shift;
-    return $c->{block}{content}[-1] = shift if @_;
-    return $c->{block}{content}[-1];
+    return $c->{catch}{location}[-1] = shift if @_;
+    return $c->{catch}{location}[-1];
 }
 
-# append a string to the last element in the current block's content
+# append a string to the last element in the current catch
 sub append_content {
-    my ($c, $append) = @_;
-    $c->{block}{content}[-1] .= $append;
+    my ($c, @append) = @_;
+    foreach my $append (@append) {
+        my $catch    = $c->catch or die;
+        my $location = $catch->{location};
+
+        # if it's a block, push.
+        # if the location is empty, this is the first element, so push.
+        # if the previous element is blessed, push, as this is a new text node.
+        if (blessed $append || !@$location || blessed $location->[-1]) {
+            $c->push_content($append);
+            next;
+        }
+
+        $location->[-1] .= $append;
+    }
 }
 
 # set the current catch
@@ -481,28 +480,30 @@ sub append_content {
 #   hr_name     Human-readable description of the catch, used in warnings/errors
 #   valid_chars Regex for characters that are allowed in the catch
 #   location    A scalar reference to where text will be appended
-#   ow_ok       True if we should silently allow the catch to be overwritten
+#   nested_ok   True if we should allow this catch elsewhere than top-level
 # )
 sub catch {
     my ($c, %opts) = (shift, @_);
     return $c->{catch} if !@_;
 
-    # there's already a catch
-    if ($c->{catch} && !$c->{catch}{ow_ok}) {
+    # there's already a catch, and this is only allowed at the top level
+    if ($c->{catch} && !$c->{catch}{is_toplevel} && !$opts{nested_ok}) {
         return $c->error(
-            "Attempted to start a $opts{hr_name} in the middle of a ".
+            "Attempted to start $opts{hr_name} in the middle of ".
             $c->{catch}{hr_name}
         );
     }
 
     @opts{'line', 'col'} = @$c{'line', 'col'};
+    $opts{parent} ||= $c->catch;
     $c->{catch} = \%opts;
     return; # success
 }
 
 sub clear_catch {
     my $c = shift;
-    delete $c->{catch};
+    $c->block($c->block->parent, 1) if $c->{catch}{is_block};
+    $c->{catch} = $c->{catch}{parent};
 }
 
 sub line_info {
