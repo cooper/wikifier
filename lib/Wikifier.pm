@@ -46,6 +46,9 @@ use Wikifier::Block;
 use Wikifier::Element;
 use Wikifier::Elements;
 
+binmode STDOUT, ':utf8';
+binmode STDERR, ':utf8';
+
 # create a new wikifier instance.
 sub new {
     my ($class, %opts) = @_;

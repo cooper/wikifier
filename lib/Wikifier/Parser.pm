@@ -93,7 +93,7 @@ sub handle_line {
     return;
 }
 
-my %variable_tokens = map { $_ => 1 } qw(@ : ;);
+my %variable_tokens = map { $_ => 1 } qw(@ % : ;);
 
 # %current
 #   char:       the current character.
@@ -284,13 +284,14 @@ sub handle_character {
         next DEFAULT if $c->is_escaped;
 
         # starts a variable name
-        if ($char eq '@' && $c->catch->{is_block}) {
+        if ($char =~ m/[@%]/ && $c->catch->{is_block}) {
             $c->catch(
                 name        => 'var_name',
                 hr_name     => 'variable name',
                 valid_chars => qr/[\w\.]/,
                 location    => $c->{variable_name} = []
             ) and next CHAR;
+            $c->{var_no_interpolate}++ if $char eq '%';
         }
 
         # starts a variable value
@@ -329,7 +330,8 @@ sub handle_character {
 
             # string
             if (length $val) {
-                $val = $wikifier->parse_formatted_text($page, $val);
+                $val = $wikifier->parse_formatted_text($page, $val)
+                    unless delete $c->{var_no_interpolate};
             }
 
             # boolean
@@ -368,6 +370,7 @@ sub handle_character {
         # make sure the char is acceptable
         if (defined $catch->{valid_chars} && $char !~ $catch->{valid_chars}) {
             my $loc = $catch->{location}[-1];
+            $char   = "\x{2424}" if $char eq "\n";
             my $err = "Invalid character '$char' in $$catch{hr_name}.";
             $err   .= " Partial: $loc" if length $loc;
             return $c->error($err);
