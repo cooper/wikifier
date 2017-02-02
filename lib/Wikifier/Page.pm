@@ -232,7 +232,8 @@ sub _get_var {
 # fetch an attribute from $where. returns (value, error)
 sub _get_attr {
     my ($where, $attr) = @_;
-    my $desc = "$where";
+    return undef if !defined $where;
+    my $desc = $where;
 
     # it's an object. hopefully it can ->get_attribute or ->to_data
     if (blessed $where) {
@@ -266,7 +267,7 @@ sub _get_attr {
     }
 
     # something else
-    return (undef, 'Not sure what to do with '.($where // '(undef)'));
+    return (undef, "Not sure how to fetch \@$attr from ".($desc // '(undef)'));
 }
 
 # set a variable on $where. returns (new value, error)
@@ -292,7 +293,8 @@ sub _set_var {
 # set an attribute on $where. returns (new value, error)
 sub _set_attr {
     my ($where, $attr, $value) = @_;
-    my $desc = "$where";
+    return undef if !defined $where;
+    my $desc = $where;
 
     # it's an object. hopefully it can ->set_attribute or ->to_data
     if (blessed $where) {
@@ -326,7 +328,7 @@ sub _set_attr {
     }
 
     # something else
-    return (undef, 'Not sure what to do with '.($where // '(undef)'));
+    return (undef, "Not sure how to assign \@$attr on ".($desc // '(undef)'));
 }
 
 # returns HTML for formatting.
