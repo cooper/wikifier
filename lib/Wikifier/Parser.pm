@@ -1,4 +1,4 @@
-# Copyright (c) 2014, Mitchell Cooper
+# Copyright (c) 2016, Mitchell Cooper
 #
 # Wikifier::Parser is a function class of Wikifier which parses a wiki file.
 # The parser separates the file into block types and then passes those to
@@ -42,7 +42,7 @@ sub parse {
 
     # set initial parse info
     my $main_block = $page->{main_block};
-    my $c = bless { warnings => [] }, 'Wikifier::Parser::Current';
+    my $c = Wikifier::Parser::Current->new;
     $page->{warnings} = $c->{warnings}; # store parser warnings in the page
     $main_block->{current} = $c;        # manually set {current} for main block
     $c->block($main_block);             # set the current block to the main one
@@ -104,7 +104,7 @@ sub handle_line {
     my ($wikifier, $line, $page, $c) = @_;
     my @chars = (split(//, $line), "\n");
     CHAR: for my $i (0 .. $#chars) {
-        next CHAR if delete $c->{skip_next_char};
+        next CHAR if delete $c->{skip_char};
         $c->{col} = $i;
         $c->{next_char} = $chars[$i + 1] // '';
         $wikifier->handle_character($chars[$i], $page, $c);
@@ -114,14 +114,6 @@ sub handle_line {
 }
 
 my %variable_tokens = map { $_ => 1 } qw(@ % : ;);
-
-# %current
-#   char:       the current character.
-#   escaped:    true if the current character was escaped. (last character = \)
-#   block:      the current block object.
-#   ignored:    true if the character is a master parser character({, }, etc.).
-#   line:       current line number
-#   col:        current column number (actually column + 1)
 
 # parse a single character.
 # note: never return from this method; instead last from for loop.
@@ -143,7 +135,7 @@ sub handle_character {
     if ($char eq '*' && $c->{next_char} eq '/') {
         next DEFAULT if !$c->is_comment;
         $c->clear_comment;
-        $c->{skip_next_char}++;
+        $c->{skip_char}++;
         next CHAR;
     }
 
@@ -163,6 +155,7 @@ sub handle_character {
         my $block_type    = my $block_name    = '';
         my $in_block_name = my $chars_scanned = 0;
 
+        # no ->last_content?
         return $c->error("Block has no type")
             if !length $content;
 
@@ -217,12 +210,11 @@ sub handle_character {
         $c->last_content(substr($c->last_content, 0, -$chars_scanned));
 
         # if the block type contains dot(s), it has classes.
-        my @block_classes;
-        if (index($block_type, '.') != -1) {
-            my @split      = split /\./, $block_type;
-            $block_type    = shift @split;
-            @block_classes = @split;
-        }
+        ($block_type, my @block_classes) = split /\./, $block_type;
+
+        # check a second time, now that we've extracted classes
+        return $c->error("Block has no type")
+            if !length $block_type;
 
         # if the block type starts with $, it's a model.
         my $first = \substr($block_type, 0, 1);
@@ -312,7 +304,7 @@ sub handle_character {
                 name        => 'var_name',
                 hr_name     => 'variable name',
                 valid_chars => qr/[\w\.]/,
-                location    => $c->{variable_name} = []
+                location    => $c->{var_name} = []
             ) and next CHAR;
             $c->{var_no_interpolate}++ if $char eq '%';
         }
@@ -322,7 +314,7 @@ sub handle_character {
             $c->clear_catch;
 
             # no length? no variable name
-            my $var = $c->{variable_name}[-1];
+            my $var = $c->{var_name}[-1];
             return $c->error("Variable has no name")
                 if !length $var;
 
@@ -332,7 +324,7 @@ sub handle_character {
                 name        => 'var_value',
                 hr_name     => "variable \@$hr_var value",
                 valid_chars => qr/./s,
-                location    => $c->{variable_value} = []
+                location    => $c->{var_value} = []
             ) and next CHAR;
         }
 
@@ -340,7 +332,7 @@ sub handle_character {
         elsif ($char eq ';' && $c->{catch}{name} =~ m/^var_name|var_value$/) {
             $c->clear_catch;
             my ($var, $val) =
-                _get_var_parts(delete @$c{'variable_name', 'variable_value'});
+                _get_var_parts(delete @$c{'var_name', 'var_value'});
 
             # more than one content? not allowed in variables
             return $c->error("Variable can't contain both text and blocks")
@@ -407,7 +399,7 @@ sub handle_character {
     }
 
     # nothing to catch! I don't think this can ever happen since the main block
-    # is the toplevel catch and cannot be closed, but it's here just in case.
+    # is the top-level catch and cannot be closed, but it's here just in case.
     else {
         return $c->error("Nothing to catch $char!");
     }

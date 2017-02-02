@@ -293,7 +293,7 @@ sub parse_format_type {
         return '(null)' if !defined $var; # TODO: make a warning
         $var = $wikifier->parse_formatted_text($page, $var, 0, 1)
             if !ref $var && $1 ne '%';
-        $var = $var->{element}->generate if blessed $var;
+        $var = $var->to_html if blessed $var && $var->can('to_html');
         return $var;
     }
 

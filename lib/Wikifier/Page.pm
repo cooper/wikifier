@@ -195,50 +195,152 @@ sub _css_item_string {
     return $string;
 }
 
-# set a variable.
+# set a variable. returns new value
 sub set {
     my ($page, $var, $value) = @_;
-    my ($hash, $name) = _get_hash($page->{variables}, $var);
-    $hash->{$name} = $value;
+    return ($page->set_with_err($var, $value))[0];
 }
 
-# fetch a variable.
+# set a variable. returns (new value, error)
+sub set_with_err {
+    my ($page, $var, $value) = @_;
+    my ($new_val, $err) = _set_var($page->{variables}, $var, $value);
+    $page->warning($err) if $err;
+    return ($new_val, $err);
+}
+
+# fetch a variable. returns value
 sub get {
+    my ($page, $var) = @_;
+    return ($page->get_with_err($var))[0];
+}
+
+# fetch a variable. returns (value, error)
+sub get_with_err {
     my ($page, $var)  = @_;
 
     # try page variables.
-    my ($hash, $name) = _get_hash($page->{variables}, $var);
-    return $hash->{$name} if defined $hash->{$name};
+    my ($found, $err) = _get_var($page->{variables}, $var);
+    $page->warning($err) if $err;
+    return ($found, $err) if defined $found || $err;
 
     # try global variables.
-    ($hash, $name) = _get_hash($page->{wiki}{variables}, $var);
-    return $hash->{$name};
+    ($found, $err) = _get_var($page->{wiki}{variables}, $var) if $page->{wiki};
+    $page->warning($err) if $err;
+    return ($found, $err) if defined $found || $err;
+
+    return (undef, undef);
 }
 
+# fetch a variable yielding a hashref.
+# returns empty hashref if not found.
 sub get_href {
     my $val = &get;
     return {} if ref $val ne 'HASH';
     return $val;
 }
 
+# fetch a variable yielding an arrayref.
+# returns empty arrayref if not found.
 sub get_aref {
     my $val = &get;
     return [] if ref $val ne 'ARRAY';
     return $val;
 }
 
-# internal use only.
-sub _get_hash {
-    my ($hash, $var) = @_;
-    my $i    = 0;
+# fetch a variable from $where. returns (value, error)
+sub _get_var {
+    my ($where, $var) = @_;
     my @parts = split /\./, $var;
-    foreach my $part (@parts) {
-        last if $i == $#parts;
-        $hash->{$part} = {} if ref $hash->{$part} ne 'HASH';
-        $hash = $hash->{$part};
-        $i++;
+    while ($var = shift @parts) {
+        ($where, my $err) = _get_attr($where, $var);
+        return (undef, $err) if $err;
     }
-    return ($hash, $parts[-1]);
+    return $where;
+}
+
+# fetch an attribute from $where. returns (value, error)
+sub _get_attr {
+    my ($where, $attr) = @_;
+
+    # it's an object. hopefully it can ->get_attribute
+    if (blessed $where) {
+        my $desc = $where->can('to_desc') ? $where->to_desc : "$where";
+        return (undef,
+            "Attempted to fetch \@$attr from $desc ".
+            'which does not support attributes'
+        ) if !$where->can('get_attribute');
+        return $where->get_attribute($attr);
+    }
+
+    # hash ref
+    if (ref $where eq 'HASH') {
+        return $where->{$attr};
+    }
+
+    # array ref
+    if (ref $where eq 'ARRAY') {
+        return (undef,
+            "Attempted to fetch \@$attr from $where ".
+            'which only supports numeric indices'
+        ) if !looks_like_number($attr);
+        return $where->[$attr];
+    }
+
+    # something else
+    return (undef, "Not sure what to do with $where");
+}
+
+# set a variable on $where. returns (new value, error)
+sub _set_var {
+    my ($where, $var, $value) = @_;
+    my @parts   = split /\./, $var;
+    my $setting = pop @parts;
+    while ($var = shift @parts) {
+        my ($new_where, $err) = _get_attr($where, $var);
+        return (undef, $err) if $err;
+
+        # this location doesn't exist, so make a new hash
+        if (!$new_where) {
+            $new_where = {};
+            _set_attr($where, $var, $new_where);
+        }
+
+        $where = $new_where;
+    }
+    return _set_attr($where, $setting, $value);
+}
+
+# set an attribute on $where. returns (new value, error)
+sub _set_attr {
+    my ($where, $attr, $value) = @_;
+
+    # it's an object. hopefully it can ->set_attribute
+    if (blessed $where) {
+        my $desc = $where->can('to_desc') ? $where->to_desc : "$where";
+        return (undef,
+            "Attempted to assign \@$attr on $desc ".
+            'which does not support attribute assignment'
+        ) if !$where->can('set_attribute');
+        return $where->set_attribute($attr, $value);
+    }
+
+    # hash ref
+    if (ref $where eq 'HASH') {
+        return $where->{$attr} = $value;
+    }
+
+    # array ref
+    if (ref $where eq 'ARRAY') {
+        return (undef,
+            "Attempted to set \@$attr on $where ".
+            'which only supports numeric indices'
+        ) if !looks_like_number($attr);
+        return $where->[$attr] = $value;
+    }
+
+    # something else
+    return (undef, "Not sure what to do with $where");
 }
 
 # returns HTML for formatting.
@@ -414,6 +516,13 @@ sub title {
 sub title_or_name {
     my $page = shift;
     return $page->title // $page->name;
+}
+
+# parser warning
+sub warning {
+    my $page = shift;
+    my $main_block = $page->{main_block} or return;
+    return $main_block->warning(@_);
 }
 
 sub wikifier { shift->{wikifier} }

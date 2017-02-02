@@ -14,7 +14,7 @@ use warnings;
 use strict;
 
 use Scalar::Util qw(blessed weaken);
-use Wikifier::Utilities qw(L);
+use Wikifier::Utilities qw(L truncate_hr);
 
 # Required properties of blocks.
 #
@@ -242,6 +242,25 @@ sub first_parent {
         return $block if $block->type eq $type;
     }
     return;
+}
+
+# this is for human-readable version
+sub to_desc {
+    my $block = shift;
+    my $title = truncate_hr($block->{name}, 30);
+       $title = length $title ? "[$title]" : '';
+    return "$$block{type}$title\{}";
+}
+
+# this is for the variable to html
+sub to_html {
+    my $block = shift;
+    return $block->{element}->generate if $block->{element};
+    $block->warning(
+        "Tried to display $$block{type}\{} ".
+        'which has no element asssociated with it'
+    );
+    return "$$block{type}\{}";
 }
 
 # produce a parser warning

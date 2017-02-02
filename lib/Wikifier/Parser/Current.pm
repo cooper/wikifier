@@ -1,10 +1,66 @@
+# Copyright (c) 2016, Mitchell Cooper
+# a Current object describes the state of the parser
 package Wikifier::Parser::Current;
 
 use warnings;
 use strict;
 use 5.010;
 
-use Wikifier::Utilities qw(truncate_hr);
+# %current
+#
+#   char        current character
+#
+#   next_char   next character or an empty string if this is the last one
+#
+#   last_char   previous character or an empty string if this is the first one
+#
+#   skip_char   character parser may set this to a true value at any point,
+#               which results in the next character being skipped entirely.
+#               currently this is used only for the closing '/' in comments
+#
+#   catch       current catch, represented by a hashref of options. a catch
+#               describes the location to where content will be pushed. see the
+#               ->catch method for a list of options and what they mean.
+#               fetch with ->catch
+#
+#   block       current block object
+#
+#   line        current line number
+#
+#   col         current column number (actually column + 1)
+#
+#   escaped     true if the current character was escaped (last character = \)
+#               check with ->is_escaped. mark with ->mark_escaped
+#
+#   ignored     true if the character is a master parser character({, }, etc.)
+#               these are "ignored" in that if they are escaped they will not be
+#               re-escaped for block parsers or the formatting parser.
+#               check with ->is_ignored. mark with ->mark_ignored
+#
+#   comment     true if the character is inside a comment and should be ignored.
+#               check with ->is_comment. mark with ->mark_comment
+#
+#   warnings    an array reference to which parser warnings are pushed. this
+#               will later be copied to $page->{warnings} and will be included
+#               in the display result for pages.
+#               produce warnings with ->warning($msg)
+#
+#   error       parser error message. this is checked after each character. if
+#               it is present, parsing is aborted; ->parse() returns the error.
+#               produce errors with ->error($msg)
+#
+#   (others)    these contain partial data until the end of a catch:
+#               var_name, var_value, var_no_interpolate
+
+sub new {
+    my ($class, %opts) = @_;
+    return bless {
+        warnings    => [],
+        next_char   => '',
+        last_char   => '',
+        %opts
+    }, $class;
+}
 
 # escaped characters
 sub is_escaped    { shift->{escaped}   }
@@ -35,11 +91,9 @@ sub block {
     my ($c, $block, $no_catch) = @_;
     return $c->{block} if !$block;
     $c->{block} = $block;
-    my $title = truncate_hr($block->{name}, 30);
-       $title = length $title ? "[$title]" : '';
     $c->catch(
-        name        => $block->{type},
-        hr_name     => "$$block{type}$title\{}",
+        name        => $block->type,
+        hr_name     => $block->to_desc,
         location    => $block->{content}  ||= [],
         position    => $block->{position} ||= [],
         is_block    => 1,
@@ -100,6 +154,8 @@ sub append_content {
 #   position    (opt) an array reference to where position info will be pushed
 #   nested_ok   (opt) true if we should allow the catch elsewhere than top-level
 #   parent      (opt) the catch we will return to when this one closes
+#   is_block    (opt) true for blocks so that we know to reset $c->block
+#   is_toplevel (opt) true only for the main block
 # )
 sub catch {
     my ($c, %opts) = (shift, @_);
