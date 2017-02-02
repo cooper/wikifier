@@ -51,7 +51,7 @@ table.wiki-infobox {
     clear: right;
     background-color: #f7f7f7;
     border: 1px solid #ccc;
-    font-size: 0.8em;
+    font-size: 0.88em;
     border-collapse: collapse;
     padding: 0;
 }
@@ -145,14 +145,14 @@ div.wiki-imagebox-right {
 div.wiki-imagebox-description {
     text-align: left;
     background-color: #eee;
-    font-size: 85%;
+    font-size: 0.85em;
     display: block;
     width: 100%;
 }
 
 div.wiki-imagebox-description-inner {
     padding: 5px 3px 3px 3px;
-    line-height: 1.2em;
+    line-height: 1.3em;
 }
 
 /* images */

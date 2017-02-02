@@ -62,6 +62,12 @@ sub parse {
 
     close $fh;
 
+    # some catch was not terminated.
+    if (my $catch = $c->catch) {
+        my ($type, $line, $col) = @$catch{ qw(hr_name line col) };
+        return "Line $line:$col: ".ucfirst($type).' still open at EOF';
+    }
+
     # some block was not closed.
     if ($c->{block} != $main_block) {
         my ($type, $line, $col) = @{ $c->{block} }{ qw(type line col) };
@@ -79,17 +85,17 @@ sub parse {
 sub handle_line {
     my ($wikifier, $line, $page, $c) = @_;
 
-    # illegal regex filters out variable declaration.
-    if ($line =~ m/^\s*\@([\w\.]+):\s*(.+);\s*$/) {
-        $page->set($1, $wikifier->parse_formatted_text($page, $2));
-        return;
-    }
-
-    # variable boolean.
-    elsif ($line =~ m/^\s*\@([\w\.]+);\s*$/) {
-        $page->set($1, 1);
-        return;
-    }
+    # # illegal regex filters out variable declaration.
+    # if ($line =~ m/^\s*\@([\w\.]+):\s*(.+);\s*$/) {
+    #     $page->set($1, $wikifier->parse_formatted_text($page, $2));
+    #     return;
+    # }
+    #
+    # # variable boolean.
+    # elsif ($line =~ m/^\s*\@([\w\.]+);\s*$/) {
+    #     $page->set($1, 1);
+    #     return;
+    # }
 
     # only parsing variables.
     return if $page->{vars_only};
@@ -106,6 +112,8 @@ sub handle_line {
 
     return;
 }
+
+my %variable_tokens = map { $_ => 1 } qw(@ : ;);
 
 # %current
 #   char:       the current character.
@@ -240,7 +248,7 @@ sub handle_character {
         next DEFAULT if $c->is_escaped;
 
         # we cannot close the main block.
-        if ($c->block == $page->{main_block}) {
+        if ($c->block->type eq 'main') {
             return $c->error("Attempted to close main block");
         }
 
@@ -290,6 +298,45 @@ sub handle_character {
         next CHAR;
     }
 
+
+    elsif ($c->block->type eq 'main' && $variable_tokens{$char}) {
+        $c->mark_ignored;
+        next DEFAULT if $c->is_escaped;
+
+        # starts a variable name
+        if ($char eq '@') {
+            $c->catch(
+                hr_name     => 'variable name',
+                valid_chars => qr/[\w\.]/,
+                location    => \$c->{variable_name}
+            ) and next CHAR;
+        }
+
+        elsif ($char eq ':' && $c->catch) {
+            $c->clear_catch;
+            my $name_str = delete $c->{variable_name};
+
+            # no length? no variable name
+            if (!length $name_str) {
+                return $c->error("Variable has no name");
+            }
+
+            # now catch the value
+            $c->catch(
+                hr_name     => 'variable value',
+                valid_chars => qr/./m,
+                location    => \$c->{variable_value}
+            ) and next CHAR;
+        }
+
+        elsif ($char eq ';' && $c->catch) {
+            $c->clear_catch;
+            my $value_str = delete $c->{variable_value};
+        }
+
+        else { $use_default++ }
+    }
+
     else { $use_default++ }
     next CHAR unless $use_default;
 
@@ -311,10 +358,25 @@ sub handle_character {
         $append = "$$c{last_char}$char";
     }
 
-    # append character to current block's content.
+    # if we have someplace to append this, do that
+    if (my $catch = $c->catch) {
+
+        # make sure the char is acceptable
+        if ($char !~ $catch->{valid_chars}) {
+            my $loc = $catch->{location};
+            my $err = "Invalid character '$char' in $$catch{hr_name}.";
+            $err   .= " Partial: $$loc" if length $$loc;
+            return $c->error($err);
+        }
+
+        # append
+        ${ $catch->{location} } .= $append;
+    }
+
+    # otherwise, append character to current block's content.
 
     # if the current block's content array is empty, push the character.
-    if (!scalar $c->content) {
+    elsif (!scalar $c->content) {
         $c->push_content($append);
     }
 
@@ -412,6 +474,35 @@ sub last_content {
 sub append_content {
     my ($c, $append) = @_;
     $c->{block}{content}[-1] .= $append;
+}
+
+# set the current catch
+# %opts = (
+#   hr_name     Human-readable description of the catch, used in warnings/errors
+#   valid_chars Regex for characters that are allowed in the catch
+#   location    A scalar reference to where text will be appended
+#   ow_ok       True if we should silently allow the catch to be overwritten
+# )
+sub catch {
+    my ($c, %opts) = (shift, @_);
+    return $c->{catch} if !@_;
+
+    # there's already a catch
+    if ($c->{catch} && !$c->{catch}{ow_ok}) {
+        return $c->error(
+            "Attempted to start a $opts{hr_name} in the middle of a ".
+            $c->{catch}{hr_name}
+        );
+    }
+
+    @opts{'line', 'col'} = @$c{'line', 'col'};
+    $c->{catch} = \%opts;
+    return; # success
+}
+
+sub clear_catch {
+    my $c = shift;
+    delete $c->{catch};
 }
 
 sub line_info {
