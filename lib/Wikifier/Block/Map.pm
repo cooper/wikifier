@@ -25,6 +25,7 @@ our %block_types = (
 
 sub map_init {
     my $block = shift;
+    $block->{map_hash}  = {};
     $block->{map_array} = [];
 }
 
@@ -258,11 +259,11 @@ sub map_parse {
     }
 
     # append/overwrite values found in this parser.
-    my %hash = $block->{map} ? %{ $block->{map} } : ();
+    my %hash = $block->{map_hash} ? %{ $block->{map_hash} } : ();
     @hash{ keys %values } = values %values;
 
     # reassign the hash.
-    $block->{map} = \%hash;
+    $block->{map_hash} = \%hash;
 
     return 1;
 }
@@ -282,18 +283,13 @@ sub map_html {
             next;
         }
         $_->[1] = $value; # overwrite the block value with HTML
-        $block->{map}{$key} = $value;
+        $block->{map_hash}{$key} = $value;
     }
 }
 
-sub get_attribute {
-    my ($map, $attr) = @_;
-    return $map->{map}{$attr};
-}
-
-sub set_attribute {
-    my ($map, $attr, $val) = @_;
-    return $map->{map}{$attr} = $val;
+sub to_data {
+    my $map = shift;
+    return $map->{map_hash};
 }
 
 __PACKAGE__

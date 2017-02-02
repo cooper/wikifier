@@ -36,7 +36,7 @@ sub image_parse {
     my ($w, $h);
 
     # get values from hash.
-    $block->{$_} = $block->{map}{$_} foreach qw(
+    $block->{$_} = $block->{map_hash}{$_} foreach qw(
         file width height
         align float author license
     );
@@ -212,7 +212,7 @@ sub image_html {
 
     # description. we have to extract this here instead of in ->parse()
     # because at the time of ->parse() its text is not yet formatted.
-    my $desc = $block->{map}{description} // $block->{map}{desc};
+    my $desc = $block->{map_hash}{description} // $block->{map_hash}{desc};
     if (length $desc) {
         $inner->create_child(
             class => 'imagebox-description'

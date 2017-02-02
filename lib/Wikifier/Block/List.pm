@@ -164,4 +164,9 @@ sub list_html {
     $block->{list_array} = \@new;
 }
 
+sub to_data {
+    my $list = shift;
+    return $list->{list_array};
+}
+
 __PACKAGE__

@@ -8,7 +8,7 @@ package Wikifier::Page;
 
 use warnings;
 use strict;
-use Scalar::Util qw(blessed);
+use Scalar::Util qw(blessed looks_like_number);
 use File::Basename qw(basename);
 use Cwd qw(abs_path);
 use HTML::Strip;
@@ -252,7 +252,7 @@ sub get_aref {
 sub _get_var {
     my ($where, $var) = @_;
     my @parts = split /\./, $var;
-    while ($var = shift @parts) {
+    while (length($var = shift @parts)) {
         ($where, my $err) = _get_attr($where, $var);
         return (undef, $err) if $err;
     }
@@ -262,15 +262,23 @@ sub _get_var {
 # fetch an attribute from $where. returns (value, error)
 sub _get_attr {
     my ($where, $attr) = @_;
+    my $desc = "$where";
 
-    # it's an object. hopefully it can ->get_attribute
+    # it's an object. hopefully it can ->get_attribute or ->to_data
     if (blessed $where) {
-        my $desc = $where->can('to_desc') ? $where->to_desc : "$where";
-        return (undef,
-            "Attempted to fetch \@$attr from $desc ".
-            'which does not support attributes'
-        ) if !$where->can('get_attribute');
-        return $where->get_attribute($attr);
+        $desc = $where->to_desc if $where->can('to_desc');
+        if ($where->can('get_attribute')) {
+            return $where->get_attribute($attr);
+        }
+        elsif ($where->can('to_data')) {
+            $where = $where->to_data;
+        }
+        else {
+            return (undef,
+                "Attempted to fetch \@$attr from $desc ".
+                'which does not support attributes'
+            );
+        }
     }
 
     # hash ref
@@ -281,14 +289,14 @@ sub _get_attr {
     # array ref
     if (ref $where eq 'ARRAY') {
         return (undef,
-            "Attempted to fetch \@$attr from $where ".
+            "Attempted to fetch \@$attr from $desc ".
             'which only supports numeric indices'
         ) if !looks_like_number($attr);
         return $where->[$attr];
     }
 
     # something else
-    return (undef, "Not sure what to do with $where");
+    return (undef, 'Not sure what to do with '.($where // '(undef)'));
 }
 
 # set a variable on $where. returns (new value, error)
@@ -296,7 +304,7 @@ sub _set_var {
     my ($where, $var, $value) = @_;
     my @parts   = split /\./, $var;
     my $setting = pop @parts;
-    while ($var = shift @parts) {
+    while (length($var = shift @parts)) {
         my ($new_where, $err) = _get_attr($where, $var);
         return (undef, $err) if $err;
 
@@ -314,15 +322,23 @@ sub _set_var {
 # set an attribute on $where. returns (new value, error)
 sub _set_attr {
     my ($where, $attr, $value) = @_;
+    my $desc = "$where";
 
-    # it's an object. hopefully it can ->set_attribute
+    # it's an object. hopefully it can ->set_attribute or ->to_data
     if (blessed $where) {
-        my $desc = $where->can('to_desc') ? $where->to_desc : "$where";
-        return (undef,
-            "Attempted to assign \@$attr on $desc ".
-            'which does not support attribute assignment'
-        ) if !$where->can('set_attribute');
-        return $where->set_attribute($attr, $value);
+        $desc = $where->to_desc if $where->can('to_desc');
+        if ($where->can('set_attribute')) {
+            return $where->set_attribute($attr, $value);
+        }
+        elsif ($where->can('to_data')) {
+            $where = $where->to_data;
+        }
+        else {
+            return (undef,
+                "Attempted to assign \@$attr on $desc ".
+                'which does not support attribute assignment'
+            );
+        }
     }
 
     # hash ref
@@ -333,14 +349,14 @@ sub _set_attr {
     # array ref
     if (ref $where eq 'ARRAY') {
         return (undef,
-            "Attempted to set \@$attr on $where ".
+            "Attempted to set \@$attr on $desc ".
             'which only supports numeric indices'
         ) if !looks_like_number($attr);
         return $where->[$attr] = $value;
     }
 
     # something else
-    return (undef, "Not sure what to do with $where");
+    return (undef, 'Not sure what to do with '.($where // '(undef)'));
 }
 
 # returns HTML for formatting.
