@@ -59,7 +59,8 @@ sub new {
 sub parse {
     my $block = shift;
     my $type  = $block->{type};
-
+    return if $block->{did_parse}++;
+    
     # parse this block.
     $block->{parse_done} = {};
     $block->_parse($type, @_);
@@ -107,6 +108,7 @@ sub _parse {
 sub html {
     my $block = shift;
     my $type  = $block->{type};
+    return $block->{element} if $block->{did_html}++;
 
     # strip excess whitespace
     $block->remove_blank;
