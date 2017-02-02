@@ -185,8 +185,9 @@ sub map_parse {
 
                 # if this key exists, rename it to the next available <key>_key_<n>.
                 KEY: while (exists $values{$key}) {
-                    my ($key_name, $key_number) = split '_key_', $key, 2;
-                    if (!defined $key_number) {
+                    my ($key_name, $key_number) = reverse map scalar reverse,
+                        split('_', reverse($key), 2);
+                    if (!defined $key_number || $key_number =~ m/\D/) {
                         $key = "${key}_2";
                         next KEY;
                     }

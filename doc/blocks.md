@@ -73,12 +73,12 @@ As some block types such as `infobox{}` and `history{}` use the pairs of a map
 to display table rows in the generated HTML, keys may be duplicate. When using
 a key more than once, both pairs will be displayed in the resulting HTML, but
 because only one value can be associated with each key internally, duplicate
-keys are suffixed with `_key_n` where `n` is incremented for each occurrence,
+keys are suffixed with `_n` where `n` is incremented for each occurrence,
 starting at 2.
 ```
 infobox {
-    Name:   Britney;    /* shows as Name, and internally Name       */
-    Name:   Spears;     /* shows as Name, but internally Name_key_2 */
+    Name:   Britney;    /* shows as Name, and internally Name   */
+    Name:   Spears;     /* shows as Name, but internally Name_2 */
 }
 ```
 
