@@ -10,7 +10,7 @@ use warnings;
 use strict;
 use 5.010;
 
-use Scalar::Util   ();
+use Scalar::Util qw(blessed);
 use HTML::Entities ();
 use Wikifier::Utilities qw(page_name_link trim);
 
@@ -287,20 +287,13 @@ sub parse_format_type {
         return $fmt;
     }
 
-    # interpolable variable.
-    if ($type =~ /^%([\w.]+)$/ && !$careful) {
-        my $var = $page->get($1);
-        return defined $var ?
-            $wikifier->parse_formatted_text($page, $var, 0, 1) : '(null)';
-    }
-
     # variable.
-    if ($type =~ /^@([\w.]+)$/) {
-        my $var = $page->get($1);
-        if (!defined $var) {
-            # TODO: make a warning
-            return '(null)';
-        }
+    if ($type =~ /^([@%])([\w.]+)$/ && !$careful) {
+        my $var = $page->get($2);
+        return '(null)' if !defined $var; # TODO: make a warning
+        $var = $wikifier->parse_formatted_text($page, $var, 0, 1)
+            if !ref $var && $1 ne '%';
+        $var = $var->{element}->generate if blessed $var;
         return $var;
     }
 

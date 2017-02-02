@@ -66,6 +66,7 @@ sub image_parse {
     # no file - this is mandatory.
     if (!length $block->{file}) {
         $block->warning("No file specified for image\{}");
+        $block->{parse_failed}++;
         return;
     }
 
@@ -139,7 +140,8 @@ sub image_parse {
 sub image_html {
     my ($box, $block, $page, $el) = (shift, shift, @_);
     $block->html_base($page); # call hash html.
-
+    return if $block->{parse_failed};
+    
     # add the appropriate float class.
     $el->add_class('imagebox-'.$block->{float}) if $box;
 

@@ -88,9 +88,32 @@ sub parse {
 sub html {
     my $page = shift;
     my $res;
-    # TODO ->html on variables. they will continue to hold the block afterward,
-    # but the element will be generated if we try to display the variable
+
     L('HTML', sub {
+
+        # run ->html on variables. they will continue to hold the block
+        # afterward, but the element will be generated if we try to display it
+        my $html_vars; $html_vars = sub {
+            my $hash = shift;
+            for my $var (keys %$hash) {
+                my $val = $hash->{$var};
+
+                # another hash
+                if (ref $val eq 'HASH') {
+                    $html_vars->($val);
+                    next;
+                }
+
+                # text node
+                next if !blessed $val;
+
+                # it's a block. ->html it
+                $val->html($page);
+            }
+        };
+        $html_vars->($page->{variables});
+
+        # run ->html on main block
         $res = $page->{wikifier}{main_block}->html($page);
     });
     L('Generate', sub {

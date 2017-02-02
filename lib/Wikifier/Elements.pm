@@ -65,8 +65,9 @@ sub classes {
 
 sub generate {
     my ($els, $str) = (shift, '');
+    return $els->{generated} if defined $els->{generated};
     $str .= $_->generate for $els->elements;
-    return $str;
+    return $els->{generated} = $str;
 }
 
 sub elements    { @{ shift->{elements} }    }

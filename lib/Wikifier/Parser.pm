@@ -14,7 +14,6 @@ use warnings;
 use strict;
 use 5.010;
 
-use Scalar::Util qw(blessed);
 use Wikifier::Utilities qw(trim L);
 
 ###############
@@ -68,9 +67,29 @@ sub parse {
         return "Line $line:$col: $type still open at EOF";
     }
 
-    # run ->parse on variables TODO
+    # run ->parse on variables
+    my $parse_vars; $parse_vars = sub {
+        my $hash = shift;
+        for my $var (keys %$hash) {
+            my $val = $hash->{$var};
 
-    # run ->parse on children.
+            # another hash
+            if (ref $val eq 'HASH') {
+                $parse_vars->($val);
+                next;
+            }
+
+            # text node
+            next if !ref $val;
+
+            # it's a block. parse it
+            $val->parse($page);
+            return $c->{error} if $c->{error};
+        }
+    };
+    $parse_vars->($page->{variables});
+
+    # run ->parse on the main block
     unless ($page->{vars_only}) {
         $main_block->parse($page);
         return $c->{error} if $c->{error};
@@ -331,7 +350,7 @@ sub handle_character {
             # string
             if (length $val) {
                 $val = $wikifier->parse_formatted_text($page, $val)
-                    unless delete $c->{var_no_interpolate};
+                    if !delete $c->{var_no_interpolate} && !ref $val;
             }
 
             # boolean
@@ -340,6 +359,8 @@ sub handle_character {
             $page->set($var => $val);
         }
 
+
+        # should never reach this, but just in case
         else { $use_default++ }
     }
 
@@ -413,7 +434,7 @@ sub _get_var_parts {
             push @new, [];
             next;
         }
-        @$part = grep length, map { blessed $_ ? $_ : trim($_) } @$part;
+        @$part = grep length, map { ref $_ ? $_ : trim($_) } @$part;
         push @new, $part;
     }
     return @new;
@@ -424,8 +445,6 @@ package Wikifier::Parser::Current;
 use warnings;
 use strict;
 use 5.010;
-
-use Scalar::Util qw(blessed);
 
 # escaped characters
 sub is_escaped    {        shift->{escaped}   }
@@ -491,8 +510,8 @@ sub append_content {
 
         # if it's a block, push.
         # if the location is empty, this is the first element, so push.
-        # if the previous element is blessed, push, as this is a new text node.
-        if (blessed $append || !@$location || blessed $location->[-1]) {
+        # if the previous element is a ref, push, as this is a new text node.
+        if (ref $append || !@$location || ref $location->[-1]) {
             $c->push_content($append);
             next;
         }

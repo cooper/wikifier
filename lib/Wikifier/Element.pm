@@ -98,7 +98,8 @@ sub remove_class {
 
 # generate HTML.
 sub generate {
-    my $el   = shift;
+    my $el = shift;
+    return $el->{generated} if defined $el->{generated};
     my $html = "<$$el{type}";
 
     # quickly determine if this is a container.
@@ -145,7 +146,7 @@ sub generate {
         $html .= $el->{container} ? "</$$el{type}>" : ' />';
     }
 
-    return "$html\n";
+    return $el->{generated} = "$html\n";
 }
 
 sub classes { @{ shift->{classes} || [] } }
