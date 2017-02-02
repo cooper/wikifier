@@ -16,6 +16,7 @@ use 5.010;
 
 use Wikifier::Parser::Current;
 use Wikifier::Utilities qw(trim truncate_hr L);
+use Scalar::Util qw(blessed);
 
 ###############
 ### PARSING ###
@@ -67,28 +68,6 @@ sub parse {
         my ($type, $line, $col) = @$catch{ qw(hr_name line col) };
         return "Line $line:$col: $type still open at EOF";
     }
-
-    # run ->parse on variables
-    my $parse_vars; $parse_vars = sub {
-        my $hash = shift;
-        for my $var (keys %$hash) {
-            my $val = $hash->{$var};
-
-            # another hash
-            if (ref $val eq 'HASH') {
-                $parse_vars->($val);
-                next;
-            }
-
-            # text node
-            next if !ref $val;
-
-            # it's a block. parse it
-            $val->parse($page);
-            return $c->{error} if $c->{error};
-        }
-    };
-    $parse_vars->($page->{variables});
 
     # run ->parse on the main block
     unless ($page->{vars_only}) {
@@ -353,9 +332,12 @@ sub handle_character {
             # boolean
             else { $val = 1 }
 
-            $page->set($var => $val);
-        }
+            # set the value
+            $val = $page->set($var => $val);
 
+            # run ->parse if necessary
+            _parse_vars($page, $val) if defined $val;
+        }
 
         # should never reach this, but just in case
         else { $use_default++ }
@@ -436,6 +418,20 @@ sub _get_var_parts {
         push @new, $part;
     }
     return @new;
+}
+
+sub _parse_vars {
+    my ($page, $val) = @_;
+
+    # this is a block. parse it
+    if (blessed $val && $val->can('parse')) {
+        $val->parse($page);
+        return;
+    }
+
+    # consider: this doesn't work for object attributes
+    if (ref $val eq 'HASH')  { _parse_vars($_) for values %$val }
+    if (ref $val eq 'ARRAY') { _parse_vars($_) for @$val        }
 }
 
 1

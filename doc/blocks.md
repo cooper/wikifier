@@ -189,6 +189,22 @@ list {
 }
 ```
 
+Lists support attribute fetching and assignment, which allows you to retrieve
+and set their values using the wikifier variable attribute syntax.
+```
+@greetings: list {
+    hello;
+    bonjour;
+    buenos dias;
+};
+
+@greetings.2: hola;
+
+sec [Greetings around the world] {
+    [@greetings]
+}
+```
+
 ## Model
 
 Allows you to embed a template. See [Models](models.md).
