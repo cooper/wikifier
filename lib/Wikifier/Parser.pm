@@ -335,7 +335,7 @@ sub handle_character {
             # set the value
             $val = $page->set($var => $val);
 
-            # run ->parse if necessary
+            # run ->parse and ->html if necessary
             _parse_vars($page, 'parse', $val);
             _parse_vars($page, 'html',  $val);
         }

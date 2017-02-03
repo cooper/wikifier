@@ -149,7 +149,7 @@ sub _css_item_string {
         # we're starting an ID.
         if ($char eq '#') {
             $in_id++;
-            $string .= '#wiki-';
+            $string .= '.wiki-id-';
             next;
         }
 

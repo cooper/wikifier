@@ -50,7 +50,7 @@ sub create_block {
     # Safe point - the block type is real and is loaded.
 
     # call init sub.
-    my $block = ($type_ref->{package} || 'Wikifier::Block')->new(
+    my $block = $type_ref->{package}->new(
         type_ref => $type_ref,  # reference to the block type
         %opts,                  # options passed to ->create_block
         wdir => $dir            # wikifier directory
@@ -74,23 +74,37 @@ sub load_block {
     }
 
     # do the file.
-    my $package = do $file
-        or L "Error loading ${type}{} block: ".($@ || $!);
-    return unless $package;
+    my $main_package = do $file;
+    if (!$main_package) {
+        L "Error loading ${type}{} block: ".($@ || $!);
+        return;
+    }
 
     # fetch blocks.
     my %blocks;
     {
         no strict 'refs';
-        unshift @{ "${package}::ISA" }, 'Wikifier::Block';
-        %blocks = %{ "${package}::block_types" };
+        %blocks = %{ "${main_package}::block_types" };
     }
 
     # register blocks.
     foreach my $block_type (keys %blocks) {
         my $type_ref = $blocks{$block_type};
+
+        # find the package. this may or may not exist already
+        my $package = 'Wikifier::Block::'.ucfirst($block_type);
+
+        # store the type ref
         $type_ref->{package} = $package;
         $block_types{$block_type} = $type_ref;
+
+        # make the package inherit from its base
+        my $base = $type_ref->{base} ?
+            'Wikifier::Block::'.ucfirst($type_ref->{base}) : 'Wikifier::Block';
+        {
+            no strict 'refs';
+            unshift @{ "${package}::ISA" }, $base;
+        }
 
         # if this depends on a base, load it.
         $wikifier->load_block($type_ref->{base}, $dir)
