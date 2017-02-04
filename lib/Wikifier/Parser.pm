@@ -163,7 +163,7 @@ sub handle_character {
 
             # it can, so we're probably in the block type at this point.
             # append to the block type.
-            elsif ($last_char =~ m/[\w\-\$\.]/) {
+            elsif ($last_char =~ m/[\w\-\$\@\.]/) {
                 $block_type = $last_char.$block_type;
                 next BACKCHAR;
             }
@@ -196,6 +196,7 @@ sub handle_character {
             if !length $block_type;
 
         # if the block type starts with $, it's a model.
+        my $block;
         my $first = \substr($block_type, 0, 1);
         if ($$first eq '$') {
             $$first = '';
@@ -203,8 +204,26 @@ sub handle_character {
             $block_type = 'model';
         }
 
-        # create the new block.
-        $c->block($wikifier->create_block(
+        # if the block type starts with an @,
+        # it's a variable containing a block.
+        elsif ($$first eq '@') {
+            $$first = '';
+
+            # find the block; make sure it's a block
+            $block = $page->get(my $var = $block_type);
+            if (!$block) {
+                return $c->error("Variable block \@$var does not exist");
+            }
+            elsif (!blessed $block || !$block->isa('Wikifier::Block')) {
+                return $c->error("Variable \@$var does not contain a block");
+            }
+
+            $block_name = $block->name;
+            $block_type = $block->type;
+        }
+
+        # create a block if necessary
+        $block ||= $wikifier->create_block(
             current => $c,
             line    => $c->{line},
             col     => $c->{col},
@@ -212,7 +231,10 @@ sub handle_character {
             type    => $block_type,
             name    => $block_name,
             classes => \@block_classes
-        ));
+        );
+
+        # set the block
+        $c->block($block);
     }
 
     # right bracket indicates the closing of a block.
@@ -283,6 +305,8 @@ sub handle_character {
                 name        => 'var_name',
                 hr_name     => 'variable name',
                 valid_chars => qr/[\w\.]/,
+                skip_chars  => qr/\s/,
+                prefix      => [ $char ],
                 location    => $c->{var_name} = []
             ) and next CHAR;
             $c->{var_no_interpolate}++ if $char eq '%';
@@ -368,8 +392,22 @@ sub handle_character {
     # if we have someplace to append this, do that
     if (my $catch = $c->catch) {
 
-        # make sure the char is acceptable
-        if (defined $catch->{valid_chars} && $char !~ $catch->{valid_chars}) {
+        # terminate the catch if the char is in skip_chars,
+        if (defined $catch->{skip_chars} && $char =~ $catch->{skip_chars}) {
+
+            # fetch the stuff that we caught up to this point.
+            # also, fetch the prefixes if there are any.
+            my @stuff = @{ $catch->{location} };
+            unshift @stuff, @{ $catch->{prefix} }
+                if $catch->{prefix};
+
+            # revert to the parent catch, and add our stuff to it
+            $c->clear_catch;
+            $c->append_content(@stuff);
+        }
+
+        # make sure the char is acceptable according to valid_chars
+        elsif (defined $catch->{valid_chars} && $char !~ $catch->{valid_chars}) {
             my $loc = $catch->{location}[-1];
             $char   = "\x{2424}" if $char eq "\n";
             my $err = "Invalid character '$char' in $$catch{hr_name}.";

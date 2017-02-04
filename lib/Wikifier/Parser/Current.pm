@@ -149,9 +149,11 @@ sub append_content {
 # %opts = (
 #   name        type of catch
 #   hr_name     human-readable description of the catch, used in warnings/errors
-#   location    an array reference to where content will be pushed
+#   location    array reference to where content will be pushed
 #   valid_chars (opt) regex for characters that are allowed in the catch
-#   position    (opt) an array reference to where position info will be pushed
+#   skip_chars  (opt) regex for characters that should be silently ignored
+#   prefix      (opt) array reference of prefixes to be injected on skip_chars
+#   position    (opt) array reference to where position info will be pushed
 #   nested_ok   (opt) true if we should allow the catch elsewhere than top-level
 #   parent      (opt) the catch we will return to when this one closes
 #   is_block    (opt) true for blocks so that we know to reset $c->block
