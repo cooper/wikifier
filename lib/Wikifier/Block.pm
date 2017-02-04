@@ -102,7 +102,7 @@ sub parse {
     return if $block->{did_parse}++;
 
     # parse this block.
-    $block->_parse($type_ref, {}, @_);
+    $block->_parse($type_ref, @_);
 
     # parse child blocks.
     foreach my $block ($block->content_blocks) {
@@ -120,19 +120,20 @@ sub parse_base {
         L $block->hr_type.' called ->parse_base(), but it has no base';
         return;
     }
-    $block->_parse($base_ref, {}, @_);
+    $block->_parse($base_ref, @_);
 }
 
 # do not call directly.
 sub _parse {
-    my ($block, $type_ref, $done) = splice @_, 0, 2;
-    my %done;
+    my ($block, $type_ref) = splice @_, 0, 2;
+    my $done = $block->{parse_done} ||= {};
     while ($type_ref) {
-        if ($type_ref->{parse} && !$done{ $type_ref->{type} }++) {
+        if ($type_ref->{parse} && !$done->{ $type_ref->{type} }++) {
             $type_ref->{parse}($block, @_);
         }
         $type_ref = $type_ref->{base_ref};
     }
+    delete $block->{parse_done};
 }
 
 
@@ -152,9 +153,8 @@ sub html {
     # generate this block.
     $block->_html($type_ref, @_);
 
-    # do child blocks that haven't been done.
+    # do child blocks. they will be skipped if already done.
     foreach my $block ($block->content_blocks) {
-        next if $block->element; # already done
         $block->html(@_);
     }
 
@@ -182,26 +182,31 @@ sub html_base {
 
 # do not call directly.
 sub _html {
-    my ($block, $type_ref, $done) = splice @_, 0, 2;
+    my ($block, $type_ref) = splice @_, 0, 2;
+    my $done = $block->{html_done} ||= {};
+    my $el = $block->{element} ||= do {
+        my $el;
 
-    # block with multiple elements
-    my $el;
-    if ($type_ref->{multi}) {
-        $el = $block->{element} = Wikifier::Elements->new;
-    }
+        # block with multiple elements
+        if ($type_ref->{multi}) {
+            $el = Wikifier::Elements->new;
+        }
 
-    # normal element
-    elsif (!$type_ref->{invis}) {
-        $el = $block->{element} = Wikifier::Element->new(class => $block->type);
-    }
+        # normal element
+        elsif (!$type_ref->{invis}) {
+            $el = Wikifier::Element->new(class => $block->type);
+        }
 
-    my %done;
+        $el;
+    };
+
     while ($type_ref) {
-        if ($type_ref->{html} && !$done{ $type_ref->{type} }++) {
+        if ($type_ref->{html} && !$done->{ $type_ref->{type} }++) {
             $type_ref->{html}($block, @_, $el);
         }
         $type_ref = $type_ref->{base_ref};
     }
+    delete $block->{html_done};
 }
 
 ########################
