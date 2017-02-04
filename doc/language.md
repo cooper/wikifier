@@ -17,44 +17,85 @@ See [Blocks](blocks.md) for a list of built-in block types.
 
 ### Block syntax
 
-Blocks can have names: Some do, and some don't. Each block type may use its name
-for a different purpose. For example, section blocks use the name to display a
-title header over the section. Infoboxes use the name to display a title along
-the top of the box. The syntax for blocks is as follows.
+Blocks can have names: Some do, and some don't. Each block type may use its
+name field for a different purpose. For example, section blocks use the field
+to display a title header over the section. Infoboxes use the name to display a
+title along the top of the box. The syntax for blocks is as follows.
 
+#### Nameless blocks
 
-**Nameless blocks**
-
-    blocktype {
-        ...
-    }
-
-Example
-
-    imagebox {
-        desc:   [[Foxy]], supreme librarian;
-        align:  left;
-        file:   foxy2.png;
-        width:  100px;
-    }
-
-**Named blocks**
-
-    blocktype [block name] {
-        ...
-    }
+```
+blocktype {
+    ...
+}
+```
 
 Example
+```
+imagebox {
+    desc:   [[Foxy]], supreme librarian;
+    align:  left;
+    file:   foxy2.png;
+    width:  100px;
+}
+```
 
-    sec [Statistics] {
-        NoTrollPlzNet Library's online division currently hosts
-        [b][@stats.site.articles][/b] articles.
-    }
+#### Named blocks
 
+```
+blocktype [block name] {
+    ...
+}
+```
+
+Example
+```
+sec [Statistics] {
+    NoTrollPlzNet Library's online division currently hosts
+    [@stats.site.articles] articles.
+}
+```
+
+#### Model shorthand
+
+Convenient syntax for [models](models.md).
+
+```
+$my_model {
+    option1: Something;
+    option2: Another option;
+}
+```
+Note: From within the model source, those options can be retrieved with
+`@m.option1` and `@m.option2`.
+
+Same as writing the long form:
+```
+model [my_model] {
+    option1: Something;
+    option2: Another option;
+}
+```
+
+#### Blocks in variables
+
+Blocks can be stored in variables and displayed later.
+
+```
+/* store the infobox in a variable */
+@person: infobox [Britney Spears] {
+    First name:     Britney;
+    Last name:      Spears;
+    Age:            35;
+};
+
+/* display the infobox */
+@person {}
+```
 
 ## Variables
 
-Wikifier supports string and boolean variables.
+Wikifier supports string, boolean, and block variables.
 
 ### Assignment
 
@@ -69,15 +110,37 @@ Boolean variables look like this:
 @some_bool;
 ```
 
+Block variables look like this:
+```
+@my_box: infobox [United States of America] {
+    Declaration:    1776;
+    States:         50;
+};
+```
+
 ### Retrieval
 
-Once variables are assigned, they are typically used in formatted text. You can
-use variables anywhere that formatted text is accepted:
+Once variables are assigned, they are typically used in formatted text or
+[conditionals](#conditionals). You can use variables anywhere that formatted
+text is accepted like this:
 ```
 sec {
     This is a paragraph inside a section. I am allow to use [b]bold text[/b],
     as well as [@variables].
 }
+```
+
+If the variable contains a block, you can display it using `@var_name {}`. So
+if you have:
+```
+@my_box: infobox [United States of America] {
+    Declaration:    1776;
+    States:         50;
+};
+```
+You would display the infobox later using:
+```
+@my_box {}
 ```
 
 ### Formatted variables
@@ -98,9 +161,48 @@ Also, variables can have attributes. This helps to organize things:
 @page.author: John Doe;
 ```
 
+You don't have to worry about whether a variable exists to define attributes on
+it. A new variable will be created on the fly if necessary (in the above
+example, `@page` does not initially exist but is created automatically).
+
+Some block types support attribute fetching and/or setting:
+```
+/* define the infobox in a variable so we can access attributes */
+@person: infobox [Britney Spears] {
+    First name:     Britney;
+    Last name:      Spears;
+    Age:            35;
+};
+
+/* display the infobox */
+@person {}
+
+/* access attributes from it elsewhere
+   btw this works for all map-based block types */
+sec {
+    Did you know that [@person.First_name] [@person.Last_name] is
+    [@person.Age] years old?
+}
+```
+```
+@alphabet: list {
+    a;
+    b;
+    c;
+    ... the rest;
+};
+
+sec {
+    Breaking News: [@alphabet.0] is the first letter of the alphabet,
+    and [@alphabet.25] is the last.
+}
+```
+
 ### Conditionals
 
-You can use conditionals on boolean variables:
+You can use conditionals `if{}`, `elsif{}`, and `else{}` on variables. Currently
+all that can be tested is the boolean value of a variable. Boolean and block
+variables are always true, and all strings besides zero are true.
 ```
 if [@page.draft] {
     Note to self: Don't forget to publish this page.
@@ -109,6 +211,44 @@ else {
     Thanks for checking out my page.
 }
 ```
+
+### Interpolable variables
+
+Interpolable variables allow you to evaluate the formatting of a string variable
+at some point after the variable was defined.
+
+Normally the formatting of string variables is evaluated immediately as the
+variable is defined.
+```
+@another_variable: references other variables;
+@my_text: This string variable has [b]bold text[/b] and [@another_variable];
+/* ok, @my_text now is:
+   This string variable has <strong>bold text</strong> and references
+   other variables
+*/
+```
+
+Interpolate variables (with the `%` sigil) are different in that their contents
+are evaluated as they are accessed rather than as they are defined.
+```
+@another_variable: references other variables;
+%my_text: This string variable has [b]bold text[/b] and [@another_variable];
+/* ok, @my_text now is:
+   This string variable has [b]bold text[/b] and [@another_variable];
+*/
+```
+Now that the variable is defined with the formatting still unevaluated, so
+accessing it as `[@my_text]` would display the raw formatting code. Instead,
+we use `[%my_text]` to display it which tells the parser to format the
+contents of the variable as we retrieve its value.
+
+Whether you defined the variable with `@` or `%` sigil does not concern the
+parser. Therefore if you do something like:
+```
+@my_text: This string variable has [b]bold text[/b];
+```
+and then try to display it with `[%my_text]`, the variable will be
+double-formatted, resulting in ugly escaped HTML tags visible to clients.
 
 ### Special variables
 
@@ -151,7 +291,7 @@ used for text formatting tokens.
 
 **Variables**
 * `[@some.variable]` - normal variable
-* `[%some.variable]` - interpolable variable (deprecated)
+* `[%some.variable]` - interpolable variable
 * See [Variables](#variables) above
 
 **Links**
