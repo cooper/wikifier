@@ -1,12 +1,11 @@
 # Copyright (c) 2016, Mitchell Cooper
 #
-# Wikifier::Parser is a function class of Wikifier which parses a wiki file.
-# The parser separates the file into block types and then passes those to
-# Wikifier::BlockManager for block class loading and object creation.
+# Wikifier::Parser is a function class of Wikifier which parses wiki source
+# code. This is the master parser; its only purpose is to separates the file
+# into blocks. The content within such blocks is parsed elsewhere by block
+# type classes.
 #
-# This class is never to be used on its own. You must use Wikifier::Wiki for a
-# high-level Wiki manager or the medium-level Wikifier::Page for managing a
-# single page.
+# This class is never to be used on its own.
 #
 package Wikifier::Parser;
 
@@ -30,12 +29,12 @@ sub parse {
     my $file = $page->path;
     $file = \$page->{source} if defined $page->{source};
 
-    # no file given.
+    # no file given
     if (!defined $file) {
         return "No file specified for parsing";
     }
 
-    # open the file.
+    # open the file
     my $fh;
     if (!open $fh, '<', $file) {
         return "Couldn't open '$file': $!";
@@ -49,7 +48,7 @@ sub parse {
     $c->block($main_block);             # set the current block to the main one
     $c->{catch}{is_toplevel}++;         # mark the main block as top-level catch
 
-    # read it line-by-line.
+    # read it line-by-line
     while (my $line = <$fh>) {
         $line =~ s/[\r\n\0]//g;     # remove returns and newlines.
         $line = trim($line);        # remove prefixing and suffixing whitespace.
@@ -62,7 +61,7 @@ sub parse {
 
     close $fh;
 
-    # some catch was not terminated.
+    # some catch was not terminated
     my $catch = $c->catch;
     if ($catch && $catch->{name} ne 'main') {
         my ($type, $line, $col) = @$catch{ qw(hr_name line col) };
@@ -98,19 +97,19 @@ my %variable_tokens = map { $_ => 1 } qw(@ % : ;);
 # note: never return from this method; instead last from for loop.
 sub handle_character {
     my ($wikifier, $char, $page, $c) = @_;
-
-    # set current character.
     $c->{char} = $char;
 
-    CHAR:    for ($char) {
-    DEFAULT: for ($char) {  my $use_default;
+    CHAR:    for ($char) {                      # next CHAR skips default
+    DEFAULT: for ($char) {  my $use_default;    # next DEFAULT goes to default
 
-    # comment entrance and closure.
+    # comment entrance
     if ($char eq '/' && $c->{next_char} eq '*') {
         next DEFAULT if $c->is_escaped;
         $c->mark_comment;
         next CHAR;
     }
+
+    # comment closure
     if ($char eq '*' && $c->{next_char} eq '/') {
         next DEFAULT if !$c->is_comment;
         $c->clear_comment;
@@ -118,16 +117,13 @@ sub handle_character {
         next CHAR;
     }
 
-    # inside a comment.
+    # inside a comment
     next CHAR if $c->is_comment;
 
-    # left bracket indicates the start of a block.
+    # starts a block
     if ($char eq '{') {
         $c->mark_ignored;
         next DEFAULT if $c->is_escaped;
-
-        # now we must remove the new block type from the
-        # current block's last content element.
 
         # set some initial variables for the loop.
         my $content       = $c->last_content;
@@ -138,7 +134,7 @@ sub handle_character {
         return $c->error("Block has no type")
             if !length $content;
 
-        # chop one character at a time from the end of the content.
+        # scan the text backwards to find the block type and name
         BACKCHAR: while (length(my $last_char = chop $content)) {
             $chars_scanned++;
 
@@ -180,22 +176,17 @@ sub handle_character {
             }
         }
 
-        #
-        # remove the block type and name from the current block's content.
-        #
-        # note: it is very likely that a single space will remain, but this will
-        # later be trimmed out by a further cleanup.
-        #
+        # overwrite the ->last_content with the title and name stripped out
         $c->last_content(substr($c->last_content, 0, -$chars_scanned));
 
-        # if the block type contains dot(s), it has classes.
+        # if the block type contains dot(s), it has classes
         ($block_type, my @block_classes) = split /\./, $block_type;
 
         # check a second time, now that we've extracted classes
         return $c->error("Block has no type")
             if !length $block_type;
 
-        # if the block type starts with $, it's a model.
+        # if the block type starts with $, it's a model
         my $block;
         my $first = \substr($block_type, 0, 1);
         if ($$first eq '$') {
@@ -205,7 +196,7 @@ sub handle_character {
         }
 
         # if the block type starts with an @,
-        # it's a variable containing a block.
+        # it's a variable containing a block
         elsif ($$first eq '@') {
             $$first = '';
 
@@ -242,7 +233,7 @@ sub handle_character {
         $c->block($block);
     }
 
-    # right bracket indicates the closing of a block.
+    # closes a block
     elsif ($char eq '}') {
         $c->mark_ignored;
         next DEFAULT if $c->is_escaped;
@@ -302,6 +293,7 @@ sub handle_character {
         next CHAR;
     }
 
+    # if we're at document level, this might be a variable declaration
     elsif ($c->block->type eq 'main' && $variable_tokens{$char}) {
         $c->mark_ignored;
         next DEFAULT if $c->is_escaped;
@@ -382,9 +374,6 @@ sub handle_character {
 
     # DEFAULT:
     # next DEFAULT goes here
-    #
-    # OK, this is the second half of the CHAR loop, which is only reached
-    # if the if chain above reaches else{} or next DEFAULT is used.
 
     # at this point, anything that needs escaping should have been handled
     # by now. so, if this character is escaped and reached all the way to
@@ -400,7 +389,7 @@ sub handle_character {
     if (my $catch = $c->catch) {
 
         # terminate the catch if the char is in skip_chars,
-        if (defined $catch->{skip_chars} && $char =~ $catch->{skip_chars}) {
+        if ($catch->{skip_chars} && $char =~ $catch->{skip_chars}) {
 
             # fetch the stuff that we caught up to this point.
             # also, fetch the prefixes if there are any.
@@ -414,7 +403,7 @@ sub handle_character {
         }
 
         # make sure the char is acceptable according to valid_chars
-        elsif (defined $catch->{valid_chars} && $char !~ $catch->{valid_chars}) {
+        elsif ($catch->{valid_chars} && $char !~ $catch->{valid_chars}) {
             my $loc = $catch->{location}[-1];
             $char   = "\x{2424}" if $char eq "\n";
             my $err = "Invalid character '$char' in $$catch{hr_name}.";
@@ -440,7 +429,7 @@ sub handle_character {
     $c->clear_ignored;
     $c->{last_char} = $char;
 
-    # the current character is \, so set $c->{escaped} for the next
+    # the current character is '\', so set $c->{escaped} for the next
     # character. unless, of course, this escape itself is escaped.
     # (determined with current{escaped})
     if ($char eq '\\' && !$c->is_escaped) {
