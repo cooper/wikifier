@@ -1,9 +1,9 @@
-# Copyright (c) 2014, Mitchell Cooper
+# Copyright (c) 2016, Mitchell Cooper
 #
-# Wikifier::BlockManager is in charge of managing block classes. When Wikifier::Parser
-# segregates wiki code into blocks, the BlockManager loads block classes as needed.
-# These classes then register block types to the Wikifier using methods provided by this
-# class. BlockManager also contains a list of default blocks and their associated classes.
+# Wikifier::BlockManager is in charge of managing block classes.
+# When Wikifier::Parser divides wiki code into blocks, the block manager loads
+# block classes as needed. These classes then register block types to this
+# manager. Blocks are created from the manager using ->create_block().
 #
 package Wikifier::BlockManager;
 
@@ -18,6 +18,8 @@ our %block_types = (
     else    => { }
 );
 
+# creates a new block.
+# see Block.pm for accepted options
 sub create_block {
     my ($wikifier, %opts) = @_;
     my $c_maybe = $opts{current};

@@ -1,12 +1,11 @@
+# Copyright (c) 2016, Mitchell Cooper
 #
-# Copyright (c) 2014, Mitchell Cooper
+# Wikifier::Block represents a parsing block, such a section, paragraph,
+# infobox, etc. All blocks have a parent besides the main block, which is an
+# artificial block to serve as the parent of all top-level blocks.
 #
-# Wikifier::Block represents a parsing block, such a section, paragraph, infobox, etc.
-# With the exception of the main block, each block has a parent block. The main block is
-# the implied block which surrounds all other blocks.
-#
-# This class is subclassed by several specific types of blocks, each which provides its
-# own specific functionality.
+# Wikifier::Block is subclassed by several specific types of blocks, each which
+# provides its own specific functionality.
 #
 package Wikifier::Block;
 
@@ -16,29 +15,75 @@ use strict;
 use Scalar::Util qw(blessed weaken);
 use Wikifier::Utilities qw(L truncate_hr);
 
-# Required properties of blocks.
+# Properties of blocks
 #
-#   parent:     the parent block object. (for main block, undef)
-#   type:       the name type of block, such as 'imagebox', 'paragraph', etc.
-#   content:    the inner content of the block, an arrayref of strings and child blocks.
-#   closed:     parser sets this true after the block has been closed.
-#   name:       the name of the block or an empty string if it has no name.
+#   parent      (required) parent block
+#
+#   type        (required) type of block, such as 'imagebox', 'paragraph', etc.
+#
+#   name        block title (text between '[' and ']' in source)
+#
+#   content     mixed array ref of text and child block objects within the block
+#
+#   current     parser state information, used for warnings and errors mostly
+#
+#   line        line position where block was opened by '{'
+#
+#   col         column position of the '{' character which opened the block
+#
+#   classes     array ref of classes (e.g., p.left.clear -> [left, clear])
+#
+#   closed      true if the block was closed by '}' (rather, # of times closed)
+#
+#   end_line    line position where block was closed by '}'
+#
+#   end_col     column position of the '}' character which closed the block
+#
+#
+# Block type definitions
+#
+#   alias       (string) block type for which this block is an alias. if the
+#               option is specified, all other options within the block typedef
+#               are ignored; only the properties of the target are respected
+#
+#   base        (string) block type from which this block type inherits. if
+#               specified, the base will be loaded automatically when necessary,
+#               and this block type becomes a dependency of it. the base block
+#               type may provide generic parsing or HTML generation which the
+#               inheriting block type can utilize with ->parse_base() and
+#               ->html_base()
+#
+#   init        (code reference) executed upon the creation of a block, before
+#               its inner contents are parsed or any HTML is generated. this is
+#               useful for setting up the initial state of a new block
+#
+#   parse       (code reference) executed when the block's contents should be
+#               parsed. typically at this point the data within the block
+#               delimeters '{' and '}' is extracted and/or validated.
+#               passed ($block, $page)
+#
+#   html        (code reference) executed when block should prepare its HTML
+#               element object in preparation for HTML generation.
+#               passed ($block, $page, $element)
+#
+#   title       (boolean) if true, the block type accepts a title within the
+#               '[' and ']' delimeters following the block type
+#
+#   invis       (boolean) if true, the block yields no HTML. an element object
+#               will not be created. the block may still implement an 'html'
+#               option, but the code will not be passed an element object. if
+#               marked invisible, the block will be entiely ignored by anything
+#               that iterates over the ->content_visible method
+#
+#   multi       (boolean) if true, the block type is capable of yielding more
+#               than one element. the 'html' option will be passed an instance
+#               of Wikifier::Elements instead of a Wikifier::Element. this
+#               is only useful when the block type may produce more than one
+#               element and wrapping them in the primary element is undesired
+#
 
-# Required methods of blocks.
-#   parse:  parse the inner contents of the block.
-#   result: the resulting HTML from the block's content.
-
-
-# Create a new block.
-#
-# Required arguments:
-#   parent:     the parent block. (for main block, undef)
-#   type:       the name of the block, such as 'imagebox', 'paragraph', etc.
-#   wikifier:   the wikifier object.
-#
-# For subclasses, the type is provided automatically.
-# This should rarely be used directly; use $wikifier->create_block().
-#
+# create a new block.
+# this should rarely be used directly; use $wikifier->create_block()
 sub new {
     my ($class, %opts) = @_;
     $opts{content} ||= [];
