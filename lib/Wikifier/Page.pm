@@ -402,7 +402,7 @@ sub _default_sizer {
     my %img = @_;
     my $page = $img{page};
 
-    # full-sized image.
+    # full-size image.
     if (!$img{width} || !$img{height}) {
         return $page->wiki_opt('root.image').'/'.$img{file};
     }

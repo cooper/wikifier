@@ -8,7 +8,7 @@ The fundamental component of the Wikifier language is the block. Each block
 belongs to a specific type, and each type provides a unique function. For
 example, `infobox{}` displays a table of information associated with an
 article. `imagebox{}` displays an image preview with a caption and link to a
-full-sized image.
+full size image.
 
 Many blocks may contain text as well as other blocks. Each block type handles
 the data inside of it differently.
@@ -58,7 +58,8 @@ sec [Statistics] {
 
 #### Model shorthand
 
-Convenient syntax for [models](models.md).
+Wikifier has a special syntax for using [models](models.md). Write them like any
+block, except prefix the model name with a dollar sign (`$`).
 
 ```
 $my_model {
@@ -101,8 +102,8 @@ Wikifier supports string, boolean, and block variables.
 
 String variables look like this:
 ```
-@some_variable: The value;
-@another_variable: You can escape semicolons\; I think;
+@some_variable:     The value;
+@another_variable:  You can escape semicolons\; I think;
 ```
 
 Boolean variables look like this:
@@ -120,9 +121,9 @@ Block variables look like this:
 
 ### Retrieval
 
-Once variables are assigned, they are typically used in formatted text or
-[conditionals](#conditionals). You can use variables anywhere that formatted
-text is accepted like this:
+Once variables are assigned, they are typically used in
+[formatted text](#text-formatting) or [conditionals](#conditionals). You can use
+variables anywhere that formatted text is accepted like this:
 ```
 sec {
     This is a paragraph inside a section. I am allow to use [b]bold text[/b],
@@ -148,17 +149,20 @@ You would display the infobox later using:
 By the way, you can use text formatting within string variables, including other
 embedded variables:
 ```
-@site: [b]MyWiki[/b];
-@name: John;
-@welcome: Welcome to [@site], [@name].
+@site:      [b]MyWiki[/b];
+@name:      John;
+@welcome:   Welcome to [@site], [@name].
 ```
+
+If you don't want that to happen, take a look at
+[interpolable variables](#interpolable-variables).
 
 ### Attributes
 
-Also, variables can have attributes. This helps to organize things:
+Variables can have attributes. This helps to organize things:
 ```
-@page.title: Hello World!;
-@page.author: John Doe;
+@page.title:    Hello World!;
+@page.author:   John Doe;
 ```
 
 You don't have to worry about whether a variable exists to define attributes on
@@ -184,6 +188,10 @@ sec {
     [@person.Age] years old?
 }
 ```
+
+Some data types may not support attributes at all. Others might only support
+certain attributes. For example, [`list{}`](blocks.md#list) only allows
+numeric indices.
 ```
 @alphabet: list {
     a;
@@ -237,7 +245,7 @@ are evaluated as they are accessed rather than as they are defined.
    This string variable has [b]bold text[/b] and [@another_variable];
 */
 ```
-Now that the variable is defined with the formatting still unevaluated, so
+Now the variable is defined with the formatting still unevaluated, so
 accessing it as `[@my_text]` would display the raw formatting code. Instead,
 we use `[%my_text]` to display it which tells the parser to format the
 contents of the variable as we retrieve its value.

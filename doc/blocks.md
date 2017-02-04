@@ -48,43 +48,61 @@ Yields no HTML.
 
 ```
 map {
-    key: value;
-    other key: another value;
+    key:        value;
+    other key:  another value;
 }
 ```
 
-Maps support attribute fetching and assignment, which allows you to retrieve and
-set their values using the wikifier variable attribute syntax.
+**Attributes**. Maps and all map-based block types support attribute fetching
+and assignment, which allows you to retrieve and set their values using the
+Wikifier variable attribute syntax.
 ```
-@person: map {
-    first_name: Britney;
-    last_name:  Spears;
+/* define the infobox in a variable so we can access attributes */
+@person: infobox [Britney Spears] {
+    First name:     Britney;
+    Last name:      Spears;
+    Age:            35;
 };
 
-@person.full_name: [@person.first_name] [@person.last_name];
-@person.age: 35;
+/* display the infobox */
+@person {}
 
-p {
-    [@person.full_name] is [@person.age] years old.
+/* access attributes from it elsewhere
+   btw this works for all map-based block types */
+sec {
+    Did you know that [@person.First_name] [@person.Last_name] is
+    [@person.Age] years old?
 }
 ```
 
-As some block types such as `infobox{}` and `history{}` use the pairs of a map
-to display table rows in the generated HTML, keys may be duplicate. When using
-a key more than once, both pairs will be displayed in the resulting HTML, but
-because only one value can be associated with each key internally, duplicate
-keys are suffixed with `_n` where `n` is incremented for each occurrence,
-starting at 2.
+**Duplicate keys**. As some block types such as [`infobox{}`](#infobox) and
+[`history{}`](#history) use the pairs of a map to display table rows in the
+generated HTML, keys may be duplicated. When using a key more than once, both
+pairs will be displayed in the resulting HTML, but because only one value can be
+associated with each key internally, duplicate keys are suffixed with `_n` where
+`n` is incremented for each occurrence, starting at 2.
 ```
 infobox {
-    Name:   Britney;    /* shows as Name, and internally Name   */
-    Name:   Spears;     /* shows as Name, but internally Name_2 */
+    Name:   Britney;    /* shows Name, internally Name   */
+    Name:   Spears;     /* shows Name, internally Name_2 */
+}
+```
+
+**Key fixing**. The original characters of a key will be displayed, but the
+internal key will be fixed by replacing all non-word characters with an
+underscore (`_`).
+```
+infobox {
+    First name:     Britney;    /* shows First name, internally First_name    */
+    First name:     Brittany;   /* shows First name, internally First_name_2  */
+    Last name:      Spears;     /* shows Last name, internally Last_name      */
+    Last/name:      Speers;     /* shows Last name, internally Last_name_2    */
 }
 ```
 
 ## History
 
-Displays a timeline of events.
+Displays a timeline of events in a table.
 
 ```
 history {
@@ -125,6 +143,19 @@ infobox [Planet Earth] {
 }
 ```
 
+**Options**
+* __file__ - _required_, filename of the full-size image.
+* __width__ - image width in pixels.
+* __height__ - image height in pixels.
+* __align__ - `left` or `right` to specify which side of the container the
+  image should clear. defaults to `right`.
+* __float__ - alias for __align__.
+
+If neither __width__ nor __height__ is specified, the image will be full-size,
+unless its size is constrained by a container. In the above
+[`infobox{}`](#infobox) example, the image size is automatically constrained by
+the width of the infobox, so dimensions do not need to be specified.
+
 ## Imagebox
 
 Embeds an image with an automatic border. It will be either left or right
@@ -140,6 +171,17 @@ imagebox {
 }
 ```
 
+**Options**
+* __file__ - _required_, filename of the full-size image.
+* __width__ - image width in pixels.
+* __height__ - image height in pixels.
+* __align__ - `left` or `right` to specify which side of the container the
+  imagebox should clear. defaults to `right`.
+* __float__ - alias for __align__.
+
+If neither __width__ nor __height__ is specified, the image will be full-size,
+unless its size is constrained by a container.
+
 ## Infobox
 
 Displays a summary of information for an article. Usually there is just one
@@ -149,17 +191,56 @@ per article, and it occurs before the first section.
 @page.title: Earth;
 
 infobox [Planet Earth] {
+
+    /* many infoboxes start with an image of the subject */
+    /* the image dimensions are dictated by the infobox  */
     image {
         file: planet-earth.jpg;
-        desc: Earth from space;
     };
-    Type: [b]Planet[/b];
-    Population: 23 billion;
-    Galaxy: Milky Way;
+
+    /* standalone text should be prefixed with colon */
+    :Earth from space;
+
+    Type:           [[ Planet ]];
+    Population:     23 billion;
+    Galaxy:         Milky Way;
 }
 
 sec {
-    Welcome to my page!
+    [b]Earth[/b] is the planet on which we live.
+}
+```
+
+You can organize the information in sections with `infosec{}`. Each can
+optionally have a title as well.
+```
+@page.title: United States;
+
+infobox [United States of America] {
+    infosec {  
+        Capital:        [! Washington, DC !];  
+        Largest city:   [! New York City !];    
+    };
+    infosec [Goverment] {
+        :[! Federal presidential constitutional republic | Republic !];   
+        President:              [! Donald Trump !];
+        Vice President:         [! Mike Pence !];
+        Speaker of the House:   [! Paul Ryan !];
+        Chief Justice:          [! John Roberts !];
+    };
+    infosec [Independence[nl]from [! Great Britain !]] {
+        Declaration:            July 4, 1776;
+        Confederation:          March 1, 1781;
+        Treaty of Paris:        September 3, 1783;
+        Constitution:           June 21, 1788;
+        Last polity admitted:   March 24, 1976;
+    };
+}
+
+sec {
+    [b]The United States[/b] ([b]USA[/b], [b]US[/b], [b]America[/b], officially
+    [b]the United States of America[/b]) is the country in which 100% of
+    American residents live.
 }
 ```
 

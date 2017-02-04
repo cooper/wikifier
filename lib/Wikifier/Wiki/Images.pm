@@ -55,15 +55,15 @@ sub _display_image {
                             $image{ext} eq 'jpeg' ? 'jpeg' : 'png';
     $result->{mime} = $image{ext} eq 'png' ? 'image/png' : 'image/jpeg';
 
-    ##################################
-    ### THIS IS A FULL-SIZED IMAGE ###
+    #################################
+    ### THIS IS A FULL-SIZE IMAGE ###
     ############################################################################
 
     # stat for full-size image.
     my @stat = stat $image{big_path};
 
     # if no width or height are specified,
-    # display the full-sized version of the image.
+    # display the full-size version of the image.
     if (!$width || !$height) {
 
         # only include the content if $dont_open is false
@@ -148,7 +148,7 @@ sub _display_image {
         }
     }
 
-    # if image generation is disabled, we must supply the full-sized image data.
+    # if image generation is disabled, we must supply the full-size image data.
     if (!$wiki->opt('image.enable.cache')) {
         # XXX: what is this?!?!?! so confused
         return $wiki->display_image($result, $image_name, 0, 0);
@@ -160,7 +160,7 @@ sub _display_image {
     my $err = $wiki->generate_image(\%image, $result);
     return $err if $err;
 
-    # the generator says to use the full-sized image.
+    # the generator says to use the full-size image.
     if (delete $result->{use_fullsize}) {
 
         # only include the content if $dont_open is false
@@ -273,7 +273,7 @@ sub generate_image {
             " >= original ${fi_width}x${fi_height}"
         );
 
-        # symlink to the full-sized image.
+        # symlink to the full-size image.
         $image{full_name} = $image{name};
         $wiki->symlink_scaled_image(\%image) if $image{retina};
 
@@ -413,7 +413,7 @@ sub _wiki_default_sizer {
     my $page = $img{page};
     my $wiki = $page->{wiki};
 
-    # full-sized image.
+    # full-size image.
     if (!$img{width} || !$img{height}) {
         return $wiki->opt('root.image').'/'.$img{file};
     }
