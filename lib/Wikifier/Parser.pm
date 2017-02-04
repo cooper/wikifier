@@ -125,69 +125,78 @@ sub handle_character {
         $c->mark_ignored;
         next DEFAULT if $c->is_escaped;
 
-        # set some initial variables for the loop.
-        my $content       = $c->last_content;
-        my $block_type    = my $block_name    = '';
-        my $in_block_name = my $chars_scanned = 0;
-
-        # no ->last_content?
-        return $c->error("Block has no type")
-            if !length $content;
-
-        # scan the text backwards to find the block type and name
-        BACKCHAR: while (length(my $last_char = chop $content)) {
-            $chars_scanned++;
-
-            # entering block name.
-            if ($last_char eq ']') {
-                next BACKCHAR if !$in_block_name++;
-                # if it was at 0, we just entered the block name.
-            }
-
-            # exiting block name.
-            elsif ($last_char eq '[') {
-                next BACKCHAR if !--$in_block_name;
-                # if it was 1 or more, we're still in it.
-            }
-
-            # we are in the block name, so add this character to the front.
-            if ($in_block_name) {
-                $block_name = $last_char.$block_name;
-            }
-
-            # could this char be part of a block type?
-
-            # it can, so we're probably in the block type at this point.
-            # append to the block type.
-            elsif ($last_char =~ m/[\w\-\$\@\.]/) {
-                $block_type = $last_char.$block_type;
-                next BACKCHAR;
-            }
-
-            # this could be a space between things.
-            elsif ($last_char =~ m/\s/ && !length $block_type) {
-                next BACKCHAR;
-            }
-
-            # I give up. bail!
-            else {
-                $chars_scanned--; # we do not possess this character.
-                last BACKCHAR;
-            }
+        # if the next char is @, this is {@some_var}
+        my @block_classes;
+        my $block_type = my $block_name = '';
+        if ($c->{next_char} eq '@') {
+            $c->{skip_char}++;
+            $block_type = 'variable';
         }
 
-        # overwrite the ->last_content with the title and name stripped out
-        $c->last_content(substr($c->last_content, 0, -$chars_scanned));
+        # otherwise, this is a normal block.
+        # we will find the block type and name from the ->last_content
+        else {
+            my $content = $c->last_content;
+            my $in_block_name = my $chars_scanned = 0;
 
-        # if the block type contains dot(s), it has classes
-        ($block_type, my @block_classes) = split /\./, $block_type;
+            # no ->last_content? don't waste any more time
+            return $c->error("Block has no type")
+                if !length $content;
 
-        # check a second time, now that we've extracted classes
+            # scan the text backwards to find the block type and name
+            BACKCHAR: while (length(my $last_char = chop $content)) {
+                $chars_scanned++;
+
+                # entering block name.
+                if ($last_char eq ']') {
+                    next BACKCHAR if !$in_block_name++;
+                    # if it was at 0, we just entered the block name.
+                }
+
+                # exiting block name.
+                elsif ($last_char eq '[') {
+                    next BACKCHAR if !--$in_block_name;
+                    # if it was 1 or more, we're still in it.
+                }
+
+                # we are in the block name, so add this character to the front.
+                if ($in_block_name) {
+                    $block_name = $last_char.$block_name;
+                }
+
+                # could this char be part of a block type?
+
+                # it can, so we're probably in the block type at this point.
+                # append to the block type.
+                elsif ($last_char =~ m/[\w\-\$\@\.]/) {
+                    $block_type = $last_char.$block_type;
+                    next BACKCHAR;
+                }
+
+                # this could be a space between things.
+                elsif ($last_char =~ m/\s/ && !length $block_type) {
+                    next BACKCHAR;
+                }
+
+                # I give up. bail!
+                else {
+                    $chars_scanned--; # we do not possess this character.
+                    last BACKCHAR;
+                }
+            }
+
+            # overwrite the ->last_content with the title and name stripped out
+            $c->last_content(substr($c->last_content, 0, -$chars_scanned));
+
+            # if the block type contains dot(s), it has classes
+            ($block_type, @block_classes) = split /\./, $block_type;
+        }
+
+        # block better have a type at this point
         return $c->error("Block has no type")
             if !length $block_type;
 
         # if the block type starts with $, it's a model
-        my $block;
         my $first = \substr($block_type, 0, 1);
         if ($$first eq '$') {
             $$first = '';
@@ -195,26 +204,8 @@ sub handle_character {
             $block_type = 'model';
         }
 
-        # if the block type starts with an @,
-        # it's a variable containing a block
-        elsif ($$first eq '@') {
-            $$first = '';
-
-            # find the block; make sure it's a block
-            $block = $page->get(my $var = $block_type);
-            if (!$block) {
-                return $c->error("Variable block \@$var does not exist");
-            }
-            elsif (!blessed $block || !$block->isa('Wikifier::Block')) {
-                return $c->error("Variable \@$var does not contain a block");
-            }
-
-            $block_name = $block->name;
-            $block_type = $block->type;
-        }
-
-        # create a block if necessary
-        $block ||= $wikifier->create_block(
+        # create a block
+        my $block = $wikifier->create_block(
             current => $c,
             line    => $c->{line},
             col     => $c->{col},
@@ -226,7 +217,7 @@ sub handle_character {
 
         # produce a warning if the block has a name but the type
         # does not support it
-        $c->warning($block->hr_type.' does not support title')
+        $c->warning($block->hr_type.' does not support block title')
             if length $block_name && !$block->{type_ref}{title};
 
         # set the block
@@ -278,6 +269,34 @@ sub handle_character {
 
             # the conditional was false. add the contents of the else.
             @add_contents = $c->content unless delete $c->{conditional};
+        }
+
+        # this is {@some_var}
+        elsif ($c->block->type eq 'variable') {
+
+            # the variable name may be the block's content.
+            # clear the content and set the block name to the variable name
+            my $var = length $c->block->name ? $c->block->name : do {
+                my $last = $c->last_content;
+                @{ $c->block->{content} } = [];
+                $c->block->{name} = $last;
+                $last;
+            };
+
+            # find the block; make sure it's a block
+            my $block = $page->get($var);
+            if (!$block) {
+                return $c->error("Variable block \@$var does not exist");
+            }
+            elsif (!blessed $block || !$block->isa('Wikifier::Block')) {
+                return $c->error("Variable \@$var does not contain a block");
+            }
+
+            # overwrite the block's parent to the parent of the variable{} block
+            $block->{parent} = $c->block->parent;
+
+            # add the block we got from the variable
+            @add_contents = $block;
         }
 
         # normal block. add the block itself.

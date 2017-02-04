@@ -14,9 +14,10 @@ use 5.010;
 use Wikifier::Utilities qw(L);
 
 our %block_types = (
-    if      => { title => 1 },
-    elsif   => { title => 1 },
-    else    => { }
+    if          => { title => 1 },
+    elsif       => { title => 1 },
+    variable    => { title => 1 },
+    else        => { }
 );
 
 # creates a new block.
