@@ -88,12 +88,7 @@ sub new {
     my ($class, %opts) = @_;
     $opts{content} ||= [];
     $opts{type} = lc $opts{type};
-    my $block = bless \%opts, $class;
-
-    # weaken reference to wikifier.
-    weaken($block->{wikifier}) if $block->{wikifier};
-
-    return $block;
+    return bless \%opts, $class;
 }
 
 #############
@@ -103,13 +98,11 @@ sub new {
 # parse the contents.
 sub parse {
     my $block = shift;
-    my $type  = $block->{type};
+    my $type_ref = $block->{type_ref};
     return if $block->{did_parse}++;
 
     # parse this block.
-    $block->{parse_done} = {};
-    $block->_parse($type, @_);
-    delete $block->{parse_done};
+    $block->_parse($type_ref, {}, @_);
 
     # parse child blocks.
     foreach my $block ($block->content_blocks) {
@@ -122,28 +115,27 @@ sub parse {
 # SUPER::parse() at the beginning of a parse().
 sub parse_base {
     my $block = shift;
-    my $type  = $block->{type_ref}{base};
-    if (!defined $type) {
+    my $base_ref = $block->{type_ref}{base_ref};
+    if (!$base_ref) {
         L $block->hr_type.' called ->parse_base(), but it has no base';
         return;
     }
-    $block->_parse($type, @_);
+    $block->_parse($base_ref, {}, @_);
 }
 
 # do not call directly.
 sub _parse {
-    my ($block, $type) = (shift, shift);
-
-    # parse the block hereditarily.
-    while ($type) {
-        my $type_opts = $Wikifier::BlockManager::block_types{$type};
-        if ($type_opts->{parse} && !$block->{parse_done}{$type}) {
-            $type_opts->{parse}->($block, @_);
-            $block->{parse_done}{$type} = 1;
+    my ($block, $type_ref, $done) = splice @_, 0, 2;
+    my %done;
+    while ($type_ref) {
+        if ($type_ref->{parse} && !$done{ $type_ref->{type} }++) {
+            $type_ref->{parse}($block, @_);
         }
-        $type = $type_opts->{base};
+        $type_ref = $type_ref->{base_ref};
+        $block->{called_parse}++;
     }
 }
+
 
 ############
 ### HTML ###
@@ -152,31 +144,24 @@ sub _parse {
 # HTML contents.
 sub html {
     my $block = shift;
-    my $type  = $block->{type};
+    my $type_ref = $block->{type_ref};
     return $block->element if $block->{did_html}++;
 
     # strip excess whitespace
     $block->remove_blank;
 
     # block with multiple elements
-    if ($block->{type_ref}{multi}) {
+    if ($type_ref->{multi}) {
         $block->{element} = Wikifier::Elements->new;
     }
 
-    # invisible block. this must come after {multi}
-    elsif ($block->{type_ref}{invis}) {
-        # do nothing
-    }
-
     # normal element
-    else {
-        $block->{element} = Wikifier::Element->new(class => $block->{type});
+    elsif (!$type_ref->{invis}) {
+        $block->{element} = Wikifier::Element->new(class => $block->type);
     }
 
     # generate this block.
-    $block->{html_done} = {};
-    $block->_html($type, @_);
-    delete $block->{html_done};
+    $block->_html($type_ref, @_);
 
     # do child blocks that haven't been done.
     foreach my $block ($block->content_blocks) {
@@ -198,26 +183,23 @@ sub html {
 # SUPER::html() at the beginning of a html().
 sub html_base {
     my $block = shift;
-    my $type  = $block->{type_ref}{base};
-    if (!defined $type) {
+    my $base_ref = $block->{type_ref}{base_ref};
+    if (!$base_ref) {
         L $block->hr_type.' called ->html_base(), but it has no base';
         return;
     }
-    $block->_html($type, @_);
+    $block->_html($base_ref, @_);
 }
 
 # do not call directly.
 sub _html {
-    my ($block, $type) = (shift, shift);
-
-    # generate the block hereditarily.
-    while ($type) {
-        my $type_opts = $Wikifier::BlockManager::block_types{$type};
-        if ($type_opts->{html} && !$block->{html_done}{$type}) {
-            $type_opts->{html}->($block, @_, $block->element);
-            $block->{html_done}{$type} = 1;
+    my ($block, $type_ref, $done) = splice @_, 0, 2;
+    my %done;
+    while ($type_ref) {
+        if ($type_ref->{html} && !$done{ $type_ref->{type} }++) {
+            $type_ref->{html}($block, @_, $block->element);
         }
-        $type = $type_opts->{base};
+        $type_ref = $type_ref->{base_ref};
         $block->{called_html}++;
     }
 }

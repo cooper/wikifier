@@ -26,13 +26,8 @@ sub create_block {
     my $type = $opts{type};
     my $dir  = _dir(\%opts);
 
-    # this will be weakened in new().
-    $opts{wikifier} = $wikifier;
-
-    # if this block type doesn't exist, try loading its module.
-    my $type_ref = $block_types{$type};
-    $wikifier->load_block($type, $dir) if !$type_ref;
-    $type_ref = $block_types{$type};
+    # fetch or load the block type.
+    my $type_ref = $block_types{$type} || $wikifier->load_block($type, $dir);
 
     # is this an alias?
     if ($type_ref && length $type_ref->{alias}) {
@@ -51,25 +46,30 @@ sub create_block {
 
     # Safe point - the block type is real and is loaded.
 
-    # call init sub.
+    # create the block
     my $block = ($type_ref->{package} || 'Wikifier::Block')->new(
         type_ref => $type_ref,  # reference to the block type
         %opts,                  # options passed to ->create_block
         wdir => $dir            # wikifier directory
     );
+
+    # call init
     $type_ref->{init}($block) if $type_ref->{init};
 
     return $block;
 }
 
-# load a block module.
+# load a block class.
+# returns the type ref of undef on error.
 sub load_block {
     my ($wikifier, $type, $dir) = @_;
-    return 1 if $block_types{$type};
-    return 1 unless length $type;
-    my $file = "$dir/lib/Wikifier/Block/".ucfirst(lc $type).'.pm';
+    return if !length $type;
+
+    # already loaded
+    return $block_types{$type} if $block_types{$type};
 
     # does the file exist?
+    my $file = "$dir/lib/Wikifier/Block/".ucfirst(lc $type).'.pm';
     if (!-f $file && !-l $file) {
         L "Block ${type}{} does not exist";
         return;
@@ -90,15 +90,18 @@ sub load_block {
     }
 
     # register blocks.
+    my $req_type_ref;
     foreach my $block_type (keys %blocks) {
         my $type_ref = $blocks{$block_type};
+        $type_ref->{type} = $block_type;
 
         # find the package. this may or may not exist already
         my $package = 'Wikifier::Block::'.ucfirst($block_type);
+        $type_ref->{package} = $package;
 
         # store the type ref
-        $type_ref->{package} = $package;
         $block_types{$block_type} = $type_ref;
+        $req_type_ref = $type_ref if $block_type eq $type;
 
         # make the package inherit from its base
         my $base = $type_ref->{base} ?
@@ -109,13 +112,15 @@ sub load_block {
         }
 
         # if this depends on a base, load it.
-        $wikifier->load_block($type_ref->{base}, $dir)
-            if $type_ref->{base};
+        if ($type_ref->{base}) {
+            my $base_ref = $wikifier->load_block($type_ref->{base}, $dir);
+            $type_ref->{base_ref} = $base_ref;
+        }
 
         L "Loaded block ${block_type}{}";
     }
 
-    return 1;
+    return $req_type_ref;
 }
 
 # find the wikifier directory.
