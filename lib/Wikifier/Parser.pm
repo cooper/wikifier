@@ -246,32 +246,43 @@ sub handle_character {
         # this is an if statement.
         my @add_contents;
         if ($c->block->type eq 'if') {
-            my $conditional = $c->block->name;
+            $c->{conditional} = !!_get_conditional($c, $page, $c->block->name);
+            @add_contents = $c->content if $c->{conditional};
+        }
 
-            # variable.
-            if ($conditional =~ /^@([\w\.]+)$/) {
-                $conditional = $page->get($1);
-            }
-            else {
-                $c->warning('Invalid conditional expression');
-            }
+        # this is an elsif statement.
+        elsif ($c->block->type eq 'elsif') {
 
-            # add everything from within the if block IF conditional is true.
-            @add_contents = $c->content if $conditional;
-            $c->{conditional} = !!$conditional;
+            # no conditional before this
+            return $c->error('Unexpected '.$c->block->to_desc)
+                if !exists $c->{conditional};
+
+            # only evaluate the conditional if the last one was false
+            my $before = $c->{conditional};
+            if (!$c->{conditional}) {
+                $c->{conditional} = !!_get_conditional($c, $page, $c->block->name);
+                @add_contents = $c->content if $c->{conditional};
+            }
         }
 
         # this is an else statement.
         elsif ($c->block->type eq 'else') {
+
+            # no conditional before this
+            return $c->error('Unexpected '.$c->block->to_desc)
+                if !exists $c->{conditional};
+
+            # title provided
             $c->warning("Conditional on else{} ignored")
                 if length $c->block->name;
 
             # the conditional was false. add the contents of the else.
-            @add_contents = $c->content unless $c->{conditional};
+            @add_contents = $c->content unless delete $c->{conditional};
         }
 
         # normal block. add the block itself.
         else {
+            delete $c->{conditional};
             @add_contents = $c->block;
         }
 
@@ -482,6 +493,15 @@ sub _parse_vars {
     if (ref $val eq 'ARRAY') {
         _parse_vars($page, $method, $_) for @$val;
     }
+}
+
+sub _get_conditional {
+    my ($c, $page, $conditional) = @_;
+    if ($conditional =~ /^@([\w\.]+)$/) {
+        return $page->get($1);
+    }
+    $c->warning('Invalid conditional expression');
+    return;
 }
 
 1
