@@ -50,7 +50,7 @@ sub create_block {
     # Safe point - the block type is real and is loaded.
 
     # call init sub.
-    my $block = $type_ref->{package}->new(
+    my $block = ($type_ref->{package} || 'Wikifier::Block')->new(
         type_ref => $type_ref,  # reference to the block type
         %opts,                  # options passed to ->create_block
         wdir => $dir            # wikifier directory

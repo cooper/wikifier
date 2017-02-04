@@ -279,10 +279,12 @@ sub handle_character {
             @add_contents = $c->block;
         }
 
-        # close the block
+        # close the block.
+        # only set the position if it doesn't exist. it may exist already if
+        # the block was created in a variable.
         $c->block->{closed}++;
-        $c->block->{end_line} = $c->{line};
-        $c->block->{end_col}  = $c->{col};
+        $c->block->{end_line} //= $c->{line};
+        $c->block->{end_col}  //= $c->{col};
 
         # return to the parent
         $c->clear_catch;
