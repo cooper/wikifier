@@ -15,6 +15,7 @@ use Wikifier::Utilities qw(L);
 
 our %block_types = (
     if      => { title => 1 },
+    elsif   => { title => 1 },
     else    => { }
 );
 

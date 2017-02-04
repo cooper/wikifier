@@ -132,7 +132,6 @@ sub _parse {
             $type_ref->{parse}($block, @_);
         }
         $type_ref = $type_ref->{base_ref};
-        $block->{called_parse}++;
     }
 }
 
@@ -150,22 +149,12 @@ sub html {
     # strip excess whitespace
     $block->remove_blank;
 
-    # block with multiple elements
-    if ($type_ref->{multi}) {
-        $block->{element} = Wikifier::Elements->new;
-    }
-
-    # normal element
-    elsif (!$type_ref->{invis}) {
-        $block->{element} = Wikifier::Element->new(class => $block->type);
-    }
-
     # generate this block.
     $block->_html($type_ref, @_);
 
     # do child blocks that haven't been done.
     foreach my $block ($block->content_blocks) {
-        next if $block->{called_html};
+        next if $block->element; # already done
         $block->html(@_);
     }
 
@@ -194,13 +183,24 @@ sub html_base {
 # do not call directly.
 sub _html {
     my ($block, $type_ref, $done) = splice @_, 0, 2;
+
+    # block with multiple elements
+    my $el;
+    if ($type_ref->{multi}) {
+        $el = $block->{element} = Wikifier::Elements->new;
+    }
+
+    # normal element
+    elsif (!$type_ref->{invis}) {
+        $el = $block->{element} = Wikifier::Element->new(class => $block->type);
+    }
+
     my %done;
     while ($type_ref) {
         if ($type_ref->{html} && !$done{ $type_ref->{type} }++) {
-            $type_ref->{html}($block, @_, $block->element);
+            $type_ref->{html}($block, @_, $el);
         }
         $type_ref = $type_ref->{base_ref};
-        $block->{called_html}++;
     }
 }
 

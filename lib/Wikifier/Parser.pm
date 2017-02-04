@@ -473,7 +473,7 @@ sub _parse_vars {
     my ($page, $method, $val) = @_;
     return if !defined $val;
 
-    # this is a block. parse it
+    # this is a block
     if (blessed $val && $val->can($method)) {
         $val->$method($page);
         $val->{is_variable}++;
@@ -495,12 +495,18 @@ sub _parse_vars {
     }
 }
 
+# get the value of a conditional expression
 sub _get_conditional {
     my ($c, $page, $conditional) = @_;
+    if (!length $conditional) {
+        $c->warning('Conditional expression required');
+        return;
+    }
     if ($conditional =~ /^@([\w\.]+)$/) {
         return $page->get($1);
     }
-    $c->warning('Invalid conditional expression');
+    my $what = $conditional ? 'true' : 'false';
+    $c->warning('Invalid conditional expression; will always be '.$what);
     return;
 }
 
