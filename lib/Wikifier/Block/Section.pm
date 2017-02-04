@@ -14,7 +14,8 @@ use Wikifier::Utilities qw(trim);
 our %block_types = (
     section => {
         parse => \&section_parse,
-        html  => \&section_html
+        html  => \&section_html,
+        title => 1
     },
     sec => {
         alias => 'section',
@@ -34,7 +35,7 @@ sub section_parse {
     my ($block, $page) = @_;
 
     # determine header level.
-    $block->{header_level} = ($block->{parent}{header_level} || 1) + 1;
+    $block->{header_level} = ($block->parent->{header_level} || 1) + 1;
 
     $page->{section_n}++;
 }
@@ -60,11 +61,11 @@ sub section_html {
     if ($page->wiki_opt('page.enable.footer') &&
     $page->{wikifier}{main_block}{content}[-1] == $block) {
         $el->configure(no_close_tag => 1);
-        $block->{parent}{element}->configure(no_close_tag => 1);
+        $block->parent->element->configure(no_close_tag => 1);
     }
 
     # determine the page title if necessary.
-    my $title = $block->{name};
+    my $title = $block->name;
        $title = $page->get('page.title') if $is_intro && !length $title;
 
     # if we have a title and this type of title is enabled.

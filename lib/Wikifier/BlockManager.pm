@@ -14,8 +14,8 @@ use 5.010;
 use Wikifier::Utilities qw(L);
 
 our %block_types = (
-    if   => {},
-    else => {}
+    if      => { title => 1 },
+    else    => { }
 );
 
 sub create_block {

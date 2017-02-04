@@ -60,7 +60,7 @@ sub parse {
     my $block = shift;
     my $type  = $block->{type};
     return if $block->{did_parse}++;
-    
+
     # parse this block.
     $block->{parse_done} = {};
     $block->_parse($type, @_);
@@ -79,7 +79,7 @@ sub parse_base {
     my $block = shift;
     my $type  = $block->{type_ref}{base};
     if (!defined $type) {
-        L "$$block->{type}\{} called ->parse_base(), but it has no base";
+        L $block->hr_type.' called ->parse_base(), but it has no base';
         return;
     }
     $block->_parse($type, @_);
@@ -108,7 +108,7 @@ sub _parse {
 sub html {
     my $block = shift;
     my $type  = $block->{type};
-    return $block->{element} if $block->{did_html}++;
+    return $block->element if $block->{did_html}++;
 
     # strip excess whitespace
     $block->remove_blank;
@@ -140,12 +140,12 @@ sub html {
     }
 
     # add classes from the parser.
-    if ($block->{element}) {
+    if ($block->element) {
         my @classes = @{ delete $block->{classes} || [] };
-        $block->{element}->add_class("class-$_") foreach @classes;
+        $block->element->add_class("class-$_") foreach @classes;
     }
 
-    return $block->{element}; # may be undef
+    return $block->element; # may be undef
 }
 
 # run the base's html() now instead of afterward.
@@ -155,7 +155,7 @@ sub html_base {
     my $block = shift;
     my $type  = $block->{type_ref}{base};
     if (!defined $type) {
-        L "$$block->{type}\{} called ->html_base(), but it has no base";
+        L $block->hr_type.' called ->html_base(), but it has no base';
         return;
     }
     $block->_html($type, @_);
@@ -169,7 +169,7 @@ sub _html {
     while ($type) {
         my $type_opts = $Wikifier::BlockManager::block_types{$type};
         if ($type_opts->{html} && !$block->{html_done}{$type}) {
-            $type_opts->{html}->($block, @_, $block->{element});
+            $type_opts->{html}->($block, @_, $block->element);
             $block->{html_done}{$type} = 1;
         }
         $type = $type_opts->{base};
@@ -233,9 +233,10 @@ sub content_text_pos {
 ### OTHER ###
 #############
 
-sub parent { shift->{parent} }
-sub type   { shift->{type}   }
-sub name   { shift->{name}   }
+sub element { shift->{element}  }
+sub parent  { shift->{parent}   }
+sub type    { shift->{type}     }
+sub name    { shift->{name}     }
 
 # find the first parent of a type
 sub first_parent {
@@ -246,10 +247,16 @@ sub first_parent {
     return;
 }
 
+# type{}
+sub hr_type {
+    my $block = shift;
+    return "$$block{type}\{}";
+}
+
 # this is for human-readable version
 sub to_desc {
     my $block = shift;
-    my $title = truncate_hr($block->{name}, 30);
+    my $title = truncate_hr($block->name, 30);
        $title = length $title ? "[$title]" : '';
     return "$$block{type}$title\{}";
 }
@@ -257,12 +264,12 @@ sub to_desc {
 # this is for the variable to html
 sub to_html {
     my $block = shift;
-    return $block->{element}->generate if $block->{element};
+    return $block->element->generate if $block->element;
     $block->warning(
-        "Tried to display $$block{type}\{} ".
+        'Tried to display ' . $block->hr_type .
         'which has no element associated with it'
     );
-    return "$$block{type}\{}";
+    return $block->hr_type;
 }
 
 # produce a parser warning

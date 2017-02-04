@@ -16,14 +16,15 @@ our %block_types = (
     infobox => {
         base  => 'map',
         parse => \&infobox_parse,
-        html  => \&infobox_html
+        html  => \&infobox_html,
+        title => 1
     },
     infosec => {
         base  => 'map',
         parse => \&infosec_parse,
         html  => \&infosec_html,
-        #invis => 1, # the html is added manually in infobox_html
-        multi => 1  # infosec{} produces more than one element
+        multi => 1,  # infosec{} produces more than one element
+        title => 1
     }
 );
 
@@ -38,12 +39,12 @@ sub infobox_html {
     $table->configure(type => 'table');
 
     # display the title if it exists.
-    if (length $infobox->{name}) {
+    if (length $infobox->name) {
         $table->create_child(type => 'tr')->create_child(
             type        => 'th',
             class       => 'infobox-title',
             attributes  => { colspan => 2 },
-            content     => $page->parse_formatted_text($infobox->{name})
+            content     => $page->parse_formatted_text($infobox->name)
         );
     }
 
@@ -147,7 +148,7 @@ sub infosec_html {
     }
 
     # inject the title
-    if (length(my $title = $infosec->{name})) {
+    if (length(my $title = $infosec->name)) {
         unshift @{ $infosec->{map_array} }, [
             undef,              # no key title
             $page->parse_formatted_text($title),

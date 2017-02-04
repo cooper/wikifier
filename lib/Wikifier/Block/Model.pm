@@ -14,6 +14,7 @@ our %block_types = (
         base   => 'map',
         parse  => \&model_parse,
         html   => \&model_html
+        title  => 1
     }
 );
 
@@ -24,7 +25,7 @@ sub model_parse {
     $block->parse_base(@_);
 
     # create a page.
-    my $name  = $block->{name};
+    my $name  = $block->name;
     my $file  = page_name($name, '.model');
     my $path  = abs_path($page->wiki_opt('dir.model')."/$file");
     my $model = $block->{model} = Wikifier::Page->new(

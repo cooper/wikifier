@@ -34,7 +34,7 @@ sub list_parse {
                 !length $thing      ?
                 undef               :
                 blessed $thing      ?
-                "$$thing{type}\{}"  :
+                $thing->to_desc     :
                 q(').truncate_hr($thing, 30).q(');
             $res;
         } @_;

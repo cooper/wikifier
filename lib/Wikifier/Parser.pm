@@ -233,6 +233,11 @@ sub handle_character {
             classes => \@block_classes
         );
 
+        # produce a warning if the block has a name but the type
+        # does not support it
+        $c->warning($block->hr_type.' does not support title')
+            if length $block_name && !$block->{type_ref}{title};
+
         # set the block
         $c->block($block);
     }

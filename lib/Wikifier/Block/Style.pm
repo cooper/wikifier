@@ -12,6 +12,7 @@ our %block_types = (style => {
     base   => 'map',
     parse  => \&style_parse,
     html   => \&style_html,
+    title  => 1,
     invis  => 1
 });
 
@@ -28,8 +29,8 @@ sub style_parse {
     );
 
     # if the block has a name, it applies to child class(es).
-    if (length $block->{name}) {
-        my @matchers = split ',', $block->{name};
+    if (length $block->name) {
+        my @matchers = split ',', $block->name;
         foreach my $matcher (@matchers) {
             $matcher =~ s/^\s*//g;
             $matcher =~ s/\s*$//g;
@@ -64,7 +65,7 @@ sub style_parse {
 sub style_html {
     my ($block, $page) = (shift, @_);
     my %style   = %{ $block->{style} };
-    my $main_el = $block->{parent}{element};
+    my $main_el = $block->parent->element;
     my @apply;
     $main_el->{need_id}++;
 
