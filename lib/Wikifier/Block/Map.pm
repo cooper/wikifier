@@ -167,6 +167,7 @@ sub map_parse {
                     $key = "$key" if blessed $key; # just in case
                     $key = trim($key);
                     $key_title = $key;
+                    $key =~ s/\W/_/g;
                 }
 
                 # fix the value

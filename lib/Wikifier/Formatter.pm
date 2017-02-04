@@ -295,7 +295,7 @@ sub parse_format_type {
     }
 
     # variable.
-    if ($type =~ /^([@%])([\w.]+)$/ && !$careful) {
+    if ($type =~ /^([@%])([\w\.]+)$/ && !$careful) {
         my $var = $page->get($2);
 
         # undefined variable

@@ -231,7 +231,7 @@ sub handle_character {
             my $conditional = $c->block->name;
 
             # variable.
-            if ($conditional =~ /^@([\w.]+)$/) {
+            if ($conditional =~ /^@([\w\.]+)$/) {
                 $conditional = $page->get($1);
             }
             else {
