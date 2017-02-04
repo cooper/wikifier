@@ -13,7 +13,7 @@ our %block_types = (
     model => {
         base   => 'map',
         parse  => \&model_parse,
-        html   => \&model_html
+        html   => \&model_html,
         title  => 1
     }
 );
@@ -21,12 +21,15 @@ our %block_types = (
 sub model_parse {
     my ($block, $page) = (shift, @_);
 
-    # parse the hash.
+    # parse the hash
     $block->parse_base(@_);
 
-    # create a page.
-    my $name  = $block->name;
-    my $file  = page_name($name, '.model');
+    # remember that the page uses this model
+    my $name = $block->name;
+    my $file = page_name($name, '.model');
+    $page->{models}{$file}++;
+
+    # create a page
     my $path  = abs_path($page->wiki_opt('dir.model')."/$file");
     my $model = $block->{model} = Wikifier::Page->new(
         is_model   => 1,
@@ -38,9 +41,15 @@ sub model_parse {
         variables  => { 'm' => $block->{map_hash} }
     );
 
+    # check if it exists before anything else
+    if (!-e $model->path) {
+        $block->warning("Model \$$name\{} does not exist");
+        return;
+    }
+
     # parse the page.
-    $model->parse;
-    $page->{models}{$file}++;
+    my $err = $model->parse;
+    $block->warning("Model \$$name\{} error: $err") if $err;
 }
 
 sub model_html {
