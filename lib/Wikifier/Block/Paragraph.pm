@@ -32,10 +32,10 @@ sub paragraph_html {
             $line = trim($page->parse_formatted_text($line, pos => $pos));
 
             # skip if no length is left
+            $pos->{line}++;
             next LINE unless length $line;
 
             $el->add($line);
-            $pos->{line}++;
         }
     }
 }
