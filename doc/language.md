@@ -4,7 +4,7 @@ Wikifier's source language is designed to be easily legible by the naked eye.
 
 ## Blocks
 
-The fundamental component of the Wikifier language is the block.
+The fundamental component of the Wikifier language is the **block**.
 The syntax for a block is as follows:
 
 ```
@@ -25,6 +25,8 @@ See [Blocks](blocks.md) for a list of built-in block types.
 
 #### Nameless blocks
 
+The `[block name]` field may be omitted for block types that do not require it.
+
 ```
 blocktype {
     ...
@@ -43,6 +45,13 @@ imagebox {
 
 #### Named blocks
 
+For block types that support a `[block name]` field, it should follow the block
+type and be delimited by square brackets (`[` and `]`).
+
+The name field may contain additional square brackets (`[` and `]`) inside it
+without the need for the escape character (`\`) as long as the number of opening
+brackets and closing brackets are equal. Otherwise, they must be escaped.
+
 ```
 blocktype [block name] {
     ...
@@ -59,8 +68,8 @@ sec [Statistics] {
 
 #### Model shorthand
 
-Wikifier has a special syntax for using [models](models.md). Write them like any
-block, except prefix the model name with a dollar sign (`$`).
+Wikifier has a special syntax for using [**models**](models.md). Write them like
+any block, except prefix the model name with a dollar sign (`$`).
 
 ```
 $my_model {
@@ -101,18 +110,18 @@ Wikifier supports string, boolean, and block variables.
 
 ### Assignment
 
-String variables look like this:
+**String** variables look like this:
 ```
 @some_variable:     The value;
 @another_variable:  You can escape semicolons\; I think;
 ```
 
-Boolean variables look like this:
+**Boolean** variables look like this:
 ```
 @some_bool;
 ```
 
-Block variables look like this:
+**Block** variables look like this:
 ```
 @my_box: infobox [United States of America] {
     Declaration:    1776;
@@ -157,11 +166,12 @@ embedded variables:
 ```
 
 If you don't want that to happen, take a look at
-[interpolable variables](#interpolable-variables).
+[interpolable variables](#interpolable-variables), the values of which are
+formatted upon retrieval rather than at the time of assignment.
 
 ### Attributes
 
-Variables can have attributes. This helps to organize things:
+Variables can have **attributes**. This helps to organize things:
 ```
 @page.title:    Hello World!;
 @page.author:   John Doe;
@@ -210,9 +220,9 @@ sec {
 
 ### Conditionals
 
-You can use conditionals `if{}`, `elsif{}`, and `else{}` on variables. Currently
-all that can be tested is the boolean value of a variable. Boolean and block
-variables are always true, and all strings besides zero are true.
+You can use **conditionals** `if{}`, `elsif{}`, and `else{}` on variables.
+Currently all that can be tested is the boolean value of a variable. Boolean and
+block variables are always true, and all strings besides zero are true.
 ```
 if [@page.draft] {
     Note to self: Don't forget to publish this page.
@@ -224,8 +234,8 @@ else {
 
 ### Interpolable variables
 
-Interpolable variables allow you to evaluate the formatting of a string variable
-at some point after the variable was defined.
+**Interpolable variables** allow you to evaluate the formatting of a string
+variable at some point after the variable was defined.
 
 Normally the formatting of string variables is evaluated immediately as the
 variable is defined.
@@ -262,8 +272,8 @@ double-formatted, resulting in ugly escaped HTML tags visible to clients.
 
 ### Special variables
 
-`@page` contains information about the current page. Its attributes are set at
-the very top of a page source file.
+**`@page`** contains information about the current page. Its attributes are set
+at the very top of a page source file.
 
 * `@page.title` - Human-readable page title. Utilized internally by the
   Wikifier, so it is required for most purposes. Often used as the `<title>` of
@@ -278,17 +288,18 @@ the very top of a page source file.
 * `@page.draft` - This boolean value marks the page as a draft. This means that
   it will not be served to unauthenticated users or cached.
 
-`@category` is used to mark the page as belonging to a category. Each attribute
-of it is a boolean. If present, the page belongs to that category. Example:
+**`@category`** is used to mark the page as belonging to a category. Each
+attribute of it is a boolean. If present, the page belongs to that category.
+Example:
 * `@category.news;`
 * `@category.important;`
 
-`@m` is a special variable used in [models](models.md). Its attributes are
+**`@m`** is a special variable used in [models](models.md). Its attributes are
 mapped to any options provided in the model block.
 
 ## Text formatting
 
-Many block types can contain formatted text. Square brackets `[` and `]` are
+Many block types can contain **formatted text**. Square brackets `[` and `]` are
 used for text formatting tokens.
 
 **Basic formatting**

@@ -317,7 +317,7 @@ sub parse_format_type {
 
         # undefined variable
         if (!defined $val) {
-            $page->warning($opts{startpos}, "Undefined variable \@$2")
+            $page->warning($opts{startpos}, "Undefined variable $1$2")
                 unless $opts{no_warnings};
             return '(null)';
         }
