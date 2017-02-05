@@ -333,13 +333,27 @@ sub warning {
 # remove empty content items.
 sub remove_blank {
     my $block = shift;
-    my @new;
+    my (@content, @position);
+    my $i = 0;
     foreach my $item ($block->content) {
-        push @new, $item and next if blessed $item;
+        my $pos = $block->{position}[$i++];
+
+        # leave blocks as they are
+        if (blessed $item) {
+            push @content,  $item;
+            push @position, $pos;
+            next;
+        }
+
+        # trim, then skip if no length is left
         my $trimmed = Wikifier::Utilities::trim($item);
-        push @new, $item if length $trimmed;
+        next unless length $trimmed;
+
+        push @content,  $item;
+        push @position, $pos;
     }
-    $block->{content} = \@new;
+    $block->{content}  = \@content;
+    $block->{position} = \@position;
 }
 
 1
