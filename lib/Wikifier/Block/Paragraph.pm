@@ -8,7 +8,8 @@ package Wikifier::Block::Paragraph;
 use warnings;
 use strict;
 
-use Scalar::Util 'blessed';
+use Scalar::Util qw(blessed);
+use Wikifier::Utilities qw(trim);
 
 our %block_types = (
     paragraph => {
@@ -22,18 +23,18 @@ our %block_types = (
 sub paragraph_html {
     my ($block, $page, $el) = @_;
     $el->configure(type => 'p');
+    TEXT: foreach ($block->content_text_pos) {
+        my ($item, $pos) = @$_;
+        LINE: foreach my $line (split "\n", $item) {
 
-    foreach my $item ($block->content) {
-        next if blessed $item; # paragraphs cannot currently contain anything.
+            # trim after formatting so that position is accurate
+            $line = trim($page->parse_formatted_text($line, pos => $pos));
 
-        # trim.
-        my @items;
-        foreach my $line (split "\n", $item) {
-            $line = Wikifier::Utilities::trim($line);
-            push @items, $line if length $line;
+            # skip if no length is left
+            next LINE unless length $line;
+
+            $el->add($line);
         }
-
-        $el->add($page->parse_formatted_text(join "\n", @items));
     }
 }
 

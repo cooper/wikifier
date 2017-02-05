@@ -13,7 +13,7 @@ use warnings;
 use strict;
 
 use Scalar::Util qw(blessed weaken);
-use Wikifier::Utilities qw(L truncate_hr);
+use Wikifier::Utilities qw(L truncate_hr trim);
 
 # Properties of blocks
 #
@@ -346,7 +346,7 @@ sub remove_blank {
         }
 
         # trim, then skip if no length is left
-        my $trimmed = Wikifier::Utilities::trim($item);
+        my $trimmed = trim($item);
         next unless length $trimmed;
 
         push @content,  $item;

@@ -175,8 +175,8 @@ sub parse_formatted_text {
     my ($wikifier, $page, $text, %opts) = @_;
 
     # find and copy the position
-    $opts{pos} ||= $page->pos;
-    my $pos = $opts{pos} = { %{ $opts{pos} } };
+    my $pos = $opts{pos} || $page->pos;
+    $pos = $opts{pos} = { %$pos };
 
     my @items;
     my $string       = '';
@@ -206,7 +206,6 @@ sub parse_formatted_text {
 
         # [ marks the beginning of a formatting element.
         elsif ($char eq '[' && !$escaped) {
-            $opts{startpos} = $pos;
 
             # if we're in format already, it's a [[link]].
             if ($in_format && $last_char eq '[') {
@@ -218,8 +217,9 @@ sub parse_formatted_text {
             }
 
             # we are now inside the format type.
-            $in_format   = 1;
-            $format_type = '';
+            $opts{startpos} = { %$pos };
+            $in_format      = 1;
+            $format_type    = '';
 
             # store the string we have so far.
             if (length $string) {
