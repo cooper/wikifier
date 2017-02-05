@@ -89,9 +89,9 @@ sub new {
     $opts{content} ||= [];
 
     # get line and column from position
-    if (my $pos = delete $opts{pos}) {
-        $opts{line} = $pos->{line};
-        $opts{col}  = $pos->{col};
+    if (my $pos = $opts{position}) {
+        $opts{line} = $pos->[0]{line};
+        $opts{col}  = $pos->[0]{col};
     }
 
     # steal {current} from parent
@@ -352,6 +352,7 @@ sub remove_blank {
         push @content,  $item;
         push @position, $pos;
     }
+
     $block->{content}  = \@content;
     $block->{position} = \@position;
 }
