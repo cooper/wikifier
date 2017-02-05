@@ -206,7 +206,7 @@ sub parse_formatted_text {
 
         # [ marks the beginning of a formatting element.
         elsif ($char eq '[' && !$escaped) {
-            $ops{startpos} = $pos;
+            $opts{startpos} = $pos;
 
             # if we're in format already, it's a [[link]].
             if ($in_format && $last_char eq '[') {
