@@ -37,7 +37,7 @@ sub style_parse {
 
             # this element.
             if ($matcher eq 'this') {
-                $style{apply_to_main}++;
+                $style{apply_to_parent}++;
                 next;
             }
 
@@ -56,7 +56,7 @@ sub style_parse {
 
     # the block has no name. it applies to the parent element only.
     else {
-        $style{apply_to_main}++;
+        $style{apply_to_parent}++;
     }
 
     $block->{style} = \%style;
@@ -64,21 +64,21 @@ sub style_parse {
 
 sub style_html {
     my ($block, $page) = (shift, @_);
-    my %style   = %{ $block->{style} };
-    my $main_el = $block->parent->element;
+    my %style     = %{ $block->{style} };
+    my $parent_el = $block->parent->element;
     my @apply;
-    $main_el->{need_id}++;
+    $parent_el->{need_id}++;
 
     # if we're applying to main, add that.
-    push @apply, [ $main_el->{id} ] if $style{apply_to_main};
+    push @apply, [ $parent_el->{id} ] if $style{apply_to_parent};
 
     # add other things, if any.
     foreach my $item (@{ $style{apply_to} }) {
-        unshift @$item, $main_el->{id};
+        unshift @$item, $parent_el->{id};
         push @apply, $item;
     }
 
-    $style{main_el}  = $main_el->{id};
+    $style{main_el}  = $parent_el->{id};
     $style{apply_to} = \@apply;
 
     push @{ $page->{styles} ||= [] }, \%style;

@@ -102,6 +102,44 @@ sub new {
     return bless \%opts, $class;
 }
 
+############
+### INIT ###
+############
+
+# initialize
+sub init {
+    my $block = shift;
+    my $type_ref = $block->{type_ref};
+    return if $block->{did_init}++;
+    $block->_init($type_ref, @_);
+}
+
+# run the base's init() now instead of afterward.
+# this is similar to the former method of calling
+# SUPER::init() at the beginning of an init().
+sub init_base {
+    my $block = shift;
+    my $base_ref = $block->{type_ref}{base_ref};
+    if (!$base_ref) {
+        L $block->hr_type.' called ->init_base(), but it has no base';
+        return;
+    }
+    $block->_init($base_ref, @_);
+}
+
+# do not call directly.
+sub _init {
+    my ($block, $type_ref) = splice @_, 0, 2;
+    my $done = $block->{init_done} ||= {};
+    while ($type_ref) {
+        if ($type_ref->{init} && !$done->{ $type_ref->{init} }++) {
+            $type_ref->{init}($block, @_);
+        }
+        $type_ref = $type_ref->{base_ref};
+    }
+    delete $block->{init_done};
+}
+
 #############
 ### PARSE ###
 #############

@@ -45,7 +45,10 @@ sub main_html {
     my ($block, $page, $el) = @_;
 
     # generate a better ID.
-    $el->{id} = 'main-'.time.substr(md5_hex($page->path), 0, 5);
+    $el->configure(
+        id      => 'main-'.time.substr(md5_hex($page->path), 0, 5),
+        need_id => 1
+    );
 
     foreach my $item ($block->content_blocks) {
         $el->add($item->html($page));

@@ -122,9 +122,9 @@ sub _css_apply_string {
     return join ",\n", map {
         my $string = $page->_css_set_string(@$_);
         my $start  = substr $string, 0, 10;
-        if (!$start || $start ne '#wiki-main') {
+        if (!$start || $start ne '.wiki-main') {
             my $id  = $page->{wikifier}{main_block}{element}{id};
-            $string = "#wiki-$id $string";
+            $string = ".wiki-$id $string";
         }
         $string
     } @sets;

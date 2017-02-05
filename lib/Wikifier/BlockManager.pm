@@ -56,7 +56,7 @@ sub create_block {
     );
 
     # call init
-    $type_ref->{init}($block) if $type_ref->{init};
+    $block->init;
 
     return $block;
 }

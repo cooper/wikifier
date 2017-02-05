@@ -146,7 +146,7 @@ sub list_html {
     my @new;
 
     # start with a ul.
-    $el->{type} = 'ul';
+    $el->configure(type => 'ul');
 
     # append each item.
     foreach ($block->list_array) {
