@@ -87,6 +87,17 @@ use Wikifier::Utilities qw(L truncate_hr);
 sub new {
     my ($class, %opts) = @_;
     $opts{content} ||= [];
+
+    # get line and column from position
+    if (my $pos = delete $opts{pos}) {
+        $opts{line} = $pos->{line};
+        $opts{col}  = $pos->{col};
+    }
+
+    # steal {current} from parent
+    $opts{current} = $opts{parent}{current}
+        if $opts{parent} && !$opts{current};
+
     $opts{type} = lc $opts{type};
     return bless \%opts, $class;
 }
