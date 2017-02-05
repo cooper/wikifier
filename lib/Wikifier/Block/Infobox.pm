@@ -58,11 +58,11 @@ sub infobox_html {
 # note that $table might actually be a Wikifier::Elements container
 sub table_add_rows {
     my ($table, $page, $block) = @_;
-    my @pairs = @{ $block->{map_array} };
+    my @pairs = $block->map_array;
     my $has_title = 0;
     for (0..$#pairs) {
-        my ($key_title, $value, $key, $is_block, $pos, $is_title) =
-            @{ $pairs[$_] };
+        my ($key_title, $value, $key, $pos, $is_block, $is_title) =
+            @{ $pairs[$_] }{ qw(key_title value key pos is_block is_title) };
         my $next = $pairs[$_ + 1];
 
         # if the value is from infosec{}, add each row
@@ -77,7 +77,8 @@ sub table_add_rows {
         my @classes;
         push @classes, 'infosec-title' and $has_title++ if $is_title;
         push @classes, 'infosec-first' if $_ == $has_title;
-        my $b4_infosec = $next && blessed $next->[1] && $next->[1]{is_infosec};
+        my $b4_infosec = $next && blessed $next->{value} &&
+            $next->{value}{is_infosec};
         push @classes, 'infosec-last'
             if !$is_title && ($b4_infosec || $_ == $#pairs);
 
@@ -153,14 +154,13 @@ sub infosec_html {
 
     # inject the title
     if (length(my $title = $infosec->name)) {
-        unshift @{ $infosec->{map_array} }, [
-            undef,              # no key title
-            $page->parse_formatted_text($title, pos => $infosec->create_pos),
-            '_infosec_title_',  # the real key
-            undef,              # block?
-            undef,              # position
-            1                   # title?
-        ];
+        unshift @{ $infosec->{map_array} }, {
+            is_title    => 1,
+            key         => '_infosec_title_',
+            value       => $page->parse_formatted_text(
+                $title, pos => $infosec->create_pos
+            ),
+        };
     }
 
     table_add_rows($els, $page, $infosec);

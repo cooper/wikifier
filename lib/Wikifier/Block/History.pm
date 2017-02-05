@@ -27,8 +27,7 @@ sub history_html {
     );
 
     # append each pair.
-    foreach my $pair (@{ $block->{map_array} }) {
-        my ($key, $value, undef, undef, $pos) = @$pair;
+    foreach my $pair ($block->map_array) {
         my $tr = $table->create_child(
             type  => 'tr',
             class => 'history-pair'
@@ -36,16 +35,18 @@ sub history_html {
         $tr->create_child(
             type    => 'td',
             class   => 'history-key',
-            content => $page->parse_formatted_text($key, pos => $pos)
+            content => $page->parse_formatted_text(
+                $pair->{key_title},
+                pos => $pair->{pos}
+            )
         );
         $tr->create_child(
             type    => 'td',
             class   => 'history-value',
-            content => $value
+            content => $pair->{value}
         );
 
     }
-
 }
 
 __PACKAGE__

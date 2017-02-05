@@ -199,13 +199,13 @@ sub map_parse {
 
                 # store the value.
                 $values{$key} = $value;
-                push @{ $block->{map_array} }, [
-                    $key_title,     # displayed key
-                    $value,         # value, at this stage text or block
-                    $key,           # actual hash key
-                    $is_block,      # true if value originally was a block
-                    { %$pos }       # copy of the position
-                ];
+                push @{ $block->{map_array} }, {
+                    key_title   => $key_title,     # displayed key
+                    value       => $value,         # value, text or block
+                    key         => $key,           # actual hash key
+                    is_block    => $is_block,      # true if value was a block
+                    pos         => { %$pos }       # copy of the position
+                };
 
                 # warn bad keys and values
                 $warn_bad_maybe->();
@@ -272,8 +272,9 @@ sub map_parse {
 
 sub map_html {
     my ($block, $page) = (shift, @_);
-    foreach (@{ $block->{map_array} }) {
-        my ($key_title, $value, $key, undef, $pos) = @$_;
+    foreach ($block->map_array) {
+        my ($key_title, $value, $key, $pos) =
+            @$_{ qw(key_title value key pos) };
         if (blessed $value) {
             my $their_el = $value->html($page);
             $value = $their_el || "$value";
@@ -288,7 +289,7 @@ sub map_html {
         else {
             next;
         }
-        $_->[1] = $value; # overwrite the block value with HTML
+        $_->{value} = $value; # overwrite the block value with HTML
         $block->{map_hash}{$key} = $value;
     }
 }
@@ -297,5 +298,8 @@ sub to_data {
     my $map = shift;
     return $map->{map_hash};
 }
+
+sub map_array { @{ shift->{map_array} } }
+sub map_hash  { %{ shift->{map_hash}  } }
 
 __PACKAGE__
