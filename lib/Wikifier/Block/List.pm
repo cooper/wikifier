@@ -19,6 +19,7 @@ our %block_types = (list => {
 sub list_init {
     my $block = shift;
     $block->{list_array} = [];
+    $block->{list_array_values} = [];
 }
 
 # parse a list.
@@ -103,7 +104,11 @@ sub list_parse {
 
                 # store the value.
                 $warn_bad_maybe->();
-                push @{ $block->{list_array} }, $value;
+                push @{ $block->{list_array} }, {
+                    value => $value,        # value
+                    pos   => { %$pos }      # copy of position
+                };
+                push @{ $block->{list_array_values} }, $value;
 
                 # reset status.
                 $value = '';
@@ -144,18 +149,27 @@ sub list_html {
     $el->{type} = 'ul';
 
     # append each item.
-    foreach my $value (@{ $block->{list_array} }) {
+    foreach ($block->list_array) {
+        my $value = $_->{value};
+
+        # convert block to element
         if (blessed $value) {
             my $their_el = $value->html($page);
             $value = $their_el || "$value";
         }
+
+        # parse formatted text
         elsif (!$block->{no_format_values}) {
-            $value = $page->parse_formatted_text($value);
+            $value = $page->parse_formatted_text($value, pos => $_->{pos});
             if (blessed $value) {
                 my $their_el = $value->html($page);
                 $value = $their_el || "$value";
             }
         }
+
+        # overwrite the value in list_array
+        # add to new list_array_values
+        $_->{value} = $value;
         push @new, $value;
 
         $el->create_child(
@@ -164,13 +178,15 @@ sub list_html {
             content    => $value
         );
     }
-
-    $block->{list_array} = \@new;
+    $block->{list_array_values} = \@new;
 }
 
 sub to_data {
     my $list = shift;
-    return $list->{list_array};
+    return $list->{list_array_values};
 }
+
+sub list_array          { @{ shift->{list_array}        } }
+sub list_array_values   { @{ shift->{list_array_values} } }
 
 __PACKAGE__
