@@ -5,10 +5,27 @@ blocks, see [Language](language.md).
 
 ## Clear
 
-Creates a `<div>` with `clear: both`.
+Creates an empty `<div>` with `clear: both`.
 
 ```
 clear{}
+```
+
+This is mostly useless now that the built-in wiki classes `clear`, `clear-left`,
+and `clear-right` can be used on any block:
+
+```
+p.clear {
+    This will clear both sides.
+}
+
+p.clear-left {
+    This will clear the left side.
+}
+
+p.clear-right {
+    This will clear the right side.
+}
 ```
 
 ## Code
@@ -318,10 +335,13 @@ sec [My Section] {
 
 ## Section
 
-A section is kinda like a `<div>`, except that it can also have a header. The
-first section on a page always has the page title as its header, so even if
-specify some text there, it will not be considered. As for the rest, the
-header will be displayed at the appropriate level. Also spelled `sec{}`.
+You can organize the content of an article by dividing it into sections.
+Sections typically have title headers, except for the first one. The first
+section on a page is considered the introduction. It always has the page title
+as its header, so even if specify some text there, it will not be considered. As
+for the rest, the header will be displayed at the appropriate level.
+
+Also spelled `sec{}`.
 
 ```
 sec {
@@ -347,4 +367,17 @@ sec [More stuff] {
 
 ## Style
 
-Allows you to use CSS with Wikifier. See [Styling](styling.md).
+Allows you to use CSS with Wikifier.
+
+See [Styling](styling.md).
+
+```
+imagebox {
+    file:   some-image.png;
+    width:  500px;
+    style {
+        padding: 5px;
+        background-color: red;
+    }
+}
+```

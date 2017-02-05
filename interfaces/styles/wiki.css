@@ -1,7 +1,3 @@
-.wiki-clear {
-    clear: both;
-}
-
 p.wiki-paragraph {
 /*
     line-height: 19px;
@@ -13,7 +9,7 @@ p.wiki-paragraph {
     line-height: 1.8em;
 }
 
-a img {
+.wiki-main a img {
     border: 0;
 }
 
@@ -256,3 +252,9 @@ a.wiki-ref-anchor, a.wiki-ref-anchor:hover {
     text-decoration: inherit;
     font-size: inherit;
 }
+
+/* built-in classes */
+
+.wiki-class-clear { clear: both; }
+.wiki-class-clear-left { clear: left; }
+.wiki-class-clear-right { clear: right; }
