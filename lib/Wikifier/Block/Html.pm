@@ -22,7 +22,7 @@ sub html_html {
             $item = $item->html($page);
         }
         elsif ($format) {
-            $item = $page->parse_formatted_text($item, 1);
+            $item = $page->parse_formatted_text($item, no_entities => 1);
         }
         $el->add($item);
     }

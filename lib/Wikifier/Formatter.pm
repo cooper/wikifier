@@ -1,8 +1,8 @@
-# Copyright (c) 2014, Mitchell Cooper
+# Copyright (c) 2016, Mitchell Cooper
 #
-# Wikifier::Formatter is in charge of text formatting. Block types use the functions
-# provided by the Formatter to convert formatted wiki source such as '[b]hello[/b]' to
-# formatted XHTML.
+# Wikifier::Formatter is in charge of text formatting. Block types use the
+# functions provided by the Formatter to convert formatted wiki source such as
+# [b]hello[/b] to formatted HTML.
 #
 package Wikifier::Formatter;
 
@@ -163,12 +163,14 @@ our %colors = (
 ### FORMAT PARSING ###
 ######################
 #
-# $no_entities      disables HTML entity conversion
-# $careful          used internally to prevent recursion
+# %opts
+#
+#   no_entities         disables HTML entity conversion
+#   no_variables        used internally to prevent recursion
+#   no_warnings         silence warnings for undefined variables
 #
 sub parse_formatted_text {
-    my ($wikifier, $page, $text) = splice @_, 0, 3;
-    my ($no_entities, $careful) = @_;
+    my ($wikifier, $page, $text, %opts) = @_;
 
     my @items;
     my $string       = '';
@@ -205,7 +207,7 @@ sub parse_formatted_text {
 
             # store the string we have so far.
             if (length $string) {
-                push @items, [ $no_entities, $string ];
+                push @items, [ $opts{no_entities}, $string ];
                 $string = '';
             }
         }
@@ -221,7 +223,6 @@ sub parse_formatted_text {
                 $format_type .= $char;
                 $in_format    = 0;
             }
-
 
             # otherwise, the format type is ended and must now be parsed.
             else {
@@ -249,7 +250,7 @@ sub parse_formatted_text {
     }
 
     # final string item.
-    push @items, [ $no_entities, $string ] if length $string;
+    push @items, [ $opts{no_entities}, $string ] if length $string;
 
     # might be a blessed object
     return $items[0][1] if $#items == 0 && blessed $items[0][1];
@@ -284,7 +285,7 @@ my %static_formats = (
 # parses an individual format type, aka the content in [brackets].
 # for example, 'i' for italic. returns the string generated from it.
 sub parse_format_type {
-    my ($wikifier, $page, $type, $no_entities, $careful) = @_;
+    my ($wikifier, $page, $type, %opts) = @_;
 
     # static format from above
     if (my $fmt = $static_formats{$type}) {
@@ -292,19 +293,21 @@ sub parse_format_type {
     }
 
     # variable.
-    if ($type =~ /^([@%])([\w\.]+)$/ && !$careful) {
-        my $var = $page->get($2);
+    if ($type =~ /^([@%])([\w\.]+)$/ && !$opts{no_variables}) {
+        my $val = $page->get($2);
 
         # undefined variable
-        # TODO: make a warning
-        return '(null)'
-            if !defined $var;
+        if (!defined $val) {
+            $page->warning("Undefined variable \@$2")
+                unless $opts{no_warnings};
+            return '(null)';
+        }
 
         # format text unless this is %var
-        $var = $wikifier->parse_formatted_text($page, $var, 0, 1)
-            if !ref $var && $1 ne '%';
+        $val = $wikifier->parse_formatted_text($page, $val, no_variables => 1)
+            if !ref $val && $1 ne '%';
 
-        return $var;
+        return $val;
     }
 
     # html entity.
@@ -325,21 +328,21 @@ sub parse_format_type {
             $target = trim($2);
         }
 
-        # internal wiki link [[article]]
+        # internal wiki link [[ article ]]
         if ($link_char eq '[') {
             $link_type = 'internal';
             $title     = ucfirst $target;
             $target    = $page->wiki_opt('root.page')."/$name_link";
         }
 
-        # category wiki link [~category~]
+        # category wiki link [~ category ~]
         elsif ($link_char eq '~') {
             $link_type = 'category';
             $title     = ucfirst $target;
             $target    = $page->wiki_opt('root.category')."/$name_link";
         }
 
-        # external wiki link [!article!]
+        # external wiki link [! article !]
         elsif ($link_char eq '!') {
             my $external_link = page_name_link($target, 1);
             $link_type = 'external';
@@ -347,7 +350,7 @@ sub parse_format_type {
             $target    = $page->wiki_opt('external.root')."/$external_link";
         }
 
-        # other non-wiki link [$url$]
+        # other non-wiki link [$ url $]
         elsif ($link_char eq '$') {
             $link_type = 'other';
             $title     = 'External link';
@@ -366,12 +369,12 @@ sub parse_format_type {
 
     # color name.
     if (my $color = $colors{ lc $type }) {
-        return "<span style=\"color: $color;\">";
+        return qq{<span style="color: $color;">};
     }
 
     # color hex code.
     if ($type =~ m/^#[\da-f]+$/i) {
-        return "<span style=\"color: $type;\">";
+        return qq{<span style="color: $type;">};
     }
 
     # real references.
