@@ -378,7 +378,7 @@ sub handle_character {
 
             # string
             if (length $val) {
-                $val = $wikifier->parse_formatted_text($page, $val, 0, 0, 1)
+                $val = $wikifier->parse_formatted_text($page, $val)
                 if !delete $c->{var_no_interpolate} && !ref $val;
             }
 

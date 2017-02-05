@@ -293,13 +293,13 @@ sub to_desc {
     return "$$block{type}$title\{}";
 }
 
-# this is for the variable to html
-sub to_html {
+# this is for the variable to html in [@some_var]
+sub generate {
     my $block = shift;
     return $block->element->generate if $block->element;
     $block->warning(
         'Tried to display ' . $block->hr_type .
-        'which has no element associated with it'
+        ' which has no element associated with it'
     );
     return $block->hr_type;
 }

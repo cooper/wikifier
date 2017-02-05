@@ -167,7 +167,7 @@ our %colors = (
 #
 # $careful          prevents recursion
 #
-# $no_html          says we should not call ->to_html, preserve object for now
+# $to_html          we should not preserve block objects; convert to HTML now
 #
 sub parse_formatted_text {
     my ($wikifier, $page, $text) = splice @_, 0, 3;
@@ -287,7 +287,7 @@ my %static_formats = (
 # parses an individual format type, aka the content in [brackets].
 # for example, 'i' for italic. returns the string generated from it.
 sub parse_format_type {
-    my ($wikifier, $page, $type, $no_entities, $careful, $no_html) = @_;
+    my ($wikifier, $page, $type, $no_entities, $careful, $to_html) = @_;
 
     # static format from above
     if (my $fmt = $static_formats{$type}) {
@@ -309,7 +309,7 @@ sub parse_format_type {
 
         # convert object to html when necessary
         $var = $var->to_html
-            if !$no_html && blessed $var && $var->can('to_html');
+            if $to_html && blessed $var && $var->can('to_html');
 
         return $var;
     }
