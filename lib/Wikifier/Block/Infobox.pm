@@ -46,7 +46,7 @@ sub infobox_html {
             attributes  => { colspan => 2 },
             content     => $page->parse_formatted_text(
                 $infobox->name,
-                pos => $infobox->pos
+                pos => $infobox->create_pos
             )
         );
     }
@@ -155,7 +155,7 @@ sub infosec_html {
     if (length(my $title = $infosec->name)) {
         unshift @{ $infosec->{map_array} }, [
             undef,              # no key title
-            $page->parse_formatted_text($title, pos => $infosec->pos),
+            $page->parse_formatted_text($title, pos => $infosec->create_pos),
             '_infosec_title_',  # the real key
             undef,              # block?
             undef,              # position
