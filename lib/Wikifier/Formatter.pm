@@ -228,7 +228,7 @@ sub parse_formatted_text {
             else {
                 push @items, [
                     1,
-                    $wikifier->parse_format_type($page, $format_type, @_)
+                    $wikifier->parse_format_type($page, $format_type, %opts)
                 ];
                 $in_format = 0;
             }

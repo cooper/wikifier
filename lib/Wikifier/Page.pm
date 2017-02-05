@@ -508,9 +508,17 @@ sub title_or_name {
 
 # parser warning
 sub warning {
-    my $page = shift;
-    my $main_block = $page->{main_block} or return;
-    return $main_block->warning(@_);
+    my ($page, $pos, $warn) = @_;
+    my $block = $page->{main_block} or return;
+    my $c     = $block->{current}   or return;
+    if (!defined $warn) {
+        $warn = $pos;
+    }
+    else {
+        $c->{temp_line} = $pos->{line};
+        $c->{temp_col}  = $pos->{col};
+    }
+    $c->warning($warn);
 }
 
 sub wikifier { shift->{wikifier} }
