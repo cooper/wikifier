@@ -317,6 +317,22 @@ sub generate {
     return $block->hr_type;
 }
 
+sub create_pos {
+    my $block = shift;
+    return {
+        line => $block->{line},
+        col  => $block->{col}
+    };
+}
+
+sub end_pos {
+    my $block = shift;
+    return {
+        line => $block->{end_line},
+        col  => $block->{end_col}
+    };
+}
+
 # produce a parser warning
 sub warning {
     my ($block, $pos, $warn) = @_;

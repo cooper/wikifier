@@ -17,12 +17,16 @@ our %block_types = (
 
 sub html_html {
     my ($format, $block, $page, $el) = @_;
-    foreach my $item ($block->content_visible) {
+    foreach ($block->content_visible_pos) {
+        my ($item, $pos) = @$_;
         if (blessed $item) {
             $item = $item->html($page);
         }
         elsif ($format) {
-            $item = $page->parse_formatted_text($item, no_entities => 1);
+            $item = $page->parse_formatted_text($item,
+                no_entities => 1,
+                pos => $pos
+            );
         }
         $el->add($item);
     }

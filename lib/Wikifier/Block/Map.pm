@@ -203,7 +203,8 @@ sub map_parse {
                     $key_title,     # displayed key
                     $value,         # value, at this stage text or block
                     $key,           # actual hash key
-                    $is_block       # true if value originally was a block
+                    $is_block,      # true if value originally was a block
+                    { %$pos }       # copy of the position
                 ];
 
                 # warn bad keys and values
@@ -272,13 +273,13 @@ sub map_parse {
 sub map_html {
     my ($block, $page) = (shift, @_);
     foreach (@{ $block->{map_array} }) {
-        my ($key_title, $value, $key) = @$_;
+        my ($key_title, $value, $key, undef, $pos) = @$_;
         if (blessed $value) {
             my $their_el = $value->html($page);
             $value = $their_el || "$value";
         }
         elsif (!$block->{no_format_values}) {
-            $value = $page->parse_formatted_text($value);
+            $value = $page->parse_formatted_text($value, pos => $pos);
             if (blessed $value) {
                 my $their_el = $value->html($page);
                 $value = $their_el || "$value";

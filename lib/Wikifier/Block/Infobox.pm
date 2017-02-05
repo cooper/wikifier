@@ -44,7 +44,10 @@ sub infobox_html {
             type        => 'th',
             class       => 'infobox-title',
             attributes  => { colspan => 2 },
-            content     => $page->parse_formatted_text($infobox->name)
+            content     => $page->parse_formatted_text(
+                $infobox->name,
+                pos => $infobox->pos
+            )
         );
     }
 
@@ -58,7 +61,8 @@ sub table_add_rows {
     my @pairs = @{ $block->{map_array} };
     my $has_title = 0;
     for (0..$#pairs) {
-        my ($key_title, $value, $key, $is_block, $is_title) = @{ $pairs[$_] };
+        my ($key_title, $value, $key, $is_block, $pos, $is_title) =
+            @{ $pairs[$_] };
         my $next = $pairs[$_ + 1];
 
         # if the value is from infosec{}, add each row
@@ -84,14 +88,14 @@ sub table_add_rows {
         );
 
         # not an infosec{}; this is a top-level pair
-        table_add_row($table, $page, $key_title, $value, \%row_opts);
+        table_add_row($table, $page, $key_title, $value, $pos, \%row_opts);
     }
 }
 
 # add a row.
 # note that $table might actually be a Wikifier::Elements container
 sub table_add_row {
-    my ($table, $page, $key_title, $value, $opts_) = @_;
+    my ($table, $page, $key_title, $value, $pos, $opts_) = @_;
     my %opts    = hash_maybe $opts_;
     my %td_opts = hash_maybe $opts{td_opts};
 
@@ -103,7 +107,7 @@ sub table_add_row {
 
     # append table row with key.
     if (length $key_title) {
-        $key_title = $page->parse_formatted_text($key_title);
+        $key_title = $page->parse_formatted_text($key_title, pos => $pos);
         $tr->create_child(
             type       => 'th',
             class      => 'infobox-key',
@@ -151,9 +155,10 @@ sub infosec_html {
     if (length(my $title = $infosec->name)) {
         unshift @{ $infosec->{map_array} }, [
             undef,              # no key title
-            $page->parse_formatted_text($title),
+            $page->parse_formatted_text($title, pos => $infosec->pos),
             '_infosec_title_',  # the real key
             undef,              # block?
+            undef,              # position
             1                   # title?
         ];
     }
