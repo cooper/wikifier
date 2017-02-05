@@ -1,6 +1,6 @@
 # Wikifier
 
-Wikifier is a file-based wiki software suite.
+Wikifier is a file-based wiki suite.
 
 ## Example
 
@@ -24,7 +24,7 @@ infobox {
 }
 
 sec {
-    Wikifier is a wiki software suite. It is unique because it is completely
+    Wikifier is a wiki suite. It is unique because it is completely
     file-based. There are no databases. Yet, it offers page caching, image
     sizing, session management/authentication, and lots of other things that
     fancy wikis use databases for.

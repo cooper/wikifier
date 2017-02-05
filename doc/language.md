@@ -1,26 +1,27 @@
 # Language
 
-Wikifier's unique language is designed specifically for easy legibility.
+Wikifier's source language is designed to be easily legible by the naked eye.
 
 ## Blocks
 
-The fundamental component of the Wikifier language is the block. Each block
-belongs to a specific type, and each type provides a unique function. For
-example, `infobox{}` displays a table of information associated with an
-article. `imagebox{}` displays an image preview with a caption and link to a
-full size image.
+The fundamental component of the Wikifier language is the block.
+The syntax for a block is as follows:
 
-Many blocks may contain text as well as other blocks. Each block type handles
-the data inside of it differently.
+```
+Type [Name] { Content }
+```
+* __Type__ - The kind of block. The block type provides a unique
+  function. For instance, [`imagebox{}`](blocks.md#imagebox) displays a bordered
+  image with a caption and link to the full size original.
+* __Name__ - Depending on its type, a block may have a name. Each block type
+  may use the name field for a different purpose. For example,
+  [`infobox{}`](blocks.md#infobox) uses the field to display a title bar across
+  the top of the info table.
+* __Content__ - Inside the block, there may be additional blocks and/or text.
+  Each block handles the content within differently. Some may treat it as
+  plain text, while others may do further parsing on it.
 
 See [Blocks](blocks.md) for a list of built-in block types.
-
-### Block syntax
-
-Blocks can have names: Some do, and some don't. Each block type may use its
-name field for a different purpose. For example, section blocks use the field
-to display a title header over the section. Infoboxes use the name to display a
-title along the top of the box. The syntax for blocks is as follows.
 
 #### Nameless blocks
 
@@ -132,8 +133,8 @@ sec {
 ```
 
 If the variable contains a block, you can display it using `{@var_name}`. This
-syntax works anywhere, not just in places where text formatting is accepted
-like the `[@var_name]` syntax. So if you have:
+syntax works anywhere, not just in places where formatted text is accepted
+like with the `[@var_name]` syntax. So if you have:
 ```
 @my_box: infobox [United States of America] {
     Declaration:    1776;

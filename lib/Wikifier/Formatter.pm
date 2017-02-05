@@ -164,14 +164,11 @@ our %colors = (
 ######################
 #
 # $no_entities      disables HTML entity conversion
-#
-# $careful          prevents recursion
-#
-# $to_html          we should not preserve block objects; convert to HTML now
+# $careful          used internally to prevent recursion
 #
 sub parse_formatted_text {
     my ($wikifier, $page, $text) = splice @_, 0, 3;
-    my ($no_entities, $careful, $to_html) = @_;
+    my ($no_entities, $careful) = @_;
 
     my @items;
     my $string       = '';
@@ -287,7 +284,7 @@ my %static_formats = (
 # parses an individual format type, aka the content in [brackets].
 # for example, 'i' for italic. returns the string generated from it.
 sub parse_format_type {
-    my ($wikifier, $page, $type, $no_entities, $careful, $to_html) = @_;
+    my ($wikifier, $page, $type, $no_entities, $careful) = @_;
 
     # static format from above
     if (my $fmt = $static_formats{$type}) {
@@ -306,10 +303,6 @@ sub parse_format_type {
         # format text unless this is %var
         $var = $wikifier->parse_formatted_text($page, $var, 0, 1)
             if !ref $var && $1 ne '%';
-
-        # convert object to html when necessary
-        $var = $var->to_html
-            if $to_html && blessed $var && $var->can('to_html');
 
         return $var;
     }
@@ -371,10 +364,14 @@ sub parse_format_type {
         return qq{<sup style="font-size: 75%"><a href="#">[$ref]</a></sup>};
     }
 
-    # colors.
-    if (exists $colors{ lc $type }) {
-        my $color = $colors{ lc $type };
+    # color name.
+    if (my $color = $colors{ lc $type }) {
         return "<span style=\"color: $color;\">";
+    }
+
+    # color hex code.
+    if ($type =~ m/^#[\da-f]+$/i) {
+        return "<span style=\"color: $type;\">";
     }
 
     # real references.
