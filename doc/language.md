@@ -91,7 +91,7 @@ Blocks can be stored in variables and displayed later.
 };
 
 /* display the infobox */
-@person {}
+{@person}
 ```
 
 ## Variables
@@ -131,8 +131,9 @@ sec {
 }
 ```
 
-If the variable contains a block, you can display it using `@var_name {}`. So
-if you have:
+If the variable contains a block, you can display it using `{@var_name}`. This
+syntax works anywhere, not just in places where text formatting is accepted
+like the `[@var_name]` syntax. So if you have:
 ```
 @my_box: infobox [United States of America] {
     Declaration:    1776;
@@ -141,7 +142,7 @@ if you have:
 ```
 You would display the infobox later using:
 ```
-@my_box {}
+{@my_box}
 ```
 
 ### Formatted variables
@@ -179,7 +180,7 @@ Some block types support attribute fetching and/or setting:
 };
 
 /* display the infobox */
-@person {}
+{@person}
 
 /* access attributes from it elsewhere
    btw this works for all map-based block types */
