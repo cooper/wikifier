@@ -8,6 +8,7 @@ package Wikifier::Page;
 
 use warnings;
 use strict;
+use 5.010;
 use Scalar::Util qw(blessed looks_like_number);
 use File::Basename qw(basename);
 use Cwd qw(abs_path);
@@ -504,6 +505,18 @@ sub title {
 sub title_or_name {
     my $page = shift;
     return $page->title // $page->name;
+}
+
+# get position
+sub pos : method {
+    my $page = shift;
+    state $zeropos = { line => 0, col => 0 };
+    my $block = $page->{main_block} or return $zeropos;
+    my $c     = $block->{current}   or return $zeropos;
+    return {
+        line    => $c->{line},
+        col     => $c->{col}
+    };
 }
 
 # parser warning

@@ -168,21 +168,36 @@ our %colors = (
 #   no_entities         disables HTML entity conversion
 #   no_variables        used internally to prevent recursion
 #   no_warnings         silence warnings for undefined variables
+#   pos                 position used for warnings, defaults to $page->pos
+#   startpos            set internally to the position of the '[' character
 #
 sub parse_formatted_text {
     my ($wikifier, $page, $text, %opts) = @_;
 
+    # find and copy the position
+    $opts{pos} ||= $page->pos;
+    my $pos = $opts{pos} = { %{ $opts{pos} } };
+
     my @items;
     my $string       = '';
     my $last_char    = '';   # the last parsed character.
-    my $in_format    = 0;    # inside a formatting element.
     my $format_type  = '';   # format name such as 'i' or '/b'
+    my $in_format    = 0;    # inside a formatting element.
     my $escaped      = 0;    # this character was escaped.
     my $next_escaped = 0;    # the next character will be escaped.
 
     # parse character-by-character.
     CHAR: foreach my $char (split '', $text) {
         $next_escaped = 0;
+
+        # update position
+        if ($char eq "\n") {
+            $pos->{line}++;
+            $pos->{col} = 0;
+        }
+        else {
+            $pos->{col}++;
+        }
 
         # escapes.
         if ($char eq '\\' && !$escaped) {
@@ -191,6 +206,7 @@ sub parse_formatted_text {
 
         # [ marks the beginning of a formatting element.
         elsif ($char eq '[' && !$escaped) {
+            $ops{startpos} = $pos;
 
             # if we're in format already, it's a [[link]].
             if ($in_format && $last_char eq '[') {
@@ -232,6 +248,8 @@ sub parse_formatted_text {
                 ];
                 $in_format = 0;
             }
+
+            delete $opts{startpos};
         }
 
         # any other character.
@@ -250,7 +268,8 @@ sub parse_formatted_text {
     }
 
     # final string item.
-    push @items, [ $opts{no_entities}, $string ] if length $string;
+    push @items, [ $opts{no_entities}, $string ]
+        if length $string;
 
     # might be a blessed object
     return $items[0][1] if $#items == 0 && blessed $items[0][1];
@@ -298,7 +317,7 @@ sub parse_format_type {
 
         # undefined variable
         if (!defined $val) {
-            $page->warning("Undefined variable \@$2")
+            $page->warning($opts{startpos}, "Undefined variable \@$2")
                 unless $opts{no_warnings};
             return '(null)';
         }
