@@ -184,7 +184,8 @@ sub html_base {
 sub _html {
     my ($block, $type_ref) = splice @_, 0, 2;
     my $done = $block->{html_done} ||= {};
-    my $el = $block->{element} ||= do {
+    my $c    = $block->{current};
+    my $el   = $block->{element} ||= do {
         my $el;
 
         # block with multiple elements
@@ -201,6 +202,7 @@ sub _html {
     };
 
     while ($type_ref) {
+        @$c{ qw(line col) } = @$block{ qw(line col) };
         if ($type_ref->{html} && !$done->{ $type_ref->{type} }++) {
             $type_ref->{html}($block, @_, $el);
         }
