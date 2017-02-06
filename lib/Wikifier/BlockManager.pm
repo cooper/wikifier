@@ -91,6 +91,13 @@ sub load_block {
         %blocks = %{ "${main_package}::block_types" };
     }
 
+    # none? probably the package didn't return the correct name
+    if (!keys %blocks) {
+        L "Error loading ${type}{} block: No blocks found. " .
+          "Perhaps the returned package '$main_package' is incorrect?";
+        return;
+    }
+
     # register blocks.
     my $req_type_ref;
     foreach my $block_type (keys %blocks) {
