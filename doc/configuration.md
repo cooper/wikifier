@@ -63,9 +63,9 @@ it is required as the first argument to the `wikiserver` executable.
 store your wiki configuration file at a path outside of the wiki root, just in
 case it contains sensitive information. If you are using a wiki server, the path
 of each wiki's configuration file is defined in the server configuration using
-the `server.wiki.[name].config` option. If you are using Wikifier::Wiki
-directly, the path to the wiki configuration must be provided to the
-constructor:
+the [`server.wiki.[name].config`](#serverwikinameconfig) option. If you are
+using Wikifier::Wiki directly, the path to the wiki configuration must be
+provided to the constructor:
 ```perl
 my $wiki = Wikifier::Wiki->new(config_file => '/home/www/mywiki/wiki.conf');
 ```
@@ -75,8 +75,9 @@ the credentials of administrators can exist more securely than in the primary
 configuration. This file certainly should not be within the wiki root because
 that would probably allow anyone to download it from the web server. If you are
 using a wiki server, the path of the private configuration is defined by
-`server.wiki.[name].private`. If you are using Wikifier::Wiki directly, the path
-to the private configuration may be provided to the constructor:
+[`server.wiki.[name].private`](#serverwikinameprivate). If you are using
+Wikifier::Wiki directly, the path to the private configuration may be provided
+to the constructor:
 ```perl
 my $wiki = Wikifier::Wiki->new(
     config_file  => '/home/www/mywiki/wiki.conf',
@@ -128,9 +129,10 @@ It may be useful to use `root.wiki` within the definitions of the rest:
     @root.image:    [@root.wiki]/images;
 
 If you are using Wikifier::Wiki (or a wiki server) in conjunction with
-`image.enable.cache` and `image.enable.pregeneration`, you should set root.image
-to wherever your cache directory can be found on the HTTP root. This is
-where generated images are cached, and full-sized images are symbolically
+[`image.enable.cache`](#imageenablecache) and
+[`image.enable.pregeneration`](#imageenablepregeneration), you should set
+root.image to wherever your cache directory can be found on the HTTP root. This
+is where generated images are cached, and full-sized images are symbolically
 linked to. This allows the web server to deliver images directly, which is
 certainly most efficient.
 
@@ -196,14 +198,15 @@ The method which the Wikifier should use to scale images.
 
 **Accepted values**
 * _javascript_ - JavaScript-injected image sizing
-* _server_ - server-side image sizing using `image.sizer` and `image.calc`
-  (recommended)
+* _server_ - server-side image sizing using [`image.sizer`](#imagesizer) and
+  [`image.calc`](#imagecalc) (recommended)
 
-When set to _server_, the options `image.calc` and `image.sizer` are required.
-If using Wikifier::Page directly, `image.calc` is provided but requires that
-you install Image::Size. In that case, you are required to provide a
-custom `image.sizer` routine. If using Wikifier::Wiki, `image.calc` and
-`image.sizer` are both provided, but GD must be installed from CPAN.
+When set to _server_, the options [`image.calc`](#imagecalc) and
+[`image.sizer`](#imagesizer) are required. If using Wikifier::Page directly,
+`image.calc` is provided but requires that you install Image::Size. In that
+case, you are required to provide a custom `image.sizer` routine. If using
+Wikifier::Wiki, `image.calc` and `image.sizer` are both provided, but GD must be
+installed from CPAN.
 
 __Default__ (Page): _javascript_
 
@@ -212,7 +215,7 @@ __Default__ (Wiki): _server_
 ### image.calc
 
 A code reference that calculates a missing dimension of an image.
-This is utilized only when `image.size_method` is _server_.
+This is utilized only when [`image.size_method`](#imagesize_method) is _server_.
 
 Returns `(width, height)`.
 
@@ -223,8 +226,8 @@ __Default__ (Wiki): built in, uses GD
 ### image.rounding
 
 The desired rounding method used when determining image dimensions. Used by
-the default `image.calc`. If a custom `image.calc` is provided, this will not be
-utilized.
+the default [`image.calc`](#imagecalc). If a custom `image.calc` is provided,
+this will not be utilized.
 
 **Accepted values**
 * _normal_ - round up from .5 or more, down for less
@@ -236,11 +239,11 @@ __Default__: _normal_
 ### image.sizer
 
 A code reference that returns the URL to a sized version of an image. After
-using `image.calc` to find the dimensions of an image, `image.sizer` is called
-to generate a URL for the image at those dimensions.
+using [`image.calc`](#imagecalc) to find the dimensions of an image,
+`image.sizer` is called to generate a URL for the image at those dimensions.
 
-If using `image.size_method` _server_, `image.sizer` must be provided
-(unless using Wikifier::Wiki, which provides its own).
+If using [`image.size_method`](#imagesize_method) _server_, `image.sizer` must
+be provided (unless using Wikifier::Wiki, which provides its own).
 
 Returns a URL.
 
@@ -264,8 +267,8 @@ __Default__: *png*
 
 ### image.quality
 
-The desired quality of generated images. This is only utilized if `image.type`
-is set to jpeg.
+The desired quality of generated images. This is only utilized if
+[`image.type`](#imagetype) is set to *jpeg*.
 
 __Default__: *100*
 
@@ -295,7 +298,7 @@ load time.
 The disadvantage is slower page generation time if new images have been
 added since the last generation time.
 
-__Requires__: `image.enable.cache`
+__Requires__: [`image.enable.cache`](#imageenablecache)
 
 __Default__: Enabled
 
@@ -318,7 +321,8 @@ __Default__: Enabled
 
 Enable caching of generated images.
 
-__Required by__: `image.enable.pregeneration`, `image.enable.restriction`
+__Required by__: [`image.enable.pregeneration`](#imageenablepregeneration),
+[`image.enable.restriction`](#imageenablerestriction)
 
 __Default__: Enabled
 
@@ -408,7 +412,7 @@ __Default__: *sha1*
 ### admin.[username].password
 
 The password of the administrator `[username]`. It must be encrypted in
-the crypt set by `admin.[username].crypt`.
+the crypt set by [`admin.[username].crypt`](#adminusernamecrypt).
 
 
 ## Wikifier::Server options
@@ -429,7 +433,7 @@ If enabled, the Wikifier::Server will generate all pages upon the first
 start. It will then monitor all page files and regenerate them as soon as
 they are modified, greatly reducing the first page load time.
 
-__Requires__: `page.enable.cache`
+__Requires__: [`page.enable.cache`](#pageenablecache)
 
 __Default__: Disabled (but recommended)
 
