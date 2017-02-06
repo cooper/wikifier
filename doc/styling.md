@@ -5,6 +5,10 @@ language. Rules can be added to specific blocks and/or children of specific
 blocks, and selectors like classes and block types can also narrow down the
 matched elements.
 
+* [Styling](#styling)
+    * [Rules for one block](#rules-for-one-block)
+    * [Rules for a block's children](#rules-for-a-blocks-children)
+
 ### Rules for one block
 
 A style block with no selector will be applied to the parent block.

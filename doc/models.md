@@ -5,6 +5,10 @@ source code from another file. This allows you to create reusable templates
 for consistency across your wiki, or to eliminate repetitive code in your
 page files.
 
+* [Models](#models)
+  * [Creating models](#creating-models)
+  * [Using models](#using-models)
+
 ## Creating models
 
 For safety, you cannot include any page file. Instead, models should be in a

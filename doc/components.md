@@ -1,5 +1,12 @@
 # Components
 
+* [Components](#components)
+  * [Wikifier](#wikifier)
+  * [Wikifier::Page](#wikifierpage)
+  * [Wikifier::Wiki](#wikifierwiki)
+  * [Wikifier::Server](#wikifierserver)
+  * [Interfaces](#interfaces)
+
 ## Wikifier
 
 The most basic package is Wikifier. It provides the minimal functionality for
