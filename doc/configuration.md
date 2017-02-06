@@ -9,18 +9,50 @@ of a full wiki, and others yet for the operation of a wiki server.
     * [Configuration files](#configuration-files)
     * [Configuration directly from code](#configuration-directly-from-code)
   * [Wikifier::Page options](#wikifierpage-options)
-  * [Wikifier::Wiki options](#wikifierwiki-options)
+    * [name](#name)
+    * [root](#root)
+    * [dir](#dir)
+    * [external](#external)
+    * [page\.enable\.titles](#pageenabletitles)
+    * [page\.enable\.footer](#pageenablefooter)
+    * [image\.size\_method](#imagesize_method)
+    * [image\.calc](#imagecalc)
+    * [image\.rounding](#imagerounding)
+    * [image\.sizer](#imagesizer)
+  * [Wikifier::Wiki public options](#wikifierwiki-public-options)
+    * [image\.type](#imagetype)
+    * [image\.quality](#imagequality)
+    * [image\.enable\.retina](#imageenableretina)
+    * [image\.enable\.pregeneration](#imageenablepregeneration)
+    * [image\.enable\.tracking](#imageenabletracking)
+    * [image\.enable\.restriction](#imageenablerestriction)
+    * [image\.enable\.cache](#imageenablecache)
+    * [page\.enable\.cache](#pageenablecache)
+    * [cat\.per\_page](#catper_page)
+    * [cat\.\.main](#catmain)
+    * [cat\.\.title](#cattitle)
+    * [var\.\*](#var)
+  * [Wikifier::Wiki private options](#wikifierwiki-private-options)
+    * [admin\.\.name](#adminname)
+    * [admin\.\.email](#adminemail)
+    * [admin\.\.crypt](#admincrypt)
+    * [admin\.\.password](#adminpassword)
   * [Wikifier::Server options](#wikifierserver-options)
+    * [server\.socket\.type](#serversockettype)
+    * [server\.socket\.path](#serversocketpath)
+    * [server\.enable\.pregeneration](#serverenablepregeneration)
+    * [server\.wiki\.\.config](#serverwikiconfig)
+    * [server\.wiki\.\.private](#serverwikiprivate)
+    * [server\.wiki\.\.password](#serverwikipassword)
 
 ### Configuration files
 
 The primary method of configuration is to define options in a configuration
 file. All wikifier configuration files are written in the wikifier language:
-```
-@name:          MyWiki;
-@dir.wiki:      /home/www/mywiki;
-@dir.page:      [@dir.wiki]/pages;
-```
+
+    @name:          MyWiki;
+    @dir.wiki:      /home/www/mywiki;
+    @dir.page:      [@dir.wiki]/pages;
 
 If you are using a **wiki server**, you must have a dedicated configuration file
 for the server. This tells it where to listen and where to find the wikis you
@@ -71,291 +103,340 @@ my $page = Wikifier::Page->new(
 
 ## Wikifier::Page options
 
-```
-name                            Default: Wiki
+### name
 
-    The name of the wiki.
+Name of the wiki.
 
-root.wiki                       Default: '' (i.e. /)
-root.page                       Default: /page
-root.image                      Default: /images
+__Default__: *Wiki*
 
-    HTTP roots. These are relative to the server HTTP root, NOT the wiki root.
-    They are used for link targets and image URLs; they will never be used to
-    locate content on the filesystem. Do not include trailing slashes.
+### root
 
-    It may be useful to use root.wiki within the definitions of the rest:
-        @root.wiki:     /mywiki;
-        @root.page:     [@root.wiki]/page;
-        @root.image:    [@root.wiki]/images;
+* `root.wiki`   - wiki root.    __Default__: '' (i.e. /)
+* `root.page`   - page root.    __Default__: /page
+* `root.image`  - image root.   __Default__: /images
 
-    If you are using Wikifier::Wiki (or a wiki server) in conjunction with
-    image.enable.cache and image.enable.pregeneration, you should set root.image
-    to wherever your cache directory can be found on the HTTP root. This is
-    where generated images are cached, and full-sized images are symbolically
-    linked to. This allows the web server to deliver images directly, which is
-    certainly most efficient.
+HTTP roots. These are relative to the server HTTP root, NOT the wiki root.
+They are used for link targets and image URLs; they will never be used to
+locate content on the filesystem. Do not include trailing slashes.
 
-dir.wikifier            the wikifier repository
-dir.wiki                wiki root directory
-dir.page                page files stored here
-dir.image               image originals stored here
-dir.model               models stored here
-dir.cache               generated page and image cache files stored here
-dir.category            generated category files stored here
+It may be useful to use root.wiki within the definitions of the rest:
 
-    Directories on the filesystem. It is strongly recommended that they are
-    absolute paths; otherwise they will be dictated by whichever directory the
-    script is started from. All are required except dir.wikifier and dir.wiki.
-    The directories will be created if they do not exist. Do not include
-    trailing slashes.
+    @root.wiki:     /mywiki;
+    @root.page:     [@root.wiki]/page;
+    @root.image:    [@root.wiki]/images;
 
-    It may be useful to use dir.wiki within the definitions of the rest:
-        @dir.wiki:      /home/www/mywiki;
-        @dir.page:      [@dir.wiki]/pages;
-        @dir.cache:     [@dir.wiki]/cache;
+If you are using Wikifier::Wiki (or a wiki server) in conjunction with
+image.enable.cache and image.enable.pregeneration, you should set root.image
+to wherever your cache directory can be found on the HTTP root. This is
+where generated images are cached, and full-sized images are symbolically
+linked to. This allows the web server to deliver images directly, which is
+certainly most efficient.
 
-    It is recommended that all of the files related to one wiki exist within
-    a master wiki directory (dir.wiki), but this is not technically required
-    unless you are using Wikifer::Wiki's built-in revision tracking.
+### dir
 
-external.name                   Default: Wikipedia
-external.root                   Default: http://en.wikipedia.org/wiki
+* `dir.wikifier`  - wikifier repository
+* `dir.wiki`      - wiki root directory
+* `dir.page`      - page files stored here
+* `dir.image`     - image originals stored here
+* `dir.model`     - models stored here
+* `dir.cache`     - generated page and image cache files stored here
+* `dir.category`  - generated category files stored here
 
-    External wiki information. This is used for External wiki links in the form
-    of [! article !].
+Directories on the filesystem. It is strongly recommended that they are
+absolute paths; otherwise they will be dictated by whichever directory the
+script is started from. All are required except dir.wikifier and dir.wiki.
+The directories will be created if they do not exist. Do not include
+trailing slashes.
 
-    name = the name to be displayed in link tooltips.
-    root = the HTTP root for articles.
+It may be useful to use dir.wiki within the definitions of the rest:
 
-    Page names will be translated to URLs in a format compatible with MediaWiki.
-    Currently this is non-configurable.
+    @dir.wiki:      /home/www/mywiki;
+    @dir.page:      [@dir.wiki]/pages;
+    @dir.cache:     [@dir.wiki]/cache;
 
-page.enable.titles              Default: enabled
+It is recommended that all of the files related to one wiki exist within
+a master wiki directory (dir.wiki), but this is not technically required
+unless you are using Wikifer::Wiki's built-in revision tracking.
 
-    If enabled, the first section's title will be the title of the page. You
-    may want to disable this if your wiki content is embedded within a template
-    that has its own place for the page title.
+### external
 
-page.enable.footer              Default: disabled
+* `external.name` - External wiki name, displayed in link tooltips.
+  __Default__: *Wikipedia*
+* `external.root` - External wiki page root.
+  __Default__: *http://en.wikipedia.org/wiki*
 
-    If enabled, the closing </div> tags will be omitted from the final section
-    and wiki block. This allows a footer to be injected before closing them off.
+External wiki information. This is used for External wiki links in the form
+of `[! article !]`.
 
-image.size_method               Default (Page): javascript
-                                Default (Wiki): server
+Page names will be translated to URLs in a format compatible with MediaWiki.
+Currently this is non-configurable.
 
-    The method which the wikifier should use to scale images.
+### page.enable.titles
 
-    'javascript' = JavaScript-injected (bad)
-    'server'     = server-side using image.sizer and image.calc (recommended)
+If enabled, the first section's title will be the title of the page. You
+may want to disable this if your wiki content is embedded within a template
+that has its own place for the page title.
 
-    When set to 'server', the options image.calc and image.sizer are required.
-    If using Wikifier::Page directly, image.calc is provided but requires that
-    you install Image::Size. In that case, you are required to provide a
-    custom image.sizer routine. If using Wikifier::Wiki, image.calc and
-    image.sizer are both provided, but GD must be installed from CPAN.
+__Default__: Enabled
 
-image.calc                      Default (Page): built in, uses Image::Size
-                                Default (Wiki): built in, uses GD
+### page.enable.footer
 
-    A code reference that calculates a missing dimension of an image.
-    This is utilized only when image.size_method is 'server.'
+If enabled, the closing `</div>` tags will be omitted from the final section
+and wiki block. This allows a footer to be injected before closing them off.
 
-    Returns (width, height)
+__Default__: Disabled
 
-image.rounding                  Default: normal
+### image.size_method
 
-    The desired rounding method used when determining image dimensions. Used by
-    the default image.calc. If a custom image.calc is provided, this will not be
-    utilized.
+The method which the Wikifier should use to scale images.
 
-    'normal' = round up from .5 or more, down for less
-    'up'     = always round up
-    'down'   = always round down
+* _javascript_ - JavaScript-injected image sizing
+* _server_ - server-side image sizing using `image.sizer` and `image.calc`
+  (recommended)
 
-image.sizer                     Default (Page): none; custom code required
-                                Default (Wiki): built in
+When set to 'server', the options image.calc and image.sizer are required.
+If using Wikifier::Page directly, image.calc is provided but requires that
+you install Image::Size. In that case, you are required to provide a
+custom image.sizer routine. If using Wikifier::Wiki, image.calc and
+image.sizer are both provided, but GD must be installed from CPAN.
 
-    A code reference that returns the URL to a sized version of an image. After
-    using image.calc to find the dimensions of an image, image.sizer is called
-    to generate a URL for the image at those dimensions.
+__Default__ (Page): _javascript_
 
-    If using image.size_method 'server', image.sizer must be provided
-    (unless using Wikifier::Wiki, which provides its own).
+__Default__ (Wiki): _server_
 
-    Returns a URL.
-```
+### image.calc
 
-## Wikifier::Wiki options
+A code reference that calculates a missing dimension of an image.
+This is utilized only when `image.size_method` is _server_.
 
-```
-image.type                      Default: png
+Returns `(width, height)`.
 
-    The desired file type for generated images. This is used by Wikifier::Wiki
-    when generating images of different dimensions. All resulting images will be
-    in this format, regardless of their original format.
+__Default__ (Page): built in, uses Image::Size
 
-    'png'  = larger, lossless compression format
-    'jpeg' = smaller, lossy compression format
+__Default__ (Wiki): built in, uses GD
 
-image.quality                   Default: 100
+### image.rounding
 
-    The desired quality of generated images. This is only utilized if image.type
-    is set to jpeg.
+The desired rounding method used when determining image dimensions. Used by
+the default `image.calc`. If a custom `image.calc` is provided, this will not be
+utilized.
 
-image.enable.retina             Default: 2
+* _normal_ - round up from .5 or more, down for less
+* _up_ - always round up
+* _down_ - always round down
 
-    Enable retina display support. Wikifier::Wiki will interpret and properly
-    handle @2x or larger scaled versions of images.
+__Default__: _normal_
 
-    This option is a comma-separated list of scales, such as
-        @image.enable.retina: 2,3;
-    to support @2x and @3x scaling both.
+### image.sizer
 
-image.enable.pregeneration      Default: enabled
+A code reference that returns the URL to a sized version of an image. After
+using `image.calc` to find the dimensions of an image, `image.sizer` is called
+to generate a URL for the image at those dimensions.
 
-    Enable pregeneration of images. Images will be generated as pages that
-    require them are generated. This contrasts from the default behavior in
-    which images are generated as they are requested.
+If using `image.size_method` _server_, `image.sizer` must be provided
+(unless using Wikifier::Wiki, which provides its own).
 
-    The advantage of this option is that it allows images to be served directly
-    by a web server without summoning any Wikifier software, decreasing the page
-    load time.
+Returns a URL.
 
-    The disadvantage is slower page generation time if new images have been
-    added since the last generation time.
+__Default__ (Page): none; custom code required
 
-    Requires:
-        image.enable.cache
+__Default__ (Wiki): built in
 
-image.enable.tracking           Default: enabled
+## Wikifier::Wiki public options
 
-    If enabled, Wikifier::Wiki will create page categories that track image
-    usage. This is particularly useful for a Wikifier::Server feature that
-    allows images and pages to be generated as they are modified.
+### image.type
 
-image.enable.restriction        Default: enabled
+The desired file type for generated images. This is used by Wikifier::Wiki
+when generating images of different dimensions. All resulting images will be
+in this format, regardless of their original format.
 
-    If enabled, Wikifier::Wiki will only generate images in dimensions used by
-    pages on the wiki. This prevents useless resource usage and abuse.
+* _png_ - larger, lossless compression
+* _jpeg_ - smaller, lossy compression
 
-image.enable.cache              Default: enabled
+__Default__: *png*
 
-    Enable caching of generated images.
+### image.quality
 
-    Required for:
-        image.enable.pregeneration
-        image.enable.restriction
+The desired quality of generated images. This is only utilized if `image.type`
+is set to jpeg.
 
-page.enable.cache               Default: enabled
+__Default__: *100*
 
-    Enable caching of generated pages.
+### image.enable.retina
 
-cat.per_page                    Default: unlimited
+Enable retina display support. Wikifier::Wiki will interpret and properly
+handle @2x or larger scaled versions of images.
 
-    Number of pages to display on a single category posts page.
+This option is a comma-separated list of scales, such as
 
-cat.<name>.main                 Default: no main page; show newest at top
+    @image.enable.retina: 2,3;
 
-    Set the main page for the category by the name of <name>.
-    This means that it will be displayed before all other categories, regardless
-    of their creation dates. The value of this option is the page filename.
+to support @2x and @3x scaling both.
 
-    You can also mark a page as the main page of a category from within the page
-    source itself, like so:
-        @category.some_cat.main;
+__Default__: *2*
 
-    If multiple pages are marked as the main page of a category, the one with
-    the most recent creation time is preferred. If this option is provided,
-    however, the page specified by it will always be preferred.
+### image.enable.pregeneration
 
-cat.<name>.title                Default: page filename displayed as title
+Enable pregeneration of images. Images will be generated as pages that
+require them are generated. This contrasts from the default behavior in
+which images are generated as they are requested.
 
-    Sets the human-readable title for the category by the name of <name>.
+The advantage of this option is that it allows images to be served directly
+by a web server without summoning any Wikifier software, decreasing the page
+load time.
 
-    You can also set the title of a category from within the category file
-    itself using the "title" key.
+The disadvantage is slower page generation time if new images have been
+added since the last generation time.
 
-var.*
+__Requires__: `image.enable.cache`
 
-    Global wiki variable space. Variables defined in this space will be
-    available throughout the wiki. However they may be overwritten on a
-    particular page.
+__Default__: Enabled
 
-    Example (in config):
-        @var.site.url: http://mywiki.example.com
-        @var.site.display_name: MyWiki;
-    (on main page):
-        Welcome to [@site.display_name]!
+### image.enable.tracking
 
-PRIVATE Wikifier::Wiki options may be in a separation configuration file.
+If enabled, Wikifier::Wiki will create page categories that track image
+usage. This is particularly useful for a Wikifier::Server feature that
+allows images and pages to be generated as they are modified.
+
+__Default__: Enabled
+
+### image.enable.restriction
+
+If enabled, Wikifier::Wiki will only generate images in dimensions used by
+pages on the wiki. This prevents useless resource usage and abuse.
+
+__Default__: Enabled
+
+### image.enable.cache
+
+Enable caching of generated images.
+
+__Required by__: `image.enable.pregeneration`, `image.enable.restriction`
+
+__Default__: Enabled
+
+### page.enable.cache
+
+Enable caching of generated pages.
+
+__Default__: Enabled
+
+### cat.per_page
+
+Number of pages to display on a single category posts page.
+
+__Default__: Unlimited
+
+### cat.<name>.main
+
+Set the main page for the category by the name of `<name>`.
+This means that it will be displayed before all other categories, regardless
+of their creation dates. The value of this option is the page filename.
+
+You can also mark a page as the main page of a category from within the page
+source itself, like so:
+
+    @category.some_cat.main;
+
+If multiple pages are marked as the main page of a category, the one with
+the most recent creation time is preferred. If this option is provided,
+however, the page specified by it will always be preferred.
+
+__Default__: None; show newest at top
+
+### cat.<name>.title
+
+Sets the human-readable title for the category by the name of `<name>`.
+
+You can also set the title of a category from within the category file
+itself using the "title" key.
+
+__Default__: None; page filename displayed as title
+
+### var.*
+
+Global wiki variable space. Variables defined in this space will be
+available throughout the wiki. However they may be overwritten on a
+particular page.
+
+Example (in config):
+
+    @var.site.url: http://mywiki.example.com
+    @var.site.display_name: MyWiki;
+
+Example (on main page):
+
+    Welcome to [@site.display_name]!
+
+## Wikifier::Wiki private options
+
+Private Wikifier::Wiki options may be in a separation configuration file.
 This is where administrator credentials are stored. You can also put them in the
 primary configuration file, but this is not recommended.
 
-admin.<username>.name
+### admin.<username>.name
 
-    The real name for the administrator <username>. This is used to attribute
-    page creation, image upload, etc. to the user. It may be displayed to the
-    public as the author or maintainer of a page or the owner of some file.
-    It is also used for Wikifier::Wiki's built-in revision tracking.
+The real name for the administrator `<username>`. This is used to attribute
+page creation, image upload, etc. to the user. It may be displayed to the
+public as the author or maintainer of a page or the owner of some file.
+It is also used for Wikifier::Wiki's built-in revision tracking.
 
-admin.<username>.email
+### admin.<username>.email
 
-    The email address of the administrator <username>. Currently this is used
-    only for Wikifier::Wiki's built-in revision tracking.
+The email address of the administrator `<username>`. Currently this is used
+only for Wikifier::Wiki's built-in revision tracking.
 
-admin.<username>.crypt
+### admin.<username>.crypt
 
-    The type of encryption used for the password of administrator <username>.
+The type of encryption used for the password of administrator `<username>`.
 
-    Accepted values:
-        none    (plain text)
-        sha1    (default)
-        sha256
-        sha512
+* _none_ - plain text
+* _sha1_ - __Default__
+* _sha256_
+* _sha512_
 
-admin.<username>.password
+### admin.<username>.password
 
-    The password of the administrator <username>. It must be encrypted in
-    the crypt set by admin.<username>.crypt.
-```
+The password of the administrator `<username>`. It must be encrypted in
+the crypt set by `admin.<username>.crypt`.
+
 
 ## Wikifier::Server options
 
-```
-server.socket.type              Default: unix
+### server.socket.type
 
-    The socket domain to use for listening. Currently, only UNIX is supported.
+The socket domain to use for listening. Currently, only UNIX is supported.
 
-server.socket.path
+__Default__: _unix_
 
-    The path of a UNIX socket to listen on.
+### server.socket.path
 
-server.enable.pregeneration     Default: disabled (but recommended)
+The path of a UNIX socket to listen on.
 
-    If enabled, the Wikifier::Server will generate all pages upon the first
-    start. It will then monitor all page files and regenerate them as soon as
-    they are modified, greatly reducing the first page load time.
+### server.enable.pregeneration
 
-    Requires:
-        page.enable.cache
+If enabled, the Wikifier::Server will generate all pages upon the first
+start. It will then monitor all page files and regenerate them as soon as
+they are modified, greatly reducing the first page load time.
 
-server.wiki.<name>.config
+__Requires__: `page.enable.cache`
 
-    The path to the configuration file for the wiki by the name of <name>.
-    Any number of wikis can be configured on a single server using this.
+__Default__: Disabled (but recommended)
 
-server.wiki.<name>.private
+### server.wiki.<name>.config
 
-    The path to the PRIVATE configuration file for the wiki by the name of
-    <name>. This is where administrator credentials are stored. If it is not
-    provided, it will be assumed that this information is in the primary
-    configuration file. Be sure that the private configuration is not inside
-    the HTTP server root or has proper permissions to deny access to it.
+The path to the configuration file for the wiki by the name of `<name>`.
+Any number of wikis can be configured on a single server using this.
 
-server.wiki.<name>.password
+### server.wiki.<name>.private
 
-    The read authentication password for the wiki by the name of <name>
-    in plain text.
-```
+The path to the PRIVATE configuration file for the wiki by the name of
+`<name>`. This is where administrator credentials are stored. If it is not
+provided, it will be assumed that this information is in the primary
+configuration file. Be sure that the private configuration is not inside
+the HTTP server root or has proper permissions to deny access to it.
+
+### server.wiki.<name>.password
+
+The read authentication password for the wiki by the name of `<name>`
+in plain text.
