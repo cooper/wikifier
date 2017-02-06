@@ -13,7 +13,7 @@ of a full wiki, and others yet for the operation of a wiki server.
     * [root](#root)
     * [dir](#dir)
     * [external](#external)
-    * [page\.enable\.titles](#pageenabletitles)
+    * [page\.enable\.title](#pageenabletitle)
     * [page\.enable\.footer](#pageenablefooter)
     * [image\.size\_method](#imagesize_method)
     * [image\.calc](#imagecalc)
@@ -171,7 +171,7 @@ of `[! article !]`.
 Page names will be translated to URLs in a format compatible with MediaWiki.
 Currently this is non-configurable.
 
-### page.enable.titles
+### page.enable.title
 
 If enabled, the first section's title will be the title of the page. You
 may want to disable this if your wiki content is embedded within a template
