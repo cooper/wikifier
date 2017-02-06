@@ -64,7 +64,7 @@ use 5.010;
 #
 #   (others)    these contain partial data until the end of a catch:
 #               var_name, var_value, var_no_interpolate, var_is_string,
-#               var_is_negated, curly_content
+#               var_is_negated, curly_first
 
 sub new {
     my ($class, %opts) = @_;
@@ -211,17 +211,18 @@ sub catch {
 
     # there's already a catch, and this is only allowed at the top level
     if ($c->{catch} && !$c->{catch}{is_toplevel} && !$opts{nested_ok}) {
-        return $c->error(
+        $c->error(
             "Attempted to start $opts{hr_name} in the middle of ".
             $c->{catch}{hr_name}
         );
+        return; # failure
     }
 
     @opts{'line', 'col'} = @$c{'line', 'col'};
     $opts{position} ||= [];
     $opts{parent}   ||= $c->catch;
     $c->{catch} = \%opts;
-    return; # success
+    return 1; # success
 }
 
 # set the catch back to the parent

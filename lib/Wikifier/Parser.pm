@@ -102,6 +102,28 @@ sub handle_character {
     CHAR:    for ($char) {                      # next CHAR skips default
     DEFAULT: for ($char) {  my $use_default;    # next DEFAULT goes to default
 
+    # before ANYTHING else, check if we are in a curly escape
+    if ($c->is_curly) {
+
+        # increase curly count
+        my $is_first = delete $c->{curly_first};
+        if ($char eq '{' && !$is_first) {
+            $c->mark_curly;
+        }
+
+        # only ->clear_curly if this is NOT the last curly
+        elsif ($char eq '}') {
+            $c->clear_curly;
+            $c->clear_catch if !$c->is_curly;
+        }
+
+        # go to next char if this was the initial or final curly bracket
+        next CHAR if $is_first || !$c->is_curly;
+
+        # go to default which will ->append_content to the curly escape catch
+        next DEFAULT;
+    }
+
     # comment entrance
     if ($char eq '/' && $c->{next_char} eq '*') {
         next DEFAULT if $c->is_escaped;
@@ -222,6 +244,25 @@ sub handle_character {
 
         # set the block
         $c->block($block);
+
+        # if the next char is {, this is type {{ content }}
+        if ($c->{next_char} eq '{') {
+
+            # mark as in a curly escape
+            $c->{curly_first}++;
+            $c->mark_curly;
+
+            # set the current catch to the curly escape.
+            # the content and position are that of the block itself.
+            # the parent catch will be the block catch.
+            $c->catch(
+                name        => 'curly_escape',
+                hr_name     => 'curly-escaped '.$block->hr_type,
+                location    => $block->{content},
+                position    => $block->{position},
+                nested_ok   => 1 # it will always be nested by the block
+            ) or next CHAR;
+        }
     }
 
     # closes a block
@@ -349,7 +390,7 @@ sub handle_character {
                 skip_chars  => qr/\s/,
                 prefix      => [ $prefix, $c->pos ],
                 location    => $c->{var_name} = []
-            ) and next CHAR;
+            ) or next CHAR;
         }
 
         # starts a variable value
@@ -369,7 +410,7 @@ sub handle_character {
                 hr_name     => "variable \@$hr_var value",
                 valid_chars => qr/./s,
                 location    => $c->{var_value} = []
-            ) and next CHAR;
+            ) or next CHAR;
         }
 
         # ends a variable name (for booleans) or value
@@ -495,7 +536,7 @@ sub handle_character {
     # the current character is '\', so set $c->{escaped} for the next
     # character. unless, of course, this escape itself is escaped.
     # (determined with current{escaped})
-    if ($char eq '\\' && !$c->is_escaped) {
+    if ($char eq '\\' && !$c->is_escaped && !$c->curly) {
         $c->mark_escaped;
     }
     else {
