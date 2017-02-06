@@ -133,7 +133,7 @@ infobox [My Article] {
         file: mypic.jpg;
     };
 
-    /* this anonymous value is text, so it must be prefixed with a colon */
+    /* this anonymous value is text, so it should be prefixed with a colon */
     :This is some text.;
 }
 ```
@@ -381,16 +381,16 @@ list {
 you to retrieve and set their values using the wikifier variable attribute
 syntax.
 ```
-@greetings: list {
-    hello;
-    bonjour;
-    buenos dias;
+@alphabet: list {
+    a;
+    b;
+    c;
+    ... the rest;
 };
 
-@greetings.2: hola;
-
-sec [Greetings around the world] {
-    [@greetings]
+sec {
+    Breaking News: [@alphabet.0] is the first letter of the alphabet,
+    and [@alphabet.25] is the last.
 }
 ```
 
