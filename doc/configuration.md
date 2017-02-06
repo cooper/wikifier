@@ -111,22 +111,24 @@ __Default__: *Wiki*
 
 ### root
 
-* `root.wiki`   - wiki root.    __Default__: '' (i.e. /)
-* `root.page`   - page root.    __Default__: /page
-* `root.image`  - image root.   __Default__: /images
+| Option        | Description   | Default       |
+| -----         | -----         | -----         |
+| `root.wiki`   | Wiki root     | '' (i.e. /)   |
+| `root.page`   | Page root     | */page*       |
+| `root.image`  | Image root    | */images*     |
 
 HTTP roots. These are relative to the server HTTP root, NOT the wiki root.
 They are used for link targets and image URLs; they will never be used to
 locate content on the filesystem. Do not include trailing slashes.
 
-It may be useful to use root.wiki within the definitions of the rest:
+It may be useful to use `root.wiki` within the definitions of the rest:
 
     @root.wiki:     /mywiki;
     @root.page:     [@root.wiki]/page;
     @root.image:    [@root.wiki]/images;
 
 If you are using Wikifier::Wiki (or a wiki server) in conjunction with
-image.enable.cache and image.enable.pregeneration, you should set root.image
+`image.enable.cache` and `image.enable.pregeneration`, you should set root.image
 to wherever your cache directory can be found on the HTTP root. This is
 where generated images are cached, and full-sized images are symbolically
 linked to. This allows the web server to deliver images directly, which is
@@ -134,36 +136,38 @@ certainly most efficient.
 
 ### dir
 
-* `dir.wikifier`  - wikifier repository
-* `dir.wiki`      - wiki root directory
-* `dir.page`      - page files stored here
-* `dir.image`     - image originals stored here
-* `dir.model`     - models stored here
-* `dir.cache`     - generated page and image cache files stored here
-* `dir.category`  - generated category files stored here
+| Option            | Description                                           |
+| -----             | -----                                                 |
+| `dir.wikifier`    | Wikifier repository                                   |
+| `dir.wiki`        | Wiki root directory                                   |
+| `dir.page`        | Page files stored here                                |
+| `dir.image`       | Image originals stored here                           |
+| `dir.model`       | Model files stored here                               |
+| `dir.cache`       | Generated page and image cache files stored here      |
+| `dir.category`    | Generated category files stored here                  |
 
 Directories on the filesystem. It is strongly recommended that they are
 absolute paths; otherwise they will be dictated by whichever directory the
-script is started from. All are required except dir.wikifier and dir.wiki.
+script is started from. All are required except `dir.wikifier` and `dir.wiki`.
 The directories will be created if they do not exist. Do not include
 trailing slashes.
 
-It may be useful to use dir.wiki within the definitions of the rest:
+It may be useful to use `dir.wiki` within the definitions of the rest:
 
     @dir.wiki:      /home/www/mywiki;
     @dir.page:      [@dir.wiki]/pages;
     @dir.cache:     [@dir.wiki]/cache;
 
 It is recommended that all of the files related to one wiki exist within
-a master wiki directory (dir.wiki), but this is not technically required
+a master wiki directory (`dir.wiki`), but this is not technically required
 unless you are using Wikifer::Wiki's built-in revision tracking.
 
 ### external
 
-* `external.name` - External wiki name, displayed in link tooltips.
-  __Default__: *Wikipedia*
-* `external.root` - External wiki page root.
-  __Default__: *http://en.wikipedia.org/wiki*
+| Option            | Description                                       | Default                           |
+| -----             | -----                                             | -----                             |
+| `external.name`   | External wiki name, displayed in link tooltips    | *Wikipedia*                       |
+| `external.root`   | External wiki page root                           | *http://en.wikipedia.org/wiki*    |
 
 External wiki information. This is used for External wiki links in the form
 of `[! article !]`.
@@ -190,15 +194,16 @@ __Default__: Disabled
 
 The method which the Wikifier should use to scale images.
 
+**Accepted values**
 * _javascript_ - JavaScript-injected image sizing
 * _server_ - server-side image sizing using `image.sizer` and `image.calc`
   (recommended)
 
-When set to 'server', the options image.calc and image.sizer are required.
-If using Wikifier::Page directly, image.calc is provided but requires that
+When set to _server_, the options `image.calc` and `image.sizer` are required.
+If using Wikifier::Page directly, `image.calc` is provided but requires that
 you install Image::Size. In that case, you are required to provide a
-custom image.sizer routine. If using Wikifier::Wiki, image.calc and
-image.sizer are both provided, but GD must be installed from CPAN.
+custom `image.sizer` routine. If using Wikifier::Wiki, `image.calc` and
+`image.sizer` are both provided, but GD must be installed from CPAN.
 
 __Default__ (Page): _javascript_
 
@@ -221,6 +226,7 @@ The desired rounding method used when determining image dimensions. Used by
 the default `image.calc`. If a custom `image.calc` is provided, this will not be
 utilized.
 
+**Accepted values**
 * _normal_ - round up from .5 or more, down for less
 * _up_ - always round up
 * _down_ - always round down
@@ -250,6 +256,7 @@ The desired file type for generated images. This is used by Wikifier::Wiki
 when generating images of different dimensions. All resulting images will be
 in this format, regardless of their original format.
 
+**Accepted values**
 * _png_ - larger, lossless compression
 * _jpeg_ - smaller, lossy compression
 
@@ -390,6 +397,7 @@ only for Wikifier::Wiki's built-in revision tracking.
 
 The type of encryption used for the password of administrator `[username]`.
 
+**Accepted values**
 * _none_ (plain text)
 * _sha1_
 * _sha256_
