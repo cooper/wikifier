@@ -91,7 +91,7 @@ sub handle_line {
     return;
 }
 
-my %variable_tokens = map { $_ => 1 } qw(@ % : ;);
+my %variable_tokens = map { $_ => 1 } qw(@ % : ; -);
 
 # parse a single character.
 # note: never return from this method; instead last from for loop.
@@ -330,15 +330,26 @@ sub handle_character {
 
         # starts a variable name
         if ($char =~ m/[@%]/ && $c->catch->{is_block}) {
+
+            # disable interpolation if it's %var
+            $c->{var_no_interpolate}++ if $char eq '%';
+
+            # negate the value if -@var
+            my $prefix = $char;
+            if ($c->{last_char} eq '-') {
+                $prefix = $c->{last_char}.$prefix;
+                $c->{var_is_negated}++;
+            }
+
+            # catch the var name
             $c->catch(
                 name        => 'var_name',
                 hr_name     => 'variable name',
                 valid_chars => qr/[\w\.]/,
                 skip_chars  => qr/\s/,
-                prefix      => [ $char, $c->pos ],
+                prefix      => [ $prefix, $c->pos ],
                 location    => $c->{var_name} = []
             ) and next CHAR;
-            $c->{var_no_interpolate}++ if $char eq '%';
         }
 
         # starts a variable value
@@ -366,8 +377,9 @@ sub handle_character {
             $c->clear_catch;
             my ($var, $val) =
                 _get_var_parts(delete @$c{ qw(var_name var_value) });
-            my ($is_string, $no_intplt) =
-                delete @$c{ qw(var_is_string var_no_interpolate) };
+            my ($is_string, $no_intplt, $is_negated) = delete @$c{qw(
+                var_is_string var_no_interpolate var_is_negated
+            )};
 
             # more than one content? not allowed in variables
             return $c->error("Variable can't contain both text and blocks")
@@ -397,11 +409,17 @@ sub handle_character {
             }
 
             # set the value
+            $val = !$val if $is_negated;
             $val = $page->set($var => $val);
 
             # run ->parse and ->html if necessary
             _parse_vars($page, 'parse', $val);
             _parse_vars($page, 'html',  $val);
+        }
+
+        # -@var
+        elsif ($char eq '-' && $c->{next_char} =~ m/[@%]/) {
+            # do nothing; just prevent the - from making it to default
         }
 
         # should never reach this, but just in case

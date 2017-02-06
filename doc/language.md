@@ -128,7 +128,8 @@ Wikifier supports string, boolean, and block variables.
 
 **Boolean** variables look like this:
 ```
-@some_bool;
+@some_bool;     /* true  */
+-@some_bool;    /* false */
 ```
 
 **Block** variables look like this:
