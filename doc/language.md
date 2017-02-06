@@ -295,17 +295,17 @@ at the very top of a page source file.
 * `@page.created` - UNIX timestamp of the page creation time. This is not used
   in the Wikifier itself, but can be used in frontends for sorting the page list
   by creation date.
-* `@page.author` - The name of the page author. This is also optional but may be
+* `@page.author` - Name of the page author. This is also optional but may be
   used by frontends to organize pages by author.
-* `@page.draft` - This boolean value marks the page as a draft. This means that
-  it will not be served to unauthenticated users or cached.
-* `@page.enable` - contains boolean attributes which allow you to enable or disable
-  certain features specific to the page.
-    * `@page.enable.title` - whether to display the page title (from
+* `@page.draft` - [Boolean](#assignment) value which marks the page as a draft.
+  This means that it will not be served to unauthenticated users.
+* `@page.enable` - Contains [boolean](#assignment) attributes which allow you to
+  enable or disable certain features specific to the page.
+    * `@page.enable.title` - Whether to display the page title (from
       `@page.title`) as the header of the first `section{}` block. Overrides the
       wiki configuration option
       [page.enable.title](configuration.md#pageenabletitle).
-    * `@page.enable.footer` - whether to omit the closing `<div>` tags such that
+    * `@page.enable.footer` - Whether to omit the closing `<div>` tags such that
       a page footer can be injected. Overrides the wiki configuration option
       [page.enable.footer](configuration.md#pageenablefooter).
 
