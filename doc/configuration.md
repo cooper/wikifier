@@ -29,21 +29,21 @@ of a full wiki, and others yet for the operation of a wiki server.
     * [image\.enable\.cache](#imageenablecache)
     * [page\.enable\.cache](#pageenablecache)
     * [cat\.per\_page](#catper_page)
-    * [cat\.\.main](#catmain)
-    * [cat\.\.title](#cattitle)
+    * [cat\.[name]\.main](#catnamemain)
+    * [cat\.[name]\.title](#catnametitle)
     * [var\.\*](#var)
   * [Wikifier::Wiki private options](#wikifierwiki-private-options)
-    * [admin\.\.name](#adminname)
-    * [admin\.\.email](#adminemail)
-    * [admin\.\.crypt](#admincrypt)
-    * [admin\.\.password](#adminpassword)
+    * [admin\.[username]\.name](#adminusernamename)
+    * [admin\.[username]\.email](#adminusernameemail)
+    * [admin\.[username]\.crypt](#adminusernamecrypt)
+    * [admin\.[username]\.password](#adminusernamepassword)
   * [Wikifier::Server options](#wikifierserver-options)
     * [server\.socket\.type](#serversockettype)
     * [server\.socket\.path](#serversocketpath)
     * [server\.enable\.pregeneration](#serverenablepregeneration)
-    * [server\.wiki\.\.config](#serverwikiconfig)
-    * [server\.wiki\.\.private](#serverwikiprivate)
-    * [server\.wiki\.\.password](#serverwikipassword)
+    * [server\.wiki\.[name]\.config](#serverwikinameconfig)
+    * [server\.wiki\.[name]\.private](#serverwikinameprivate)
+    * [server\.wiki\.[name]\.password](#serverwikinamepassword)
 
 ### Configuration files
 
@@ -63,7 +63,7 @@ it is required as the first argument to the `wikiserver` executable.
 store your wiki configuration file at a path outside of the wiki root, just in
 case it contains sensitive information. If you are using a wiki server, the path
 of each wiki's configuration file is defined in the server configuration using
-the `server.wiki.<name>.config` option. If you are using Wikifier::Wiki
+the `server.wiki.[name].config` option. If you are using Wikifier::Wiki
 directly, the path to the wiki configuration must be provided to the
 constructor:
 ```perl
@@ -75,7 +75,7 @@ the credentials of administrators can exist more securely than in the primary
 configuration. This file certainly should not be within the wiki root because
 that would probably allow anyone to download it from the web server. If you are
 using a wiki server, the path of the private configuration is defined by
-`server.wiki.<name>.private`. If you are using Wikifier::Wiki directly, the path
+`server.wiki.[name].private`. If you are using Wikifier::Wiki directly, the path
 to the private configuration may be provided to the constructor:
 ```perl
 my $wiki = Wikifier::Wiki->new(
@@ -181,7 +181,7 @@ __Default__: Enabled
 
 ### page.enable.footer
 
-If enabled, the closing `</div>` tags will be omitted from the final section
+If enabled, the closing `/div>` tags will be omitted from the final section
 and wiki block. This allows a footer to be injected before closing them off.
 
 __Default__: Disabled
@@ -327,9 +327,9 @@ Number of pages to display on a single category posts page.
 
 __Default__: Unlimited
 
-### cat.<name>.main
+### cat.[name].main
 
-Set the main page for the category by the name of `<name>`.
+Set the main page for the category by the name of `[name]`.
 This means that it will be displayed before all other categories, regardless
 of their creation dates. The value of this option is the page filename.
 
@@ -344,9 +344,9 @@ however, the page specified by it will always be preferred.
 
 __Default__: None; show newest at top
 
-### cat.<name>.title
+### cat.[name].title
 
-Sets the human-readable title for the category by the name of `<name>`.
+Sets the human-readable title for the category by the name of `[name]`.
 
 You can also set the title of a category from within the category file
 itself using the "title" key.
@@ -374,31 +374,31 @@ Private Wikifier::Wiki options may be in a separation configuration file.
 This is where administrator credentials are stored. You can also put them in the
 primary configuration file, but this is not recommended.
 
-### admin.<username>.name
+### admin.[username].name
 
-The real name for the administrator `<username>`. This is used to attribute
+The real name for the administrator `[username]`. This is used to attribute
 page creation, image upload, etc. to the user. It may be displayed to the
 public as the author or maintainer of a page or the owner of some file.
 It is also used for Wikifier::Wiki's built-in revision tracking.
 
-### admin.<username>.email
+### admin.[username].email
 
-The email address of the administrator `<username>`. Currently this is used
+The email address of the administrator `[username]`. Currently this is used
 only for Wikifier::Wiki's built-in revision tracking.
 
-### admin.<username>.crypt
+### admin.[username].crypt
 
-The type of encryption used for the password of administrator `<username>`.
+The type of encryption used for the password of administrator `[username]`.
 
 * _none_ - plain text
 * _sha1_ - __Default__
 * _sha256_
 * _sha512_
 
-### admin.<username>.password
+### admin.[username].password
 
-The password of the administrator `<username>`. It must be encrypted in
-the crypt set by `admin.<username>.crypt`.
+The password of the administrator `[username]`. It must be encrypted in
+the crypt set by `admin.[username].crypt`.
 
 
 ## Wikifier::Server options
@@ -423,20 +423,20 @@ __Requires__: `page.enable.cache`
 
 __Default__: Disabled (but recommended)
 
-### server.wiki.<name>.config
+### server.wiki.[name].config
 
-The path to the configuration file for the wiki by the name of `<name>`.
+The path to the configuration file for the wiki by the name of `[name]`.
 Any number of wikis can be configured on a single server using this.
 
-### server.wiki.<name>.private
+### server.wiki.[name].private
 
 The path to the PRIVATE configuration file for the wiki by the name of
-`<name>`. This is where administrator credentials are stored. If it is not
+`[name]`. This is where administrator credentials are stored. If it is not
 provided, it will be assumed that this information is in the primary
 configuration file. Be sure that the private configuration is not inside
 the HTTP server root or has proper permissions to deny access to it.
 
-### server.wiki.<name>.password
+### server.wiki.[name].password
 
-The read authentication password for the wiki by the name of `<name>`
+The read authentication password for the wiki by the name of `[name]`
 in plain text.
