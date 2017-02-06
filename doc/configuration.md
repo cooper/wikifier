@@ -390,10 +390,12 @@ only for Wikifier::Wiki's built-in revision tracking.
 
 The type of encryption used for the password of administrator `[username]`.
 
-* _none_ - plain text
-* _sha1_ - __Default__
+* _none_ (plain text)
+* _sha1_
 * _sha256_
 * _sha512_
+
+__Default__: *sha1*
 
 ### admin.[username].password
 
