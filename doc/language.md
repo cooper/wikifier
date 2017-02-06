@@ -299,6 +299,15 @@ at the very top of a page source file.
   used by frontends to organize pages by author.
 * `@page.draft` - This boolean value marks the page as a draft. This means that
   it will not be served to unauthenticated users or cached.
+* `@page.enable` - contains boolean attributes which allow you to enable or disable
+  certain features specific to the page.
+    * `@page.enable.title` - whether to display the page title (from
+      `@page.title`) as the header of the first `section{}` block. Overrides the
+      wiki configuration option
+      [page.enable.title](configuration.md#pageenabletitle).
+    * `@page.enable.footer` - whether to omit the closing `<div>` tags such that
+      a page footer can be injected. Overrides the wiki configuration option
+      [page.enable.footer](configuration.md#pageenablefooter).
 
 `@category` is used to mark the page as belonging to a category. Each
 attribute of it is a boolean. If present, the page belongs to that category.

@@ -181,7 +181,7 @@ __Default__: Enabled
 
 ### page.enable.footer
 
-If enabled, the closing `/div>` tags will be omitted from the final section
+If enabled, the closing `</div>` tags will be omitted from the final section
 and wiki block. This allows a footer to be injected before closing them off.
 
 __Default__: Disabled
