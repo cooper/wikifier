@@ -351,6 +351,7 @@ sub handle_character {
                 if !length $var;
 
             # now catch the value
+            $c->{var_is_string}++;
             my $hr_var = truncate_hr($var, 30);
             $c->catch(
                 name        => 'var_value',
@@ -364,7 +365,9 @@ sub handle_character {
         elsif ($char eq ';' && $c->{catch}{name} =~ m/^var_name|var_value$/) {
             $c->clear_catch;
             my ($var, $val) =
-                _get_var_parts(delete @$c{'var_name', 'var_value'});
+                _get_var_parts(delete @$c{ qw(var_name var_value) });
+            my ($is_string, $no_intplt) =
+                delete @$c{ qw(var_is_string var_no_interpolate) };
 
             # more than one content? not allowed in variables
             return $c->error("Variable can't contain both text and blocks")
@@ -377,13 +380,21 @@ sub handle_character {
                 if !length $var;
 
             # string
-            if (length $val) {
+            if ($is_string && length $val) {
                 $val = $wikifier->parse_formatted_text($page, $val)
-                if !delete $c->{var_no_interpolate} && !ref $val;
+                    if !$no_intplt && !ref $val;
             }
 
             # boolean
-            else { $val = 1 }
+            elsif (!$is_string) {
+                $val = 1;
+            }
+
+            # no length and not a boolean.
+            # there is no value here
+            else {
+                undef $val;
+            }
 
             # set the value
             $val = $page->set($var => $val);

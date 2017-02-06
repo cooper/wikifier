@@ -50,7 +50,7 @@ use 5.010;
 #               produce errors with ->error($msg)
 #
 #   (others)    these contain partial data until the end of a catch:
-#               var_name, var_value, var_no_interpolate
+#               var_name, var_value, var_no_interpolate, var_is_string
 
 sub new {
     my ($class, %opts) = @_;
