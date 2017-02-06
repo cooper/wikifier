@@ -17,6 +17,11 @@ Wikifier's source language is designed to be easily legible by the naked eye.
     * [Interpolable variables](#interpolable-variables)
     * [Special variables](#special-variables)
   * [Text formatting](#text-formatting)
+    * [Basic formatting](#basic-formatting)
+    * [Variables](#variables-1)
+    * [Links](#links)
+    * [References](#references)
+    * [Characters](#characters)
 
 ## Blocks
 
@@ -308,7 +313,7 @@ mapped to any options provided in the model block.
 Many block types can contain **formatted text**. Square brackets `[` and `]` are
 used for text formatting tokens.
 
-**Basic formatting**
+### Basic formatting
 * `[b]bold text[/b]` - **bold text**
 * `[s]strikethrough text[/s]` - ~~strikethrough text~~
 * `[i]italicized text[/i]` - *italicized text*
@@ -317,12 +322,12 @@ used for text formatting tokens.
 * `[Aquamarine]some colored text by color name[/]`
 * `[#ff1337]some colored text by hex code[/]`
 
-**Variables**
+### Variables
 * `[@some.variable]` - normal variable
 * `[%some.variable]` - interpolable variable
 * See [Variables](#variables) above
 
-**Links**
+### Links
 * `[[ Page name ]]` - internal wiki page link
 * `[! Page name !]` - external wiki page link
 * `[~ Cat name ~]` - category link
@@ -330,11 +335,11 @@ used for text formatting tokens.
 * For any link type, you can change the display text:
   `[$ Google | http://google.com $]`
 
-**References**
+### References
 * `[ref]` - a fake reference. just to make your wiki look credible.
 * `[1]` - an actual reference number. a true reference.
 
-**Characters**
+### Characters
 * `[nl]` - a line break
 * `[--]` - an en dash
 * `[---]` - an em dash
