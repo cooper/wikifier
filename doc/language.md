@@ -46,11 +46,10 @@ imagebox {
 #### Named blocks
 
 For block types that support a `[block name]` field, it should follow the block
-type and be delimited by square brackets (`[` and `]`).
-
-The name field may contain additional square brackets (`[` and `]`) inside it
-without the need for the escape character (`\`) as long as the number of opening
-brackets and closing brackets are equal. Otherwise, they must be escaped.
+type and be delimited by square brackets `[` and `]`. The name field may
+contain additional square brackets inside it without the need for the escape
+character (`\`) as long as the number of opening brackets and closing brackets
+are equal. Otherwise, they must be escaped.
 
 ```
 blocktype [block name] {
@@ -220,9 +219,10 @@ sec {
 
 ### Conditionals
 
-You can use **conditionals** `if{}`, `elsif{}`, and `else{}` on variables.
-Currently all that can be tested is the boolean value of a variable. Boolean and
-block variables are always true, and all strings besides zero are true.
+You can use the **conditional blocks** `if{}`, `elsif{}`, and `else{}` on
+variables. Currently all that can be tested is the boolean value of a variable.
+Boolean and block variables are always true, and all strings besides zero are
+true.
 ```
 if [@page.draft] {
     Note to self: Don't forget to publish this page.
@@ -234,8 +234,8 @@ else {
 
 ### Interpolable variables
 
-**Interpolable variables** allow you to evaluate the formatting of a string
-variable at some point after the variable was defined.
+**Interpolable variables** (with the `%` sigil) allow you to evaluate the
+formatting of a string variable at some point after the variable was defined.
 
 Normally the formatting of string variables is evaluated immediately as the
 variable is defined.
@@ -248,7 +248,7 @@ variable is defined.
 */
 ```
 
-Interpolate variables (with the `%` sigil) are different in that their contents
+Interpolate variables are different in that their contents
 are evaluated as they are accessed rather than as they are defined.
 ```
 @another_variable: references other variables;
@@ -272,7 +272,7 @@ double-formatted, resulting in ugly escaped HTML tags visible to clients.
 
 ### Special variables
 
-**`@page`** contains information about the current page. Its attributes are set
+`@page` contains information about the current page. Its attributes are set
 at the very top of a page source file.
 
 * `@page.title` - Human-readable page title. Utilized internally by the
@@ -288,13 +288,13 @@ at the very top of a page source file.
 * `@page.draft` - This boolean value marks the page as a draft. This means that
   it will not be served to unauthenticated users or cached.
 
-**`@category`** is used to mark the page as belonging to a category. Each
+`@category` is used to mark the page as belonging to a category. Each
 attribute of it is a boolean. If present, the page belongs to that category.
 Example:
 * `@category.news;`
 * `@category.important;`
 
-**`@m`** is a special variable used in [models](models.md). Its attributes are
+`@m` is a special variable used in [models](models.md). Its attributes are
 mapped to any options provided in the model block.
 
 ## Text formatting
