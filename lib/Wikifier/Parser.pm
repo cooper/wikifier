@@ -536,7 +536,7 @@ sub handle_character {
     # the current character is '\', so set $c->{escaped} for the next
     # character. unless, of course, this escape itself is escaped.
     # (determined with current{escaped})
-    if ($char eq '\\' && !$c->is_escaped && !$c->curly) {
+    if ($char eq '\\' && !$c->is_escaped && !$c->is_curly) {
         $c->mark_escaped;
     }
     else {
