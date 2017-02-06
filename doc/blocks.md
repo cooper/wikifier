@@ -123,7 +123,7 @@ infobox [My Article] {
     /* this is here to demonstrate that "invisible" blocks (those which
        yield no HTML) are NOT map values and therefore do NOT need to be
        terminated with the semicolon
-   */
+    */
     style {
         border: 1px solid red;
     }
@@ -360,6 +360,22 @@ list {
 [block](language.md#blocks) but not both simultaneously. Values are terminated
 by the semicolon (`;`). If the value is text, additional semicolons may be
 included by prefixing them with the escape character (`\`).
+```
+list {
+
+    /* this is here to demonstrate that "invisible" blocks (those which
+       yield no HTML) are NOT list values and therefore do NOT need to be
+       terminated with the semicolon
+    */
+    style {
+        border: 1px solid red;
+    }
+
+    Item one;
+    Item two;
+    Item three can have an escaped semicolon\; I think;
+}
+```
 
 **Attributes**. Lists support attribute fetching and assignment, which allows
 you to retrieve and set their values using the wikifier variable attribute
