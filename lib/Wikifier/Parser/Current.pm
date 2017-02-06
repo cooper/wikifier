@@ -30,15 +30,28 @@ use 5.010;
 #   col         current column number (actually column + 1)
 #
 #   escaped     true if the current character was escaped (last character = \)
-#               check with ->is_escaped. mark with ->mark_escaped
+#               check   ->is_escaped
+#               mark    ->mark_escaped
+#               clear   ->clear_escaped
 #
 #   ignored     true if the character is a master parser character({, }, etc.)
 #               these are "ignored" in that if they are escaped they will not be
 #               re-escaped for block parsers or the formatting parser.
-#               check with ->is_ignored. mark with ->mark_ignored
+#               check   ->is_ignored
+#               mark    ->mark_ignored
+#               clear   ->clear_ignored
 #
 #   comment     true if the character is inside a comment and should be ignored.
-#               check with ->is_comment. mark with ->mark_comment
+#               check   ->is_comment
+#               mark    ->mark_comment
+#               clear   ->clear_comment
+#
+#   curly       if 1 or greater, this block treats curly brackets inside as
+#               text because the block was written as type{{ content }}. this
+#               value is the current number of unmatched opening curly brackets.
+#               check   ->is_curly
+#               mark    ->mark_curly
+#               clear   ->clear_curly
 #
 #   warnings    an array reference to which parser warnings are pushed. this
 #               will later be copied to $page->{warnings} and will be included
@@ -51,7 +64,7 @@ use 5.010;
 #
 #   (others)    these contain partial data until the end of a catch:
 #               var_name, var_value, var_no_interpolate, var_is_string,
-#               var_is_negated
+#               var_is_negated, curly_content
 
 sub new {
     my ($class, %opts) = @_;
@@ -64,28 +77,30 @@ sub new {
 }
 
 # escaped characters
-sub is_escaped    { shift->{escaped}   }
-sub mark_escaped  { shift->{escaped}++ }
-sub clear_escaped {
-    my $c = shift;
-    $c->{escaped}-- if ($c->{escaped} || 0) > 0;
-}
+sub is_escaped      { &_is      }
+sub mark_escaped    { &_mark    }
+sub clear_escaped   { &_clear   }
 
 # /* block comments */
-sub is_comment    { shift->{comment}   }
-sub mark_comment  { shift->{comment}++ }
-sub clear_comment {
-    my $c = shift;
-    $c->{comment}-- if ($c->{comment} || 0) > 0;
-}
+sub is_comment      { &_is      }
+sub mark_comment    { &_mark    }
+sub clear_comment   { &_clear   }
 
 # ignored characters
-sub is_ignored    { shift->{ignored}   }
-sub mark_ignored  { shift->{ignored}++ }
-sub clear_ignored {
-    my $c = shift;
-    $c->{ignored}-- if ($c->{ignored} || 0) > 0;
-}
+sub is_ignored      { &_is      }
+sub mark_ignored    { &_mark    }
+sub clear_ignored   { &_clear   }
+
+# { curly brackets }
+sub is_curly        { &_is      }
+sub mark_curly      { &_mark    }
+sub clear_curly     { &_clear   }
+
+# incremental markers
+sub _is     { my ($c, $w) = &_what; $c->{$w} && $c->{$w} > 0                }
+sub _mark   { my ($c, $w) = &_what; $c->{$w}++                              }
+sub _clear  { my ($c, $w) = &_what; $c->{$w}-- if ($c->{$w} || 0) > 0       }
+sub _what   { my ($w) = (caller 2)[3] =~ m/([^_\W]+)$/; return ($_[0], $w)  }
 
 # the current block
 sub block {
