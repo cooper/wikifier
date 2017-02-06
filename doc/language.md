@@ -7,7 +7,7 @@ Wikifier's source language is designed to be easily legible by the naked eye.
       * [Nameless blocks](#nameless-blocks)
       * [Named blocks](#named-blocks)
       * [Model shorthand](#model-shorthand)
-      * [Blocks in variables](#blocks-in-variables)
+      * [Data types](#data-types)
   * [Variables](#variables)
     * [Assignment](#assignment)
     * [Retrieval](#retrieval)
@@ -103,21 +103,11 @@ model [my_model] {
 }
 ```
 
-#### Blocks in variables
+#### Data types
 
-Blocks can be stored in variables and displayed later.
-
-```
-/* store the infobox in a variable */
-@person: infobox [Britney Spears] {
-    First name:     Britney;
-    Last name:      Spears;
-    Age:            35;
-};
-
-/* display the infobox */
-{@person}
-```
+[`map{}`](blocks.md#map) provides a key-value map datatype. It serves as the
+base of many other block types. Likewise, [`list{}`](blocks.md#list) provides an
+array datatype.
 
 ## Variables
 

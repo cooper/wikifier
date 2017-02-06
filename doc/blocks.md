@@ -4,21 +4,21 @@ This is the list of built-in block types. For a syntactical explanation of
 blocks, see [Language](language.md).
 
 * [Blocks](#blocks)
-  * [Clear](#clear)
-  * [Code](#code)
-  * [Format](#format)
-  * [Map](#map)
-  * [History](#history)
-  * [Html](#html)
-  * [Image](#image)
-  * [Imagebox](#imagebox)
-  * [Infobox](#infobox)
-  * [Invisible](#invisible)
-  * [List](#list)
-  * [Model](#model)
-  * [Paragraph](#paragraph)
-  * [Section](#section)
-  * [Style](#style)
+  * [Clear](#clear) - CSS clear
+  * [Code](#code) - Block of code (`<pre>` and `<code>`)
+  * [Format](#format) - Embedded HTML with formatted text
+  * [Map](#map) - Key-value datatype
+  * [History](#history) - Table of chronological events
+  * [Html](#html) - Embedded HTML
+  * [Image](#image) - `<img>`
+  * [Imagebox](#imagebox) - `<img>` with border, link, and description
+  * [Infobox](#infobox) - Table to summarize article information
+  * [Invisible](#invisible) - Silences all other blocks
+  * [List](#list) - An ordered list datatype as well as `<ul>`
+  * [Model](#model) - Wikifier templates
+  * [Paragraph](#paragraph) - `<p>`
+  * [Section](#section) - Article section with optional header
+  * [Style](#style) - Use CSS with Wikifier
 
 ## Clear
 
@@ -75,8 +75,8 @@ format {
 
 ## Map
 
-A key-value map data type. It can be used for the parameters of other blocks.
-Many other block types inherit from this when they accept key-value options.
+An *ordered* key-value map data type. Many other block types inherit from this
+when they accept key-value options.
 
 Yields no HTML.
 
@@ -84,6 +84,57 @@ Yields no HTML.
 map {
     key:        value;
     other key:  another value;
+}
+```
+
+**Syntax for pairs**. Each pair is separated by a colon (`:`). The left side is
+the key; the right is the value. The key must be plain text (no formatting
+permitted). Colons (`:`) can be included in the key be prefixing them with the
+escape character (`\`). The value may contain
+[formatted text](language.md#text-formatting) or a single
+[block](language.md#blocks) but not both simultaneously. Values are terminated
+with the semicolon (`;`). If the value is text, semicolons can be included by
+prefixing them with the escape character (`\`). Colons (`:`) do not need to be
+escaped in the value.
+```
+map {
+    /* the value of this pair is a block */
+    key: list {
+        a;
+        b;
+        c;
+    };
+
+    /* the value of this pair is text with an escaped semicolon */
+    other key:  another value\; with a semicolon;
+}
+```
+
+**Syntax for standalone values**. In addition to pairs, maps can contain
+anonymous values. These are values which are not mapped to a key. Like values in
+pairs, standalone values are terminated by the semicolon (`;`). If the value is
+text, it should be prefixed with a colon (`:`). The advantage of this is that
+colons consequently need not be escaped in the value. For blocks, this prefixing
+colon is not required. Semicolons (`;`) can be included in standalone text
+values by prefixing them with the escape character (`\`).
+```
+infobox [My Article] {
+
+    /* this is here to demonstrate that "invisible" blocks (those which
+       yield no HTML) are NOT map values and therefore do NOT need to be
+       terminated with the semicolon
+   */
+    style {
+        border: 1px solid red;
+    }
+
+    /* this anonymous value is a block */
+    image {
+        file: mypic.jpg;
+    };
+
+    /* this anonymous value is text, so it must be prefixed with a colon */
+    :This is some text.;
 }
 ```
 
@@ -136,7 +187,7 @@ infobox {
 
 ## History
 
-Displays a timeline of events in a table.
+Displays a timeline of chronological events in a table.
 
 ```
 history {
@@ -293,8 +344,8 @@ invisible {
 
 ## List
 
-A list datatype. It may be used by other block types. By itself though, it
-yields an unordered list.
+An ordered list datatype. It may be used by other block types. By itself though,
+it yields an unordered list element (`<ul>`).
 
 ```
 list {
@@ -304,8 +355,15 @@ list {
 }
 ```
 
-Lists support attribute fetching and assignment, which allows you to retrieve
-and set their values using the wikifier variable attribute syntax.
+**Syntax**. A value may contain
+[formatted text](language.md#text-formatting) or a single
+[block](language.md#blocks) but not both simultaneously. Values are terminated
+by the semicolon (`;`). If the value is text, additional semicolons may be
+included by prefixing them with the escape character (`\`).
+
+**Attributes**. Lists support attribute fetching and assignment, which allows
+you to retrieve and set their values using the wikifier variable attribute
+syntax.
 ```
 @greetings: list {
     hello;
