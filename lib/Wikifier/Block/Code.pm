@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2014, Mitchell Cooper
+# Copyright (c) 2016, Mitchell Cooper
 #
 # code blocks display a block of code or other unformatted text.
 #
@@ -8,19 +7,16 @@ package Wikifier::Block::Code;
 use warnings;
 use strict;
 
-our %block_types = (
-    code => {
-        html => \&code_html
-    }
-);
+our %block_types = (code => {
+    html => \&code_html
+});
 
 sub code_html {
     my ($block, $page, $el) = @_;
     $el->configure(
         type    => 'pre',
-        class   => 'code',
-        content => $block->{content}[0]
+        content => [ @{ $block->{content} } ] # copy
     );
 }
 
-1
+__PACKAGE__
