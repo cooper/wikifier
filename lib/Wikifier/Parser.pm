@@ -278,7 +278,7 @@ sub handle_character {
             # clear the content and set the block name to the variable name
             my $var = length $c->block->name ? $c->block->name : do {
                 my $last = $c->last_content;
-                @{ $c->block->{content} } = [];
+                $c->clear_content;
                 $c->block->{name} = $last;
                 $last;
             };
@@ -335,7 +335,7 @@ sub handle_character {
                 hr_name     => 'variable name',
                 valid_chars => qr/[\w\.]/,
                 skip_chars  => qr/\s/,
-                prefix      => [ $char ],
+                prefix      => [ $char, $c->pos ],
                 location    => $c->{var_name} = []
             ) and next CHAR;
             $c->{var_no_interpolate}++ if $char eq '%';
@@ -423,13 +423,17 @@ sub handle_character {
 
             # fetch the stuff that we caught up to this point.
             # also, fetch the prefixes if there are any.
-            my @stuff = @{ $catch->{location} };
-            unshift @stuff, @{ $catch->{prefix} }
-                if $catch->{prefix};
+            my @location = @{ $catch->{location} };
+            my @position = @{ $catch->{position} };
+            if (my $pfx = $catch->{prefix}) {
+                my ($prefix, $pos) = @$pfx;
+                unshift @location, $prefix;
+                unshift @position, $pos;
+            }
 
             # revert to the parent catch, and add our stuff to it
             $c->clear_catch;
-            $c->append_content(@stuff);
+            $c->push_content_position(\@location, \@position);
         }
 
         # make sure the char is acceptable according to valid_chars

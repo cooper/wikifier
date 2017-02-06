@@ -108,15 +108,36 @@ sub content {
     return @{ $c->{block}{content} };
 }
 
-# push content to the current catch
-sub push_content {
+# returns the current position
+sub pos : method {
     my $c = shift;
-    my $pos = {
+    return {
         line => $c->{line},
         col  => $c->{col}
     };
-    push @{ $c->{catch}{position} }, $pos for 0..$#_;
-    push @{ $c->{catch}{location} }, @_;
+}
+
+# push content to the current catch at the given positions
+sub push_content_position {
+    my ($c, $contents, $positions) = @_;
+    if ($#$contents > $#$positions) {
+        warn '->push_contents(): Not enough positions!';
+        my $last_pos = $positions->[-1] // $c->pos;
+        push @$positions, $last_pos for $#$positions .. $#$contents;
+    }
+    elsif ($#$positions > $#$contents) {
+        warn '->push_contents(): Too many positions!';
+        @$positions[ $#$contents .. $#$positions ] = ();
+    }
+    push @{ $c->{catch}{position} }, @$positions;
+    push @{ $c->{catch}{location} }, @$contents;
+}
+
+# push content to the current catch at the current position
+sub push_content {
+    my ($c, @contents) = @_;
+    my $pos = $c->pos;
+    $c->push_content_position(\@contents, [ ($pos) x @contents ]);
 }
 
 # return the last element in the current catch
@@ -126,11 +147,13 @@ sub last_content {
     return $c->{catch}{location}[-1];
 }
 
-# append a string to the last element in the current catch
+# append content to the last element in the current catch, or call
+# ->push_content if we need to add additional elements.
+# @append may be any combination of strings and blocks
 sub append_content {
     my ($c, @append) = @_;
     foreach my $append (@append) {
-        my $catch    = $c->catch or die;
+        my $catch    = $c->catch;
         my $location = $catch->{location};
 
         # if it's a block, push.
@@ -145,6 +168,13 @@ sub append_content {
     }
 }
 
+# clear the content of the current catch
+sub clear_content {
+    my $catch = shift->catch;
+    @{ $catch->{location} } = [];
+    @{ $catch->{position} } = [];
+}
+
 # set the current catch
 # %opts = (
 #   name        type of catch
@@ -152,7 +182,7 @@ sub append_content {
 #   location    array reference to where content will be pushed
 #   valid_chars (opt) regex for characters that are allowed in the catch
 #   skip_chars  (opt) regex for characters that should be silently ignored
-#   prefix      (opt) array reference of prefixes to be injected on skip_chars
+#   prefix      (opt) [prefix, pos]; prefix to be injected on skip_chars
 #   position    (opt) array reference to where position info will be pushed
 #   nested_ok   (opt) true if we should allow the catch elsewhere than top-level
 #   parent      (opt) the catch we will return to when this one closes
