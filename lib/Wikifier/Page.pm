@@ -348,6 +348,26 @@ sub wiki_opt {
     );
 }
 
+# returns the variable defined on the page if available; otherwise
+# falls back to the wiki option or its default.
+sub page_opt {
+    my ($page, $var, @args) = @_;
+
+    # first see if the page variable exists
+    my $val = $page->get($var);
+
+    # use $wiki->opt if there is a wiki
+    if (!defined $val && blessed $page->{wiki}) {
+        return $page->{wiki}->opt($var, @args);
+    }
+
+    # still nothing?
+    $val //= $page->{opts}{$var};   # opts => { ... } in the page constructor
+    $val //= $wiki_defaults{$var};  # default options as a last resort
+
+    return _call_wiki_opt($val, @args);
+}
+
 sub _call_wiki_opt {
     my ($val, @args) = @_;
     if (ref $val eq 'CODE') {
