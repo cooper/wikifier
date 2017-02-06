@@ -3,6 +3,23 @@
 This is the list of built-in block types. For a syntactical explanation of
 blocks, see [Language](language.md).
 
+* [Blocks](#blocks)
+  * [Clear](#clear)
+  * [Code](#code)
+  * [Format](#format)
+  * [Map](#map)
+  * [History](#history)
+  * [Html](#html)
+  * [Image](#image)
+  * [Imagebox](#imagebox)
+  * [Infobox](#infobox)
+  * [Invisible](#invisible)
+  * [List](#list)
+  * [Model](#model)
+  * [Paragraph](#paragraph)
+  * [Section](#section)
+  * [Style](#style)
+
 ## Clear
 
 Creates an empty `<div>` with `clear: both`.

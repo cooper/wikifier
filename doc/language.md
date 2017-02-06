@@ -2,6 +2,22 @@
 
 Wikifier's source language is designed to be easily legible by the naked eye.
 
+* [Language](#language)
+  * [Blocks](#blocks)
+      * [Nameless blocks](#nameless-blocks)
+      * [Named blocks](#named-blocks)
+      * [Model shorthand](#model-shorthand)
+      * [Blocks in variables](#blocks-in-variables)
+  * [Variables](#variables)
+    * [Assignment](#assignment)
+    * [Retrieval](#retrieval)
+    * [Formatted variables](#formatted-variables)
+    * [Attributes](#attributes)
+    * [Conditionals](#conditionals)
+    * [Interpolable variables](#interpolable-variables)
+    * [Special variables](#special-variables)
+  * [Text formatting](#text-formatting)
+
 ## Blocks
 
 The fundamental component of the Wikifier language is the **block**.

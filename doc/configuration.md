@@ -5,6 +5,13 @@ are categorized by the lowest-level wikifier interface at which they are used.
 Some are required for the generation of a single page, others for the operation
 of a full wiki, and others yet for the operation of a wiki server.
 
+* [Configuration](#configuration)
+    * [Configuration files](#configuration-files)
+    * [Configuration directly from code](#configuration-directly-from-code)
+  * [Wikifier::Page options](#wikifierpage-options)
+  * [Wikifier::Wiki options](#wikifierwiki-options)
+  * [Wikifier::Server options](#wikifierserver-options)
+
 ### Configuration files
 
 The primary method of configuration is to define options in a configuration
