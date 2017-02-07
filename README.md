@@ -80,10 +80,17 @@ sec [Components] {
 
 ## Documentation
 
-* [Configuration](doc/configuration.md) - Configuration options
-* [Language](doc/language.md) - Specification for the Wikifier source language
-* [Blocks](doc/blocks.md) - Built-in block types
-* [Parsing](doc/parsing.md) - Wikifier parsing stages
-* [Models](doc/models.md) - Explanation of Wikifier templates
-* [Styling](doc/styling.md) - Using CSS in Wikifier source
-* [Components](doc/components.md) - Info about Wikifier programming interfaces
+General
+* [Language](doc/language.md)           - Wikifier language specification
+* [Configuration](doc/configuration.md) - Wikifier configuration
+* [Blocks](doc/blocks.md)               - Wikifier built-in block types
+* [Models](doc/models.md)               - Wikifier templates
+* [Styling](doc/styling.md)             - Wikifier + CSS
+
+Technical
+* [Parsing](doc/parsing.md)             - Wikifier parsing stages
+* [Components](doc/components.md)       - Wikifier programming interfaces
+
+## Contact
+
+Go to `#k` on `irc.notroll.net`.
