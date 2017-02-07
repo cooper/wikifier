@@ -102,7 +102,7 @@ sub handle_character {
     CHAR:    for ($char) {                      # next CHAR skips default
     DEFAULT: for ($char) {  my $use_default;    # next DEFAULT goes to default
 
-    # before ANYTHING else, check if we are in a curly escape
+    # before ANYTHING else, check if we are in a brace escape
     if ($c->is_curly) {
 
         # increase curly count
@@ -120,13 +120,12 @@ sub handle_character {
         # go to next char if this was the initial or final curly bracket
         next CHAR if $is_first || !$c->is_curly;
 
-        # go to default which will ->append_content to the curly escape catch
+        # go to default which will ->append_content to the brace escape catch
         next DEFAULT;
     }
 
     # comment entrance
     if ($char eq '/' && $c->{next_char} eq '*') {
-        #next DEFAULT if $c->is_escaped;
         $c->mark_comment;
         next CHAR;
     }
@@ -248,16 +247,16 @@ sub handle_character {
         # if the next char is {, this is type {{ content }}
         if ($c->{next_char} eq '{') {
 
-            # mark as in a curly escape
+            # mark as in a brace escape
             $c->{curly_first}++;
             $c->mark_curly;
 
-            # set the current catch to the curly escape.
+            # set the current catch to the brace escape.
             # the content and position are that of the block itself.
             # the parent catch will be the block catch.
             $c->catch(
-                name        => 'curly_escape',
-                hr_name     => 'curly-escaped '.$block->hr_type,
+                name        => 'brace_escape',
+                hr_name     => 'brace-escaped '.$block->hr_type,
                 location    => $block->{content},
                 position    => $block->{position},
                 nested_ok   => 1 # it will always be nested by the block
@@ -292,7 +291,8 @@ sub handle_character {
             # only evaluate the conditional if the last one was false
             my $before = $c->{conditional};
             if (!$c->{conditional}) {
-                $c->{conditional} = !!_get_conditional($c, $page, $c->block->name);
+                $c->{conditional} =
+                    !!_get_conditional($c, $page, $c->block->name);
                 @add_contents = $c->content if $c->{conditional};
             }
         }
