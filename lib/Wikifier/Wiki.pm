@@ -273,17 +273,16 @@ sub verify_login {
     }
 
     # find the user.
-    my $user = $wiki->{pconf}->get("admin.$username");
-    if (!$user) {
+    my %user = $wiki->{pconf}->get_hash("admin.$username");
+    if (!keys %user) {
         L "Attempted to login as '$username' which does not exist";
         return;
     }
 
-    # make a copy of the user.
-    $user = { %$user, username => $username };
+    $user{username} = $username;
 
     # hash it.
-    my $crypt = delete $user->{crypt};
+    my $crypt = delete $user{crypt};
     $crypt = $crypts{$crypt} ? $crypt : 'sha1';
     my $hash = eval {
         my ($pkg, $func) = @{ $crypts{$crypt} };
@@ -301,13 +300,13 @@ sub verify_login {
     }
 
     # invalid credentials
-    if ($hash ne delete $user->{password}) {
+    if ($hash ne delete $user{password}) {
         L "Incorrect password for '$username'";
         return;
     }
 
     # return the user info, with crypt and password removed.
-    return $user;
+    return \%user;
 }
 
 #####################
