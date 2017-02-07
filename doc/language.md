@@ -3,6 +3,9 @@
 Wikifier's source language is designed to be easily legible by the naked eye.
 
 * [Language](#language)
+  * [Syntax](#syntax)
+    * [Comments](#comments)
+    * [Escaping](#escaping)
   * [Blocks](#blocks)
       * [Nameless blocks](#nameless-blocks)
       * [Named blocks](#named-blocks)
@@ -22,6 +25,90 @@ Wikifier's source language is designed to be easily legible by the naked eye.
     * [Links](#links)
     * [References](#references)
     * [Characters](#characters)
+
+## Syntax
+
+The Wikifier source language is [parsed hierarchically](parsing.md). In other
+words, the source is divided into components (called [blocks](#blocks)) which
+then are responsible for parsing their inner contents. The master parser is
+concerned only with the most basic syntax:
+* Dividing the source into [blocks](#blocks)
+* Stripping [comments](#comments)
+* [Variable assignment](#assignment)
+
+Further parsing is provided by:
+* [Text formatter](#text-formatting)
+* [Map](blocks.md#map) base block type
+* [List](blocks.md#list) base block type
+* Block types may implement custom parsing
+
+### Comments
+
+Currently only C-style block comments are supported:
+```
+/* Some text */
+```
+
+These can span multiple lines and be nested within each other:
+```
+/*
+    Line one
+    Line two has /* a nested comment */
+*/
+```
+
+### Escaping
+
+**Anywhere** in a document, these characters MUST be escaped for literal use:
+
+| Character | Reason                            |
+| -----     | -----                             |
+| `\`       | Escape character                  |
+| `{`       | Starts a [block](#blocks)         |
+| `}`       | Terminates a [block](#blocks)     |
+
+Within [**formatted text**](#text-formatting), the following characters must be
+escaped, in addition to those listed above which must be escaped everywhere:
+
+| Character | Reason                                                    |
+| -----     | -----                                                     |
+| `[`       | Starts a [text formatting](#text-formatting) token        |
+| `]`       | Terminates a [text formatting](#text-formatting) token    |
+
+Within [**maps**](blocks.md#map) and [**lists**](blocks.md#list), these
+characters must also be escaped:
+
+| Character | Must be escaped in                    | Reason                |
+| -----     | -----                                 | -----                 |
+| `;`       | Map keys and values, list values      | Terminates a value    |
+| `:`       | Map keys                              | Terminates a key      |
+
+**Brace-escape**. Sometimes it may be desired to disable all parsing within a
+particular block. This is especially useful for things like
+[`code{}`](blocks.md#code), [`html{}`](blocks.md#html), and
+[`format{}`](blocks.md#format) because then you do not have to escape every
+instance of special characters like `{`, `}`, and `\`. It works as long as there
+is a closing bracket `{` to correspond with every opening bracket `}`. To enable
+brace-escape mode, open and close the block with double curly brackets:
+
+```javascript
+code {{
+    ae.removeLinesInRanges = function (ranges) {
+        if (!ranges || !ranges.length)
+            return;
+        for (var i = biggest; i >= smallest; i--) {
+            if (!rows[i]) {
+                if (typeof lastLine != 'undefined') {
+                    editor.session.doc.removeFullLines(i + 1, lastLine);
+                    lastLine = undefined;
+                }
+                continue;
+            }
+            if (typeof lastLine == 'undefined') lastLine = i;
+        }
+    };
+}}
+```
 
 ## Blocks
 
