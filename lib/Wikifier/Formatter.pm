@@ -322,9 +322,9 @@ sub parse_format_type {
             return '(null)';
         }
 
-        # format text unless this is %var
+        # format text if this is %var
         $val = $wikifier->parse_formatted_text($page, $val, no_variables => 1)
-            if !ref $val && $1 ne '%';
+            if !ref $val && $1 eq '%';
 
         return $val;
     }
