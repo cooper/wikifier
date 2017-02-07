@@ -192,19 +192,7 @@ sub clear_content {
 }
 
 # set the current catch
-# %opts = (
-#   name        type of catch
-#   hr_name     human-readable description of the catch, used in warnings/errors
-#   location    array reference to where content will be pushed
-#   valid_chars (opt) regex for characters that are allowed in the catch
-#   skip_chars  (opt) regex for characters that should be silently ignored
-#   prefix      (opt) [prefix, pos]; prefix to be injected on skip_chars
-#   position    (opt) array reference to where position info will be pushed
-#   nested_ok   (opt) true if we should allow the catch elsewhere than top-level
-#   parent      (opt) the catch we will return to when this one closes
-#   is_block    (opt) true for blocks so that we know to reset $c->block
-#   is_toplevel (opt) true only for the main block
-# )
+# see doc/parsing.md for options
 sub catch {
     my ($c, %opts) = (shift, @_);
     return $c->{catch} if !@_;

@@ -1,11 +1,11 @@
 # Copyright (c) 2016, Mitchell Cooper
 #
 # Wikifier::Parser is a function class of Wikifier which parses wiki source
-# code. This is the master parser; its only purpose is to separates the file
+# code. This is the master parser; its primary purpose is to divide the file
 # into blocks. The content within such blocks is parsed elsewhere by block
 # type classes.
 #
-# This class is never to be used on its own.
+# This class is never to be used directly. Use $page->parse.
 #
 package Wikifier::Parser;
 
