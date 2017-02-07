@@ -27,8 +27,7 @@ sub main_parse {
     # produce warnings for stray text.
     foreach ($block->content_text_pos) {
         my ($text, $pos) = @$_;
-        $pos = { %$pos }; # copy
-
+        
         # trim the text and increment the line number appropriately
         ($text, my $removed) = trim_count($text);
         $pos->{line} += $removed;

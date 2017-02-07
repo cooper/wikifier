@@ -106,7 +106,7 @@ sub list_parse {
                 $warn_bad_maybe->();
                 push @{ $block->{list_array} }, {
                     value => $value,        # value
-                    pos   => { %$pos }      # copy of position
+                    pos   => $pos           # position
                 };
                 push @{ $block->{list_array_values} }, $value;
 

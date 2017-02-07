@@ -290,7 +290,9 @@ sub content_pos {
     my @content = $block->content;
     my @content_pos;
     for (0..$#content) {
-        push @content_pos, [ $content[$_], $block->{position}[$_] ];
+        my $pos = $block->{position}[$_];
+        $pos = $pos ? { %$pos } : {}; # make a copy of the position
+        push @content_pos, [ $content[$_], $pos ];
     }
     return @content_pos;
 }

@@ -104,7 +104,6 @@ sub map_parse {
     # for each content item...
     ITEM: foreach ($block->content_visible_pos) {
         (my $item, $pos) = @$_;
-        $pos = { %$pos }; # copy because we are modifying it
 
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
@@ -204,7 +203,7 @@ sub map_parse {
                     value       => $value,         # value, text or block
                     key         => $key,           # actual hash key
                     is_block    => $is_block,      # true if value was a block
-                    pos         => { %$pos }       # copy of the position
+                    pos         => $pos            # position
                 };
 
                 # warn bad keys and values

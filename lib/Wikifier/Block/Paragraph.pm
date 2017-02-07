@@ -25,7 +25,6 @@ sub paragraph_html {
     $el->configure(type => 'p');
     TEXT: foreach ($block->content_text_pos) {
         my ($item, $pos) = @$_;
-        $pos = { %$pos };
         LINE: foreach my $line (split "\n", $item) {
 
             # trim after formatting so that position is accurate
