@@ -101,7 +101,7 @@ sub handle_data {
 # create Wikifier::Wiki instances.
 sub create_wikis {
     my $w = $conf->get('server.wiki');
-    my %confwikis = $w && ref $w eq 'HASH' ? %$w : {};
+    my %confwikis = %{ $conf->get_href('server.wiki') };
     Lindent 'Initializing wikis';
 
     foreach my $name (keys %confwikis) {

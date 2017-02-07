@@ -207,6 +207,7 @@ sub get_with_err {
 # returns empty hashref if not found.
 sub get_href {
     my $val = &get;
+    $val = $val->to_data if blessed $val && $val->can('to_data');
     return {} if ref $val ne 'HASH';
     return $val;
 }
@@ -215,6 +216,7 @@ sub get_href {
 # returns empty arrayref if not found.
 sub get_aref {
     my $val = &get;
+    $val = $val->to_data if blessed $val && $val->can('to_data');
     return [] if ref $val ne 'ARRAY';
     return $val;
 }
