@@ -256,7 +256,7 @@ sub handle_character {
             # the parent catch will be the block catch.
             $c->catch(
                 name        => 'brace_escape',
-                hr_name     => 'brace-escaped '.$block->hr_type,
+                hr_name     => 'brace-escaped '.$block->hr_desc,
                 location    => $block->{content},
                 position    => $block->{position},
                 nested_ok   => 1 # it will always be nested by the block
@@ -285,7 +285,7 @@ sub handle_character {
         elsif ($c->block->type eq 'elsif') {
 
             # no conditional before this
-            return $c->error('Unexpected '.$c->block->to_desc)
+            return $c->error('Unexpected '.$c->block->hr_desc)
                 if !exists $c->{conditional};
 
             # only evaluate the conditional if the last one was false
@@ -301,7 +301,7 @@ sub handle_character {
         elsif ($c->block->type eq 'else') {
 
             # no conditional before this
-            return $c->error('Unexpected '.$c->block->to_desc)
+            return $c->error('Unexpected '.$c->block->hr_desc)
                 if !exists $c->{conditional};
 
             # title provided

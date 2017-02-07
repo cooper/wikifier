@@ -52,7 +52,7 @@ sub map_parse {
                 !length $thing      ?
                 undef               :
                 blessed $thing      ?
-                $thing->to_desc     :
+                $thing->hr_desc     :
                 q(').truncate_hr($thing, 30).q(');
             $res;
         } @_;

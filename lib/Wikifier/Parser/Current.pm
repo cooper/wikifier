@@ -109,7 +109,7 @@ sub block {
     $c->{block} = $block;
     $c->catch(
         name        => $block->type,
-        hr_name     => $block->to_desc,
+        hr_name     => $block->hr_desc,
         location    => $block->{content}  ||= [],
         position    => $block->{position} ||= [],
         is_block    => 1,

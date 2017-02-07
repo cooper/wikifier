@@ -238,7 +238,7 @@ sub _get_attr {
 
     # it's an object. hopefully it can ->get_attribute or ->to_data
     if (blessed $where) {
-        $desc = $where->to_desc if $where->can('to_desc');
+        $desc = $where->hr_desc if $where->can('hr_desc');
         if ($where->can('get_attribute')) {
             return $where->get_attribute($attr);
         }
@@ -299,7 +299,7 @@ sub _set_attr {
 
     # it's an object. hopefully it can ->set_attribute or ->to_data
     if (blessed $where) {
-        $desc = $where->to_desc if $where->can('to_desc');
+        $desc = $where->hr_desc if $where->can('hr_desc');
         if ($where->can('set_attribute')) {
             return $where->set_attribute($attr, $value);
         }

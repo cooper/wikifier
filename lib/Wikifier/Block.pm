@@ -337,7 +337,7 @@ sub hr_type {
 }
 
 # this is for human-readable version
-sub to_desc {
+sub hr_desc {
     my $block = shift;
     my $title = truncate_hr($block->name, 30);
        $title = length $title ? "[$title]" : '';
