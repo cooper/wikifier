@@ -175,7 +175,7 @@ sub set {
 # set a variable. returns (new value, error)
 sub set_with_err {
     my ($page, $var, $value) = @_;
-    my ($new_val, $err) = _set_var($page->{variables}, $var, $value);
+    my ($new_val, $err) = _set_var($page, $page->{variables}, $var, $value);
     $page->warning($err) if $err;
     return ($new_val, $err);
 }
@@ -273,16 +273,23 @@ sub _get_attr {
 
 # set a variable on $where. returns (new value, error)
 sub _set_var {
-    my ($where, $var, $value) = @_;
+    my ($page, $where, $var, $value) = @_;
     my @parts   = split /\./, $var;
     my $setting = pop @parts;
     while (length($var = shift @parts)) {
         my ($new_where, $err) = _get_attr($where, $var);
         return (undef, $err) if $err;
 
-        # this location doesn't exist, so make a new hash
+        # this location doesn't exist, so make a new map
         if (!$new_where) {
-            $new_where = {};
+            my $c = $page->{main_block}{current};
+            $new_where = $page->wikifier->create_block(
+                type    => 'map',
+                current => $c,
+                line    => $c->{line},
+                col     => $c->{col},
+                parent  => $page->{main_block}
+            );
             _set_attr($where, $var, $new_where);
         }
 

@@ -280,8 +280,9 @@ Variables can have **attributes**. This helps to organize things:
 ```
 
 You don't have to worry about whether a variable exists to define attributes on
-it. A new variable will be created on the fly if necessary (in the above
-example, `@page` does not initially exist but is created automatically).
+it. A new [`map{}`](blocks.md#map) will be created on the fly if necessary
+(in the above example, `@page` does not initially exist, but an empty map is
+allocated automatically).
 
 Some block types support attribute fetching and/or setting:
 ```

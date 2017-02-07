@@ -1,7 +1,7 @@
 # Blocks
 
 This is the list of built-in block types. For a syntactical explanation of
-blocks, see [Language](language.md).
+blocks, see [Language](language.md#blocks).
 
 * [Blocks](#blocks)
   * [Clear](#clear) - CSS clear
