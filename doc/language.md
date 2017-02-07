@@ -59,18 +59,21 @@ These can span multiple lines and be nested within each other:
 
 ### Escaping
 
+Some characters must be escaped for literal use. The escape character (`\`)
+denotes the character immediately following it as escaped.
+
 **Anywhere** in a document, these characters MUST be escaped for literal use:
 
-| Character | Reason                            |
+| Character | Reason for escape                 |
 | -----     | -----                             |
 | `\`       | Escape character                  |
 | `{`       | Starts a [block](#blocks)         |
 | `}`       | Terminates a [block](#blocks)     |
 
 Within [**formatted text**](#text-formatting), the following characters must be
-escaped, in addition to those listed above which must be escaped everywhere:
+escaped in addition to those listed above:
 
-| Character | Reason                                                    |
+| Character | Reason for escape                                         |
 | -----     | -----                                                     |
 | `[`       | Starts a [text formatting](#text-formatting) token        |
 | `]`       | Terminates a [text formatting](#text-formatting) token    |
@@ -78,12 +81,12 @@ escaped, in addition to those listed above which must be escaped everywhere:
 Within [**maps**](blocks.md#map) and [**lists**](blocks.md#list), these
 characters must also be escaped:
 
-| Character | Must be escaped in                    | Reason                |
+| Character | Must be escaped in                    | Reason for escape     |
 | -----     | -----                                 | -----                 |
 | `;`       | Map keys and values, list values      | Terminates a value    |
 | `:`       | Map keys                              | Terminates a key      |
 
-**Brace-escape**. Sometimes it may be desired to disable all parsing within a
+**Brace-escape**. Sometimes it may be desirable to disable all parsing within a
 particular block. This is especially useful for things like
 [`code{}`](blocks.md#code), [`html{}`](blocks.md#html), and
 [`format{}`](blocks.md#format) because then you do not have to escape every
