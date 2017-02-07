@@ -27,10 +27,11 @@ The master parser is concerned only with the most basic syntax:
 * Dividing the source into [blocks](language.md#blocks)
 * Stripping [comments](language.md#comments)
 * [Variable assignment](language.md#assignment)
+* [Conditionals](language.md#conditionals)
 
 ### Current
 
-Parser states are stored in the **current** object:
+Parser state information is stored in the **current** object:
 
 | Key/Method            | Type/Arguments    | Description
 | -----                 | -----             | -----

@@ -35,6 +35,7 @@ concerned only with the most basic syntax:
 * Dividing the source into [blocks](#blocks)
 * Stripping [comments](#comments)
 * [Variable assignment](#assignment)
+* [Conditionals](#conditionals)
 
 Further parsing is provided by:
 * [Text formatter](#text-formatting)
