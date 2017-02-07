@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use 5.010;
 
-# %current
+# %current      (ALSO UPDATE parsing.md)
 #
 #   char        current character
 #
