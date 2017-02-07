@@ -134,7 +134,7 @@ sub pos : method {
 }
 
 # push content to the current catch at the given positions
-sub push_content_position {
+sub push_content_pos {
     my ($c, $contents, $positions) = @_;
     if ($#$contents > $#$positions) {
         warn '->push_contents(): Not enough positions!';
@@ -153,7 +153,7 @@ sub push_content_position {
 sub push_content {
     my ($c, @contents) = @_;
     my $pos = $c->pos;
-    $c->push_content_position(\@contents, [ ($pos) x @contents ]);
+    $c->push_content_pos(\@contents, [ ($pos) x @contents ]);
 }
 
 # return the last element in the current catch

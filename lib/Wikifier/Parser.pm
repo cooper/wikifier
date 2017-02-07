@@ -503,7 +503,7 @@ sub handle_character {
 
             # revert to the parent catch, and add our stuff to it
             $c->clear_catch;
-            $c->push_content_position(\@location, \@position);
+            $c->push_content_pos(\@location, \@position);
         }
 
         # make sure the char is acceptable according to valid_chars

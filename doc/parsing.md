@@ -59,7 +59,8 @@ Parser state information is stored in the **current** object:
 | `->clear_curly`       |                   | decrease the brace-escape level
 | `->warning`           | `$pos, $message`  | push a parser warning at `$pos` or the current position if unspecified
 | `->error`             | `$message`        | throw a fatal parser error. parsing of the document will be aborted
-| `->push_content`      |  `@content`       | push the contents (mixed text/block) to the current catch
+| `->push_content`      | `@content`        | push the contents (mixed text/block) to the current catch at current position
+| `->push_content_pos`  | `\@content, \@pos` | push the contents (mixed text/block) to the current catch at provided positions
 | `->append_content`    | `@content`        | push or append the contents (mixed text/block) to the current catch
 | `->clear_content`     |                   | purge all content and position information from the current catch
 | `->last_content`      | String or [Block](language.md#blocks) | fetch or set the last element of the current catch content
