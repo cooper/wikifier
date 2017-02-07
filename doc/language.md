@@ -410,8 +410,9 @@ mapped to any options provided in the model block.
 
 ## Text formatting
 
-Many block types can contain **formatted text**. Square brackets `[` and `]` are
-used for text formatting tokens.
+Many block types, as well as values in [variable assignment](#assignment), can
+contain **formatted text**. Square brackets `[` and `]` are used to delimit text
+formatting tokens.
 
 ### Basic formatting
 * `[b]bold text[/b]` - **bold text**
