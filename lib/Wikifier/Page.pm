@@ -203,6 +203,12 @@ sub get_with_err {
     return (undef, undef);
 }
 
+# fetch a variable yielding a hash.
+sub get_hash {
+    my $val = &get_href;
+    return %$val;
+}
+
 # fetch a variable yielding a hashref.
 # returns empty hashref if not found.
 sub get_href {
@@ -210,6 +216,12 @@ sub get_href {
     $val = $val->to_data if blessed $val && $val->can('to_data');
     return {} if ref $val ne 'HASH';
     return $val;
+}
+
+# fetch a variable yielding a list.
+sub get_array {
+    my $val = &get_aref;
+    return @$val;
 }
 
 # fetch a variable yielding an arrayref.

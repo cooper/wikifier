@@ -77,7 +77,7 @@ sub read_config {
     }
 
     # global wiki variables
-    my %vars_maybe = %{ $conf->get_href('var') };
+    my %vars_maybe = $conf->get_hash('var');
     @{ $wiki->{variables} }{ keys %vars_maybe } = values %vars_maybe;
 
     # private configuration.
