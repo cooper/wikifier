@@ -25,7 +25,7 @@ sub write_page {
 
     # update the page
     my $display_method = $page->{is_model} ? 'display_model' : 'display_page';
-    $wiki->$display_method($page);
+    $wiki->$display_method($page, draft_ok => 1);
 
     # commit the change
     return $wiki->rev_commit(
