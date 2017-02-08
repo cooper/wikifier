@@ -1,7 +1,8 @@
-# Copyright (c) 2014, Mitchell Cooper
+# Copyright (c) 2017, Mitchell Cooper
 #
 # Wikifier::Utilities provides several functions used throughout the Wikifier.
 # It exports any of the functions as needed.
+#
 package Wikifier::Utilities;
 
 use warnings;

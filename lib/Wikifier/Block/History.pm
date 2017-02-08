@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2014, Mitchell Cooper
+# Copyright (c) 2017, Mitchell Cooper
 #
 # history blocks display a table of dates and important events associated with them.
 #

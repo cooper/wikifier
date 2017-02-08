@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2014, Mitchell Cooper
+# Copyright (c) 2017, Mitchell Cooper
 #
 # sections are containers for paragraphs, image boxes, etc., each with a title.
 #

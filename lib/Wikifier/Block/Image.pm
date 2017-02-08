@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2014, Mitchell Cooper
+# Copyright (c) 2017, Mitchell Cooper
 #
 # image blocks represent a single HTML image.
 # this is rarely used inside of a section. most images are displayed using imageboxes
@@ -141,7 +140,7 @@ sub image_html {
     my ($box, $block, $page, $el) = (shift, shift, @_);
     $block->html_base($page); # call hash html.
     return if $block->{parse_failed};
-    
+
     # add the appropriate float class.
     $el->add_class('imagebox-'.$block->{float}) if $box;
 

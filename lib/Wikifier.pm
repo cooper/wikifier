@@ -1,33 +1,29 @@
-#
-# Copyright (c) 2014, Mitchell Cooper
+# Copyright (c) 2017, Mitchell Cooper
 #
 # This class represents a wiki language manager.
 #
 # Typically, this class is not accessed directly. It is used indirectly via a
 # Wikifier::Wiki or Wikifier::Page.
 #
-# The same Wikifier instance may be used for several pages. However, the Wikifier object
-# should not be used for a wiki implementation. For example, an HTTPd module which manages
-# an entire wiki site would do so by using a Wikifier::Wiki. This Wikifier::Wiki might
-# use the same Wikifier object for each page, saving the need to reregister blocks,
-# formatting parsers, etc.
+# The same Wikifier instance may be used for several pages. However, the
+# Wikifier object should not be used for a wiki implementation. For example, an
+# HTTPd helper process which manages an entire wiki site would do so by using a
+# Wikifier::Wiki. This Wikifier::Wiki would then use the same Wikifier object
+# for each page, saving the need to reregister blocks, formatting parsers, etc.
 #
-# This change was made when the Wikifier class was split into several smaller classes and
-# the block loading system was redesigned to require registration rather than dynamically
-# loading modules as they are needed. This new approach may require more memory, but it
-# will be faster and more practical for an HTTPd wiki application.
+# On 13 February 2013, the Wikifier class was split into several smaller
+# packages, and the block loading system was redesigned to require registration
+# of block types.
 #
-# Whereas before a Wikifier::Page object would store most parser-related storage, the
-# Wikifier object now has this duty; Wikifier::Page objects represent a single page now.
+#   Parser:         parses a wiki source file, separating it into blocks.
+#   Formatter:      parses text formatting such as [b]bolds[/b] and [[links]].
+#   BlockManager:   manages creation of block objects, loading of block classes.
+#   Utilities:      provides convenience methods used throughout Wikifier.
+#
+# Whereas before a Wikifier::Page object would store most parser-related
+# storage, the Wikifier object now has this duty; Wikifier::Page objects
+# represent a single page now and has little to do with the actual parser.
 # (That makes more sense anyway, right?)
-#
-# As of this change that was implemented on February 13, 2013,
-# this class is based upon several subclasses which each have different functions:
-#
-#   Parser:         parses a wiki language file, separating it into individual blocks.
-#   Formatter:      parses text formatting such as [b] and [i] formatting.
-#   BlockManager:   manages creation of block objects, loading of block classes, etc.
-#   Utilities:      provides convenience methods used throughout the Wikifier software
 #
 package Wikifier;
 

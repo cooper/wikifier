@@ -1,12 +1,7 @@
-# Copyright (c) 2016, Mitchell Cooper
+# Copyright (c) 2017, Mitchell Cooper
 #
-# The Wikifier is a simple wiki language parser. It merely converts wiki language to HTML.
-# Wikifier::Wiki, on the other hand, provides a full wiki management mechanism. It
-# features image sizing, page and image caching, and more.
-#
-# The Wikifier and Wikifier::Page can operate as only a parser without this class.
-# This is useful if you wish to implement your own image resizing and caching methods
-# or if you don't feel that these features are necessary.
+# Wikifier::Wiki provides a full wiki suite featuring image sizing, page and
+# image caching, category management, revision tracking, and more.
 #
 package Wikifier::Wiki;
 

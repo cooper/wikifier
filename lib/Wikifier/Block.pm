@@ -1,4 +1,4 @@
-# Copyright (c) 2016, Mitchell Cooper
+# Copyright (c) 2017, Mitchell Cooper
 #
 # Wikifier::Block represents a parsing block, such a section, paragraph,
 # infobox, etc. All blocks have a parent besides the main block, which is an

@@ -1,4 +1,4 @@
-# Copyright (c) 2016, Mitchell Cooper
+# Copyright (c) 2017, Mitchell Cooper
 #
 # Wikifier::Parser is a function class of Wikifier which parses wiki source
 # code. This is the master parser; its primary purpose is to divide the file

@@ -2,7 +2,6 @@
 #
 # Copyright (c) 2013 Mitchell Cooper
 #
-
 use warnings;
 use strict;
 use lib 'lib';

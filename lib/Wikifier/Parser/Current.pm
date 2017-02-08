@@ -1,5 +1,7 @@
-# Copyright (c) 2016, Mitchell Cooper
-# a Current object describes the state of the parser
+# Copyright (c) 2017, Mitchell Cooper
+#
+# a Current object describes the state of the parser.
+#
 package Wikifier::Parser::Current;
 
 use warnings;

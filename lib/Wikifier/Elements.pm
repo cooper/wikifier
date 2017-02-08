@@ -1,6 +1,8 @@
-# Copyright (c) 2016, Mitchell Cooper
+# Copyright (c) 2017, Mitchell Cooper
+#
 # Encapsulates multiple elements to behave as one, without actually having
-# a wrapper element
+# a wrapper element.
+#
 package Wikifier::Elements;
 
 use warnings;

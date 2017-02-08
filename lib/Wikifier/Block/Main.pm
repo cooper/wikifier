@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2014, Mitchell Cooper
+# Copyright (c) 2017, Mitchell Cooper
 #
 # The main block is the only block which does not have a parent. There is only one
 # instance of this type of block. It is an implied block containing all first-level
@@ -27,7 +26,7 @@ sub main_parse {
     # produce warnings for stray text.
     foreach ($block->content_text_pos) {
         my ($text, $pos) = @$_;
-        
+
         # trim the text and increment the line number appropriately
         ($text, my $removed) = trim_count($text);
         $pos->{line} += $removed;

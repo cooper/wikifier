@@ -1,4 +1,4 @@
-# Copyright (c) 2016, Mitchell Cooper
+# Copyright (c) 2017, Mitchell Cooper
 #
 # Wikifier::Formatter is in charge of text formatting. Block types use the
 # functions provided by the Formatter to convert formatted wiki source such as

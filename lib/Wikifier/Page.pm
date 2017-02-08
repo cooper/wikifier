@@ -1,8 +1,7 @@
+# Copyright (c) 2017, Mitchell Cooper
 #
-# Copyright (c) 2014, Mitchell Cooper
-#
-# Wikifier::Page provides an objective interface to a wiki page or article. It implements
-# the very user-friendly programming interface of the Wikifier.
+# Wikifier::Page provides an objective interface to a wiki page or article. It
+# implements the most bsaic user-friendly programming interface of the Wikifier.
 #
 package Wikifier::Page;
 
