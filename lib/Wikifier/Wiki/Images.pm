@@ -48,7 +48,7 @@ sub _display_image {
     $image_name = $image{name};
     my $width   = $image{width};
     my $height  = $image{height};
-    my @stat    = stat $image->{big_path};
+    my @stat    = stat $image{big_path};
 
     # image name and full path.
     $result->{type} = 'image';
@@ -102,7 +102,7 @@ sub _display_image {
 
     # if caching is enabled, check if this exists in cache.
     if ($wiki->opt('image.enable.cache') && -f $cache_file) {
-        $result = $wiki->get_image_cache(\%image, $result, \@stat, \%opts);
+        $result = $wiki->get_image_cache(\%image, $result, $stat[9], \%opts);
         return $result if $result->{cached};
     }
 
@@ -139,9 +139,9 @@ sub get_image_full_size {
 
 # get image from cache
 sub get_image_cache {
-    my ($wiki, $image, $result, $stat, $opts) = @_;
-    my $cache_file = $result->{cache_path};
-    my ($image_modify, $cache_modify) = ($stat[9], (stat $cache_file)[9]);
+    my ($wiki, $image, $result, $image_modify, $opts) = @_;
+    my $cache_file   = $result->{cache_path};
+    my $cache_modify = (stat $cache_file)[9];
 
     # if the image's file is more recent than the cache file,
     # discard the outdated cached copy.
