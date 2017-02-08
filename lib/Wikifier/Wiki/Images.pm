@@ -41,28 +41,28 @@ sub _display_image {
     }
 
     # parse the image name.
-    my %image = %{ $wiki->parse_image_name($image_name) };
-    return display_error($image{error})
-        if $image{error};
+    my $image = $wiki->parse_image_name($image_name);
+    return display_error($image->{error})
+        if $image->{error};
 
-    $image_name = $image{name};
-    my $width   = $image{width};
-    my $height  = $image{height};
-    my @stat    = stat $image{big_path};
+    $image_name = $image->{name};
+    my $width   = $image->{width};
+    my $height  = $image->{height};
+    my @stat    = stat $image->{big_path};
 
     # image name and full path.
     $result->{type} = 'image';
     $result->{file} = $image_name;
-    $result->{path} = $result->{fullsize_path} = $image{big_path};
+    $result->{path} = $result->{fullsize_path} = $image->{big_path};
 
     # image type and mime type.
-    $result->{image_type} = $image{ext} eq 'jpg' ||
-                            $image{ext} eq 'jpeg' ? 'jpeg' : 'png';
-    $result->{mime} = $image{ext} eq 'png' ? 'image/png' : 'image/jpeg';
+    $result->{image_type} = $image->{ext} eq 'jpg' ||
+                            $image->{ext} eq 'jpeg' ? 'jpeg' : 'png';
+    $result->{mime} = $image->{ext} eq 'png' ? 'image/png' : 'image/jpeg';
 
     # if a dimension is missing or image caching is disabled, display the
     # full-size version of the image.
-    return $wiki->get_image_full_size(\%image, $result, \@stat, \%opts)
+    return $wiki->get_image_full_size($image, $result, \@stat, \%opts)
         if !$width || !$height || !$wiki->opt('image.enable.cache');
 
     #============================#
@@ -77,7 +77,7 @@ sub _display_image {
         foreach (@scales) {
 
             # the image is already retina, or pregeneration is disabled
-            last if $image{retina};
+            last if $image->{retina};
             last if !$wiki->opt('image.enable.pregeneration');
 
             # ignore scale 1 and non-integers
@@ -86,14 +86,14 @@ sub _display_image {
             next if m/\D/;
             next if $_ == 1;
 
-            my $retina_file = "$image{f_name_ne}\@${_}x.$image{ext}";
+            my $retina_file = "$$image{f_name_ne}\@${_}x.$$image{ext}";
             $wiki->display_image($retina_file, dont_open => 1);
         }
     }
 
     # determine the full file name of the image.
     # this may have doubled sizes for retina.
-    my $cache_file = $wiki->opt('dir.cache').'/'.$image{full_name};
+    my $cache_file = $wiki->opt('dir.cache').'/'.$image->{full_name};
     $result->{cache_path} = $cache_file;
 
     #=========================#
@@ -102,7 +102,7 @@ sub _display_image {
 
     # if caching is enabled, check if this exists in cache.
     if ($wiki->opt('image.enable.cache') && -f $cache_file) {
-        $result = $wiki->get_image_cache(\%image, $result, $stat[9], \%opts);
+        $result = $wiki->get_image_cache($image, $result, $stat[9], \%opts);
         return $result if $result->{cached};
     }
 
@@ -110,11 +110,11 @@ sub _display_image {
     #=== Generate image ===#
     #======================#
 
-    my $err = $wiki->generate_image(\%image, $result);
+    my $err = $wiki->generate_image($image, $result);
     return $err if $err;
 
     # the generator says to use the full-size image.
-    return $wiki->get_image_full_size(\%image, $result, \@stat, \%opts)
+    return $wiki->get_image_full_size($image, $result, \@stat, \%opts)
         if delete $result->{use_fullsize};
 
     delete $result->{content} if $opts{dont_open};
@@ -227,12 +227,11 @@ sub parse_image_name {
 # generate an image of a certain size.
 # returns error on fail, nothing on success
 sub generate_image {
-    my ($wiki, $image_, $result) = @_;
-    my %image = %$image_;
+    my ($wiki, $image, $result) = @_;
 
     # an error occurred.
-    return display_error($image{error})
-        if $image{error};
+    return display_error($image->{error})
+        if $image->{error};
 
     # if we are restricting to only sizes used in the wiki, check.
     my ($width, $height, $r_width, $r_height) =
@@ -241,7 +240,7 @@ sub generate_image {
         my $dimension_str = "${r_width}x${r_height}";
         return display_error(
             "Image does not exist at $dimension_str."
-        ) if !$wiki->{allowed_dimensions}{ $image{name} }{$dimension_str};
+        ) if !$wiki->{allowed_dimensions}{ $image->{name} }{$dimension_str};
     }
 
     # create GD instance with this full size image.
@@ -256,13 +255,13 @@ sub generate_image {
         $result->{use_fullsize} = 1;
         L align(
             'Skip',
-            "'$image{name}' at ${width}x${height}" .
+            "'$$image{name}' at ${width}x${height}" .
             " >= original ${fi_width}x${fi_height}"
         );
 
         # symlink to the full-size image.
-        $image{full_name} = $image{name};
-        $wiki->symlink_scaled_image(\%image) if $image{retina};
+        $image->{full_name} = $image->{name};
+        $wiki->symlink_scaled_image($image) if $image->{retina};
 
         return; # success
     }
@@ -298,7 +297,7 @@ sub generate_image {
     $result->{modified}     = time2str(time);
     $result->{mod_unix}     = time;
     $result->{length}       = length $result->{content};
-    $result->{etag}         = make_etag($image{name}, time);
+    $result->{etag}         = make_etag($image->{name}, time);
 
     # caching is enabled, so let's save this for later.
     my $cache_file = $result->{cache_path};
@@ -314,35 +313,36 @@ sub generate_image {
         $result->{modified}   = time2str($modified);
         $result->{mod_unix}   = $modified;
         $result->{cache_gen}  = 1;
-        $result->{etag}       = make_etag($image{name}, $modified);
+        $result->{etag}       = make_etag($image->{name}, $modified);
 
         # if this image is available in more than 1 scale, symlink.
-        $wiki->symlink_scaled_image(\%image) if $image{retina};
+        $wiki->symlink_scaled_image($image) if $image->{retina};
     }
 
     L align(
         'Generate',
-        "'$image{name}' at ${width}x${height}" .
-        ($image{retina} ? " (\@$image{retina}x)" : '')
+        "'$$image{name}' at ${width}x${height}" .
+        ($image{retina} ? " (\@$$image{retina}x)" : '')
     );
     return; # success
 }
 
 # symlink an image to its scaled version
 sub symlink_scaled_image {
-    my ($wiki, %image) = (shift, %{ +shift });
-    return unless $image{retina};
+    my ($wiki, $image) = @_;
+    return unless $image->{retina};
     my $scale_path = sprintf '%s/%dx%d-%s@%dx.%s',
         $wiki->opt('dir.cache'),
-        $image{r_width},
-        $image{r_height},
-        $image{name_wo_ext},
-        $image{retina},
-        $image{ext};
+        $image->{r_width},
+        $image->{r_height},
+        $image->{name_wo_ext},
+        $image->{retina},
+        $image->{ext};
     return 1 if -e $scale_path;
-    symlink $image{full_name}, $scale_path;
+
     # note: using full_name rather than $cache_file
     # results in a relative rather than absolute symlink.
+    symlink $image->{full_name}, $scale_path;
 }
 
 # generate an etag
