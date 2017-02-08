@@ -235,7 +235,7 @@ sub generate_image {
 
     # if we are restricting to only sizes used in the wiki, check.
     my ($width, $height, $r_width, $r_height) =
-        @image{ qw(width height r_width r_height) };
+        @$image{ qw(width height r_width r_height) };
     if ($wiki->opt('image.enable.restriction')) {
         my $dimension_str = "${r_width}x${r_height}";
         return display_error(
@@ -267,12 +267,12 @@ sub generate_image {
     }
 
     # create resized image.
-    my $image = GD::Image->new($width, $height);
+    my $sized_image = GD::Image->new($width, $height);
     return display_error("Couldn't create an empty image")
-        if !$image;
-    $image->saveAlpha(1);
-    $image->alphaBlending(0);
-    $image->copyResampled($full_image,
+        if !$sized_image;
+    $sized_image->saveAlpha(1);
+    $sized_image->alphaBlending(0);
+    $sized_image->copyResampled($full_image,
         0, 0,
         0, 0,
         $width, $height,
@@ -283,14 +283,14 @@ sub generate_image {
     my $use = $wiki->opt('image.type') || $result->{image_type};
     if ($use eq 'jpeg') {
         my $compression = $wiki->opt('image.quality') || 100;
-        $result->{content} = $image->jpeg($compression);
+        $result->{content} = $sized_image->jpeg($compression);
     }
 
     # create PNG
     else {
-        $image->saveAlpha(1);
-        $image->alphaBlending(0);
-        $result->{content} = $image->png();
+        $sized_image->saveAlpha(1);
+        $sized_image->alphaBlending(0);
+        $result->{content} = $sized_image->png();
     }
 
     $result->{generated}    = 1;
@@ -322,7 +322,7 @@ sub generate_image {
     L align(
         'Generate',
         "'$$image{name}' at ${width}x${height}" .
-        ($image{retina} ? " (\@$$image{retina}x)" : '')
+        ($image->{retina} ? " (\@$$image{retina}x)" : '')
     );
     return; # success
 }
