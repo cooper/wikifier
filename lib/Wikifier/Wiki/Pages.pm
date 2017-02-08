@@ -132,7 +132,7 @@ sub get_page_cache {
     # the page's file is more recent than the cache file.
     # discard the outdated cached copy.
     if ($page->modified > $cache_modify) {
-        unlink $cache_path;
+        unlink $page->cache_path;
         return $result;
     }
 
