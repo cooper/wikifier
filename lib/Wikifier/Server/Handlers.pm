@@ -265,7 +265,7 @@ sub handle_image {
     Lindent "Image '$$msg{name}' requested by $$connection{id}";
     my $result = $connection->{wiki}->display_image(
         [ $msg->{name}, $msg->{width} || 0, $msg->{height} || 0 ],
-        1 # don't open the image
+        dont_open => 1 # don't open the image
     );
     delete $result->{content};
     back;

@@ -19,6 +19,10 @@ my $json = JSON::XS->new->pretty(1);
 ##############
 
 # Displays an image of the supplied dimensions.
+#
+# %opts = (
+#   dont_open       don't actually read the image; {content} will be omitted
+# )
 sub display_image {
     my $result = _display_image(@_);
     L align('Error', "'$_[1]': $$result{error}")
@@ -26,7 +30,7 @@ sub display_image {
     return $result;
 }
 sub _display_image {
-    my ($wiki, $image_name, $dont_open) = @_;
+    my ($wiki, $image_name, %opts) = @_;
     my $result = {};
 
     # if $image_name is an array ref, it's given in
@@ -44,6 +48,7 @@ sub _display_image {
     $image_name = $image{name};
     my $width   = $image{width};
     my $height  = $image{height};
+    my @stat    = stat $image->{big_path};
 
     # image name and full path.
     $result->{type} = 'image';
@@ -55,38 +60,16 @@ sub _display_image {
                             $image{ext} eq 'jpeg' ? 'jpeg' : 'png';
     $result->{mime} = $image{ext} eq 'png' ? 'image/png' : 'image/jpeg';
 
-    #################################
-    ### THIS IS A FULL-SIZE IMAGE ###
-    ############################################################################
-
-    # stat for full-size image.
-    my @stat = stat $image{big_path};
-
-    # if no width or height are specified,
-    # display the full-size version of the image.
-    if (!$width || !$height) {
-
-        # only include the content if $dont_open is false
-        $result->{content} = file_contents($image{big_path}, 1)
-            unless $dont_open;
-
-        $result->{modified} = time2str($stat[9]);
-        $result->{mod_unix} = $stat[9];
-        $result->{length}   = $stat[7];
-        $result->{etag}     = make_etag($image_name, $stat[9]);
-
-        return $result;
-    }
-
-    ##############################
-    ### THIS IS A SCALED IMAGE ###
-    ############################################################################
+    # if a dimension is missing or image caching is disabled, display the
+    # full-size version of the image.
+    return $wiki->get_image_full_size(\%image, $result, \@stat, \%opts)
+        if !$width || !$height || !$wiki->opt('image.enable.cache');
 
     #============================#
     #=== Retina scale support ===#
     #============================#
 
-    # HACK: this is not a retina request, but retina is enabled, and so i
+    # HACK: this is not a retina request, but retina is enabled, and so is
     # pregeneration. therefore, we will call ->generate_image() in order to
     # pregenerate a retina version.
     if (my $retina = $wiki->opt('image.enable.retina')) {
@@ -104,7 +87,7 @@ sub _display_image {
             next if $_ == 1;
 
             my $retina_file = "$image{f_name_ne}\@${_}x.$image{ext}";
-            $wiki->display_image($retina_file, 1);
+            $wiki->display_image($retina_file, dont_open => 1);
         }
     }
 
@@ -113,68 +96,75 @@ sub _display_image {
     my $cache_file = $wiki->opt('dir.cache').'/'.$image{full_name};
     $result->{cache_path} = $cache_file;
 
-    #============================#
-    #=== Finding cached image ===#
-    #============================#
+    #=========================#
+    #=== Find cached image ===#
+    #=========================#
 
     # if caching is enabled, check if this exists in cache.
     if ($wiki->opt('image.enable.cache') && -f $cache_file) {
-        my ($image_modify, $cache_modify) = ($stat[9], (stat $cache_file)[9]);
-
-        # if the image's file is more recent than the cache file,
-        # discard the outdated cached copy.
-        if ($image_modify > $cache_modify) {
-            unlink $cache_file;
-        }
-
-        # the cached file is newer, so use it.
-        else {
-
-            # only include the content if $dont_open is false
-            $result->{content} = file_contents($cache_file, 1)
-                unless $dont_open;
-
-            $result->{path}         = $cache_file;
-            $result->{cached}       = 1;
-            $result->{modified}     = time2str($cache_modify);
-            $result->{mod_unix}     = $cache_modify;
-            $result->{etag}         = make_etag($image_name, $cache_modify);
-            $result->{length}       = -s $cache_file;
-
-            # symlink scaled version if necessary.
-            $wiki->symlink_scaled_image(\%image) if $image{retina};
-
-            return $result;
-        }
+        $result = $wiki->get_image_cache(\%image, $result, \@stat, \%opts);
+        return $result if $result->{cached};
     }
 
-    # if image generation is disabled, we must supply the full-size image data.
-    if (!$wiki->opt('image.enable.cache')) {
-        # XXX: what is this?!?!?! so confused
-        return $wiki->display_image($result, $image_name, 0, 0);
-    }
+    #======================#
+    #=== Generate image ===#
+    #======================#
 
-    #==========================#
-    #=== Generate the image ===#
-    #==========================#
     my $err = $wiki->generate_image(\%image, $result);
     return $err if $err;
 
     # the generator says to use the full-size image.
-    if (delete $result->{use_fullsize}) {
+    return $wiki->get_image_full_size(\%image, $result, \@stat, \%opts)
+        if delete $result->{use_fullsize};
 
-        # only include the content if $dont_open is false
-        $result->{content} = file_contents($image{big_path}, 1)
-            unless $dont_open;
+    delete $result->{content} if $opts{dont_open};
+    return $result;
+}
 
-        $result->{modified}     = time2str($stat[9]);
-        $result->{mod_unix}     = $stat[9];
-        $result->{length}       = $stat[7];
-        $result->{etag}         = make_etag($image_name, $stat[9]);
+# get full size version of image
+sub get_image_full_size {
+    my ($wiki, $image, $result, $stat, $opts) = @_;
+
+    # only include the content if dont_open is false
+    $result->{content} = file_contents($image->{big_path}, 1)
+        unless $opts->{dont_open};
+
+    $result->{modified}     = time2str($stat->[9]);
+    $result->{mod_unix}     = $stat->[9];
+    $result->{length}       = $stat->[7];
+    $result->{etag}         = make_etag($image->{name}, $stat->[9]);
+
+    return $result;
+}
+
+# get image from cache
+sub get_image_cache {
+    my ($wiki, $image, $result, $stat, $opts) = @_;
+    my $cache_file = $result->{cache_path};
+    my ($image_modify, $cache_modify) = ($stat[9], (stat $cache_file)[9]);
+
+    # if the image's file is more recent than the cache file,
+    # discard the outdated cached copy.
+    if ($image_modify > $cache_modify) {
+        unlink $cache_file;
+        return $result;
     }
 
-    delete $result->{content} if $dont_open;
-    return $result;
+    # the cached file is newer, so use it.
+
+    # only include the content if dont_open is false
+    $result->{content} = file_contents($cache_file, 1)
+        unless $opts->{dont_open};
+
+    $result->{path}         = $cache_file;
+    $result->{cached}       = 1;
+    $result->{modified}     = time2str($cache_modify);
+    $result->{mod_unix}     = $cache_modify;
+    $result->{etag}         = make_etag($image->{name}, $cache_modify);
+    $result->{length}       = -s $cache_file;
+
+    # symlink scaled version if necessary.
+    $wiki->symlink_scaled_image(\%image) if $image->{retina};
 }
 
 # parse an image name such as:
@@ -391,7 +381,7 @@ sub _wiki_default_calc {
     # the web server, reducing the wikifier server's load when requesting
     # cached pages and their images.
     if ($page->wiki_opt('image.enable.pregeneration')) {
-        my $res = $wiki->display_image([ $img{file}, $w, $h ], 1);
+        my $res = $wiki->display_image([ $img{file}, $w, $h ], dont_open => 1);
         my ($image_dir, $cache_dir) = (
             $page->wiki_opt('dir.image'),
             $page->wiki_opt('dir.cache')

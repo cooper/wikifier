@@ -72,21 +72,9 @@ sub _display_page {
 
     # caching is enabled, so let's check for a cached copy.
     if ($wiki->opt('page.enable.cache') && -f $cache_path) {
-
-        # the page's file is more recent than the cache file.
-        # discard the outdated cached copy.
-        if ($page->modified > $page->cache_modified) {
-            unlink $cache_path;
-        }
-
-        # the cached file is newer, so use it.
-        else {
-            $result = $wiki->get_page_cache($page, $result, %opts);
-        }
+        $result = $wiki->get_page_cache($page, $result, \%opts);
+        return $result if $result->{cached};
     }
-
-    # if we just retrieved a cached version, we're done...
-    return $result if $result->{cached};
 
     # Safe point - we will be generating the page right now.
 
@@ -137,9 +125,16 @@ sub _display_page {
 
 # get page from cache
 sub get_page_cache {
-    my ($wiki, $page, $result, %opts) = @_;
+    my ($wiki, $page, $result, $opts) = @_;
     my $cache_modify = $page->cache_modified;
     my $time_str = time2str($cache_modify);
+
+    # the page's file is more recent than the cache file.
+    # discard the outdated cached copy.
+    if ($page->modified > $cache_modify) {
+        unlink $cache_path;
+        return $result;
+    }
 
     $result->{content}  = "<!-- cached page dated $time_str -->\n\n";
 
@@ -154,7 +149,7 @@ sub get_page_cache {
     }
 
     # if this is a draft, pretend it doesn't exist.
-    if ($result->{draft} && !$opts{draft_ok}) {
+    if ($result->{draft} && !$opts->{draft_ok}) {
         return display_error(
             "Page has not yet been published.",
             draft  => 1,
@@ -232,7 +227,7 @@ sub display_page_code {
     return $result;
 }
 sub _display_page_code {
-    my ($wiki, $page_name, %opts) = @_;
+    my ($wiki, $page_name, $opts) = @_;
     my $path   = $wiki->path_for_page($page_name);
     my $result = {};
 
@@ -257,7 +252,7 @@ sub _display_page_code {
 
     # we might want to also call ->display_page(). this would be useful
     # for determining where errors occur on the page.
-    if (my $display_page = $opts{display_page}) {
+    if (my $display_page = $opts->{display_page}) {
         my %page_res_copy = %{ $wiki->display_page($page_name, draft_ok => 1) };
         delete $page_res_copy{content}
             unless $display_page == 2;
