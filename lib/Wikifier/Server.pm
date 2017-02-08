@@ -166,7 +166,7 @@ sub gen_wiki {
         }
 
         # page is not cached or has changed since cache time.
-        $wiki->display_page($page_name);
+        $wiki->display_page($page_name, draft_ok => 1);
     }
 
     # categories

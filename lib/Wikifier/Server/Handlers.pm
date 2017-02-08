@@ -179,7 +179,7 @@ sub handle_page_code {
     my ($connection, $msg) = write_required(@_, 'name') or return;
     my $result = $connection->{wiki}->display_page_code(
         $msg->{name},
-        $msg->{display_page}
+        display_page => $msg->{display_page}
     );
     $connection->send('page_code', $result);
     $connection->l("Page '$$msg{name}' code requested");

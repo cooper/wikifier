@@ -29,6 +29,11 @@ sub page_named {
 }
 
 # Displays a page.
+#
+# %opts = (
+#   draft_ok        if true, drafts will not be skipped
+# )
+#
 sub display_page {
     my ($wiki, $page_name) = (shift, shift);
     my $page = $page_name if blessed $page_name;
@@ -38,13 +43,13 @@ sub display_page {
     L align('Error', $result->{error})
         if $result->{error} && !$result->{draft} && !$result->{parse_error};
     L align('Draft', 'skipped')
-        if $result->{draft};
+        if $result->{error} && $result->{draft};
     $page->{recent_result} = $result if $page;
     back;
     return $result;
 }
 sub _display_page {
-    my ($wiki, $page_name) = @_;
+    my ($wiki, $page_name, %opts) = @_;
     my $result = {};
 
     # create a page object
@@ -76,7 +81,7 @@ sub _display_page {
 
         # the cached file is newer, so use it.
         else {
-            $result = $wiki->get_page_cache($page, $result);
+            $result = $wiki->get_page_cache($page, $result, %opts);
         }
     }
 
@@ -100,7 +105,7 @@ sub _display_page {
     $wiki->cat_check_page($page);
 
     # if this is a draft, pretend it doesn't exist.
-    if ($page->get('page.draft')) {
+    if ($page->draft && !$opts{draft_ok}) {
         return display_error(
             "Page has not yet been published.",
             draft => 1
@@ -110,6 +115,7 @@ sub _display_page {
     # generate the HTML and headers.
     $result->{generated}  = 1;
     $result->{page}       = $page;
+    $result->{draft}      = $page->draft;
     $result->{warnings}   = $page->{warnings};
     $result->{mod_unix}   = time;
     $result->{modified}   = time2str($result->{mod_unix});
@@ -131,7 +137,7 @@ sub _display_page {
 
 # get page from cache
 sub get_page_cache {
-    my ($wiki, $page, $result) = @_;
+    my ($wiki, $page, $result, %opts) = @_;
     my $cache_modify = $page->cache_modified;
     my $time_str = time2str($cache_modify);
 
@@ -148,7 +154,7 @@ sub get_page_cache {
     }
 
     # if this is a draft, pretend it doesn't exist.
-    if ($result->{draft}) {
+    if ($result->{draft} && !$opts{draft_ok}) {
         return display_error(
             "Page has not yet been published.",
             draft  => 1,
@@ -208,8 +214,12 @@ sub _cats_to_list {
 }
 
 # Displays the wikifier code for a page.
-# display_page = 1  also include ->display_page result, omitting  {content}
-# display_page = 2  also include ->display_page result, including {content}
+#
+# %opts = (
+#   display_page = 1  also include ->display_page result, omitting  {content}
+#   display_page = 2  also include ->display_page result, including {content}
+# )
+#
 sub display_page_code {
     my ($wiki, $page_name) = (shift, shift);
     my $page = $page_name if blessed $page_name;
@@ -222,7 +232,7 @@ sub display_page_code {
     return $result;
 }
 sub _display_page_code {
-    my ($wiki, $page_name, $display_page) = @_;
+    my ($wiki, $page_name, %opts) = @_;
     my $path   = $wiki->path_for_page($page_name);
     my $result = {};
 
@@ -247,8 +257,8 @@ sub _display_page_code {
 
     # we might want to also call ->display_page(). this would be useful
     # for determining where errors occur on the page.
-    if ($display_page) {
-        my %page_res_copy = %{ $wiki->display_page($page_name) };
+    if (my $display_page = $opts{display_page}) {
+        my %page_res_copy = %{ $wiki->display_page($page_name, draft_ok => 1) };
         delete $page_res_copy{content}
             unless $display_page == 2;
         $result->{display_result} = \%page_res_copy;

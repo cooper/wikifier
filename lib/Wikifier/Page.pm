@@ -519,7 +519,7 @@ sub name {
 # page draft from @page.draft
 sub draft {
     my $page = shift;
-    return $page->get('page.draft');
+    return !!$page->get('page.draft');
 }
 
 # page author from @page.author
