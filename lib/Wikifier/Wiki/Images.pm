@@ -164,7 +164,7 @@ sub get_image_cache {
     $result->{length}       = -s $cache_file;
 
     # symlink scaled version if necessary.
-    $wiki->symlink_scaled_image(\%image) if $image->{retina};
+    $wiki->symlink_scaled_image($image) if $image->{retina};
 }
 
 # parse an image name such as:
@@ -227,11 +227,8 @@ sub parse_image_name {
 # generate an image of a certain size.
 # returns error on fail, nothing on success
 sub generate_image {
-    my ($wiki, $_image, $result) = @_;
-
-    # parse image name
-    $_image   = $wiki->parse_image_name($_image) unless ref $_image eq 'HASH';
-    my %image = %$_image;
+    my ($wiki, $image_, $result) = @_;
+    my %image = %$image_;
 
     # an error occurred.
     return display_error($image{error})
