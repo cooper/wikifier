@@ -86,7 +86,7 @@ One wikiserver can manage any number of [WiWikis](#wikifierwiki).
 ### Usage
 
 1. For each wiki, you will need to write a
-   [WiWiki configuration](configuration.md#wikifierwiki-options).
+   [WiWiki configuration](configuration.md#wikifierwiki-public-options).
 2. Once your wikis are configured, write a
    [wikiserver configuration](configuration.md#wikifierserver-options).
 3. Set up a [web script](#interfaces) to connect to the wikiserver.

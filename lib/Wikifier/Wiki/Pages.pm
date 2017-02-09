@@ -227,7 +227,7 @@ sub display_page_code {
     return $result;
 }
 sub _display_page_code {
-    my ($wiki, $page_name, $opts) = @_;
+    my ($wiki, $page_name, %opts) = @_;
     my $path   = $wiki->path_for_page($page_name);
     my $result = {};
 
@@ -252,7 +252,7 @@ sub _display_page_code {
 
     # we might want to also call ->display_page(). this would be useful
     # for determining where errors occur on the page.
-    if (my $display_page = $opts->{display_page}) {
+    if (my $display_page = $opts{display_page}) {
         my %page_res_copy = %{ $wiki->display_page($page_name, draft_ok => 1) };
         delete $page_res_copy{content}
             unless $display_page == 2;
