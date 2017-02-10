@@ -77,7 +77,7 @@ sub handle {
 
     # make sure the second element, if present, is an integer.
     if (defined $possible_id && $possible_id =~ m/\D/) {
-        $connection->error('Message ID must be an integer')
+        $connection->error('Message ID must be an integer');
         return;
     }
 
