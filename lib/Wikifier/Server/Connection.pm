@@ -20,64 +20,64 @@ sub new {
 
 # write a line of JSON-encoded data.
 sub send {
-    my ($connection, @etc) = @_;
+    my ($conn, @etc) = @_;
     my $json_text = $json->encode(\@etc);
     print "S: $json_text\n" if $ENV{WIKIFIER_DEBUG};
-    $connection->{stream}->write("$json_text\n");
+    $conn->{stream}->write("$json_text\n");
 }
 
 # close the connection.
 sub close : method {
-    my $connection = shift;
-    return if $connection->{closed};
-    $connection->{closed} = 1;
-    my $stream = delete $connection->{stream};
+    my $conn = shift;
+    return if $conn->{closed};
+    $conn->{closed} = 1;
+    my $stream = delete $conn->{stream};
     delete $stream->{connection};
-    $connection->l('Connection closed');
+    $conn->l('Connection closed');
     $stream->close;
 }
 
 # send an error and close connection.
 sub error {
-    my ($connection, $error, %other) = @_;
-    $connection->send(error => { reason => $error, %other });
-    $connection->l("Error: $error");
-    $connection->close;
+    my ($conn, $error, %other) = @_;
+    $conn->send(error => { reason => $error, %other });
+    $conn->l("Error: $error");
+    $conn->close;
 }
 
 # handle a line of data.
 sub handle {
-    my ($connection, $line) = @_;
+    my ($conn, $line) = @_;
     my $return = undef;
     print "C: $line\n" if $ENV{WIKIFIER_DEBUG};
 
     # not interested if we're dropping the connection
-    return if $connection->{closed};
+    return if $conn->{closed};
 
     # make sure it's a JSON array.
     my $data = eval { $json->decode($line) };
     if (!$line || !$data || ref $data ne 'ARRAY') {
-        $connection->error('Message must be a JSON array');
-        $connection->close;
+        $conn->error('Message must be a JSON array');
+        $conn->close;
         return;
     }
 
     # make sure it has a message type.
     my ($command, $msg, $possible_id) = @$data;
     if (!length $command) {
-        $connection->error('Message has no type');
+        $conn->error('Message has no type');
         return;
     }
 
     # make sure the second element is an object.
     if ($msg && ref $msg ne 'HASH') {
-        $connection->error('Message content must be a JSON object');
+        $conn->error('Message content must be a JSON object');
         return;
     }
 
     # make sure the second element, if present, is an integer.
     if (defined $possible_id && $possible_id =~ m/\D/) {
-        $connection->error('Message ID must be an integer');
+        $conn->error('Message ID must be an integer');
         return;
     }
 
@@ -86,11 +86,11 @@ sub handle {
 
     # store the connection and ID
     bless $msg, 'Wikifier::Server::Message';
-    weaken($msg->{connection} = $connection);
+    weaken($msg->{connection} = $conn);
     $msg->{_reply_id} = $possible_id;
 
     # if the connection is not authenticated, this better be a wiki command.
-    if (!$connection->{priv_read} && $command ne 'wiki') {
+    if (!$conn->{priv_read} && $command ne 'wiki') {
         $msg->error('No read access');
         return;
     }
@@ -99,26 +99,26 @@ sub handle {
     if (my $code = Wikifier::Server::Handlers->can("handle_$command")) {
 
         # set the user in the wiki for the handler
-        my ($wiki, $sess) = @$connection{'wiki', 'sess'};
+        my ($wiki, $sess) = @$conn{'wiki', 'sess'};
         $wiki->{user} = $sess->{user} if $sess && $sess->{user};
 
         # call the code
-        $return = $code->($connection, $msg || {});
+        $return = $code->($conn, $msg || {});
 
         delete $wiki->{user} if $wiki;
     }
 
     # if the 'close' option exists, close the connection afterward.
-    $connection->close if $msg->{close};
+    $conn->close if $msg->{close};
 
     return $return;
 }
 
 sub l {
-    my $connection = shift;
-    my $wiki = $connection->{wiki_name};
+    my $conn = shift;
+    my $wiki = $conn->{wiki_name};
     $wiki = length $wiki ? "/$wiki" : '';
-    L "[$$connection{id}$wiki] @_";
+    L "[$$conn{id}$wiki] @_";
 }
 
 1

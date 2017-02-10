@@ -58,7 +58,7 @@ sub _simplify_errors {
 #
 sub handle_wiki {
     my ($wiki, $msg) = read_required(@_, qw(name password)) or return;
-    my $conn = $msg->connection;
+    my $conn = $msg->conn;
     my $name = (split /\./, $msg->{name})[0];
 
     # ensure that this wiki is configured on this server.
@@ -77,7 +77,7 @@ sub handle_wiki {
     # anonymous authentication succeeded.
     $conn->{priv_read} = 1;
     $conn->{wiki_name} = $name;
-    weaken($wiki = $Wikifier::Server::wikis{$name});
+    weaken($conn->{wiki} = $Wikifier::Server::wikis{$name});
 
     $msg->l("Successfully authenticated for read access");
 }
@@ -91,7 +91,7 @@ sub handle_wiki {
 sub handle_login {
     my ($wiki, $msg) = read_required(@_, qw(username password)) or return;
     my $sess_id = $msg->{session_id};
-    my $conn    = $msg->connection;
+    my $conn    = $msg->conn;
 
     # verify password
     my $username  = $msg->{username};
@@ -418,7 +418,7 @@ sub handle_cat_del {
 
 sub handle_ping {
     my ($wiki, $msg) = write_required(@_) or return;
-    my $conn = $msg->connection;
+    my $conn = $msg->conn;
     my $notices = delete $conn->{sess}{notifications};
     $conn->{sess}{notifications} = [];
     $msg->reply(pong => {
@@ -434,7 +434,7 @@ sub handle_ping {
 # check for all required things.
 # disconnect from the client if one is missing.
 sub read_required {
-    my ($connection, $msg, @required) = @_;
+    my ($conn, $msg, @required) = @_;
     my @good;
     foreach (@required) {
         if (defined $msg->{$_}) {
@@ -444,15 +444,15 @@ sub read_required {
         $msg->error("Required option '$_' missing");
         return;
     }
-    return my @a = ($connection->{wiki}, $msg, @good);
+    return ($conn->{wiki}, $msg, @good);
 }
 
 # check for all required things.
 # disconnect from the client if one is missing.
 # disconnect if the client does not have write access.
 sub write_required {
-    my ($connection, $msg) = @_;
-    if (!$connection->{sess} || !$connection->{sess}{priv_write}) {
+    my ($conn, $msg) = @_;
+    if (!$conn->{sess} || !$conn->{sess}{priv_write}) {
         $msg->error('No write access');
         return;
     }
