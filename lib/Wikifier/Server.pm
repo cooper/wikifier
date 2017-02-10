@@ -73,11 +73,11 @@ sub start {
 sub handle_stream {
     my (undef, $stream) = @_;
 
-    $stream->{connection} = Wikifier::Server::Connection->new($stream);
-    $stream->{connection}->l('New connection');
+    $stream->{conn} = Wikifier::Server::Connection->new($stream);
+    $stream->{conn}->l('New connection');
 
     # configure the stream.
-    my $close = sub { shift->{connection}->close };
+    my $close = sub { shift->{conn}->close };
     $stream->configure(
         on_read         => \&handle_data,
         on_write_eof    => $close,
@@ -94,8 +94,8 @@ sub handle_stream {
 sub handle_data {
     my ($stream, $buffref, $eof) = @_;
     while ($$buffref =~ s/^(.*?)\n//) {
-        return unless $stream->{connection}; # might be closed.
-        $stream->{connection}->handle($1);
+        return unless $stream->{conn}; # might be closed.
+        $stream->{conn}->handle($1);
     }
 }
 

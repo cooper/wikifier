@@ -32,7 +32,7 @@ sub close : method {
     return if $conn->{closed};
     $conn->{closed} = 1;
     my $stream = delete $conn->{stream};
-    delete $stream->{connection};
+    delete $stream->{conn};
     $conn->l('Connection closed');
     $stream->close;
 }
@@ -86,7 +86,7 @@ sub handle {
 
     # store the connection and ID
     bless $msg, 'Wikifier::Server::Message';
-    weaken($msg->{connection} = $conn);
+    weaken($msg->{conn} = $conn);
     $msg->{_reply_id} = $possible_id;
 
     # if the connection is not authenticated, this better be a wiki command.
