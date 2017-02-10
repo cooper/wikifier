@@ -12,8 +12,9 @@ use IO::Socket::UNIX;
 use File::Basename qw(basename);
 
 use Wikifier::Wiki;
-use Wikifier::Server::Connection;
+use Wikifier::Server::Message;
 use Wikifier::Server::Handlers;
+use Wikifier::Server::Connection;
 use Wikifier::Utilities qw(align L Lindent back);
 
 our ($loop, $conf, %wikis, %files, %sessions);

@@ -7,6 +7,7 @@ use 5.010;
 
 use JSON::XS ();
 use Wikifier::Utilities qw(L);
+use Scalar::Util qw(weaken);
 
 my $json = JSON::XS->new->allow_blessed;
 my $id = 'a';
@@ -60,23 +61,37 @@ sub handle {
         $connection->close;
         return;
     }
-    my ($command, $msg) = @$data;
 
     # make sure it has a message type.
-    if (!$command && !length $command) {
-        $connection->error('Empty message type received');
+    my ($command, $msg, $possible_id) = @$data;
+    if (!length $command) {
+        $connection->error('Message has no type');
         return;
     }
 
     # make sure the second element is an object.
     if ($msg && ref $msg ne 'HASH') {
-        $connection->error('Second element of message must be a JSON object');
+        $connection->error('Message content must be a JSON object');
         return;
     }
 
+    # make sure the second element, if present, is an integer.
+    if (defined $possible_id && $possible_id =~ m/\D/) {
+        $connection->error('Message ID must be an integer')
+        return;
+    }
+
+    # Safe point - the message is synactically valid, so we should use
+    # $msg->reply and $msg->error from this point on.
+
+    # store the connection and ID
+    bless $msg, 'Wikifier::Server::Message';
+    weaken($msg->{connection} = $connection);
+    $msg->{_reply_id} = $possible_id;
+
     # if the connection is not authenticated, this better be a wiki command.
     if (!$connection->{priv_read} && $command ne 'wiki') {
-        $connection->error('No read access');
+        $msg->error('No read access');
         return;
     }
 

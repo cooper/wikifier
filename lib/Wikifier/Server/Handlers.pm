@@ -57,28 +57,29 @@ sub _simplify_errors {
 # it does not require read acces - checked BEFORE read_required().
 #
 sub handle_wiki {
-    my ($connection, $msg) = read_required(@_, qw(name password)) or return;
+    my ($wiki, $msg) = read_required(@_, qw(name password)) or return;
+    my $conn = $msg->connection;
     my $name = (split /\./, $msg->{name})[0];
 
     # ensure that this wiki is configured on this server.
     if (!$conf->get("server.wiki.$name") || !$Wikifier::Server::wikis{$name}) {
-        $connection->error("Wiki '$name' not configured on this server");
+        $msg->error("Wiki '$name' not configured on this server");
         return;
     }
 
     # see if the passwords match.
     my $encrypted = sha1_hex($msg->{password});
     if ($encrypted ne $conf->get("server.wiki.$name.password")) {
-        $connection->error("Password does not match configuration");
+        $msg->error("Password does not match configuration");
         return;
     }
 
     # anonymous authentication succeeded.
-    $connection->{priv_read} = 1;
-    $connection->{wiki_name} = $name;
-    weaken($connection->{wiki} = $Wikifier::Server::wikis{$name});
+    $conn->{priv_read} = 1;
+    $conn->{wiki_name} = $name;
+    weaken($wiki = $Wikifier::Server::wikis{$name});
 
-    $connection->l("Successfully authenticated for read access");
+    $msg->l("Successfully authenticated for read access");
 }
 
 # method 1: username/password authentication
@@ -88,23 +89,24 @@ sub handle_wiki {
 #   session_id:     (optional) a string to identify the session
 #
 sub handle_login {
-    my ($connection, $msg) = read_required(@_, qw(username password)) or return;
+    my ($wiki, $msg) = read_required(@_, qw(username password)) or return;
     my $sess_id = $msg->{session_id};
+    my $conn    = $msg->connection;
 
     # verify password
-    my $wiki = $connection->{wiki};
+    my $wiki = $wiki;
     my $username  = $msg->{username};
     my $user_info = $wiki->verify_login(
         $username,
         $msg->{password}
     );
     if (!$user_info) {
-        $connection->error('Incorrect password', incorrect => 1);
+        $msg->error('Incorrect password', incorrect => 1);
         return;
     }
 
     # authentication succeeded.
-    $connection->send(login => {
+    $msg->reply(login => {
         logged_in => 1,
         %$user_info,
         conf => $wiki->{conf}{variables} || {}
@@ -113,7 +115,7 @@ sub handle_login {
     notice(user_logged_in => %$user_info);
 
     # store the session in the connection no matter what
-    $connection->{sess} = {
+    $conn->{sess} = {
         login_time  => time,        # session creation time
         time        => time,        # time of last (re)authentication
         id          => $sess_id,    # session ID (optional)
@@ -124,10 +126,10 @@ sub handle_login {
     };
 
     # also store it in the session hash if an ID was provided
-    $Wikifier::Server::sessions{$sess_id} = $connection->{sess}
+    $Wikifier::Server::sessions{$sess_id} = $conn->{sess}
         if length $sess_id;
 
-    $connection->l('Successfully authenticated for write access');
+    $msg->l('Successfully authenticated for write access');
 }
 
 # method 2: session ID authentication
@@ -135,21 +137,22 @@ sub handle_login {
 #   session_id:     a string to identify the session
 #
 sub handle_resume {
-    my ($connection, $msg) = read_required(@_, 'session_id') or return;
+    my ($wiki, $msg) = read_required(@_, 'session_id') or return;
+    my $conn = $msg->conn;
 
     # session is too old or never existed.
     my $sess = $Wikifier::Server::sessions{ $msg->{session_id} };
     if (!$sess) {
-        $connection->l("Bad session ID; refusing reauthentication");
-        $connection->error('Please login again', login_again => 1);
+        $msg->l("Bad session ID; refusing reauthentication");
+        $msg->error('Please login again', login_again => 1);
         return;
     }
 
     # authentication succeeded.
     $sess->{time} = time;
-    $connection->{sess} = $sess;
+    $conn->{sess} = $sess;
 
-    $connection->l('Resuming write access');
+    $msg->l('Resuming write access');
 }
 
 #####################
@@ -161,10 +164,10 @@ sub handle_resume {
 #   name:   the name of the page
 #
 sub handle_page {
-    my ($connection, $msg) = read_required(@_, 'name') or return;
-    my $result = $connection->{wiki}->display_page($msg->{name});
-    $connection->send('page', $result);
-    $connection->l("Page '$$msg{name}' requested");
+    my ($wiki, $msg) = read_required(@_, 'name') or return;
+    my $result = $wiki->display_page($msg->{name});
+    $msg->reply('page', $result);
+    $msg->l("Page '$$msg{name}' requested");
 }
 
 # page code request
@@ -176,13 +179,13 @@ sub handle_page {
 #                   {content}. 2 to do the same except also preserve the content
 #
 sub handle_page_code {
-    my ($connection, $msg) = write_required(@_, 'name') or return;
-    my $result = $connection->{wiki}->display_page_code(
+    my ($wiki, $msg) = write_required(@_, 'name') or return;
+    my $result = $wiki->display_page_code(
         $msg->{name},
         display_page => $msg->{display_page}
     );
-    $connection->send('page_code', $result);
-    $connection->l("Page '$$msg{name}' code requested");
+    $msg->reply('page_code', $result);
+    $msg->l("Page '$$msg{name}' code requested");
 }
 
 # model code request
@@ -194,13 +197,13 @@ sub handle_page_code {
 #                   {content}. 2 to do the same except also preserve the content
 #
 sub handle_model_code {
-    my ($connection, $msg) = write_required(@_, 'name') or return;
-    my $result = $connection->{wiki}->display_model_code(
+    my ($wiki, $msg) = write_required(@_, 'name') or return;
+    my $result = $wiki->display_model_code(
         $msg->{name},
         $msg->{display_model}
     );
-    $connection->send('model_code', $result);
-    $connection->l("Model '$$msg{name}' code requested");
+    $msg->reply('model_code', $result);
+    $msg->l("Model '$$msg{name}' code requested");
 }
 
 # page list
@@ -208,10 +211,10 @@ sub handle_model_code {
 #   sort:   method to sort the results
 #
 sub handle_page_list {
-    my ($connection, $msg) = write_required(@_, 'sort') or return;
+    my ($wiki, $msg) = write_required(@_, 'sort') or return;
 
     # get all pages
-    my $all = $connection->{wiki}->cat_get_pages('pages', 'data');
+    my $all = $wiki->cat_get_pages('pages', 'data');
     return if !$all || ref $all ne 'HASH';
     my %pages = %$all;
     my @pages = map {
@@ -224,8 +227,8 @@ sub handle_page_list {
     my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
     @pages = sort { $sorter->($a, $b) } @pages;
 
-    $connection->send(page_list => { pages => \@pages });
-    $connection->l("Complete page list requested");
+    $msg->reply(page_list => { pages => \@pages });
+    $msg->l("Complete page list requested");
 }
 
 # model list
@@ -233,11 +236,11 @@ sub handle_page_list {
 #   sort:   method to sort the results
 #
 sub handle_model_list {
-    my ($connection, $msg) = write_required(@_, 'sort') or return;
+    my ($wiki, $msg) = write_required(@_, 'sort') or return;
 
     # get all models
     my @models;
-    foreach my $model_name ($connection->{wiki}->all_models) {
+    foreach my $model_name ($wiki->all_models) {
         push @models, { # FIXME: real info
             file  => $model_name,
             title => $model_name
@@ -248,8 +251,8 @@ sub handle_model_list {
     my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
     @models = sort { $sorter->($a, $b) } @models;
 
-    $connection->send(model_list => { models => \@models });
-    $connection->l("Complete model list requested");
+    $msg->reply(model_list => { models => \@models });
+    $msg->l("Complete model list requested");
 }
 
 # image request
@@ -261,29 +264,27 @@ sub handle_model_list {
 #   dimensions default to those of the original image
 #
 sub handle_image {
-    my ($connection, $msg) = read_required(@_, 'name') or return;
-    Lindent "Image '$$msg{name}' requested by $$connection{id}";
-    my $result = $connection->{wiki}->display_image(
+    my ($wiki, $msg) = read_required(@_, 'name') or return;
+    my $result = $wiki->display_image(
         [ $msg->{name}, $msg->{width} || 0, $msg->{height} || 0 ],
         dont_open => 1 # don't open the image
     );
     delete $result->{content};
-    back;
-    $connection->send('image', $result);
+    $msg->reply('image', $result);
 }
 
 sub handle_image_list {
-    my ($connection, $msg) = write_required(@_, 'sort') or return;
+    my ($wiki, $msg) = write_required(@_, 'sort') or return;
 
     # get all images
-    my @cats = values_maybe $connection->{wiki}->get_images;
+    my @cats = values_maybe $wiki->get_images;
 
     # sort
     my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
     @cats = sort { $sorter->($a, $b) } @cats;
 
-    $connection->send(image_list => { images => \@cats });
-    $connection->l("Complete image list requested");
+    $msg->reply(image_list => { images => \@cats });
+    $msg->l("Complete image list requested");
 }
 
 # category posts
@@ -291,11 +292,9 @@ sub handle_image_list {
 #   name:   the name of the category
 #
 sub handle_cat_posts {
-    my ($connection, $msg) = read_required(@_, 'name') or return;
-    Lindent "Category posts for '$$msg{name}' requested by $$connection{id}";
-    my $result = $connection->{wiki}->display_cat_posts($msg->{name});
-    back;
-    $connection->send('cat_posts', $result);
+    my ($wiki, $msg) = read_required(@_, 'name') or return;
+    my $result = $wiki->display_cat_posts($msg->{name});
+    $msg->reply('cat_posts', $result);
 }
 
 # category list.
@@ -303,11 +302,11 @@ sub handle_cat_posts {
 #   sort:   method to sort the results
 #
 sub handle_cat_list {
-    my ($connection, $msg) = write_required(@_, 'sort') or return;
+    my ($wiki, $msg) = write_required(@_, 'sort') or return;
 
     # get all cats
     my @cats;
-    foreach my $cat_name ($connection->{wiki}->all_categories) {
+    foreach my $cat_name ($wiki->all_categories) {
         push @cats, { # FIXME: real info
             file  => $cat_name,
             title => $cat_name
@@ -318,8 +317,8 @@ sub handle_cat_list {
     my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
     @cats = sort { $sorter->($a, $b) } @cats;
 
-    $connection->send(cat_list => { categories => \@cats });
-    $connection->l("Complete category list requested");
+    $msg->reply(cat_list => { categories => \@cats });
+    $msg->l("Complete category list requested");
 }
 
 
@@ -340,7 +339,7 @@ sub _handle_page_save {
     # regenerate it
     # commit: (existed? added : modified) x.page: user edit message
     my $is_model = shift;
-    my ($connection, $msg) = write_required(@_, qw(name content)) or return;
+    my ($wiki, $msg) = write_required(@_, qw(name content)) or return;
     my $method;
 
     # remove carriage returns injected by the browser
@@ -349,13 +348,13 @@ sub _handle_page_save {
     $content =~ s/\r//g;
 
     # update the page
-    my $wiki = $connection->{wiki};
+    my $wiki = $wiki;
     $method  = $is_model ? 'model_named' : 'page_named';
     my $page = $wiki->$method($msg->{name}, content => $content);
     $method  = $is_model ? 'write_model' : 'write_page';
     my @errs = $wiki->$method($page, $msg->{message});
 
-    $connection->send($is_model ? 'model_save' : 'page_save' => {
+    $msg->reply($is_model ? 'model_save' : 'page_save' => {
         result     => $page->{recent_result},
         saved      => !@errs,
         rev_errors => \@errs,
@@ -371,17 +370,17 @@ sub _handle_page_del {
     # remove it from all categories
     # commit: deleted page x.page
     my $is_model = shift;
-    my ($connection, $msg) = write_required(@_, 'name') or return;
+    my ($wiki, $msg) = write_required(@_, 'name') or return;
     my $method;
 
     # delete the page
-    my $wiki = $connection->{wiki};
+    my $wiki = $wiki;
     $method  = $is_model ? 'model_named' : 'page_named';
     my $page = $wiki->$method($msg->{name});
     $method  = $is_model ? 'delete_model' : 'delete_page';
     $wiki->$method($page);
 
-    $connection->send($is_model ? 'model_del' : 'page_del' => {
+    $msg->reply($is_model ? 'model_del' : 'page_del' => {
         deleted => 1
     });
 }
@@ -391,17 +390,17 @@ sub _handle_page_move {
     # rename page file
     # commit: moved page a.page -> b.page
     my $is_model = shift;
-    my ($connection, $msg) = write_required(@_, qw(name new_name)) or return;
+    my ($wiki, $msg) = write_required(@_, qw(name new_name)) or return;
     my $method;
 
     # rename the page
-    my $wiki = $connection->{wiki};
+    my $wiki = $wiki;
     $method  = $is_model ? 'model_named' : 'page_named';
     my $page = $wiki->$method($msg->{name});
     $method  = $is_model ? 'move_model' : 'move_page';
     $wiki->$method($page, $msg->{new_name});
 
-    $connection->send($is_model ? 'model_move' : 'page_move' => {
+    $msg->reply($is_model ? 'model_move' : 'page_move' => {
         moved => 1
     });
 }
@@ -422,10 +421,11 @@ sub handle_cat_del {
 }
 
 sub handle_ping {
-    my ($connection) = write_required(@_) or return;
-    my $notices = delete $connection->{sess}{notifications};
-    $connection->{sess}{notifications} = [];
-    $connection->send(pong => {
+    my ($wiki, $msg) = write_required(@_) or return;
+    my $conn = $msg->connection;
+    my $notices = delete $conn->{sess}{notifications};
+    $conn->{sess}{notifications} = [];
+    $msg->reply(pong => {
         connected     => 1,
         notifications => $notices
     });
@@ -445,10 +445,10 @@ sub read_required {
             push @good, $msg->{$_};
             next;
         }
-        $connection->error("Required option '$_' missing");
+        $msg->error("Required option '$_' missing");
         return;
     }
-    return my @a = ($connection, $msg, @good);
+    return my @a = ($connection->{wiki}, $msg, @good);
 }
 
 # check for all required things.
@@ -457,7 +457,7 @@ sub read_required {
 sub write_required {
     my ($connection) = @_;
     if (!$connection->{sess} || !$connection->{sess}{priv_write}) {
-        $connection->error('No write access');
+        $msg->error('No write access');
         return;
     }
     &read_required;
