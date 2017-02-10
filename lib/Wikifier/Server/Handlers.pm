@@ -94,7 +94,6 @@ sub handle_login {
     my $conn    = $msg->connection;
 
     # verify password
-    my $wiki = $wiki;
     my $username  = $msg->{username};
     my $user_info = $wiki->verify_login(
         $username,
@@ -348,7 +347,6 @@ sub _handle_page_save {
     $content =~ s/\r//g;
 
     # update the page
-    my $wiki = $wiki;
     $method  = $is_model ? 'model_named' : 'page_named';
     my $page = $wiki->$method($msg->{name}, content => $content);
     $method  = $is_model ? 'write_model' : 'write_page';
@@ -374,7 +372,6 @@ sub _handle_page_del {
     my $method;
 
     # delete the page
-    my $wiki = $wiki;
     $method  = $is_model ? 'model_named' : 'page_named';
     my $page = $wiki->$method($msg->{name});
     $method  = $is_model ? 'delete_model' : 'delete_page';
@@ -394,7 +391,6 @@ sub _handle_page_move {
     my $method;
 
     # rename the page
-    my $wiki = $wiki;
     $method  = $is_model ? 'model_named' : 'page_named';
     my $page = $wiki->$method($msg->{name});
     $method  = $is_model ? 'move_model' : 'move_page';
@@ -455,7 +451,7 @@ sub read_required {
 # disconnect from the client if one is missing.
 # disconnect if the client does not have write access.
 sub write_required {
-    my ($connection) = @_;
+    my ($connection, $msg) = @_;
     if (!$connection->{sess} || !$connection->{sess}{priv_write}) {
         $msg->error('No write access');
         return;
