@@ -13,8 +13,15 @@ sub reply {
     $msg->conn->send(@args);
 }
 
-sub error       { shift->conn->error(@_)  }
-sub l           { shift->conn->l(@_)      }
-sub conn        { shift->{conn}           }
+# error
+sub error {
+    my ($msg, $error, %other) = @_;
+    $msg->reply(error => { reason => $error, %other });
+    $msg->l("Error: $error");
+    $msg->conn->close;
+}
+
+sub l       { shift->conn->l(@_)    }
+sub conn    { shift->{conn}         }
 
 1
