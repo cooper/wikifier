@@ -87,7 +87,7 @@ sub handle {
     # store the connection and ID
     bless $msg, 'Wikifier::Server::Message';
     weaken($msg->{conn} = $conn);
-    $msg->{_reply_id} = $possible_id;
+    $msg->{_reply_id} = $possible_id + 0;
 
     # if the connection is not authenticated, this better be a wiki command.
     if (!$conn->{priv_read} && $command ne 'wiki') {
