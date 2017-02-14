@@ -4,8 +4,7 @@ package Wikifier::Server::Handlers;
 use warnings;
 use strict;
 
-use Digest::SHA  'sha1_hex';
-use Scalar::Util 'weaken';
+use Scalar::Util qw(weaken);
 use Wikifier::Utilities qw(notice values_maybe);
 
 my ($loop, $conf);
@@ -68,8 +67,7 @@ sub handle_wiki {
     }
 
     # see if the passwords match.
-    my $encrypted = sha1_hex($msg->{password});
-    if ($encrypted ne $conf->get("server.wiki.$name.password")) {
+    if ($msg->{password} ne $conf->get("server.wiki.$name.password")) {
         $msg->error("Password does not match configuration");
         return;
     }
