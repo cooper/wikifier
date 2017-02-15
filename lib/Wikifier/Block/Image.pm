@@ -146,10 +146,11 @@ sub image_html {
     $el->add_class('imagebox-'.$block->{float}) if $box;
 
     # add data-rjs for retina.
-    if (my $retina = $page->wiki_opt('image.enable.retina')) {
+    my $retina;
+    if ($retina = $page->wiki_opt('image.enable.retina')) {
         my @scales = split /,/, $retina;
-        my $biggest = max grep !m/\D/, map { trim($_) } @scales;
-        $el->add_attribute('data-rjs' => $biggest) if $biggest > 1;
+        $retina = max grep !m/\D/, map { trim($_) } @scales;
+        $retina ||= undef;
     }
 
     # fetch things we determined in image_parse().
@@ -173,7 +174,8 @@ sub image_html {
             type       => 'img',
             attributes => {
                 src => $image_url,
-                alt => 'image'
+                alt => 'image',
+                'data-rjs' => $retina
             },
             alt        => 'image',
             styles     => {
@@ -203,7 +205,8 @@ sub image_html {
         type       => 'img',
         attributes => {
             src => $image_url,
-            alt => $block->{file}
+            alt => $block->{file},
+            'data-rjs' => $retina
         },
         styles     => {
             width  => $width,

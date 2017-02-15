@@ -124,7 +124,9 @@ sub generate {
 
     # add other attributes.
     foreach my $attr (keys %{ $el->{attributes} }) {
-        my $value = encode_entities($el->{attributes}{$attr});
+        my $val = $el->{attributes}{$attr};
+        next if !defined $val;
+        my $value = encode_entities($val);
         $html    .= " $attr=\"$value\"";
     }
     $html .= ">\n" if $el->{container};
