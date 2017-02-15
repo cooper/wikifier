@@ -174,6 +174,8 @@ sub get_image_cache {
 
     # symlink scaled version if necessary.
     $wiki->symlink_scaled_image($image) if $image->{retina};
+
+    return $result;
 }
 
 # parse an image name such as:
