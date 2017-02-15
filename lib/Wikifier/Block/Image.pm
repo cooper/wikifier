@@ -11,7 +11,8 @@ package Wikifier::Block::Image;
 use warnings;
 use strict;
 
-use Wikifier::Utilities qw(L);
+use Wikifier::Utilities qw(L trim);
+use List::Util qw(max);
 
 our %block_types = (
     image => {
@@ -143,6 +144,13 @@ sub image_html {
 
     # add the appropriate float class.
     $el->add_class('imagebox-'.$block->{float}) if $box;
+
+    # add data-rjs for retina.
+    if (my $retina = $page->wiki_opt('image.enable.retina')) {
+        my @scales = split /,/, $retina;
+        my $biggest = max grep !m/\D/, map { trim($_) } @scales;
+        $el->add_attribute('data-rjs' => $biggest) if $biggest > 1;
+    }
 
     # fetch things we determined in image_parse().
  my ($height,          $width,          $image_root,          $image_url         ) =
