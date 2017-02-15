@@ -1,6 +1,6 @@
 # Components
 
-Wikifier is divided into several components, each built atop the previous.
+wikifier is divided into several components, each built atop the previous.
 This allows it to be used either as a wiki library or as a
 [standalone program](#executables).
 
@@ -12,9 +12,9 @@ This allows it to be used either as a wiki library or as a
      * [Features](#features)
      * [Usage](#usage)
      * [Interfaces](#interfaces)
-  * [Executables](#executables) - Use Wikifier as a standalone program
+  * [Executables](#executables) - Use wikifier as a standalone program
 
-## Wikifier
+## wikifier
 
 The **Wikifier** package includes the most basic low-level functions. It
 provides the minimal functionality for parsing wiki source files and generating
@@ -22,7 +22,7 @@ HTML. This is not to be used directly; instead set up a
 [wikiserver](#wikifierserver) or use one of [WiPage](#wikifierwiki) or
 [WiWiki](#wikifierwiki) directly from code.
 
-The Wikifier package is divided into several subpackages:
+The wikifier package is divided into several subpackages:
 * __Parser__ - Reads [wiki language](language.md) source files
   character-by-character and [parses](parsing.md) them.
 * __Formatter__ - Translates [formatted text](language.md#text-formatting) such
@@ -35,15 +35,15 @@ The Wikifier package is divided into several subpackages:
 
 ## Wikifier::Page
 
-**WiPage** (Wikifier::Page) is the most basic interface to the Wikifier. As the
+**WiPage** (Wikifier::Page) is the most basic interface to the wikifier. As the
 name suggests, a Wikifier::Page object represents a single page of a wiki.
 Usually it is associated with a single `.page` file written in the
-[Wikifier language](langauge.md). WiPage utilizes the Wikifier package to
+[wikifier language](langauge.md). WiPage utilizes the wikifier package to
 generate HTML from the source file.
 
 ## Wikifier::Wiki
 
-**WiWiki** (Wikifier::Wiki) is an optional component of Wikifier which each
+**WiWiki** (Wikifier::Wiki) is an optional component of wikifier which each
 WiPage is independent of. This class provides a full wiki manager featuring
 caching, image generation, category management, templates, and other components
 of many wikis.
@@ -99,7 +99,7 @@ One wikiserver can manage any number of [WiWikis](#wikifierwiki).
 ### Interfaces
 
 [Wikifier::Server](#wikifierserver) is *not* a web server. You have to link your
-web server to it with some sort of script. Wikifier comes with some programming
+web server to it with some sort of script. wikifier comes with some programming
 interfaces to do this. They are located in the [interfaces](../interfaces)
 directory.
 
@@ -108,8 +108,8 @@ Documentation for each interface:
 
 ## Executables
 
-These executables, included in the Wikifier distribution, make it possible to
-use Wikifier as an independent program rather than a library.
+These executables, included in the wikifier distribution, make it possible to
+use wikifier as an independent program rather than a library.
 
 ### wikifier
 

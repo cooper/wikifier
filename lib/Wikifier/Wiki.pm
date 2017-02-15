@@ -42,7 +42,7 @@ sub new {
     my ($class, %opts) = @_;
     my $wiki = bless \%opts, $class;
 
-    # create the Wiki's Wikifier instance.
+    # create the Wiki's wikifier instance.
     # using the same wikifier instance over and over makes parsing much faster.
     $wiki->{wikifier} ||= Wikifier->new;
 

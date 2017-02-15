@@ -28,7 +28,7 @@ Wikifier's source language is designed to be easily legible by the naked eye.
 
 ## Syntax
 
-The Wikifier source language is [parsed hierarchically](parsing.md). In other
+The wikifier source language is [parsed hierarchically](parsing.md). In other
 words, the source is divided into components (called [blocks](#blocks)) which
 then are responsible for parsing their inner contents. The master parser is
 concerned only with the most basic syntax:
@@ -116,7 +116,7 @@ code {{
 
 ## Blocks
 
-The fundamental component of the Wikifier language is the **block**.
+The fundamental component of the wikifier language is the **block**.
 The syntax for a block is as follows:
 
 ```
@@ -179,7 +179,7 @@ sec [Statistics] {
 
 #### Model shorthand
 
-Wikifier has a special syntax for using [**models**](models.md). Write them like
+wikifier has a special syntax for using [**models**](models.md). Write them like
 any block, except prefix the model name with a dollar sign (`$`).
 
 ```
@@ -207,7 +207,7 @@ array datatype.
 
 ## Variables
 
-Wikifier supports string, boolean, and block variables.
+wikifier supports string, boolean, and block variables.
 
 ### Assignment
 
@@ -385,7 +385,7 @@ at the very top of a page source file.
   title can contain [formatted text](#text-formatting), but it may be stripped
   down to plaintext in certain places.
 * `@page.created` - UNIX timestamp of the page creation time. This is not used
-  in the Wikifier itself, but can be used in frontends for sorting the page list
+  in the wikifier itself, but can be used in frontends for sorting the page list
   by creation date.
 * `@page.author` - Name of the page author. This is also optional but may be
   used by frontends to organize pages by author.

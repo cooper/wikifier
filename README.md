@@ -1,6 +1,6 @@
-# Wikifier
+# wikifier
 
-Wikifier is a file-based wiki suite.
+wikifier is a file-based wiki suite.
 
 ## Example
 
@@ -24,13 +24,13 @@ infobox {
 }
 
 sec {
-    Wikifier is a wiki suite. It is unique because it is completely
+    wikifier is a wiki suite. It is unique because it is completely
     file-based. There are no databases. Yet, it offers page caching, image
     sizing, session management/authentication, and lots of other things that
     fancy wikis use databases for.
 
     history {
-        February 2013:  The first commit of Wikifier is published.;
+        February 2013:  The first commit of wikifier is published.;
         December 2013:  [! Nelson Mandela !] passes away.;
         February 2014:  [! Ebola virus !] spreads across West Africa.;
         July 2015:      [! NASA !] takes a close-up photo of Pluto.;
@@ -38,7 +38,7 @@ sec {
 }
 
 sec [Components] {
-    Wikifier is split up into several packages.
+    wikifier is split up into several packages.
 
     sec [Wikifier] {
         Provides parsing and stuff. The most basic stuff. You usually
@@ -81,15 +81,15 @@ sec [Components] {
 ## Documentation
 
 General
-* [Language](doc/language.md)           - Wikifier language specification
-* [Configuration](doc/configuration.md) - Wikifier configuration
-* [Blocks](doc/blocks.md)               - Wikifier built-in block types
-* [Models](doc/models.md)               - Wikifier templates
-* [Styling](doc/styling.md)             - Wikifier + CSS
+* [Language](doc/language.md)           - wikifier language specification
+* [Configuration](doc/configuration.md) - wikifier configuration
+* [Blocks](doc/blocks.md)               - wikifier built-in block types
+* [Models](doc/models.md)               - wikifier templates
+* [Styling](doc/styling.md)             - wikifier + CSS
 
 Technical
-* [Parsing](doc/parsing.md)             - Wikifier parsing stages
-* [Components](doc/components.md)       - Wikifier programming interfaces
+* [Parsing](doc/parsing.md)             - wikifier parsing stages
+* [Components](doc/components.md)       - wikifier programming interfaces
 
 ## Contact
 

@@ -25,7 +25,7 @@ options provided to the model from the main page.
 
 ## Using models
 
-Wikifier has a special syntax for using models. Write them like any block,
+wikifier has a special syntax for using models. Write them like any block,
 except prefix the model name with a dollar sign (`$`).
 ```
 $my_model {

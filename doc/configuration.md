@@ -140,7 +140,7 @@ certainly most efficient.
 
 | Option            | Description                                           |
 | -----             | -----                                                 |
-| `dir.wikifier`    | Wikifier repository                                   |
+| `dir.wikifier`    | wikifier repository                                   |
 | `dir.wiki`        | Wiki root directory                                   |
 | `dir.page`        | Page files stored here                                |
 | `dir.image`       | Image originals stored here                           |
@@ -194,7 +194,7 @@ __Default__: Disabled
 
 ### image.size_method
 
-The method which the Wikifier should use to scale images.
+The method which the wikifier should use to scale images.
 
 **Accepted values**
 * _javascript_ - JavaScript-injected image sizing
@@ -292,7 +292,7 @@ require them are generated. This contrasts from the default behavior in
 which images are generated as they are requested.
 
 The advantage of this option is that it allows images to be served directly
-by a web server without summoning any Wikifier software, decreasing the page
+by a web server without summoning any wikifier software, decreasing the page
 load time.
 
 The disadvantage is slower page generation time if new images have been

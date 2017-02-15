@@ -1,6 +1,6 @@
 # Copyright (c) 2017, Mitchell Cooper
 #
-# Wikifier::Utilities provides several functions used throughout the Wikifier.
+# Wikifier::Utilities provides several functions used throughout the wikifier.
 # It exports any of the functions as needed.
 #
 package Wikifier::Utilities;

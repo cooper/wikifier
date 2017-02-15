@@ -15,10 +15,10 @@ blocks, see [Language](language.md#blocks).
   * [Infobox](#infobox) - Table to summarize article information
   * [Invisible](#invisible) - Silences all other blocks
   * [List](#list) - An ordered list datatype as well as `<ul>`
-  * [Model](#model) - Wikifier templates
+  * [Model](#model) - wikifier templates
   * [Paragraph](#paragraph) - `<p>`
   * [Section](#section) - Article section with optional header
-  * [Style](#style) - Use CSS with Wikifier
+  * [Style](#style) - Use CSS with wikifier
 
 ## Clear
 
@@ -68,7 +68,7 @@ used with [models](#model).
 format {
     <div>
         This is some HTML.
-        b]Wikifier formatting[/b] is allowed.
+        b]wikifier formatting[/b] is allowed.
     </div>
 }
 ```
@@ -140,7 +140,7 @@ infobox [My Article] {
 
 **Attributes**. Maps and all map-based block types support attribute fetching
 and assignment, which allows you to retrieve and set their values using the
-Wikifier variable attribute syntax.
+wikifier variable attribute syntax.
 ```
 /* define the infobox in a variable so we can access attributes */
 @person: infobox [Britney Spears] {

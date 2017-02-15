@@ -1,6 +1,6 @@
 # Parsing
 
-The Wikifier source language is parsed hierarchically.
+The wikifier source language is parsed hierarchically.
 
 ## Parsing stages
 
