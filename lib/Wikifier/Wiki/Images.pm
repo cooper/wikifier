@@ -22,6 +22,7 @@ my $json = JSON::XS->new->pretty(1);
 #
 # %opts = (
 #   dont_open       don't actually read the image; {content} will be omitted
+#   gen_override    set true for pregeneration so we can generate any dimensions
 # )
 sub display_image {
     my $result = _display_image(@_);
@@ -111,6 +112,13 @@ sub _display_image {
     #=== Generate image ===#
     #======================#
 
+    # we are not allowed to generate
+    if ($wiki->opt('image.enable.restriction') && $opts{gen_override}) {
+        my $dimension_str = "$$image{r_width}x$$image{r_height}";
+        return display_error("Image does not exist at $dimension_str.");
+    }
+
+    # generate the image
     my $err = $wiki->generate_image($image, $result);
     return $err if $err;
 
@@ -237,12 +245,6 @@ sub generate_image {
     # if we are restricting to only sizes used in the wiki, check.
     my ($width, $height, $r_width, $r_height) =
         @$image{ qw(width height r_width r_height) };
-    if ($wiki->opt('image.enable.restriction')) {
-        my $dimension_str = "${r_width}x${r_height}";
-        return display_error(
-            "Image does not exist at $dimension_str."
-        ) if !$wiki->{allowed_dimensions}{ $image->{name} }{$dimension_str};
-    }
 
     # create GD instance with this full size image.
     GD::Image->trueColor(1);
@@ -371,15 +373,16 @@ sub _wiki_default_calc {
         big_height => $big_h
     );
 
-    # store these as accepted dimensions.
-    $wiki->{allowed_dimensions}{ $img{file} }{ "${w}x${h}" } = 1;
-
     # pregenerate if necessary.
     # this allows the direct use of the cache directory as served from
     # the web server, reducing the wikifier server's load when requesting
     # cached pages and their images.
     if ($page->wiki_opt('image.enable.pregeneration')) {
-        my $res = $wiki->display_image([ $img{file}, $w, $h ], dont_open => 1);
+        my $res = $wiki->display_image(
+            [ $img{file}, $w, $h ],
+            dont_open       => 1,
+            gen_override    => 1
+        );
         my ($image_dir, $cache_dir) = (
             $page->wiki_opt('dir.image'),
             $page->wiki_opt('dir.cache')
