@@ -89,7 +89,10 @@ sub _display_image {
             next if $_ == 1;
 
             my $retina_file = "$$image{f_name_ne}\@${_}x.$$image{ext}";
-            $wiki->display_image($retina_file, dont_open => 1);
+            $wiki->display_image($retina_file,
+                dont_open => 1,
+                gen_override => 1
+            );
         }
     }
 
