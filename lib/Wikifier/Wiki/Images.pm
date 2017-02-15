@@ -37,7 +37,7 @@ sub _display_image {
     # [ name, width, height ]
     if (ref $image_name eq 'ARRAY') {
         my ($name, $w, $h) = @$image_name;
-        $image_name = "${w}x${h}-$name";
+        $image_name = "${w}x${h}-$name" if $w && $h;
     }
 
     # parse the image name.
@@ -170,7 +170,7 @@ sub get_image_cache {
 # parse an image name such as:
 #
 #   250x250-some_pic.png
-#   250x250-some_pic\@2x.png (w/o slash)
+#   250x250-some_pic@2x.png (w/o slash)
 #   some_pic.png
 #
 sub parse_image_name {
