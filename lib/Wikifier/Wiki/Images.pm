@@ -37,7 +37,8 @@ sub _display_image {
     # [ name, width, height ]
     if (ref $image_name eq 'ARRAY') {
         my ($name, $w, $h) = @$image_name;
-        $image_name = "${w}x${h}-$name" if $w && $h;
+        $image_name = "${w}x${h}-$name";
+        $image_name = $name if !$w || !$h;
     }
 
     # parse the image name.
