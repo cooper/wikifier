@@ -41,7 +41,7 @@ sub list_parse {
     };
 
     # add a block or text to the value
-    $append_value = sub {
+    my $append_value = sub {
         my $append = shift;
 
         # nothing
@@ -65,7 +65,7 @@ sub list_parse {
     };
 
     # fix the value
-    $fix_value = sub {
+    my $fix_value = sub {
         my @new;
         foreach my $item (@$value) {
             next if blessed $item;
