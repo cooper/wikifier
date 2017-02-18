@@ -68,7 +68,7 @@ sub list_parse {
     $fix_value = sub {
         my @new;
         foreach my $item (@$value) {
-        if (!blessed $item) {
+            next if blessed $item;
             $item =~ s/(^\s*)|(\s*$)//g;
 
             # special value -no-format-values;
