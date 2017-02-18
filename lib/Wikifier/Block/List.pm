@@ -5,7 +5,7 @@ use warnings;
 use strict;
 
 use Scalar::Util qw(blessed);
-use Wikifier::Utilities qw(trim truncate_hr);
+use Wikifier::Utilities qw(trim truncate_hr fix_value);
 
 our %block_types = (list => {
     init   => \&list_init,
@@ -64,26 +64,6 @@ sub list_parse {
         $$last .= $append;
     };
 
-    # fix the value
-    my $fix_value = sub {
-        my @new;
-        foreach my $item (@$value) {
-            next if blessed $item;
-            $item =~ s/(^\s*)|(\s*$)//g;
-
-            # special value -no-format-values;
-            if ($item eq '-no-format-values') {
-                $block->warning($pos, 'Redundant -no-format-values')
-                    if $block->{no_format_values}++;
-                $item = '';
-                next CHAR;
-            }
-        }
-        $value = \@new;
-        $value = $new[0]    if @new == 1;
-        undef $value        if !@new;
-    };
-
     # for each content item...
     ITEM: foreach ($block->content_visible_pos) {
         (my $item, $pos) = @$_;
@@ -109,7 +89,7 @@ sub list_parse {
             elsif ($char eq ';' && !$escaped) {
 
                 # fix the value.
-                $fix_value->();
+                $value = fix_value($value);
 
                 # store the value.
                 push @{ $block->{list_array} }, {

@@ -158,6 +158,20 @@ sub values_maybe($) {
     return values %hash;
 }
 
+sub fix_value {
+    my $value = shift;
+    my @new;
+    return if !defined $value;
+    foreach my $item (@$value) {
+        next if blessed $item;
+        $item =~ s/(^\s*)|(\s*$)//g;
+        push @new, $item;
+    }
+    return $new[0] if @new == 1;
+    return if !@new;
+    return \@new;
+}
+
 ### LOGGING
 
 our $indent = 0;
