@@ -80,7 +80,8 @@ sub list_parse {
             }
         }
         $value = \@new;
-        $value = $new[0] if @new == 1;
+        $value = $new[0]    if @new == 1;
+        undef $value        if !@new;
     };
 
     # for each content item...
