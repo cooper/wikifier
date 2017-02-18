@@ -5,7 +5,7 @@ use warnings;
 use strict;
 
 use Scalar::Util qw(blessed);
-use Wikifier::Utilities qw(trim truncate_hr fix_value);
+use Wikifier::Utilities qw(trim truncate_hr fix_value append_value);
 
 our %block_types = (list => {
     init   => \&list_init,
@@ -40,37 +40,13 @@ sub list_parse {
         return wantarray ? (@stuff) : $stuff[0];
     };
 
-    # add a block or text to the value
-    my $append_value = sub {
-        my $append = shift;
-
-        # nothing
-        return if !defined $append;
-
-        # first item
-        if (ref $value ne 'ARRAY' || !@$value) {
-            $value = [ $append ];
-            return;
-        }
-
-        # if the last element or the append element are refs, push
-        my $last = \$value->[-1];
-        if (ref $$last || ref $append) {
-            push @$value, $append;
-            return;
-        }
-
-        # otherwise, append as text
-        $$last .= $append;
-    };
-
     # for each content item...
     ITEM: foreach ($block->content_visible_pos) {
         (my $item, $pos) = @$_;
 
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
-            $append_value->($item);
+            append_value(\$value, $item);
             next ITEM;
         }
 
@@ -89,7 +65,7 @@ sub list_parse {
             elsif ($char eq ';' && !$escaped) {
 
                 # fix the value.
-                $value = fix_value($value);
+                fix_value(\$value);
 
                 # store the value.
                 push @{ $block->{list_array} }, {
@@ -104,7 +80,7 @@ sub list_parse {
 
             # any other character
             else {
-                $append_value->($char);
+                append_value(\$value, $char);
                 $escaped = 0;
             }
 

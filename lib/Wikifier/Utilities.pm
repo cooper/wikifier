@@ -161,15 +161,39 @@ sub values_maybe($) {
 sub fix_value {
     my $value = shift;
     my @new;
-    return if !defined $value;
-    foreach my $item (@$value) {
+    return if !defined $$value;
+    foreach my $item (@$$value) {
         next if blessed $item;
         $item =~ s/(^\s*)|(\s*$)//g;
         push @new, $item;
     }
-    return $new[0] if @new == 1;
-    return if !@new;
-    return \@new;
+    $$value = \@new;
+    $$value = $new[0] if @new == 1;
+    $$value = undef   if !@new;
+}
+
+sub append_value {
+    my $value = shift;
+    my $item = shift;
+
+    # nothing
+    return if !defined $item;
+
+    # first item
+    if (ref $$value ne 'ARRAY' || !@$$value) {
+        $$value = [ $item ];
+        return;
+    }
+
+    # if the last element or the append element are refs, push
+    my $last = \$$value->[-1];
+    if (ref $$last || ref $item) {
+        push @$$value, $item;
+        return;
+    }
+
+    # otherwise, append as text
+    $$last .= $item;
 }
 
 ### LOGGING
