@@ -23,7 +23,7 @@ sub list_init {
 # parse a list.
 sub list_parse {
     my ($block, $page) = @_;
-    my ($value, $pos, $ow_value, $ap_value) = '';
+    my ($value, $pos);
 
     # get human readable values
     my $get_hr = sub {
@@ -40,22 +40,47 @@ sub list_parse {
         return wantarray ? (@stuff) : $stuff[0];
     };
 
-    # check if we have bad values and produce warnings
-    my $warn_bad_maybe = sub {
+    # add a block or text to the value
+    $append_value = sub {
+        my $append = shift;
 
-        # tried to append an object value
-        if ($ap_value) {
-            my $ap_value_text = $get_hr->($ap_value);
-            $block->warning($pos, "Stray text after $ap_value_text ignored");
-            undef $ap_value;
+        # nothing
+        return if !defined $append;
+
+        # first item
+        if (ref $value ne 'ARRAY' || !@$value) {
+            $value = [ $append ];
+            return;
         }
 
-        # overwrote a value
-        if ($ow_value) {
-            my ($old, $new) = $get_hr->(@$ow_value);
-            $block->warning($pos, "Overwrote value $old with $new");
-            undef $ow_value;
+        # if the last element or the append element are refs, push
+        my $last = \$value->[-1];
+        if (ref $$last || ref $append) {
+            push @$value, $append;
+            return;
         }
+
+        # otherwise, append as text
+        $$last .= $append;
+    };
+
+    # fix the value
+    $fix_value = sub {
+        my @new;
+        foreach my $item (@$value) {
+        if (!blessed $item) {
+            $item =~ s/(^\s*)|(\s*$)//g;
+
+            # special value -no-format-values;
+            if ($item eq '-no-format-values') {
+                $block->warning($pos, 'Redundant -no-format-values')
+                    if $block->{no_format_values}++;
+                $item = '';
+                next CHAR;
+            }
+        }
+        $value = \@new;
+        $value = $new[0] if @new == 1;
     };
 
     # for each content item...
@@ -64,12 +89,7 @@ sub list_parse {
 
         # if blessed, it's a block value, such as an image.
         if (blessed($item)) {
-
-            # set the value to the block item itself.
-            $ow_value = [ $value, $item ]
-                if length trim($value);
-            $value = $item;
-
+            $append_value->($item);
             next ITEM;
         }
 
@@ -87,21 +107,10 @@ sub list_parse {
             # a semicolon indicates the termination of a pair.
             elsif ($char eq ';' && !$escaped) {
 
-                # fix the value
-                if (!blessed $value) {
-                    $value =~ s/(^\s*)|(\s*$)//g;
-
-                    # special value -no-format-values;
-                    if ($value eq '-no-format-values') {
-                        $block->warning($pos, 'Redundant -no-format-values')
-                            if $block->{no_format_values}++;
-                        $value = '';
-                        next CHAR;
-                    }
-                }
+                # fix the value.
+                $fix_value->();
 
                 # store the value.
-                $warn_bad_maybe->();
                 push @{ $block->{list_array} }, {
                     value => $value,        # value
                     pos   => $pos           # position
@@ -109,15 +118,12 @@ sub list_parse {
                 push @{ $block->{list_array_values} }, $value;
 
                 # reset status.
-                $value = '';
+                undef $value;
             }
 
             # any other character
             else {
-                if (blessed $value) {
-                    $ap_value = $value unless $char =~ m/\s/;
-                }
-                else { $value .= $char }
+                $append_value->($char);
                 $escaped = 0;
             }
 
@@ -128,7 +134,6 @@ sub list_parse {
     }       # end of item loop.
 
     # warning stuff
-    $warn_bad_maybe->();
     $pos->{line} = $block->{line};
     my $value_text = $get_hr->($value);
 
