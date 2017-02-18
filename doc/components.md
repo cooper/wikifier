@@ -103,8 +103,19 @@ web server to it with some sort of script. wikifier comes with some programming
 interfaces to do this. They are located in the [interfaces](../interfaces)
 directory.
 
-Documentation for each interface:
-* [__PHP__](../interfaces/PHP/README.md)
+* __PHP__ - [php-wikiclient](https://github.com/cooper/php-wikiclient)
+* __Go__ - [go-wikiclient](https://github.com/cooper/go-wikiclient)
+
+### Frontends
+
+These connect to wikiservers in order to serve content via HTTP.
+
+* [__quiki__](https://github.com/cooper/quiki) - a standalone web server for
+  wikifier written in Go. probably the easiest way to get a wikifier wiki up and
+  running. features a built-in template engine, the ability to serve multiple
+  wikis from one server, and more.
+* [__adminifier__](https://github.com/cooper/adminifier) - an administrator
+  panel for wikifier written in PHP.
 
 ## Executables
 

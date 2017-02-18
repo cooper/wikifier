@@ -37,6 +37,7 @@ of a full wiki, and others yet for the operation of a wiki server.
     * [admin\.[username]\.email](#adminusernameemail)
     * [admin\.[username]\.crypt](#adminusernamecrypt)
     * [admin\.[username]\.password](#adminusernamepassword)
+  * [Wikifier::Wiki extended options](#wikifierwiki-extended-options)
   * [Wikifier::Server options](#wikifierserver-options)
     * [server\.socket\.type](#serversockettype)
     * [server\.socket\.path](#serversocketpath)
@@ -53,6 +54,8 @@ file. All wikifier configuration files are written in the wikifier language:
     @name:          MyWiki;
     @dir.wiki:      /home/www/mywiki;
     @dir.page:      [@dir.wiki]/pages;
+    @image.enable.pregeneration;        /* enable a boolean option */
+    -@page.enable.title;                /* disable a boolean option */
 
 If you are using a **wiki server**, you must have a dedicated configuration file
 for the server. This tells it where to listen and where to find the wikis you
@@ -379,6 +382,45 @@ Example (on main page):
 
     Welcome to [@site.display_name]!
 
+## Wikifier::Wiki extended options
+
+These options are not used by Wikifier::Wiki directly, but may be required by
+frontends or admin panels. They are documented here for consistency across
+software built atop wikifier.
+
+### main_page
+
+Name of the main page. This should not be the page's title but rather a
+filename, relative to [`dir.page`](#dir). The `.page` extension is not
+necessary.
+
+### navigation
+
+A map of navigation items. Keys are unformatted text to be displayed, with
+spaces permitted. Values are URLs, relative to the current page (NOT the wiki
+root).
+
+```
+@navigation: map {
+    Main page: /page/welcome;
+    Rules: /page/rules;
+};
+```
+
+You can nest maps to create sublists at any level, but the number of levels
+supported depends on the frontend or template being used by the wiki.
+
+```
+@navigation: map {
+    Home: /page/welcome;
+    About: map {
+        Company info: /page/our_company;
+        Facebook: http://facebook.com/our.company;
+    };
+    Contact: /contact;
+};
+```
+
 ## Wikifier::Wiki private options
 
 Private Wikifier::Wiki options may be in a separation configuration file.
@@ -413,7 +455,6 @@ __Default__: *sha1*
 
 The password of the administrator `[username]`. It must be encrypted in
 the crypt set by [`admin.[username].crypt`](#adminusernamecrypt).
-
 
 ## Wikifier::Server options
 
