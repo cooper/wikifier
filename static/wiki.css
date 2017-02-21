@@ -229,6 +229,12 @@ pre.wiki-code {
     font-family: Consolas, "Liberation Mono", Courier, monospace;
 }
 
+/* lists */
+
+ul.wiki-list {
+    line-height: 1.6em;
+}
+
 /* references */
 
 ul.wiki-references {
