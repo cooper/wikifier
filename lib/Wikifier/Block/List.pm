@@ -29,7 +29,7 @@ sub list_parse {
     # get human readable values
     my $get_hr; $get_hr = sub {
         my @stuff = map {
-            my $thing = blessed $_ ? $_ : trim($_);
+            my $thing = ref $_ ? $_ : trim($_);
             my $res   =
                 ref $thing eq 'ARRAY'                       ?
                     join(' ', map $get_hr->($_), @$thing)   :
