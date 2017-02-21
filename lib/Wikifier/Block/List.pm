@@ -27,14 +27,16 @@ sub list_parse {
     my ($value, $pos);
 
     # get human readable values
-    my $get_hr = sub {
+    my $get_hr; $get_hr = sub {
         my @stuff = map {
             my $thing = blessed $_ ? $_ : trim($_);
             my $res   =
-                !length $thing      ?
-                undef               :
-                blessed $thing      ?
-                $thing->hr_desc     :
+                ref $thing eq 'ARRAY'                       ?
+                    join(' ', map $get_hr->($_), @$thing)   :
+                !length $thing                              ?
+                    undef                                   :
+                blessed $thing                              ?
+                    $thing->hr_desc                         :
                 q(').truncate_hr($thing, 30).q(');
             $res;
         } @_;
