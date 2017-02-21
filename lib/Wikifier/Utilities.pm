@@ -236,12 +236,12 @@ sub hr_value (@) {
     my @stuff = map {
         my $thing = ref $_ ? $_ : trim($_);
         my $res   =
-            ref $thing eq 'ARRAY'                       ?
-                join(' ', map hr_value($_), @$thing)   :
-            !length $thing                              ?
-                undef                                   :
-            blessed $thing                              ?
-                $thing->hr_desc                         :
+            ref $thing eq 'ARRAY'                                   ?
+                join(' ', grep defined, map hr_value($_), @$thing)  :
+            !length $thing                                          ?
+                undef                                               :
+            blessed $thing                                          ?
+                $thing->hr_desc                                     :
             q(').truncate_hr($thing, 30).q(');
         $res;
     } @_;
