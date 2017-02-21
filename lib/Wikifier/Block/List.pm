@@ -63,9 +63,12 @@ sub list_parse {
 
             # a semicolon indicates the termination of a pair.
             elsif ($char eq ';' && !$escaped) {
-
+                use Data::Dumper qw(Dumper);
+                $Data::Dumper::Maxdepth = 2;
+                say "VALUE BEFORE FIX: ", Dumper($value);
                 # fix the value.
                 fix_value $value;
+                say "VALUE AFTER FIX: ", Dumper($value);
 
                 # store the value.
                 push @{ $block->{list_array} }, {
