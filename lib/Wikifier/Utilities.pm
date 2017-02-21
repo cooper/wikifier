@@ -163,9 +163,12 @@ sub fix_value (\$) {
     my @new;
     return if !defined $$value;
     foreach my $item (@$$value) {
-        next if blessed $item;
+        if (blessed $item) {
+            push @new, $item;
+            next;
+        }
         $item =~ s/(^\s*)|(\s*$)//g;
-        push @new, $item;
+        push @new, $item if length $item;
     }
     $$value = \@new;
     $$value = $new[0] if @new == 1;
