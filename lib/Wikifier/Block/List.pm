@@ -122,20 +122,20 @@ sub list_html {
         my @new_value;
         foreach my $item (@items) {
 
-            # convert block to element
+            # parse formatted text
+            if (!blessed $item && !$block->{no_format_values}) {
+                $item = $page->parse_formatted_text($item, pos => $_->{pos});
+            }
+
+            # convert block to element.
+            # this has to come after the above since ->parse_formatted_text()
+            # might return a block.
             if (blessed $item) {
                 my $their_el = $item->html($page);
                 $item = $their_el || "$item";
             }
 
-            # parse formatted text
-            elsif (!$block->{no_format_values}) {
-                $item = $page->parse_formatted_text($item, pos => $_->{pos});
-                if (blessed $item) {
-                    my $their_el = $item->html($page);
-                    $item = $their_el || "$item";
-                }
-            }
+            push @new_value, $item;
         }
 
         # overwrite the value in list_array
