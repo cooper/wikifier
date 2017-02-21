@@ -3,6 +3,7 @@ package Wikifier::Block::List;
 
 use warnings;
 use strict;
+use 5.010;
 
 use Scalar::Util qw(blessed);
 use Wikifier::Utilities qw(trim truncate_hr fix_value append_value);
