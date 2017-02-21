@@ -66,12 +66,9 @@ sub list_parse {
 
             # a semicolon indicates the termination of a pair.
             elsif ($char eq ';' && !$escaped) {
-                use Data::Dumper qw(Dumper);
-                $Data::Dumper::Maxdepth = 2;
-                say "VALUE BEFORE FIX: ", Dumper($value);
+
                 # fix the value.
                 fix_value $value;
-                say "VALUE AFTER FIX: ", Dumper($value);
 
                 # store the value.
                 push @{ $block->{list_array} }, {
@@ -118,23 +115,32 @@ sub list_html {
     foreach ($block->list_array) {
         my $value = $_->{value};
 
-        # convert block to element
-        if (blessed $value) {
-            my $their_el = $value->html($page);
-            $value = $their_el || "$value";
-        }
+        # if this is an arrayref, it's a mixture of blocks and text
+        my @items = ref $value eq 'ARRAY' ? @$value : $value;
 
-        # parse formatted text
-        elsif (!$block->{no_format_values}) {
-            $value = $page->parse_formatted_text($value, pos => $_->{pos});
-            if (blessed $value) {
-                my $their_el = $value->html($page);
-                $value = $their_el || "$value";
+        # handle each item
+        my @new_value;
+        foreach my $item (@items) {
+
+            # convert block to element
+            if (blessed $item) {
+                my $their_el = $item->html($page);
+                $item = $their_el || "$item";
+            }
+
+            # parse formatted text
+            elsif (!$block->{no_format_values}) {
+                $item = $page->parse_formatted_text($item, pos => $_->{pos});
+                if (blessed $item) {
+                    my $their_el = $item->html($page);
+                    $item = $their_el || "$item";
+                }
             }
         }
 
         # overwrite the value in list_array
         # add to new list_array_values
+        $value = \@new_value;
         $_->{value} = $value;
         push @new, $value;
 
