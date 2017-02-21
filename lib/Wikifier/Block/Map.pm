@@ -46,7 +46,7 @@ sub map_parse {
 
     # check if we have bad keys or values and produce warnings
     my $warn_bad_maybe = sub {
-        my $key_text = $get_hr_kv->($key);
+        my $key_text = hr_value $key;
 
         # keys spanning multiple lines are fishy
         if (!blessed $key && length $key_text && $key_text =~ m/\n/) {
@@ -55,14 +55,14 @@ sub map_parse {
 
         # tried to append an object key
         if ($ap_key) {
-            my $ap_key_text = $get_hr_kv->($ap_key);
+            my $ap_key_text = hr_value $ap_key;
             $block->warning($pos, "Stray text after $ap_key_text ignored");
             undef $ap_key;
         }
 
         # overwrote a key
         if ($ow_key) {
-            my ($old, $new) = $get_hr_kv->(@$ow_key);
+            my ($old, $new) = hr_value @$ow_key;
             $block->warning($pos, "Overwrote $old with $new");
             undef $ow_key;
         }
@@ -195,7 +195,7 @@ sub map_parse {
     # warning stuff
     $warn_bad_maybe->();
     $pos->{line} = $block->{line};
-    my ($key_text, $value_text) = $get_hr_kv->($key, $value);
+    my ($key_text, $value_text) = hr_value $key, $value;
 
     # value warnings
     if ($value_text) {

@@ -232,7 +232,7 @@ sub html_value (\$) {
 }
 
 # convert value to human-readable form
-sub hr_value ($) {
+sub hr_value (@) {
     my @stuff = map {
         my $thing = ref $_ ? $_ : trim($_);
         my $res   =
