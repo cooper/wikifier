@@ -45,8 +45,8 @@ sub list_parse {
         (my $item, $pos) = @$_;
 
         # if blessed, it's a block value, such as an image.
-        if (blessed($item)) {
-            append_value(\$value, $item);
+        if (blessed $item) {
+            append_value $value, $item;
             next ITEM;
         }
 
@@ -65,7 +65,7 @@ sub list_parse {
             elsif ($char eq ';' && !$escaped) {
 
                 # fix the value.
-                fix_value(\$value);
+                fix_value $value;
 
                 # store the value.
                 push @{ $block->{list_array} }, {
@@ -80,7 +80,7 @@ sub list_parse {
 
             # any other character
             else {
-                append_value(\$value, $char);
+                append_value $value, $char;
                 $escaped = 0;
             }
 

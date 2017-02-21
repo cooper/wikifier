@@ -106,7 +106,7 @@ sub map_parse {
         (my $item, $pos) = @$_;
 
         # if blessed, it's a block value, such as an image.
-        if (blessed($item)) {
+        if (blessed $item) {
             if ($in_value) {
                 $ow_value = [ $value, $item, $key ]
                     if length trim($value);

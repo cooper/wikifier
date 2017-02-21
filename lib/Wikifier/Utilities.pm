@@ -158,7 +158,7 @@ sub values_maybe($) {
     return values %hash;
 }
 
-sub fix_value {
+sub fix_value (\$) {
     my $value = shift;
     my @new;
     return if !defined $$value;
@@ -172,9 +172,8 @@ sub fix_value {
     $$value = undef   if !@new;
 }
 
-sub append_value {
-    my $value = shift;
-    my $item = shift;
+sub append_value (\$$) {
+    my ($value, $item) = @_;
 
     # nothing
     return if !defined $item;
