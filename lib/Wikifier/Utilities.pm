@@ -204,7 +204,7 @@ sub append_value (\$$) {
 
 # convert blocks to HTML elements and parse formatted text.
 sub html_value (\$) {
-    my ($value, $pos) = @_;
+    my ($value, $pos, $page, $format_values) = @_;
 
     # if this is an arrayref, it's a mixture of blocks and text
     my @items = ref $$value eq 'ARRAY' ? @$$value : $$value;
@@ -214,7 +214,7 @@ sub html_value (\$) {
     foreach my $item (@items) {
 
         # parse formatted text
-        if (!blessed $item && !$block->{no_format_values}) {
+        if (!blessed $item && $format_values) {
             $item = $page->parse_formatted_text($item, pos => $pos);
         }
 
@@ -237,7 +237,7 @@ sub hr_value ($) {
         my $thing = ref $_ ? $_ : trim($_);
         my $res   =
             ref $thing eq 'ARRAY'                       ?
-                join(' ', map $get_hr->($_), @$thing)   :
+                join(' ', map hr_value($_), @$thing)   :
             !length $thing                              ?
                 undef                                   :
             blessed $thing                              ?

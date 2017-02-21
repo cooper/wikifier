@@ -101,7 +101,7 @@ sub list_html {
         my $value = $_->{value};
 
         # prepare value for inclusion in HTML element
-        html_value $value, $_->{pos};
+        html_value $value, $_->{pos}, $page, !$block->{no_format_values};
 
         # overwrite the value in list_array
         # add to new list_array_values

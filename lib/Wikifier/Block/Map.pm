@@ -226,7 +226,7 @@ sub map_html {
         my ($value, $key, $pos) = @$_{ qw(value key pos) };
 
         # prepare for inclusion in an HTML element
-        html_value $value, $pos;
+        html_value $value, $pos, $page, !$block->{no_format_values};
 
         # overwrite the old value
         $_->{value} = $value;
