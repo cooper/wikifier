@@ -203,7 +203,7 @@ sub append_value (\$$) {
 }
 
 # convert blocks to HTML elements and parse formatted text.
-sub html_value (\$) {
+sub html_value (\$@) {
     my ($value, $pos, $page, $format_values) = @_;
 
     # if this is an arrayref, it's a mixture of blocks and text
