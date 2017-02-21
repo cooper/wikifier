@@ -42,7 +42,7 @@ sub map_parse {
         $ap_key,    # an object which we tried to append key text to
         $ow_key,    # a key we overwrote with a block
         %values     # new hash values
-    ) = ('', '');
+    ) = ('');
 
     # check if we have bad keys or values and produce warnings
     my $warn_bad_maybe = sub {
@@ -120,7 +120,7 @@ sub map_parse {
                     $block->warning($pos,
                         "Standalone text should be prefixed with ':'"
                     ) if !blessed $key && index(trim($key), '-');
-                    $value = $key;
+                    $value = [ $key ];
                     $key = "anon_$i";
                     undef $key_title;
                 }
@@ -135,8 +135,8 @@ sub map_parse {
                 }
 
                 # fix the value
-                my $is_block = blessed $value;
                 fix_value $value;
+                my $is_block = blessed $value; # true if ONE block and no text
 
                 # if this key exists, rename it to the next available <key>_key_<n>.
                 KEY: while (exists $values{$key}) {
