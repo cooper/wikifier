@@ -158,6 +158,9 @@ sub values_maybe($) {
     return values %hash;
 }
 
+### MAP AND LIST VALUES
+
+# after closing a value, trim it and flatten lists
 sub fix_value (\$) {
     my $value = shift;
     my @new;
@@ -175,6 +178,7 @@ sub fix_value (\$) {
     $$value = undef   if !@new;
 }
 
+# append either some text or a block to a value
 sub append_value (\$$) {
     my ($value, $item) = @_;
 
@@ -196,6 +200,52 @@ sub append_value (\$$) {
 
     # otherwise, append as text
     $$last .= $item;
+}
+
+# convert blocks to HTML elements and parse formatted text.
+sub html_value (\$) {
+    my ($value, $pos) = @_;
+
+    # if this is an arrayref, it's a mixture of blocks and text
+    my @items = ref $$value eq 'ARRAY' ? @$$value : $$value;
+
+    # handle each item
+    my @new_value;
+    foreach my $item (@items) {
+
+        # parse formatted text
+        if (!blessed $item && !$block->{no_format_values}) {
+            $item = $page->parse_formatted_text($item, pos => $pos);
+        }
+
+        # convert block to element.
+        # this has to come after the above since ->parse_formatted_text()
+        # might return a block.
+        if (blessed $item) {
+            my $their_el = $item->html($page);
+            $item = $their_el || "$item";
+        }
+
+        push @new_value, $item;
+    }
+    $$value = \@new_value;
+}
+
+# convert value to human-readable form
+sub hr_value ($) {
+    my @stuff = map {
+        my $thing = ref $_ ? $_ : trim($_);
+        my $res   =
+            ref $thing eq 'ARRAY'                       ?
+                join(' ', map $get_hr->($_), @$thing)   :
+            !length $thing                              ?
+                undef                                   :
+            blessed $thing                              ?
+                $thing->hr_desc                         :
+            q(').truncate_hr($thing, 30).q(');
+        $res;
+    } @_;
+    return wantarray ? (@stuff) : $stuff[0];
 }
 
 ### LOGGING

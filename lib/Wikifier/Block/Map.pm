@@ -9,7 +9,9 @@ use strict;
 use 5.010;
 
 use Scalar::Util qw(blessed);
-use Wikifier::Utilities qw(L trim truncate_hr);
+use Wikifier::Utilities qw(
+    trim fix_value append_value html_value hr_value
+);
 
 our %block_types = (
     map => {
@@ -38,26 +40,9 @@ sub map_parse {
         $pos,       # position
         $in_value,  # true if in value (between : and ;)
         $ap_key,    # an object which we tried to append key text to
-        $ap_value,  # an object which we tried to append value text to
         $ow_key,    # a key we overwrote with a block
-        $ow_value,  # a value we overwrote with a block
         %values     # new hash values
     ) = ('', '');
-
-    # get human readable keys and values
-    my $get_hr_kv = sub {
-        my @stuff = map {
-            my $thing = blessed $_ ? $_ : trim($_);
-            my $res   =
-                !length $thing      ?
-                undef               :
-                blessed $thing      ?
-                $thing->hr_desc     :
-                q(').truncate_hr($thing, 30).q(');
-            $res;
-        } @_;
-        return wantarray ? (@stuff) : $stuff[0];
-    };
 
     # check if we have bad keys or values and produce warnings
     my $warn_bad_maybe = sub {
@@ -75,29 +60,11 @@ sub map_parse {
             undef $ap_key;
         }
 
-        # tried to append an object value
-        if ($ap_value) {
-            my $ap_value_text = $get_hr_kv->($ap_value);
-            my $warn = "Stray text after $ap_value_text";
-            $warn .= " for key $key_text" if length $key_text;
-            $block->warning($pos, "$warn ignored");
-            undef $ap_value;
-        }
-
         # overwrote a key
         if ($ow_key) {
             my ($old, $new) = $get_hr_kv->(@$ow_key);
             $block->warning($pos, "Overwrote $old with $new");
             undef $ow_key;
-        }
-
-        # overwrote a value
-        if ($ow_value) {
-            my ($old, $new, $assoc_key) = $get_hr_kv->(@$ow_value);
-            my $warn = "Overwrote value $old with $new";
-            $warn .= " for key $assoc_key" if length $assoc_key;
-            $block->warning($pos, $warn);
-            undef $ow_value;
         }
     };
 
@@ -108,9 +75,7 @@ sub map_parse {
         # if blessed, it's a block value, such as an image.
         if (blessed $item) {
             if ($in_value) {
-                $ow_value = [ $value, $item, $key ]
-                    if length trim($value);
-                $value = $item;
+                append_value $value, $item;
             }
             else {
                 $ow_key = [ $key, $item ]
@@ -171,18 +136,7 @@ sub map_parse {
 
                 # fix the value
                 my $is_block = blessed $value;
-                if (!$is_block) {
-                    $value = trim($value);
-
-                    # special value -no-format-values;
-                    if ($value eq '-no-format-values') {
-                        $block->warning($pos, 'Redundant -no-format-values')
-                            if $block->{no_format_values}++;
-                        $in_value = 0;
-                        $key = $value = '';
-                        next CHAR;
-                    }
-                }
+                fix_value $value;
 
                 # if this key exists, rename it to the next available <key>_key_<n>.
                 KEY: while (exists $values{$key}) {
@@ -220,10 +174,7 @@ sub map_parse {
 
                 # this is part of the value
                 if ($in_value) {
-                    if (blessed $value) {
-                        $ap_value = $value unless $char =~ m/\s/;
-                    }
-                    else { $value .= $char }
+                    append_value $value, $char;
                 }
 
                 # this must be part of the key
@@ -272,23 +223,13 @@ sub map_parse {
 sub map_html {
     my ($block, $page) = (shift, @_);
     foreach ($block->map_array) {
-        my ($key_title, $value, $key, $pos) =
-            @$_{ qw(key_title value key pos) };
-        if (blessed $value) {
-            my $their_el = $value->html($page);
-            $value = $their_el || "$value";
-        }
-        elsif (!$block->{no_format_values}) {
-            $value = $page->parse_formatted_text($value, pos => $pos);
-            if (blessed $value) {
-                my $their_el = $value->html($page);
-                $value = $their_el || "$value";
-            }
-        }
-        else {
-            next;
-        }
-        $_->{value} = $value; # overwrite the block value with HTML
+        my ($value, $key, $pos) = @$_{ qw(value key pos) };
+
+        # prepare for inclusion in an HTML element
+        html_value $value, $pos;
+
+        # overwrite the old value
+        $_->{value} = $value;
         $block->{map_hash}{$key} = $value;
     }
 }

@@ -6,7 +6,9 @@ use strict;
 use 5.010;
 
 use Scalar::Util qw(blessed);
-use Wikifier::Utilities qw(trim truncate_hr fix_value append_value);
+use Wikifier::Utilities qw(
+    trim fix_value append_value html_value hr_value
+);
 
 our %block_types = (list => {
     init   => \&list_init,
@@ -25,23 +27,6 @@ sub list_init {
 sub list_parse {
     my ($block, $page) = @_;
     my ($value, $pos);
-
-    # get human readable values
-    my $get_hr; $get_hr = sub {
-        my @stuff = map {
-            my $thing = ref $_ ? $_ : trim($_);
-            my $res   =
-                ref $thing eq 'ARRAY'                       ?
-                    join(' ', map $get_hr->($_), @$thing)   :
-                !length $thing                              ?
-                    undef                                   :
-                blessed $thing                              ?
-                    $thing->hr_desc                         :
-                q(').truncate_hr($thing, 30).q(');
-            $res;
-        } @_;
-        return wantarray ? (@stuff) : $stuff[0];
-    };
 
     # for each content item...
     ITEM: foreach ($block->content_visible_pos) {
@@ -95,7 +80,7 @@ sub list_parse {
 
     # warning stuff
     $pos->{line} = $block->{line};
-    my $value_text = $get_hr->($value);
+    my $value_text = hr_value $value;
 
     # unterminated value warning
     $block->warning($pos, "Value $value_text not terminated")
@@ -115,32 +100,11 @@ sub list_html {
     foreach ($block->list_array) {
         my $value = $_->{value};
 
-        # if this is an arrayref, it's a mixture of blocks and text
-        my @items = ref $value eq 'ARRAY' ? @$value : $value;
-
-        # handle each item
-        my @new_value;
-        foreach my $item (@items) {
-
-            # parse formatted text
-            if (!blessed $item && !$block->{no_format_values}) {
-                $item = $page->parse_formatted_text($item, pos => $_->{pos});
-            }
-
-            # convert block to element.
-            # this has to come after the above since ->parse_formatted_text()
-            # might return a block.
-            if (blessed $item) {
-                my $their_el = $item->html($page);
-                $item = $their_el || "$item";
-            }
-
-            push @new_value, $item;
-        }
+        # prepare value for inclusion in HTML element
+        html_value $value, $_->{pos};
 
         # overwrite the value in list_array
         # add to new list_array_values
-        $value = \@new_value;
         $_->{value} = $value;
         push @new, $value;
 
