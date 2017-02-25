@@ -4,7 +4,7 @@ package Wikifier::Server::Handlers;
 use warnings;
 use strict;
 
-use Scalar::Util qw(weaken);
+use Scalar::Util qw(weaken blessed);
 use Wikifier::Utilities qw(notice values_maybe hash_maybe);
 
 my ($loop, $conf);
@@ -93,10 +93,9 @@ sub handle_wiki {
         # Pure Perl where posssible
         foreach my $key (keys %conf) {
             my $val = $conf{$key};
-            if (blessed $val && $val->can('to_data')) {
-                $val = $val->to_data;
-                $conf{$key} = $val;
-            }
+            next if !blessed $val || !$val->can('to_data');
+            $val = $val->to_data;
+            $conf{$key} = $val;
         }
         $msg->reply(wiki => { config => \%conf });
     }
