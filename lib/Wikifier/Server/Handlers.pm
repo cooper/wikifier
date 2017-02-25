@@ -100,7 +100,10 @@ sub handle_wiki {
 
             # special case for navigation, to preserve the order
             if ($key eq 'navigation' && ref $val eq 'HASH') {
-                $val = [ [keys %$val], [values %$val] ];
+                $val = [ [ map {
+                    (my $k = $_) =~ s/_/ /g;
+                    $k;
+                } keys %$val ], [values %$val] ];
             }
 
             $conf{$key} = $val;
