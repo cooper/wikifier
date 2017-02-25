@@ -99,7 +99,7 @@ sub handle_wiki {
 
             # special case for navigation, to preserve the order
             if ($key eq 'navigation' && $val->can('map_array')) {
-                my @keys, @vals;
+                my (@keys, @vals);
                 for ($val->map_array) {
                     my ($key_title, $val) = @$_{'key_title', 'value'};
                     push @keys, $key_title;
