@@ -210,7 +210,7 @@ sub html_value (\$@) {
     my @items = ref $$value eq 'ARRAY' ? @$$value : $$value;
 
     # handle each item
-    my @new_value;
+    my @new;
     foreach my $item (@items) {
 
         # parse formatted text
@@ -226,9 +226,11 @@ sub html_value (\$@) {
             $item = $their_el || "$item";
         }
 
-        push @new_value, $item;
+        push @new, $item;
     }
-    $$value = \@new_value;
+    $$value = \@new;
+    $$value = $new[0] if @new == 1;
+    $$value = undef   if !@new;
 }
 
 # convert value to human-readable form
