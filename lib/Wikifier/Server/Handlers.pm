@@ -89,12 +89,20 @@ sub handle_wiki {
     if ($msg->{config}) {
         my %conf = hash_maybe $wiki->{conf}{variables};
 
+        # FIXME: this needs to be recursive! ->to_data might contain more objs!
         # blessed objects will be serialized as null, so convert them to
         # Pure Perl where posssible
+        my $nav;
         foreach my $key (keys %conf) {
             my $val = $conf{$key};
             next if !blessed $val || !$val->can('to_data');
             $val = $val->to_data;
+
+            # special case for navigation, to preserve the order
+            if ($key eq 'navigation' && ref $val eq 'HASH') {
+                $val = [ [keys %$val], [values %$val] ];
+            }
+
             $conf{$key} = $val;
         }
         $msg->reply(wiki => { config => \%conf });
