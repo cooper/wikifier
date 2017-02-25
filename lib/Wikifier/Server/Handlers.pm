@@ -96,17 +96,20 @@ sub handle_wiki {
         foreach my $key (keys %conf) {
             my $val = $conf{$key};
             next if !blessed $val || !$val->can('to_data');
-            $val = $val->to_data;
 
             # special case for navigation, to preserve the order
-            if ($key eq 'navigation' && ref $val eq 'HASH') {
-                $val = [ [ map {
-                    (my $k = $_) =~ s/_/ /g;
-                    $k;
-                } keys %$val ], [values %$val] ];
+            if ($key eq 'navigation' && $val->can('map_array')) {
+                my @keys, @vals;
+                for ($val->map_array) {
+                    my ($key_title, $val) = @$_{'key_title', 'value'};
+                    push @keys, $key_title;
+                    push @vals, $val;
+                }
+                $conf{$key} = [ \@keys, \@vals ];
+                next;
             }
 
-            $conf{$key} = $val;
+            $conf{$key} = $val->to_data;
         }
         $msg->reply(wiki => { config => \%conf });
     }
