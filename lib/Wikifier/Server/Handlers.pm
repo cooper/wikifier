@@ -5,7 +5,7 @@ use warnings;
 use strict;
 
 use Scalar::Util qw(weaken);
-use Wikifier::Utilities qw(notice values_maybe);
+use Wikifier::Utilities qw(notice values_maybe hash_maybe);
 
 my ($loop, $conf);
 
@@ -72,10 +72,34 @@ sub handle_wiki {
         return;
     }
 
+    # find the wiki.
+    my $wiki = $Wikifier::Server::wikis{$name};
+    if (!$wiki) {
+        $msg->error("Wiki is unavailable");
+        return;
+    }
+
     # anonymous authentication succeeded.
     $conn->{priv_read} = 1;
     $conn->{wiki_name} = $name;
-    weaken($conn->{wiki} = $Wikifier::Server::wikis{$name});
+    weaken($conn->{wiki} = $wiki);
+
+    # normally we do not reply to this, but if the client requested the
+    # wiki configuration, send it. see issue #27
+    if ($msg->{config}) {
+        my %conf = hash_maybe $wiki->{conf}{variables};
+
+        # blessed objects will be serialized as null, so convert them to
+        # Pure Perl where posssible
+        foreach my $key (keys %conf) {
+            my $val = $conf{$key};
+            if (blessed $val && $val->can('to_data')) {
+                $val = $val->to_data;
+                $conf{$key} = $val;
+            }
+        }
+        $msg->reply(wiki => { config => \%conf });
+    }
 
     $msg->l("Successfully authenticated for read access");
 }
