@@ -118,6 +118,7 @@ sub handle_wiki {
 sub handle_select {
     $_[0]->{no_read_ok}++;
     my (undef, $msg) = read_required(@_, qw(name)) or return;
+    my $conn = $msg->conn;
     my $name = $msg->{name};
     
     # check we're OK to select this.
