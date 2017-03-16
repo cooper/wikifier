@@ -50,11 +50,7 @@ sub _simplify_errors {
 ### AUTHENTICATION ###
 ######################
 
-# anonymous authentication
-#
-# note: there is a special exemption for this function so that
-# it does not require read acces - checked BEFORE read_required().
-#
+# ro method 1: anonymous authentication with password
 sub handle_wiki {
     $_[0]->{no_read_ok}++;
     my (undef, $msg) = read_required(@_, qw(name password)) or return;
@@ -81,7 +77,7 @@ sub handle_wiki {
     }
 
     # anonymous authentication succeeded.
-    $conn->{priv_read} = 1;
+    $conn->{priv_read}{$name}++;
     $conn->{wiki_name} = $name;
     weaken($conn->{wiki} = $wiki);
 
@@ -118,7 +114,34 @@ sub handle_wiki {
     $msg->l("Successfully authenticated for read access");
 }
 
-# method 1: username/password authentication
+# ro method 2: anonymous reauthentication
+sub handle_select {
+    $_[0]->{no_read_ok}++;
+    my (undef, $msg) = read_required(@_, qw(name)) or return;
+    my $name = $msg->{name};
+    
+    # check we're OK to select this.
+    if (!$conn->{priv_read}{$name}) {
+        $msg->error("Not authenticated for read access");
+        return;
+    }
+    
+    # find the wiki.
+    my $wiki = $Wikifier::Server::wikis{$name};
+    if (!$wiki) {
+        $msg->error("Wiki is unavailable");
+        return;
+    }
+    
+    # re-select it.
+    $conn->{wiki_name} = $name;
+    weaken($conn->{wiki} = $wiki);
+    
+    $msg->reply(select => { name => $name });
+    $msg->l("Selected");
+}
+
+# rw method 1: username/password authentication
 #
 #   username:       the plaintext account name
 #   password:       the plaintext password
@@ -167,7 +190,7 @@ sub handle_login {
     $msg->l('Successfully authenticated for write access');
 }
 
-# method 2: session ID authentication
+# rw method 2: session ID authentication
 #
 #   session_id:     a string to identify the session
 #
@@ -474,7 +497,7 @@ sub read_required {
     my @good;
     
     # if the connection is not authenticated, this better be a wiki command.
-    if (!$conn->{priv_read} && !delete $conn->{no_read_ok}) {
+    if (!$conn->{wiki_name} && !delete $conn->{no_read_ok}) {
         $msg->error('No read access');
         return;
     }
