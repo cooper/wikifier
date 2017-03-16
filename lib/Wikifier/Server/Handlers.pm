@@ -56,7 +56,8 @@ sub _simplify_errors {
 # it does not require read acces - checked BEFORE read_required().
 #
 sub handle_wiki {
-    my ($wiki, $msg) = read_required(@_, qw(name password)) or return;
+    $_[0]->{no_read_ok}++;
+    my (undef, $msg) = read_required(@_, qw(name password)) or return;
     my $conn = $msg->conn;
     my $name = (split /\./, $msg->{name})[0];
 
@@ -471,6 +472,14 @@ sub handle_ping {
 sub read_required {
     my ($conn, $msg, @required) = @_;
     my @good;
+    
+    # if the connection is not authenticated, this better be a wiki command.
+    if (!$conn->{priv_read} && !delete $conn->{no_read_ok}) {
+        $msg->error('No read access');
+        return;
+    }
+
+    # each option must be present
     foreach (@required) {
         if (defined $msg->{$_}) {
             push @good, $msg->{$_};
@@ -479,6 +488,7 @@ sub read_required {
         $msg->error("Required option '$_' missing");
         return;
     }
+    
     return ($conn->{wiki}, $msg, @good);
 }
 

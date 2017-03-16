@@ -89,12 +89,6 @@ sub handle {
     weaken($msg->{conn} = $conn);
     $msg->{_reply_id} = $possible_id + 0 if defined $possible_id;
 
-    # if the connection is not authenticated, this better be a wiki command.
-    if (!$conn->{priv_read} && $command ne 'wiki') {
-        $msg->error('No read access');
-        return;
-    }
-
     # pass it on to handlers.
     if (my $code = Wikifier::Server::Handlers->can("handle_$command")) {
 
