@@ -35,6 +35,7 @@ of a full wiki, and others yet for the operation of a wiki server.
   * [Wikifier::Wiki extended options](#wikifierwiki-extended-options)
     * [main\_page](#main_page)
     * [navigation](#navigation)
+    * [template](#template)
   * [Wikifier::Wiki private options](#wikifierwiki-private-options)
     * [admin\.[username]\.name](#adminusernamename)
     * [admin\.[username]\.email](#adminusernameemail)
@@ -421,6 +422,14 @@ supported depends on the frontend or template being used by the wiki.
     };
     Contact: /contact;
 };
+```
+
+### template
+
+Name of the template used by the wiki.
+
+```
+@template: default;
 ```
 
 ## Wikifier::Wiki private options
