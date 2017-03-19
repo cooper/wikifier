@@ -462,12 +462,23 @@ sub _image_round {
     return $size; # fallback.
 }
 
-# abs path to page
+# unresolved path to page
+sub rel_path {
+    return $page->{file_path}
+        if length $page->{file_path};
+    return $page->wiki_opt('dir.page').'/'.$page->name;
+}
+
+# absolute path to page
 sub path {
     my $page = shift;
-    return abs_path($page->{file_path})
-        if length $page->{file_path};
-    return abs_path($page->wiki_opt('dir.page').'/'.$page->name);
+    return abs_path($page->rel_path);
+}
+
+# true if the page is a symbolic link
+sub redirect {
+    my $page = shift;
+    return -l $page->rel_path;
 }
 
 # page creation time from @page.created
@@ -484,7 +495,7 @@ sub modified {
     return (stat $page->path)[9];
 }
 
-# abs path to cache file
+# absolute path to cache file
 sub cache_path {
     my $page = shift;
     return abs_path($page->{cache_path})
@@ -511,7 +522,8 @@ sub page_info {
     };
 }
 
-# page filename, with extension
+# page filename, with extension.
+# this does NOT take symbolic links into account.
 sub name {
     return shift->{name};
 }
