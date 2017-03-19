@@ -228,7 +228,7 @@ sub opt {
 
 # an array of file names in page directory.
 sub all_pages {
-    return files_in_dir(shift->opt('dir.page'), 'page');
+    return unique_files_in_dir(shift->opt('dir.page'), 'page');
 }
 
 # an array of file names in category directory.
@@ -236,17 +236,17 @@ sub all_categories {
     my ($wiki, $cat_type) = @_;
     my $dir = $wiki->opt('dir.category');
     $dir .= "/$cat_type" if length $cat_type;
-    return files_in_dir($dir, 'cat');
+    return unique_files_in_dir($dir, 'cat');
 }
 
 # an array of file names in the model directory.
 sub all_models {
-    return files_in_dir(shift->opt('dir.model'), 'model');
+    return unique_files_in_dir(shift->opt('dir.model'), 'model');
 }
 
 # an array of file names in the image directory.
 sub all_images {
-    return files_in_dir(shift->opt('dir.image'), 'png', 'jpg', 'jpeg');
+    return unique_files_in_dir(shift->opt('dir.image'), 'png', 'jpg', 'jpeg');
 }
 
 ######################
@@ -347,7 +347,7 @@ sub path_for_model {
 
 # files in directory.
 # resolves symlinks only counts each file once.
-sub files_in_dir {
+sub unique_files_in_dir {
     my ($dir, @ext) = @_;
     my $ext = join '|', @ext;
     my $dh;
