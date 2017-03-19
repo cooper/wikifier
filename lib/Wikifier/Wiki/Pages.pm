@@ -63,6 +63,16 @@ sub _display_page {
     # file does not exist.
     return display_error("Page does not exist.")
         if !-f $path;
+        
+    # redirect.
+    if ($page->redirect) {
+        $result->{type}     = 'redirect';
+        $result->{file}     = $page->abs_name;
+        $result->{path}     = $path;
+        $result->{mime}     = 'text/plain';
+        $result->{content}  = "Redirect to '$$result{file}'";
+        return $result;
+    }
 
     # set path, file, and meme type.
     $result->{type} = 'page';

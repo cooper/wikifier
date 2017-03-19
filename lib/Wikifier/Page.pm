@@ -528,6 +528,12 @@ sub name {
     return shift->{name};
 }
 
+# resolved page filename, with extension.
+# this DOES take symbolic links into account.
+sub abs_name {
+    return basename(shift->path);
+}
+
 # page draft from @page.draft
 sub draft {
     my $page = shift;
