@@ -52,6 +52,12 @@ sub move_page {
     my ($wiki, $page, $new_name) = @_;
     $new_name = page_name($new_name);
     my ($old_name, $old_path) = ($page->name, $page->path);
+    
+    # this should never happen
+    if ($page->name ne $page->rel_name) {
+        die "move_page(): mismatch ->name and ->rel_name\n";
+    }
+    
     $page->{name} = $new_name;
 
     # consider: what if the destination page exists?

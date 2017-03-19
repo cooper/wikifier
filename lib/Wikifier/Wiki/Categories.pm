@@ -173,7 +173,7 @@ sub cat_add_page {
         }
 
         # the page has not changed since the asof time, so do nothing.
-        my $page_ref = $cat->{pages}{ $page->{name} } ||= {};
+        my $page_ref = $cat->{pages}{ $page->name } ||= {};
         if ($page_ref->{asof} && $page_ref->{asof} >= $page->modified) {
             return 1;
         }
@@ -210,7 +210,7 @@ sub cat_add_page {
         cat_type   => $cat_type,
         created    => $time,
         mod_unix   => $time,
-        pages      => { $page->{name} => $page_data }
+        pages      => { $page->name => $page_data }
     });
 
     close $fh;
