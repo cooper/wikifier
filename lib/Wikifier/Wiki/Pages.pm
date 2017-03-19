@@ -49,15 +49,14 @@ sub display_page {
     return $result;
 }
 sub _display_page {
-    my ($wiki, $page_name, %opts) = @_;
+    my ($wiki, $_page_name, %opts) = @_;
     my $result = {};
 
     # create a page object
-    my $page = $wiki->page_named($page_name);
+    my $page = $wiki->page_named($_page_name);
 
     # get page info
-    $page_name     = $page->name;
-    my $path       = $page->path;
+    my $path = $page->path;
     my $cache_path = $page->cache_path;
 
     # file does not exist.
@@ -67,8 +66,9 @@ sub _display_page {
     # redirect.
     if ($page->redirect) {
         $result->{type}     = 'redirect';
-        $result->{file}     = $page->abs_name;
-        $result->{path}     = $path;
+        $result->{file}     = $page->abs_name;      # with extension
+        $resukt->{name}     = $page->abs_name(1);   # without extension
+        $result->{path}     = $path;                # absolute path
         $result->{mime}     = 'text/plain';
         $result->{content}  = "Redirect to '$$result{file}'";
         return $result;
@@ -77,8 +77,9 @@ sub _display_page {
     # set path, file, and meme type.
     $result->{type} = 'page';
     $result->{mime} = 'text/html';
-    $result->{file} = $page_name;
-    $result->{path} = $path;
+    $result->{file} = $page->name;      # with extension
+    $result->{name} = $page->name(1);   # without extension
+    $result->{path} = $path;            # absolute path
 
     # caching is enabled, so let's check for a cached copy.
     if ($wiki->opt('page.enable.cache') && -f $cache_path) {

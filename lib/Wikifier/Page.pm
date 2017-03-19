@@ -13,7 +13,7 @@ use File::Basename qw(basename);
 use Cwd qw(abs_path);
 use HTML::Strip;
 use Wikifier::Utilities qw(
-    L align page_name trim
+    L align page_name page_name_ne trim
     no_length_undef filter_defined
 );
 
@@ -523,16 +523,22 @@ sub page_info {
     };
 }
 
+sub _no_ext {
+    my ($file, $no_ext) = @_;
+    return $file if !$no_ext;
+    return page_name_ne($file);
+}
+
 # page filename, with extension.
 # this does NOT take symbolic links into account.
 sub name {
-    return shift->{name};
+    return _no_ext(shift->{name}, shift);
 }
 
 # resolved page filename, with extension.
 # this DOES take symbolic links into account.
 sub abs_name {
-    return basename(shift->path);
+    return _no_ext(basename(shift->path), shift);
 }
 
 # page draft from @page.draft
