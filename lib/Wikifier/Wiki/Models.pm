@@ -94,7 +94,6 @@ sub _display_model {
     $result->{type}       = 'model';
     $result->{content}    = $page->html;
     $result->{css}        = $page->css;
-    $result->{length}     = length $result->{content};
     $result->{generated}  = 1;
     $result->{modified}   = time2str(time);
     $result->{mod_unix}   = time;
@@ -140,7 +139,6 @@ sub _display_model_code {
     $result->{mime}     = 'text/plain';
     $result->{type}     = 'model_code';
     $result->{content}  = $code;
-    $result->{length}   = length $result->{content};
 
     # we might want to also call ->display_model(). this would be useful
     # for determining where errors occur on the page.

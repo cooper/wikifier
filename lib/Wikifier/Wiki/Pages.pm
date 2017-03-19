@@ -82,8 +82,6 @@ sub page_named {
 #
 #       content         the page content (HTML)
 #
-#       length          byte length of the page content
-#
 #       css             CSS generated for the page
 #
 #       cached          true if the content being served was read from a cache
@@ -215,7 +213,6 @@ sub _display_page {
     $result->{mod_unix}   = time;
     $result->{modified}   = time2str($result->{mod_unix});
     $result->{content}    = $page->html;
-    $result->{length}     = length $result->{content};
     $result->{css}        = $page->css;
     $result->{categories} = [ _cats_to_list($page->{categories}) ];
 
@@ -266,7 +263,6 @@ sub get_page_cache {
 
     $result->{cached}   = 1;
     $result->{content} .= shift @data;
-    $result->{length}   = length $result->{content};
     $result->{mod_unix} = $cache_modify;
     $result->{modified} = $time_str;
 
