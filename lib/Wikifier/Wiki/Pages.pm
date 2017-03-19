@@ -67,7 +67,7 @@ sub _display_page {
     if ($page->redirect) {
         $result->{type}     = 'redirect';
         $result->{file}     = $page->abs_name;      # with extension
-        $resukt->{name}     = $page->abs_name(1);   # without extension
+        $result->{name}     = $page->abs_name(1);   # without extension
         $result->{path}     = $path;                # absolute path
         $result->{mime}     = 'text/plain';
         $result->{content}  = "Redirect to '$$result{file}'";
