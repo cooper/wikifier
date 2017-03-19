@@ -521,7 +521,9 @@ sub cache_path {
     my $page = shift;
     return abs_path($page->{cache_path})
         if length $page->{cache_path};
-    return abs_path($page->wiki_opt('dir.cache').'/'.$page->name.'.cache');
+    return $page->{abs_cache_path} //= abs_path(
+        $page->wiki_opt('dir.cache').'/'.$page->name.'.cache'
+    );
 }
 
 # cache file modification time from stat()

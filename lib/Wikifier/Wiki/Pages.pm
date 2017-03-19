@@ -30,10 +30,106 @@ sub page_named {
 
 # Displays a page.
 #
-# %opts = (
-#   draft_ok        if true, drafts will not be skipped
-#   no_redir        if true, symbolic links will not be redirected
-# )
+# Input
+#
+#   $page_name          name of the page, with or without the extension
+#
+#   %opts = (
+#
+#       draft_ok        if true, drafts will not be skipped
+#
+#       no_redir        if true, symbolic links will not be redirected. the
+#                       page content of the redirected page will be served
+#
+#   )
+#
+# Result
+#
+#   for type 'not found':
+#
+#       error           a human-readable error string. sensitive info is never
+#                       included, so this may be shown to users
+#
+#       parse_error     true if the error occurred during parsing
+#
+#       draft           true if the page cannot be displayed because it has not
+#                       yet been published for public viewing
+#
+#   for type 'redirect':
+#
+#       file            basename of the page we're redirecting to, with the
+#                       extension
+#
+#       name            basename of the page we're redirecting to, without the
+#                       extension. this is usually used for the Location header
+#
+#       path            absolute file path of the page we're redirecting to
+#
+#       mime            'text/plain' (appropriate for Content-Type header)
+#
+#       content         a human-readable fallback message, displayed if the
+#                       frontend does not properly handle type 'redirect'
+#
+#   for type 'page':
+#
+#       file            basename of the page, with the extension
+#
+#       name            basename of the page, without the extension
+#
+#       path            absolute file path of the page
+#
+#       mime            'text/html' (appropriate for Content-Type header)
+#
+#       content         the page content (HTML)
+#
+#       length          byte length of the page content
+#
+#       css             CSS generated for the page
+#
+#       cached          true if the content being served was read from a cache
+#                       file (opposite of 'generated')
+#
+#       generated       true if the content being served was just generated in
+#                       order to fulfill this request (opposite of 'cached')
+#
+#       cache_gen       true if the content generated in order to fulfill this
+#                       request was written to a cache file for later use. this
+#                       can only be true if 'generated' is true
+#
+#       draft           true if the page has not yet been published for public
+#                       viewing. this only ever occurs if the 'draft_ok' option
+#                       was used; otherwise result would be of type 'not found'
+#
+#       warnings        an array reference of warnings produced by the parser
+#
+#       mod_unix        UNIX timestamp of when the page was last modified.
+#                       if 'cache_gen' is true, this is the current time.
+#                       if 'cached' is true, this is the modified date of the
+#                       cache file. otherwise, this is the modified date of the
+#                       page file itself
+#
+#       modified        like 'mod_unix' except in HTTP date format, suitable for
+#                       use in the Last-Modified header
+#
+#       created         UNIX timestamp of when the page was created. this is
+#                       extracted from the special @page.created variable within
+#                       the page source, so it is not always available
+#
+#       author          name of the author of the page, as extracted from the
+#                       special @page.author variable. not always available
+#
+#       categories      array reference of categories the page belongs to. these
+#                       do not include the '.cat' extension. always present,
+#                       even if the page belongs to no categories, in which case
+#                       it is an empty array reference
+#
+#       fmt_title       the human-readable page title, as extracted from the
+#                       special @page.title variable, including any possible
+#                       HTML-encoded text formatting. not always available
+#
+#       title           like 'fmt_title' except that all formatting has been
+#                       stripped. suitable for use in the <title> tag. not
+#                       always available
 #
 sub display_page {
     my ($wiki, $page_name) = (shift, shift);
