@@ -345,6 +345,7 @@ sub parse_format_type {
         if ($inner =~ m/^(.+?)\|(.+)$/) {
             $text   = trim($1);
             $target = trim($2);
+            $name_link = page_name_link($target);
         }
 
         # internal wiki link [[ article ]]
