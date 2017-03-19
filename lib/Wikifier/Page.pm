@@ -462,18 +462,38 @@ sub _image_round {
     return $size; # fallback.
 }
 
-# unresolved path to page
-sub rel_path {
-    my $page = shift;
-    return $page->{file_path}
-        if length $page->{file_path};
-    return $page->wiki_opt('dir.page').'/'.$page->name;
+sub _no_ext {
+    my ($file, $no_ext) = @_;
+    return $file if !$no_ext;
+    return page_name_ne($file);
+}
+
+# page filename, with or without extension.
+# this DOES take symbolic links into account.
+sub name {
+    my ($page, $no_ext) = @_;
+    return $page->{abs_name} //= _no_ext(basename($page->path), $no_ext);
 }
 
 # absolute path to page
 sub path {
     my $page = shift;
-    return abs_path($page->rel_path);
+    return $page->{abs_path} //= abs_path($page->rel_path);
+}
+
+# unresolved page filename, with or without extension.
+# this does NOT take symbolic links into account.
+sub rel_name {
+    my ($page, $no_ext) = @_;
+    return _no_ext($page->{name}, $no_ext);
+}
+
+# unresolved path to page
+sub rel_path {
+    my $page = shift;
+    return $page->{file_path}
+        if length $page->{file_path};
+    return $page->wiki_opt('dir.page').'/'.$page->rel_name;
 }
 
 # true if the page is a symbolic link
@@ -521,24 +541,6 @@ sub page_info {
         title       => $page->title,
         author      => $page->author
     };
-}
-
-sub _no_ext {
-    my ($file, $no_ext) = @_;
-    return $file if !$no_ext;
-    return page_name_ne($file);
-}
-
-# page filename, with extension.
-# this does NOT take symbolic links into account.
-sub name {
-    return _no_ext(shift->{name}, shift);
-}
-
-# resolved page filename, with extension.
-# this DOES take symbolic links into account.
-sub abs_name {
-    return _no_ext(basename(shift->path), shift);
 }
 
 # page draft from @page.draft

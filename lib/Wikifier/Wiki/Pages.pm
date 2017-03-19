@@ -63,24 +63,23 @@ sub _display_page {
     # file does not exist.
     return display_error("Page does not exist.")
         if !-f $path;
-        
-    # redirect.
-    if (!$opts{no_redir} && $page->redirect) {
-        $result->{type}     = 'redirect';
-        $result->{file}     = $page->abs_name;      # with extension
-        $result->{name}     = $page->abs_name(1);   # without extension
-        $result->{path}     = $path;                # absolute path
-        $result->{mime}     = 'text/plain';
-        $result->{content}  = "Redirect to '$$result{file}'";
-        return $result;
-    }
-
-    # set path, file, and meme type.
-    $result->{type} = 'page';
-    $result->{mime} = 'text/html';
+    
+    # filename and path info
     $result->{file} = $page->name;      # with extension
     $result->{name} = $page->name(1);   # without extension
     $result->{path} = $path;            # absolute path
+        
+    # redirect
+    if (!$opts{no_redir} && $page->redirect) {
+        $result->{type}    = 'redirect';
+        $result->{mime}    = 'text/plain';
+        $result->{content} = "Redirect to '$$result{name}'";
+        return $result;
+    }
+
+    # page content
+    $result->{type} = 'page';
+    $result->{mime} = 'text/html';
 
     # caching is enabled, so let's check for a cached copy.
     if ($wiki->opt('page.enable.cache') && -f $cache_path) {
