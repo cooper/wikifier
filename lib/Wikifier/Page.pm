@@ -464,6 +464,7 @@ sub _image_round {
 
 # unresolved path to page
 sub rel_path {
+    my $page = shift;
     return $page->{file_path}
         if length $page->{file_path};
     return $page->wiki_opt('dir.page').'/'.$page->name;
