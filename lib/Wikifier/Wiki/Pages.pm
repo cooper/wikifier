@@ -32,6 +32,7 @@ sub page_named {
 #
 # %opts = (
 #   draft_ok        if true, drafts will not be skipped
+#   no_redir        if true, symbolic links will not be redirected
 # )
 #
 sub display_page {
@@ -64,7 +65,7 @@ sub _display_page {
         if !-f $path;
         
     # redirect.
-    if ($page->redirect) {
+    if (!$opts{no_redir} && $page->redirect) {
         $result->{type}     = 'redirect';
         $result->{file}     = $page->abs_name;      # with extension
         $result->{name}     = $page->abs_name(1);   # without extension
