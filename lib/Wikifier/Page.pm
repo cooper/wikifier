@@ -464,15 +464,15 @@ sub _image_round {
 
 sub _no_ext {
     my ($file, $no_ext) = @_;
-    return $file if !$no_ext;
-    return page_name_ne($file);
+    return page_name_ne($file) if $no_ext;
+    return $file;
 }
 
 # page filename, with or without extension.
 # this DOES take symbolic links into account.
 sub name {
     my ($page, $no_ext) = @_;
-    return $page->{abs_name} //= _no_ext(basename($page->path), $no_ext);
+    return _no_ext($page->{abs_name} //= basename($page->path), $no_ext);
 }
 
 # absolute path to page
