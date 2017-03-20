@@ -213,8 +213,8 @@ sub handle_character {
             ($block_type, @block_classes) = split /\./, $block_type;
         }
 
-        # block better have a type at this point
-        return $c->error("Block has no type")
+        # if no type at this point, assume it's a map. see issue #32
+        $block_type = 'map'
             if !length $block_type;
 
         # if the block type starts with $, it's a model
