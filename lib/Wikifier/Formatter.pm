@@ -334,9 +334,65 @@ sub parse_format_type {
         return "&$1;";
     }
 
-    # a link in the form of [[link]], [!link!], or [$link$]
-    # inner match should be most greedy.
-    if ($type =~ /^([\!\[\$\~]+?)(.+)([\!\]\$\~]+?)$/) {
+    # [[link]]
+    if ($type =~ /^\[\[(.+)\]\]$/) {
+        my ($display, $target) = map trim($_), split(m/\|/, $1, 2);
+        my ($link_type, $tooltip, $normalize, @normalize_args);
+        
+        # no pipe
+        my $display_same;
+        if (!length $target) {
+            $target = $display;
+            $display_same++;
+        }
+        
+        # http://google.com
+        if ($target =~ /^(\w+):\/\//) {
+            $link_type  = 'other';
+            $tooltip    = 'External link';
+            $normalize  = \&_other_link;
+            $display    =~ s/^(\w+):\/\/// if $display_same;
+        }
+        
+        # wp: some page
+        elsif ($target =~ s/^(\w+)://) {
+            push @normalize_args, $1;
+            $target     = trim($target);
+            $link_type  = 'external';
+            $normalize  = \&_external_link;
+            $display    =~ s/^(\w+):// if $display_same;
+        }
+        
+        # ~ some category
+        elsif ($target =~ s/^\~//) {
+            $target     = trim($target);
+            $link_type  = 'category';
+            $normalize  = \&_category_link;
+            $display    =~ s/^\~// if $display_same;
+        }
+        
+        # normal page link
+        else {
+            $link_type  = 'internal';
+            $normalize  = \&_page_link;
+        }
+        
+        # normalize
+        ($target, $tooltip, $display) = map trim($_),
+            $target, $tooltip, $display;
+        $normalize->(\$target, \$tooltip, $page, @normalize_args);
+        
+        # inject tooltip
+        if (length $tooltip) {
+            $tooltip = ucfirst $tooltip;
+            $tooltip = qq( title="$tooltip");
+        }
+        
+        return qq{<a class="wiki-link-$link_type" href="$target"$tooltip>$display</a>};
+    }
+
+    # deprecated: a link in the form of [~link~], [!link!], or [$link$]
+    if ($type =~ /^([\!\$\~]+?)(.+)([\!\$\~]+?)$/) {
         my ($link_char, $inner, $link_type) = (trim($1), trim($2));
         my ($target, $text, $title) = ($inner, $inner, '');
         my $name_link = page_name_link($target);
@@ -405,5 +461,63 @@ sub parse_format_type {
     # leave out anything else, I guess.
     return '';
 }
+
+my %normalizers = (
+    wikifier  => sub { page_name_link(shift) },
+    mediawiki => sub { 'MEDIAWIKI LINK' } # FIXME
+);
+
+# a page link on the same wiki
+sub _page_link {
+    my ($target_ref, $tooltip_ref, $page) = @_;
+    
+    # split the target up into page and section, then create tooltip
+    my ($target, $section) = map trim($_),
+        split(/#/, $$target_ref, 2);
+    $$tooltip_ref  = ucfirst $target;
+    $$tooltip_ref .= ' # '.ucfirst($section) if length $section;
+    
+    # apply the normalizer to both page and section, then create link
+    ($target, $section) = map page_name_link($_), $target, $section;
+    $$target_ref  = $page->wiki_opt('root.page')."/$target";
+    $$target_ref .= "#$section" if length $section;
+}
+
+# a page link an external wiki
+sub _external_link {
+    my ($target_ref, $tooltip_ref, $page, $wiki_id) = @_;
+    my ($wiki_name, $wiki_root, $wiki_normalizer) =
+        map $page->wiki_opt("external.$wiki_id.$_"), qw(name root type);
+    
+    # no such external wiki is configured
+    if (!length $wiki_name) {
+        # TODO: produce a page warning
+        warn "no such external wiki '$wiki_name'";
+        return;
+    }
+    
+    # find the normalizer
+    $wiki_normalizer ||= 'wikifier';
+    $wiki_normalizer = $normalizers{$wiki_normalizer}
+        if !ref $wiki_normalizer;
+    if (!$wiki_normalizer) {
+        # TODO: produce a page warning
+        warn 'no such wiki normalizer';
+        return;
+    }
+    
+    # split the target up into page and section, then create tooltip
+    my ($target, $section) = map trim($_),
+        split(/#/, $$target_ref, 2);
+    $$tooltip_ref  = "$wiki_name: ".ucfirst($target);
+    $$tooltip_ref .= ' # '.ucfirst($section) if length $section;
+    
+    # apply the normalizer to both page and section, then create link
+    ($target, $section) = map $wiki_normalizer->($_), $target, $section;
+    $$target_ref   = "$wiki_root/$target";
+    $$target_ref  .= '#'.$section if length $section;
+}
+
+sub _other_link { } # do nothing
 
 1

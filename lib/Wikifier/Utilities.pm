@@ -32,7 +32,7 @@ sub indent_str {
     return $final_string;
 }
 
-# 'Some Article' -> 'Some_Article.page'
+# 'Some Article' -> 'some_article.page'
 sub page_name {
     my ($page_name, $ext) = @_;
     return $page_name->name if blessed $page_name;
@@ -60,7 +60,8 @@ sub page_name_link {
     return $page_name;
 }
 
-# 'Some_Article.page' -> 'some_article'
+# 'Some Article' -> 'some_article'
+# 'some_article.page' -> 'some_article'
 sub page_name_ne {
     my $page_name = page_name(shift, '');
     $page_name =~ s/\.(page|conf|model)$//;
@@ -73,9 +74,11 @@ sub page_names_equal {
     return page_name($page_name_1, $ext) eq page_name($page_name_2, $ext);
 }
 
+# 'Some Cat' -> 'some_cat.cat'
 # 'some_cat' -> 'some_cat.cat'
 sub cat_name {
     my $cat_name = shift;
+    $cat_name = page_name_link($cat_name);
 
     # append the extension if it isn't already there.
     if ($cat_name !~ m/\.cat$/) {
@@ -85,6 +88,7 @@ sub cat_name {
     return $cat_name;
 }
 
+# 'Some Cat' -> 'some_cat'
 # 'some_cat.cat' -> 'some_cat'
 sub cat_name_ne {
     my $cat_name = cat_name(shift);
