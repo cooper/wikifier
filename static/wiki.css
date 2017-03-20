@@ -158,20 +158,9 @@ div.wiki-image {
 
 /* links */
 
-a.wiki-link-internal {
-    text-decoration: none;
-    color: #0084FF;
-    padding: 0;
-    margin: 0;
-}
-
-a.wiki-link-external {
-    text-decoration: none;
-    color: #0084FF;
-    padding: 0;
-    margin: 0;
-}
-
+a.wiki-link-internal,
+a.wiki-link-external,
+a.wiki-link-category,
 a.wiki-link-other {
     text-decoration: none;
     color: #0084FF;
@@ -179,7 +168,10 @@ a.wiki-link-other {
     margin: 0;
 }
 
-a.wiki-link-internal:hover, a.wiki-link-external:hover, a.wiki-link-other:hover {
+a.wiki-link-internal:hover,
+a.wiki-link-external:hover,
+a.wiki-link-category:hover,
+a.wiki-link-other:hover {
     color: blue;
 }
 
