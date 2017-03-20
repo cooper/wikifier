@@ -378,9 +378,16 @@ sub parse_format_type {
         }
         
         # normalize
+        my $display_dummy = '';
         ($target, $tooltip, $display) = map trim($_),
             $target, $tooltip, $display;
-        $normalize->(\$target, \$tooltip, $page, @normalize_args);
+        $normalize->(
+            \$target,
+            \$tooltip,
+            $display_same ? \$display : \$display_dummy,
+            $page,
+            @normalize_args
+        );
         
         # inject tooltip
         if (length $tooltip) {
@@ -469,12 +476,13 @@ my %normalizers = (
 
 # a page link on the same wiki
 sub _page_link {
-    my ($target_ref, $tooltip_ref, $page) = @_;
+    my ($target_ref, $tooltip_ref, $display_ref, $page) = @_;
     
     # split the target up into page and section, then create tooltip
     my ($target, $section) = map trim($_),
         split(/#/, $$target_ref, 2);
-    $$tooltip_ref = join '#', map ucfirst, grep length, $target, $section;
+    $$tooltip_ref = join ' # ', map ucfirst, grep length, $target, $section;
+    $$display_ref = length $section ? ucfirst $section : ucfirst $target;
     
     # apply the normalizer to both page and section, then create link
     ($target, $section) = map page_name_link($_), $target, $section;
@@ -485,7 +493,7 @@ sub _page_link {
 
 # a page link an external wiki
 sub _external_link {
-    my ($target_ref, $tooltip_ref, $page, $wiki_id) = @_;
+    my ($target_ref, $tooltip_ref, $display_ref, $page, $wiki_id) = @_;
     my ($wiki_name, $wiki_root, $wiki_normalizer) =
         map $page->wiki_opt("external.$wiki_id.$_"), qw(name root type);
     
@@ -509,9 +517,10 @@ sub _external_link {
     # split the target up into page and section, then create tooltip
     my ($target, $section) = map trim($_),
         split(/#/, $$target_ref, 2);
-    $$tooltip_ref   = join '#', map ucfirst, grep length, $target, $section;
+    $$tooltip_ref   = join ' # ', map ucfirst, grep length, $target, $section;
     $$tooltip_ref   = "$wiki_name: $$tooltip_ref";
-    
+    $$display_ref   = length $section ? ucfirst $section : ucfirst $target;
+
     # apply the normalizer to both page and section, then create link
     ($target, $section) = map $wiki_normalizer->($_), $target, $section;
     $$target_ref   = "$wiki_root/$target";
