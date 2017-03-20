@@ -163,9 +163,18 @@ a.wiki-link-external,
 a.wiki-link-category,
 a.wiki-link-other {
     text-decoration: none;
-    color: #0084FF;
     padding: 0;
     margin: 0;
+}
+
+a.wiki-link-internal,
+a.wiki-link-category {
+    color: #0084FF;
+}
+
+a.wiki-link-external,
+a.wiki-link-other {
+    color: #007CF0;
 }
 
 a.wiki-link-internal:hover,
