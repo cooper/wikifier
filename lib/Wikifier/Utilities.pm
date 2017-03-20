@@ -165,6 +165,7 @@ sub fix_value (\$) {
     my $value = shift;
     my @new;
     return if !defined $$value;
+    $$value = [$$value] if ref $$value ne 'ARRAY';
     foreach my $item (@$$value) {
         if (blessed $item) {
             push @new, $item;
