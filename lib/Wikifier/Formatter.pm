@@ -473,9 +473,12 @@ my %normalizers = (
     mediawiki => sub { 'MEDIAWIKI LINK' } # FIXME
 );
 
+sub _page_link      { __page_link('page',     @_) }
+sub _category_link  { __page_link('category', @_) }
+
 # a page link on the same wiki
-sub _page_link {
-    my ($target_ref, $tooltip_ref, $display_ref, $page) = @_;
+sub __page_link {
+    my ($typ, $target_ref, $tooltip_ref, $display_ref, $page) = @_;
     
     # split the target up into page and section, then create tooltip
     my ($target, $section) = map trim($_),
@@ -486,7 +489,7 @@ sub _page_link {
     # apply the normalizer to both page and section, then create link
     ($target, $section) = map page_name_link($_), $target, $section;
     $$target_ref  = '';
-    $$target_ref .= $page->wiki_opt('root.page')."/$target" if length $target;
+    $$target_ref .= $page->wiki_opt("root.$typ")."/$target" if length $target;
     $$target_ref .= "#$section"                             if length $section;
     return 1;
 }
