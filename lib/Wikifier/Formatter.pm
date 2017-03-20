@@ -335,7 +335,7 @@ sub parse_format_type {
     }
 
     # [[link]]
-    if ($type =~ /^\[\[(.+)\]\]$/) {
+    if ($type =~ /^\[(.+)\]$/) {
         my ($display, $target) = map trim($_), split(m/\|/, $1, 2);
         my ($link_type, $tooltip, $normalize, @normalize_args);
         
