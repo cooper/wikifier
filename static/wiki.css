@@ -174,7 +174,7 @@ a.wiki-link-category {
 
 a.wiki-link-external,
 a.wiki-link-other {
-    color: #00AD6E;
+    color: #0060BA;
 }
 
 a.wiki-link-internal:hover,
@@ -254,10 +254,14 @@ span.wiki-ref-key {
     font-weight: bold;
 }
 
-a.wiki-ref-anchor, a.wiki-ref-anchor:hover {
-    color: inherit;
+a.wiki-ref-anchor {
+    color: #0084FF;
     text-decoration: inherit;
     font-size: inherit;
+}
+
+a.wiki-ref-anchor:hover {
+    color: blue;
 }
 
 /* built-in classes */

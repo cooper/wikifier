@@ -446,7 +446,7 @@ sub parse_format_type {
     if ($type eq 'ref') {
         $page->{reference_number} ||= 1;
         my $ref = $page->{reference_number}++;
-        return qq{<sup style="font-size: 75%"><a href="#">[$ref]</a></sup>};
+        return qq{<sup style="font-size: 75%"><a href="#wiki-ref-$ref" class="wiki-ref-anchor">[$ref]</a></sup>};
     }
 
     # color name.
@@ -461,7 +461,7 @@ sub parse_format_type {
 
     # real references.
     if ($type =~ m/^\d+$/) {
-        return qq{<sup style="font-size: 75%"><a href="#wiki-ref-$type">[$type]</a></sup>};
+        return qq{<sup style="font-size: 75%"><a href="#wiki-ref-$type" class="wiki-ref-anchor">[$type]</a></sup>};
     }
 
     # leave out anything else, I guess.
