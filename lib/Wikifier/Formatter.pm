@@ -500,7 +500,7 @@ sub _external_link {
     # no such external wiki is configured
     if (!length $wiki_name) {
         # TODO: produce a page warning
-        warn "no such external wiki '$wiki_name'";
+        warn "no such external wiki '$wiki_id'";
         return;
     }
     
@@ -510,7 +510,7 @@ sub _external_link {
         if !ref $wiki_normalizer;
     if (!$wiki_normalizer) {
         # TODO: produce a page warning
-        warn 'no such wiki normalizer';
+        warn "no such wiki normalizer for '$wiki_id'";
         return;
     }
     
