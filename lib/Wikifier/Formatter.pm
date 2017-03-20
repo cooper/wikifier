@@ -337,7 +337,7 @@ sub parse_format_type {
     # [[link]]
     if ($type =~ /^\[(.+)\]$/) {
         my ($display, $target) = map trim($_), split(m/\|/, $1, 2);
-        my ($link_type, $tooltip, $normalize, @normalize_args);
+        my ($tooltip, $link_type, $normalize, @normalize_args) = '';
         
         # no pipe
         my $display_same;
@@ -349,7 +349,6 @@ sub parse_format_type {
         # http://google.com
         if ($target =~ /^(\w+):\/\//) {
             $link_type  = 'other';
-            $tooltip    = 'External link';
             $normalize  = \&_other_link;
             $display    =~ s/^(\w+):\/\/// if $display_same;
         }
@@ -387,7 +386,7 @@ sub parse_format_type {
             $display_same ? \$display : \$display_dummy,
             $page,
             @normalize_args
-        );
+        ) or return '(invalid link)';
         
         # inject tooltip
         if (length $tooltip) {
@@ -489,6 +488,7 @@ sub _page_link {
     $$target_ref  = '';
     $$target_ref .= $page->wiki_opt('root.page')."/$target" if length $target;
     $$target_ref .= "#$section"                             if length $section;
+    return 1;
 }
 
 # a page link an external wiki
@@ -525,8 +525,15 @@ sub _external_link {
     ($target, $section) = map $wiki_normalizer->($_), $target, $section;
     $$target_ref   = "$wiki_root/$target";
     $$target_ref  .= '#'.$section if length $section;
+    
+    return 1;
 }
 
-sub _other_link { } # do nothing
+# external site link
+sub _other_link {
+    my ($target_ref, $tooltip_ref, $display_ref, $page) = @_;
+    $$tooltip_ref = 'External link';
+    return 1;
+}
 
 1
