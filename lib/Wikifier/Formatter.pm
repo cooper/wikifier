@@ -481,8 +481,8 @@ sub _page_link {
     # split the target up into page and section, then create tooltip
     my ($target, $section) = map trim($_),
         split(/#/, $$target_ref, 2);
-    $$tooltip_ref = join ' # ', map ucfirst, grep length, $target, $section;
-    $$display_ref = length $section ? ucfirst $section : ucfirst $target;
+    $$tooltip_ref = join "\x{00A7}", map ucfirst, grep length, $target, $section;
+    $$display_ref = length $section ? "\x{00A7} $section" : ucfirst $target;
     
     # apply the normalizer to both page and section, then create link
     ($target, $section) = map page_name_link($_), $target, $section;
@@ -517,9 +517,9 @@ sub _external_link {
     # split the target up into page and section, then create tooltip
     my ($target, $section) = map trim($_),
         split(/#/, $$target_ref, 2);
-    $$tooltip_ref   = join ' # ', map ucfirst, grep length, $target, $section;
+    $$tooltip_ref   = join "\x{00A7}", map ucfirst, grep length, $target, $section;
     $$tooltip_ref   = "$wiki_name: $$tooltip_ref";
-    $$display_ref   = length $section ? ucfirst $section : ucfirst $target;
+    $$display_ref   = length $section ? "\x{00A7} $section" : ucfirst $target;
 
     # apply the normalizer to both page and section, then create link
     ($target, $section) = map $wiki_normalizer->($_), $target, $section;
