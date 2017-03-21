@@ -469,6 +469,7 @@ sub __page_link {
     if (length $target && !-e $page->wiki_opt('dir.page')."/$target") {
         $page->warning($opts{startpos}, "Page target '$target' does not exist")
             unless $opts{no_warnings};
+        return;
     }
     
     # create link
