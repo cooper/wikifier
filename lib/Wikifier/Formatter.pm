@@ -346,8 +346,8 @@ sub parse_format_type {
         
         return sprintf '<a class="wiki-link-%s%s" href="%s"%s>%s</a>',
             $link_type,
-            $ok ? '' : ' invalid',
-            $target,
+            $ok             ? ''                    : ' invalid',
+            $ok             ? $target               : '#invalid-link',
             length $tooltip ? qq{ title="$tooltip"} : '',
             $display;
     }
@@ -466,7 +466,8 @@ sub __page_link {
     ($target, $section) = map page_name_link($_), $target, $section;
     
     # make sure the page exists
-    my $dir = $page->wiki_opt('dir.page');
+    # FIXME: probably use cat_name if $typ is 'category'
+    my $dir = $page->wiki_opt("dir.$typ");
     if (length $target && !-e page_name("$dir/$target")) {
         $page->warning($opts{startpos}, "Page target '$target' does not exist")
             unless $opts{no_warnings};
