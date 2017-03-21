@@ -335,60 +335,47 @@ sub parse_format_type {
         return "&$1;";
     }
 
+    # deprecated: a link in the form of [~link~], [!link!], or [$link$]
+    # convert to newer link format
+    if ($type =~ /^([\!\$\~]+?)(.+)([\!\$\~]+?)$/) {
+        my ($link_char, $inner) = (trim($1), trim($2));
+        my ($target, $text) = ($inner, $inner);
+
+        # format is <text>|<target>
+        if ($inner =~ m/^(.+)\|(.+?)$/) {
+            $text   = trim($1);
+            $target = trim($2);
+        }
+
+        # category wiki link [~ category ~]
+        if ($link_char eq '~') {
+            $type = "[ $text | ~ $target ]";
+        }
+
+        # external wiki link [! article !]
+        # technically this used to observe @external.name and @external.root,
+        # but in practice this was always set to wikipedia, so use 'wp'
+        elsif ($link_char eq '!') {
+            $type = "[ $text | wp: $target ]";
+        }
+
+        # other non-wiki link [$ url $]
+        elsif ($link_char eq '$') {
+            $type = "[ $text | $target ]";
+        }
+    }
+    
     # [[link]]
     if ($type =~ /^\[(.+)\]$/) {
         my ($target, $display, $tooltip, $link_type) =
-            $wikifier->parse_link($page, $1);
+            $wikifier->parse_link($page, $1, %opts);
+        return '(invalid link)'
+            if !defined $target;
         return sprintf '<a class="wiki-link-%s" href="%s"%s>%s</a>',
             $link_type,
             $target,
             length $tooltip ? qq{ title="$tooltip"} : '',
             $display;
-    }
-
-    # deprecated: a link in the form of [~link~], [!link!], or [$link$]
-    if ($type =~ /^([\!\$\~]+?)(.+)([\!\$\~]+?)$/) {
-        my ($link_char, $inner, $link_type) = (trim($1), trim($2));
-        my ($target, $text, $title) = ($inner, $inner, '');
-        my $name_link = page_name_link($target);
-
-        # format is <text>|<target>
-        if ($inner =~ m/^(.+?)\|(.+)$/) {
-            $text   = trim($1);
-            $target = trim($2);
-            $name_link = page_name_link($target);
-        }
-
-        # internal wiki link [[ article ]]
-        if ($link_char eq '[') {
-            $link_type = 'internal';
-            $title     = ucfirst $target;
-            $target    = $page->wiki_opt('root.page')."/$name_link";
-        }
-
-        # category wiki link [~ category ~]
-        elsif ($link_char eq '~') {
-            $link_type = 'category';
-            $title     = ucfirst $target;
-            $target    = $page->wiki_opt('root.category')."/$name_link";
-        }
-
-        # external wiki link [! article !]
-        elsif ($link_char eq '!') {
-            my $external_link = page_name_link($target, 1);
-            $link_type = 'external';
-            $title     = $page->wiki_opt('external.name').': '.ucfirst($target);
-            $target    = $page->wiki_opt('external.root')."/$external_link";
-        }
-
-        # other non-wiki link [$ url $]
-        elsif ($link_char eq '$') {
-            $link_type = 'other';
-            $title     = 'External link';
-        }
-
-        $title = qq( title="$title") if $title;
-        return qq{<a class="wiki-link-$link_type" href="$target"$title>$text</a>};
     }
 
     # fake references.
@@ -418,7 +405,7 @@ sub parse_format_type {
 }
 
 sub parse_link {
-    my ($wikifier, $page, $input) = @_;
+    my ($wikifier, $page, $input, %opts) = @_;
     my ($display, $target) = map trim($_), split(m/\|/, $input, 2);
     my ($tooltip, $link_type, $normalize, @normalize_args) = '';
     
@@ -438,7 +425,7 @@ sub parse_link {
     
     # wp: some page
     elsif ($target =~ s/^(\w+)://) {
-        push @normalize_args, $1;
+        push @normalize_args, $1, %opts;
         $target     = trim($target);
         $link_type  = 'external';
         $normalize  = \&_external_link;
@@ -469,7 +456,7 @@ sub parse_link {
         $display_same ? \$display : \$display_dummy,
         $page,
         @normalize_args
-    ) or return '(invalid link)';
+    ) or return;
     
     return ($target, $display, $tooltip, $link_type);
 }
@@ -506,14 +493,14 @@ sub __page_link {
 
 # a page link an external wiki
 sub _external_link {
-    my ($target_ref, $tooltip_ref, $display_ref, $page, $wiki_id) = @_;
+    my ($target_ref, $tooltip_ref, $display_ref, $page, $wiki_id, %opts) = @_;
     my ($wiki_name, $wiki_root, $wiki_normalizer) =
         map $page->wiki_opt("external.$wiki_id.$_"), qw(name root type);
     
     # no such external wiki is configured
     if (!length $wiki_name) {
-        # TODO: produce a page warning
-        warn "no such external wiki '$wiki_id'";
+        $page->warning($opts{startpos}, "No such external wiki '$wiki_id'")
+            unless $opts{no_warnings};
         return;
     }
     
@@ -522,8 +509,9 @@ sub _external_link {
     $wiki_normalizer = $normalizers{$wiki_normalizer}
         if !ref $wiki_normalizer;
     if (!$wiki_normalizer) {
-        # TODO: produce a page warning
-        warn "no such wiki normalizer for '$wiki_id'";
+        die;
+        $page->warning($opts{startpos}, "No such normalizer for '$wiki_id'")
+            unless $opts{no_warnings};
         return;
     }
     
