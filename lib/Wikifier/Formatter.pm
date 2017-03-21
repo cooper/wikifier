@@ -181,16 +181,18 @@ sub parse_formatted_text {
 
     my @items;
     my $string       = '';
-    my $last_char    = '';   # the last parsed character.
+
     my $format_type  = '';   # format name such as 'i' or '/b'
     my $in_format    = 0;    # inside a formatting element.
     my $escaped      = 0;    # this character was escaped.
-    my $next_escaped = 0;    # the next character will be escaped.
 
     # parse character-by-character.
-    CHAR: foreach my $char (split '', $text) {
-        $next_escaped = 0;
-
+    my @chars = split '', $text;
+    CHAR: foreach my $i (0..$#chars) {
+        my $char = $chars[$i];
+        my $last_char = $i == 0 ? '' : $chars[$i - 1];
+        my $escaped = $last_char eq '\\';
+        
         # update position
         if ($char eq "\n") {
             $pos->{line}++;
@@ -200,13 +202,8 @@ sub parse_formatted_text {
             $pos->{col}++;
         }
 
-        # escapes.
-        if ($char eq '\\' && !$escaped) {
-            $next_escaped = 1;
-        }
-
         # [ marks the beginning of a formatting element.
-        elsif ($char eq '[' && !$escaped) {
+        if ($char eq '[' && !$escaped) {
             if (!$in_format++) {
                 $opts{startpos} = { %$pos };
                 $format_type    = '';
@@ -216,6 +213,8 @@ sub parse_formatted_text {
                     push @items, [ $opts{no_entities}, $string ];
                     $string = '';
                 }
+                
+                next;
             }
         }
 
@@ -227,22 +226,15 @@ sub parse_formatted_text {
                     $wikifier->parse_format_type($page, $format_type, %opts)
                 ];
                 delete $opts{startpos};
+                next;
             }
         }
 
-        # any other character.
-        else {
+        # if we're in the format type, append to it.
+        if ($in_format) { $format_type .= $char }
 
-            # if we're in the format type, append to it.
-            if ($in_format) { $format_type .= $char }
-
-            # it's any regular character, either within or outside of a format.
-            else { $string .= $char }
-        }
-
-        # set last character and escape for next character.
-        $last_char = $char;
-        $escaped   = $next_escaped;
+        # it's any regular character, either within or outside of a format.
+        else { $string .= $char }
     }
 
     # final string item.
