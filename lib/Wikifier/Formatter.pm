@@ -12,7 +12,7 @@ use 5.010;
 
 use Scalar::Util qw(blessed);
 use HTML::Entities ();
-use Wikifier::Utilities qw(page_name_link page_name trim);
+use Wikifier::Utilities qw(page_name_link page_name cat_name trim);
 use URI::Escape qw(uri_escape);
 
 our %colors = (
@@ -466,12 +466,14 @@ sub __page_link {
     ($target, $section) = map page_name_link($_), $target, $section;
     
     # make sure the page exists
-    # FIXME: probably use cat_name if $typ is 'category'
-    my $dir = $page->wiki_opt("dir.$typ");
-    if (length $target && !-e page_name("$dir/$target")) {
-        $page->warning($opts{startpos}, "Page target '$target' does not exist")
-            unless $opts{no_warnings};
-        return;
+    if (length $target) {
+        my $safe_name = $typ eq 'category' ?
+            cat_name($target) : page_name($target);
+        if (!-e $page->wiki_opt("dir.$typ")."/$safe_name") {
+            $page->warning($opts{startpos}, "Page target '$target' does not exist")
+                unless $opts{no_warnings};
+            return;
+        }
     }
     
     # create link
