@@ -172,16 +172,29 @@ unless you are using Wikifer::Wiki's built-in revision tracking.
 
 ### external
 
-| Option            | Description                                       | Default                           |
-| -----             | -----                                             | -----                             |
-| `external.name`   | External wiki name, displayed in link tooltips    | *Wikipedia*                       |
-| `external.root`   | External wiki page root                           | *http://en.wikipedia.org/wiki*    |
+External wiki information.
 
-External wiki information. This is used for External wiki links in the form
-of `[! article !]`.
+You can configure any number of external wikis, each referred to by a shorthand
+identifier `[wiki_id]` consisting of word-like characters.
 
-Page names will be translated to URLs in a format compatible with MediaWiki.
-Currently this is non-configurable.
+| Option                        | Description | Default
+| -----                         | -----       | -----
+| `external.[wiki_id].name`     | External wiki name, displayed in link tooltips |
+| `external.[wiki_id].root`     | External wiki page root |
+| `external.[wiki_id].type`     | External wiki type | *wikifier*
+
+Accepted values for `type`
+* *wikifier* (this is default)
+* *mediawiki*
+
+The default configuration includes the `wp` identified for the
+[English Wikipedia](http://en.wikipedia.org):
+
+    @external.wp: {
+        name: Wikipedia;
+        root: http://en.wikipedia.org/wiki;
+        type: mediawiki;
+    };
 
 ### page.enable.title
 
