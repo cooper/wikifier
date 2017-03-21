@@ -367,7 +367,7 @@ sub parse_format_type {
     
     # [[link]]
     if ($type =~ /^\[(.+)\]$/) {
-        my ($target, $display, $tooltip, $link_type) =
+        my ($target, $display, $tooltip, $link_type, $display_same) =
             $wikifier->parse_link($page, $1, %opts);
         return '(invalid link)'
             if !defined $target;
@@ -375,7 +375,9 @@ sub parse_format_type {
             $link_type,
             $target,
             length $tooltip ? qq{ title="$tooltip"} : '',
-            $display;
+            $display_same ?
+                $display  :
+            $wikifier->parse_formatted_text($page, $display, %opts);
     }
 
     # fake references.
@@ -458,7 +460,7 @@ sub parse_link {
         @normalize_args
     ) or return;
     
-    return ($target, $display, $tooltip, $link_type);
+    return ($target, $display, $tooltip, $link_type, $display_same);
 }
 
 my %normalizers = (
