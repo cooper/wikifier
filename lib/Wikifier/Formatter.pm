@@ -192,7 +192,7 @@ sub parse_formatted_text {
         my $char = $chars[$i];
         my $last_char = $i == 0 ? '' : $chars[$i - 1];
         my $escaped = $last_char eq '\\';
-        
+
         # update position
         if ($char eq "\n") {
             $pos->{line}++;
@@ -207,13 +207,13 @@ sub parse_formatted_text {
             if (!$in_format++) {
                 $opts{startpos} = { %$pos };
                 $format_type    = '';
-                
+
                 # store the string we have so far.
                 if (length $string) {
                     push @items, [ $opts{no_entities}, $string ];
                     $string = '';
                 }
-                
+
                 next;
             }
         }
@@ -333,21 +333,21 @@ sub parse_format_type {
             $type = "[ $text | $target ]";
         }
     }
-    
+
     # [[link]]
     if ($type =~ /^\[(.+)\]$/) {
         my ($ok, $target, $display, $tooltip, $link_type, $display_same) =
             $wikifier->parse_link($page, $1, %opts);
-            
+
         # text formatting is permitted before the pipe.
         # do nothing when the link did not have a pipe ($display_same)
         $display = $wikifier->parse_formatted_text($page, $display, %opts)
             unless $display_same;
-        
+
         return sprintf '<a class="wiki-link-%s%s" href="%s"%s>%s</a>',
             $link_type,
-            $ok             ? ''                    : ' invalid',
-            $ok             ? $target               : '#invalid-link',
+            $ok ? '' : ' invalid',
+            $target,
             length $tooltip ? qq{ title="$tooltip"} : '',
             $display;
     }
@@ -383,21 +383,21 @@ sub parse_link {
     my ($display, $target) = map trim($_), split(m/\|/, $input, 2);
     my ($tooltip, $link_type, $normalize) = '';
     my @normalize_args = %opts;
-    
+
     # no pipe
     my $display_same;
     if (!length $target) {
         $target = $display;
         $display_same++;
     }
-    
+
     # http://google.com
     if ($target =~ /^(\w+):\/\//) {
         $link_type  = 'other';
         $normalize  = \&_other_link;
         $display    =~ s/^(\w+):\/\/// if $display_same;
     }
-    
+
     # wp: some page
     elsif ($target =~ s/^(\w+)://) {
         unshift @normalize_args, $1;
@@ -406,7 +406,7 @@ sub parse_link {
         $normalize  = \&_external_link;
         $display    =~ s/^(\w+):// if $display_same;
     }
-    
+
     # ~ some category
     elsif ($target =~ s/^\~//) {
         $target     = trim($target);
@@ -414,13 +414,13 @@ sub parse_link {
         $normalize  = \&_category_link;
         $display    =~ s/^\~// if $display_same;
     }
-    
+
     # normal page link
     else {
         $link_type  = 'internal';
         $normalize  = \&_page_link;
     }
-    
+
     # normalize
     my $display_dummy = '';
     ($target, $tooltip, $display) = map trim($_),
@@ -432,7 +432,7 @@ sub parse_link {
         $page,
         @normalize_args
     );
-    
+
     return ($ok, $target, $display, $tooltip, $link_type, $display_same);
 }
 
@@ -455,33 +455,34 @@ sub _category_link  { __page_link('category', @_) }
 # a page link on the same wiki
 sub __page_link {
     my ($typ, $target_ref, $tooltip_ref, $display_ref, $page, %opts) = @_;
-    
+
     # split the target up into page and section, then create tooltip
     my ($target, $section) = map trim($_),
         split(/#/, $$target_ref, 2);
     $$tooltip_ref = join ' # ', map ucfirst, grep length, $target, $section;
     $$display_ref = length $section ? $section : $target;
-    
+
     # apply the normalizer to both page and section
     ($target, $section) = map page_name_link($_), $target, $section;
-    
+
     # make sure the page exists
+    my $errors;
     if (length $target) {
         my $safe_name = $typ eq 'category' ?
             cat_name($target) : page_name($target);
         if (!-e $page->wiki_opt("dir.$typ")."/$safe_name") {
             $page->warning($opts{startpos}, "Page target '$target' does not exist")
                 unless $opts{no_warnings};
-            return;
+            $errors++;
         }
     }
-    
+
     # create link
     $$target_ref  = '';
     $$target_ref .= $page->wiki_opt("root.$typ")."/$target" if length $target;
     $$target_ref .= "#$section"                             if length $section;
-    
-    return 1;
+
+    return !$errors;
 }
 
 # a page link an external wiki
@@ -489,24 +490,26 @@ sub _external_link {
     my ($target_ref, $tooltip_ref, $display_ref, $page, $wiki_id, %opts) = @_;
     my ($wiki_name, $wiki_root, $wiki_normalizer) =
         map $page->wiki_opt("external.$wiki_id.$_"), qw(name root type);
-    
+
     # no such external wiki is configured
+    my $errors;
     if (!length $wiki_name) {
         $page->warning($opts{startpos}, "No such external wiki '$wiki_id'")
             unless $opts{no_warnings};
-        return;
+        $wiki_name = $wiki_id;
+        $errors++;
     }
-    
+
     # find the normalizer
-    $wiki_normalizer ||= 'wikifier';
-    $wiki_normalizer = $normalizers{$wiki_normalizer}
+    $wiki_normalizer = $normalizers{ $wiki_normalizer || 'wikifier' }
         if !ref $wiki_normalizer;
     if (!$wiki_normalizer) {
         $page->warning($opts{startpos}, "No such normalizer for '$wiki_id'")
             unless $opts{no_warnings};
-        return;
+        $wiki_normalizer = $normalizers{wikifier};
+        $errors++;
     }
-    
+
     # split the target up into page and section, then create tooltip
     my ($target, $section) = map trim($_),
         split(/#/, $$target_ref, 2);
@@ -518,8 +521,8 @@ sub _external_link {
     ($target, $section) = map $wiki_normalizer->($_), $target, $section;
     $$target_ref   = "$wiki_root/$target";
     $$target_ref  .= '#'.$section if length $section;
-    
-    return 1;
+
+    return !$errors;
 }
 
 # external site link
