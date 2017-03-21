@@ -12,7 +12,7 @@ use 5.010;
 
 use Scalar::Util qw(blessed);
 use HTML::Entities ();
-use Wikifier::Utilities qw(page_name_link trim);
+use Wikifier::Utilities qw(page_name_link page_name trim);
 use URI::Escape qw(uri_escape);
 
 our %colors = (
@@ -466,7 +466,8 @@ sub __page_link {
     ($target, $section) = map page_name_link($_), $target, $section;
     
     # make sure the page exists
-    if (length $target && !-e $page->wiki_opt('dir.page')."/$target") {
+    my $dir = $page->wiki_opt('dir.page');
+    if (length $target && !-e page_name("$dir/$target")) {
         $page->warning($opts{startpos}, "Page target '$target' does not exist")
             unless $opts{no_warnings};
         return;
