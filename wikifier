@@ -23,10 +23,12 @@ my $page = Wikifier::Page->new(file_path => $path);
 my $err = $page->parse;
 die $err if $err;
 
+# generate HTML and css.
+my ($html, $css) = ($page->html, $page->css);
+
 # print warnings.
 L "Warning: $_" for @{ $page->{warnings} };
 
-# print the generated HTML.
-my ($html, $css) = ($page->html, $page->css);
+# print the generated HTML and CSS.
 L "CSS: $css" if length $css;
 print $html if length $html;
