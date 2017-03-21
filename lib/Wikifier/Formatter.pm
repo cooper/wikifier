@@ -463,6 +463,7 @@ sub __page_link {
     $$display_ref = length $section ? $section : $target;
 
     # apply the normalizer to both page and section
+    my $page_name_hr = $target;
     ($target, $section) = map page_name_link($_), $target, $section;
 
     # make sure the page exists
@@ -471,8 +472,10 @@ sub __page_link {
         my $safe_name = $typ eq 'category' ?
             cat_name($target) : page_name($target);
         if (!-e $page->wiki_opt("dir.$typ")."/$safe_name") {
-            $page->warning($opts{startpos}, "Page target '$target' does not exist")
-                unless $opts{no_warnings};
+            $page->warning(
+                $opts{startpos},
+                "Page target '$page_name_hr' does not exist"
+            ) unless $opts{no_warnings};
             $errors++;
         }
     }
