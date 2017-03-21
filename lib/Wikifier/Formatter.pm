@@ -207,50 +207,27 @@ sub parse_formatted_text {
 
         # [ marks the beginning of a formatting element.
         elsif ($char eq '[' && !$escaped) {
-
-            # if we're in format already, it's a [[link]].
-            if ($in_format && $last_char eq '[') {
-                $format_type .= $char;
-
-                # skip to next character.
-                $last_char = $char;
-                next CHAR;
-            }
-
-            # we are now inside the format type.
-            $opts{startpos} = { %$pos };
-            $in_format      = 1;
-            $format_type    = '';
-
-            # store the string we have so far.
-            if (length $string) {
-                push @items, [ $opts{no_entities}, $string ];
-                $string = '';
+            if (!$in_format++) {
+                $opts{startpos} = { %$pos };
+                $format_type    = '';
+                
+                # store the string we have so far.
+                if (length $string) {
+                    push @items, [ $opts{no_entities}, $string ];
+                    $string = '';
+                }
             }
         }
 
         # ] marks the end of a formatting element.
-        elsif ($char eq ']' && !$escaped) {
-
-            # ignore it for now if it starts with [ and doesn't end with ].
-            # this means it's a [[link]] which hasn't yet handled the second ].
-            my $first = substr $format_type, 0, 1;
-            my $last  = substr $format_type, -1, 1;
-            if ($in_format && $first eq '[' && $last ne ']') {
-                $format_type .= $char;
-                $in_format    = 0;
-            }
-
-            # otherwise, the format type is ended and must now be parsed.
-            else {
+        elsif ($char eq ']' && !$escaped && $in_format) {
+            if (!--$in_format) {
                 push @items, [
                     1,
                     $wikifier->parse_format_type($page, $format_type, %opts)
                 ];
-                $in_format = 0;
+                delete $opts{startpos};
             }
-
-            delete $opts{startpos};
         }
 
         # any other character.
