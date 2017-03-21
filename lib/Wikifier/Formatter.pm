@@ -338,13 +338,13 @@ sub parse_format_type {
     # deprecated: a link in the form of [~link~], [!link!], or [$link$]
     # convert to newer link format
     if ($type =~ /^([\!\$\~]+?)(.+)([\!\$\~]+?)$/) {
-        my ($link_char, $inner) = (trim($1), trim($2));
+        my ($link_char, $inner) = ($1, $2);
         my ($target, $text) = ($inner, $inner);
 
         # format is <text>|<target>
         if ($inner =~ m/^(.+)\|(.+?)$/) {
-            $text   = trim($1);
-            $target = trim($2);
+            $text   = $1;
+            $target = $2;
         }
 
         # category wiki link [~ category ~]
@@ -369,15 +369,21 @@ sub parse_format_type {
     if ($type =~ /^\[(.+)\]$/) {
         my ($target, $display, $tooltip, $link_type, $display_same) =
             $wikifier->parse_link($page, $1, %opts);
+            
+        # no return means link format was invalid
         return '(invalid link)'
             if !defined $target;
+            
+        # text formatting is permitted before the pipe.
+        # do nothing when the link did not have a pipe ($display_same)
+        $display = $wikifier->parse_formatted_text($page, $display, %opts)
+            unless $display_same;
+        
         return sprintf '<a class="wiki-link-%s" href="%s"%s>%s</a>',
             $link_type,
             $target,
             length $tooltip ? qq{ title="$tooltip"} : '',
-            $display_same ?
-                $display  :
-            $wikifier->parse_formatted_text($page, $display, %opts);
+            $display;
     }
 
     # fake references.
