@@ -13,7 +13,7 @@ use 5.010;
 use Scalar::Util qw(blessed);
 use HTML::Entities ();
 use Wikifier::Utilities qw(page_name_link trim);
-use URI::Escape::XS;
+use URI::Escape qw(uri_escape);
 
 our %colors = (
     AliceBlue               => '#F0F8FF',
@@ -476,7 +476,11 @@ sub parse_link {
 
 my %normalizers = (
     wikifier  => sub { page_name_link(shift) },
-    mediawiki => sub { 'MEDIAWIKI LINK' } # FIXME
+    mediawiki => sub {
+        my $target = shift;
+        $target =~ s/ /_/g;
+        return uri_escape(ucfirst $target);
+    }
 );
 
 sub _page_link      { __page_link('page',     @_) }
