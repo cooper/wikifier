@@ -336,65 +336,7 @@ sub parse_format_type {
 
     # [[link]]
     if ($type =~ /^\[(.+)\]$/) {
-        my ($display, $target) = map trim($_), split(m/\|/, $1, 2);
-        my ($tooltip, $link_type, $normalize, @normalize_args) = '';
-        
-        # no pipe
-        my $display_same;
-        if (!length $target) {
-            $target = $display;
-            $display_same++;
-        }
-        
-        # http://google.com
-        if ($target =~ /^(\w+):\/\//) {
-            $link_type  = 'other';
-            $normalize  = \&_other_link;
-            $display    =~ s/^(\w+):\/\/// if $display_same;
-        }
-        
-        # wp: some page
-        elsif ($target =~ s/^(\w+)://) {
-            push @normalize_args, $1;
-            $target     = trim($target);
-            $link_type  = 'external';
-            $normalize  = \&_external_link;
-            $display    =~ s/^(\w+):// if $display_same;
-        }
-        
-        # ~ some category
-        elsif ($target =~ s/^\~//) {
-            $target     = trim($target);
-            $link_type  = 'category';
-            $normalize  = \&_category_link;
-            $display    =~ s/^\~// if $display_same;
-        }
-        
-        # normal page link
-        else {
-            $link_type  = 'internal';
-            $normalize  = \&_page_link;
-        }
-        
-        # normalize
-        my $display_dummy = '';
-        ($target, $tooltip, $display) = map trim($_),
-            $target, $tooltip, $display;
-        $normalize->(
-            \$target,
-            \$tooltip,
-            $display_same ? \$display : \$display_dummy,
-            $page,
-            @normalize_args
-        ) or return '(invalid link)';
-        
-        # inject tooltip
-        if (length $tooltip) {
-            $tooltip = ucfirst $tooltip;
-            $tooltip = qq( title="$tooltip");
-        }
-        
-        return qq{<a class="wiki-link-$link_type" href="$target"$tooltip>$display</a>};
+        return $wikifier->parse_link($page, $1);
     }
 
     # deprecated: a link in the form of [~link~], [!link!], or [$link$]
@@ -466,6 +408,69 @@ sub parse_format_type {
 
     # leave out anything else, I guess.
     return '';
+}
+
+sub parse_link {
+    my ($wikifier, $page, $input) = @_;
+    my ($display, $target) = map trim($_), split(m/\|/, $input, 2);
+    my ($tooltip, $link_type, $normalize, @normalize_args) = '';
+    
+    # no pipe
+    my $display_same;
+    if (!length $target) {
+        $target = $display;
+        $display_same++;
+    }
+    
+    # http://google.com
+    if ($target =~ /^(\w+):\/\//) {
+        $link_type  = 'other';
+        $normalize  = \&_other_link;
+        $display    =~ s/^(\w+):\/\/// if $display_same;
+    }
+    
+    # wp: some page
+    elsif ($target =~ s/^(\w+)://) {
+        push @normalize_args, $1;
+        $target     = trim($target);
+        $link_type  = 'external';
+        $normalize  = \&_external_link;
+        $display    =~ s/^(\w+):// if $display_same;
+    }
+    
+    # ~ some category
+    elsif ($target =~ s/^\~//) {
+        $target     = trim($target);
+        $link_type  = 'category';
+        $normalize  = \&_category_link;
+        $display    =~ s/^\~// if $display_same;
+    }
+    
+    # normal page link
+    else {
+        $link_type  = 'internal';
+        $normalize  = \&_page_link;
+    }
+    
+    # normalize
+    my $display_dummy = '';
+    ($target, $tooltip, $display) = map trim($_),
+        $target, $tooltip, $display;
+    $normalize->(
+        \$target,
+        \$tooltip,
+        $display_same ? \$display : \$display_dummy,
+        $page,
+        @normalize_args
+    ) or return '(invalid link)';
+    
+    # inject tooltip
+    if (length $tooltip) {
+        $tooltip = ucfirst $tooltip;
+        $tooltip = qq( title="$tooltip");
+    }
+    
+    return qq{<a class="wiki-link-$link_type" href="$target"$tooltip>$display</a>};
 }
 
 my %normalizers = (
