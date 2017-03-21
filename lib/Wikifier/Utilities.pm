@@ -35,6 +35,7 @@ sub indent_str {
 # 'Some Article' -> 'some_article.page'
 sub page_name {
     my ($page_name, $ext) = @_;
+    return undef if !defined $page_name;
     return $page_name->name if blessed $page_name;
 
     $page_name = page_name_link($page_name);
@@ -52,7 +53,8 @@ sub page_name {
 # 'Some Article' -> 'Some_Article' (with $no_lc)
 sub page_name_link {
     my ($page_name, $no_lc) = @_;
-
+    return undef if !defined $page_name;
+    
     # replace non-alphanumerics with _ and lowercase.
     $page_name =~ s/[^\w\.\-]/_/g;
     $page_name = lc $page_name unless $no_lc;

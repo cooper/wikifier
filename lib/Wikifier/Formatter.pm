@@ -439,7 +439,6 @@ sub parse_link {
 my %normalizers = (
     wikifier  => sub {
         my $target = shift;
-        return undef if !defined $target;
         return page_name_link($target);
     },
     mediawiki => sub {
