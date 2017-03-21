@@ -177,6 +177,13 @@ a.wiki-link-other {
     color: #0084FF;
 }
 
+a.wiki-link-internal.invalid,
+a.wiki-link-external.invalid,
+a.wiki-link-category.invalid,
+a.wiki-link-other.invalid {
+    color: #FF3D50;
+}
+
 a.wiki-link-internal:hover,
 a.wiki-link-external:hover,
 a.wiki-link-category:hover,
