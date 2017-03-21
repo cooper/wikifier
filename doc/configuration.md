@@ -196,6 +196,10 @@ The default configuration includes the `wp` identified for the
         type: mediawiki;
     };
 
+From the page source, this looks like:
+
+    [[ Cats | wp: Cat ]] are a type of [[ wp: animal ]].
+
 ### page.enable.title
 
 If enabled, the first section's title will be the title of the page. You
