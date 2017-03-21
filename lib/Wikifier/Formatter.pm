@@ -13,6 +13,7 @@ use 5.010;
 use Scalar::Util qw(blessed);
 use HTML::Entities ();
 use Wikifier::Utilities qw(page_name_link trim);
+use URI::Escape::XS;
 
 our %colors = (
     AliceBlue               => '#F0F8FF',
@@ -336,7 +337,13 @@ sub parse_format_type {
 
     # [[link]]
     if ($type =~ /^\[(.+)\]$/) {
-        return $wikifier->parse_link($page, $1);
+        my ($target, $display, $tooltip, $link_type) =
+            $wikifier->parse_link($page, $1);
+        return sprintf '<a class="wiki-link-%s" href="%s"%s>%s</a>',
+            $link_type,
+            $target,
+            length $tooltip ? qq{ title="$tooltip"} : '',
+            $display;
     }
 
     # deprecated: a link in the form of [~link~], [!link!], or [$link$]
@@ -464,13 +471,7 @@ sub parse_link {
         @normalize_args
     ) or return '(invalid link)';
     
-    # inject tooltip
-    if (length $tooltip) {
-        $tooltip = ucfirst $tooltip;
-        $tooltip = qq( title="$tooltip");
-    }
-    
-    return qq{<a class="wiki-link-$link_type" href="$target"$tooltip>$display</a>};
+    return ($target, $display, $tooltip, $link_type);
 }
 
 my %normalizers = (
