@@ -30,8 +30,9 @@ sub list_parse {
 
     # for each content item...
     ITEM: foreach ($block->content_visible_pos) {
-        (my $item, $pos) = @$_;
-
+        my ($item, $startpos) = @$_;
+        $pos = { %$startpos };
+        
         # if blessed, it's a block value, such as an image.
         if (blessed $item) {
             append_value $value, $item;
@@ -58,7 +59,7 @@ sub list_parse {
                 # store the value.
                 push @{ $block->{list_array} }, {
                     value => $value,        # value
-                    pos  => { %$pos }       # position
+                    pos   => $startpos      # position
                 };
                 push @{ $block->{list_array_values} }, $value;
 
