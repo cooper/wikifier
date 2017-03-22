@@ -194,7 +194,7 @@ sub map_parse {
 
     # warning stuff
     $warn_bad_maybe->();
-    $pos->{line} = $block->{line};
+    $pos->{line} ||= $block->{line};
     my ($key_text, $value_text) = hr_value $key, $value;
 
     # value warnings

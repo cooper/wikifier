@@ -79,7 +79,7 @@ sub list_parse {
     }       # end of item loop.
 
     # warning stuff
-    $pos->{line} = $block->{line};
+    $pos->{line} ||= $block->{line};
     my $value_text = hr_value $value;
 
     # unterminated value warning
