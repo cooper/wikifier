@@ -58,7 +58,7 @@ sub list_parse {
                 # store the value.
                 push @{ $block->{list_array} }, {
                     value => $value,        # value
-                    pos   => $pos           # position
+                    pos  => { %$pos }       # position
                 };
                 push @{ $block->{list_array_values} }, $value;
 
@@ -79,7 +79,6 @@ sub list_parse {
     }       # end of item loop.
 
     # warning stuff
-    $pos->{line} ||= $block->{line};
     my $value_text = hr_value $value;
 
     # unterminated value warning

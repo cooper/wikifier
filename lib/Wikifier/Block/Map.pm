@@ -157,7 +157,7 @@ sub map_parse {
                     value       => $value,         # value, text or block
                     key         => $key,           # actual hash key
                     is_block    => $is_block,      # true if value was a block
-                    pos         => $pos            # position
+                    pos         => { %$pos }       # position
                 };
 
                 # warn bad keys and values
@@ -194,7 +194,6 @@ sub map_parse {
 
     # warning stuff
     $warn_bad_maybe->();
-    $pos->{line} ||= $block->{line};
     my ($key_text, $value_text) = hr_value $key, $value;
 
     # value warnings
