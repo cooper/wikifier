@@ -111,7 +111,6 @@ sub list_html {
         $el->create_child(
             type       => 'li',
             class      => 'list-item',
-            position   => [ $_->{pos} ],
             content    => $value
         );
     }

@@ -24,7 +24,7 @@ our %block_types = (
     }
 );
 
-my $empty_lines = qr/(?:[^\S\n]*\n+[^\S\n]*){2,}/;
+my $empty_lines = qr/([^\S\n]*\n+[^\S\n]*){2,}/;
 
 # this counts how many sections there are.
 # this is then compared in section_html to see if it's the last section.
@@ -88,8 +88,11 @@ sub section_html {
         # if it's not blessed, it's text.
         # sections interpret loose text as paragraphs.
         if (!blessed $item) {
-            TEXT: foreach my $text (split $empty_lines, $item) {
-
+            my @split = split $empty_lines, $item;
+            TEXT: while (my ($text, $ws) = splice @split, 0, 2) {
+                $ws = () = $ws =~ /\n/g;
+                my $pos = { %$pos, line => $pos->{line} + $ws };
+                
                 # ignore empty things or spaces, etc.
                 next TEXT unless length trim($text);
 
