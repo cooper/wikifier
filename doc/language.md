@@ -432,11 +432,11 @@ formatting tokens.
 
 ### Links
 * `[[ Page name ]]` - internal wiki page link
-* `[! Page name !]` - external wiki page link
-* `[~ Cat name ~]` - category link
-* `[$ http://google.com $]` - external site link
+* `[[ wp: Page name ]]` - [external wiki](configuration.md#external) page link
+* `[[ ~ Cat name ]]` - category link
+* `[[ http://google.com ]]` - external site link
 * For any link type, you can change the display text:
-  `[$ Google | http://google.com $]`
+  `[[ Google | http://google.com ]]`
 
 ### References
 * `[ref]` - a fake reference. just to make your wiki look credible.
