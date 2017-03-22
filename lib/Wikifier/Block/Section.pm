@@ -90,7 +90,6 @@ sub section_html {
         if (!blessed $item) {
             my @split = split $empty_lines, $item;
             TEXT: while (my ($text, $ws) = splice @split, 0, 2) {
-                $pos->{line} += () = $ws =~ /\n/g;
             
                 # only create paragraph if it's not whitespace
                 if (length trim($text)) {
@@ -107,6 +106,8 @@ sub section_html {
                     $el->add($item->html($page));
                 }
                 
+                # add whitespace newlines and text newlines
+                $pos->{line} += () = $ws =~ /\n/g;
                 $pos->{line} += () = $text =~ /\n/g;
             }
             next ITEM;
