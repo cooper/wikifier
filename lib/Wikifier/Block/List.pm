@@ -31,16 +31,12 @@ sub list_parse {
     # for each content item...
     ITEM: foreach ($block->content_visible_pos) {
         (my $item, $pos) = @$_;
-        my $startpos;
-        
+
         # if blessed, it's a block value, such as an image.
         if (blessed $item) {
-            $startpos = $pos;
             append_value $value, $item;
             next ITEM;
         }
-        
-        $startpos = { %$pos };
 
         # for each character in this string...
         my $escaped; # true if the last was escape character
@@ -62,7 +58,7 @@ sub list_parse {
                 # store the value.
                 push @{ $block->{list_array} }, {
                     value => $value,        # value
-                    pos   => $startpos      # position
+                    pos   => { %$pos }       # position
                 };
                 push @{ $block->{list_array_values} }, $value;
 
