@@ -7,7 +7,7 @@ use 5.010;
 
 use Scalar::Util qw(blessed);
 use Wikifier::Utilities qw(
-    trim fix_value append_value html_value hr_value
+    fix_value append_value html_value hr_value
 );
 
 our %block_types = (list => {
@@ -111,6 +111,7 @@ sub list_html {
         $el->create_child(
             type       => 'li',
             class      => 'list-item',
+            position   => [ $_->{pos} ],
             content    => $value
         );
     }
