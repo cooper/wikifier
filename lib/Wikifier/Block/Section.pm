@@ -91,7 +91,7 @@ sub section_html {
             my @split = split $empty_lines, $item;
             TEXT: while (my ($text, $ws) = splice @split, 0, 2) {
                 $ws = () = $ws =~ /\n/g;
-                my $pos = { %$pos, line => $pos->{line} + $ws };
+                my $pos = { %$pos, line => $pos->{line} + $ws - 1 };
                 
                 # ignore empty things or spaces, etc.
                 next TEXT unless length trim($text);
