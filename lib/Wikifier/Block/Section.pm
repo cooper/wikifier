@@ -90,22 +90,26 @@ sub section_html {
         if (!blessed $item) {
             my @split = split $empty_lines, $item;
             TEXT: while (my ($text, $ws) = splice @split, 0, 2) {
-                $ws = () = $ws =~ /\n/g;
-                $pos->{line} += $ws - 1;
+                $pos->{line} += () = $ws =~ /\n/g;
                 
                 # ignore empty things or spaces, etc.
                 next TEXT unless length trim($text);
 
-                # create the paragraph.
-                $item = $page->wikifier->create_block(
-                    parent      => $block,
-                    type        => 'paragraph',
-                    position    => [ { %$pos } ],
-                    content     => [ $text ]
-                );
+                if (length trim($text)) {
+                    
+                    # create the paragraph.
+                    $item = $page->wikifier->create_block(
+                        parent      => $block,
+                        type        => 'paragraph',
+                        position    => [ { %$pos } ],
+                        content     => [ $text ]
+                    );
 
-                # adopt it.
-                $el->add($item->html($page));
+                    # adopt it.
+                    $el->add($item->html($page));
+                }
+                
+                $pos->{line} += () = $text =~ /\n/g;
             }
             next ITEM;
         }
