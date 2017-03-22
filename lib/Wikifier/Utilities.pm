@@ -187,7 +187,7 @@ sub fix_value (\$) {
 
 # append either some text or a block to a value
 # returns the new start position
-sub append_value (\$$) {
+sub append_value (\$@) {
     my ($value, $item, $pos, $startpos) = @_;
     
     # no start position, so use the current position
