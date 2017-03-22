@@ -31,7 +31,7 @@ sub list_parse {
     # for each content item...
     ITEM: foreach ($block->content_visible_pos) {
         (my $item, $pos) = @$_;
-        $startpos ||= $pos;
+        $startpos ||= { %$pos };
         
         # if blessed, it's a block value, such as an image.
         if (blessed $item) {
