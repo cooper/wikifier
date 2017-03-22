@@ -59,7 +59,7 @@ sub list_parse {
                 # store the value.
                 push @{ $block->{list_array} }, {
                     value => $value,        # value
-                    pos   => { %$pos }      # position
+                    pos   => { %$startpos } # position
                 };
                 push @{ $block->{list_array_values} }, $value;
 
