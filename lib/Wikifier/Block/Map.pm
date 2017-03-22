@@ -70,11 +70,12 @@ sub map_parse {
 
     # for each content item...
     ITEM: foreach ($block->content_visible_pos) {
-        my ($item, $startpos) = @$_;
-        $pos = { %$startpos };
+        (my $item, $pos) = @$_;
+        my $startpos;
         
         # if blessed, it's a block value, such as an image.
         if (blessed $item) {
+            $startpos = $pos;
             if ($in_value) {
                 append_value $value, $item;
             }
@@ -86,6 +87,8 @@ sub map_parse {
             $warn_bad_maybe->();
             next ITEM;
         }
+        
+        $startpos = { %$pos };
 
         # for each character in this string...
         my $escaped; # true if the last was escape character
