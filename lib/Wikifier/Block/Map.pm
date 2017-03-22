@@ -38,6 +38,7 @@ sub map_parse {
         $key,       # key
         $value,     # value
         $pos,       # position
+        $startpos,
         $in_value,  # true if in value (between : and ;)
         $ap_key,    # an object which we tried to append key text to
         $ow_key,    # a key we overwrote with a block
@@ -75,7 +76,7 @@ sub map_parse {
         # if blessed, it's a block value, such as an image.
         if (blessed $item) {
             if ($in_value) {
-                append_value $value, $item;
+                $startpos = append_value $value, $item, $pos, $startpos;
             }
             else {
                 $ow_key = [ $key, $item ]
@@ -174,7 +175,7 @@ sub map_parse {
 
                 # this is part of the value
                 if ($in_value) {
-                    append_value $value, $char;
+                    $startpos = append_value $value, $char, $pos, $startpos;
                 }
 
                 # this must be part of the key

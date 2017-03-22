@@ -186,27 +186,32 @@ sub fix_value (\$) {
 }
 
 # append either some text or a block to a value
+# returns the new start position
 sub append_value (\$$) {
-    my ($value, $item) = @_;
-
+    my ($value, $item, $pos, $startpos) = @_;
+    
+    # no start position, so use the current position
+    $startpos ||= $pos;
+    
     # nothing
-    return if !defined $item;
+    return { %$startpos } if !defined $item;
 
     # first item
     if (ref $$value ne 'ARRAY' || !@$$value) {
         $$value = [ $item ];
-        return;
+        return { %$pos }; # current position becomes start
     }
 
     # if the last element or the append element are refs, push
     my $last = \$$value->[-1];
     if (ref $$last || ref $item) {
         push @$$value, $item;
-        return;
+        return { %$startpos }; # unchanged
     }
 
     # otherwise, append as text
     $$last .= $item;
+    return { %$startpos }; # unchanged
 }
 
 # convert blocks to HTML elements and parse formatted text.
