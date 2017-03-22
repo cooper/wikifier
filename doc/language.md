@@ -28,9 +28,9 @@ Wikifier's source language is designed to be easily legible by the naked eye.
 
 ## Syntax
 
-The wikifier source language is [parsed hierarchically](parsing.md). In other
-words, the source is divided into components (called [blocks](#blocks)) which
-then are responsible for parsing their inner contents. The master parser is
+The wikifier source language is [parsed hierarchically](parsing.md).
+The source is divided into components called [blocks](#blocks), each of which
+is responsible for parsing its inner contents. The master parser is
 concerned only with the most basic syntax:
 * Dividing the source into [blocks](#blocks)
 * Stripping [comments](#comments)
@@ -41,11 +41,11 @@ Further parsing is provided by:
 * [Text formatter](#text-formatting)
 * [Map](blocks.md#map) base block type
 * [List](blocks.md#list) base block type
-* Block types may implement custom parsing
+* Additional block types may implement custom parsing
 
 ### Comments
 
-Currently only C-style block comments are supported:
+C-style block comments are supported:
 ```
 /* Some text */
 ```
