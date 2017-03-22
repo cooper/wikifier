@@ -38,7 +38,7 @@ sub map_parse {
         $key,       # key
         $value,     # value
         $pos,       # position
-        $startpos,
+        $startpos,  #
         $in_value,  # true if in value (between : and ;)
         $ap_key,    # an object which we tried to append key text to
         $ow_key,    # a key we overwrote with a block
@@ -72,11 +72,12 @@ sub map_parse {
     # for each content item...
     ITEM: foreach ($block->content_visible_pos) {
         (my $item, $pos) = @$_;
+        $startpos ||= $pos;
 
         # if blessed, it's a block value, such as an image.
         if (blessed $item) {
             if ($in_value) {
-                $startpos = append_value $value, $item, $pos, $startpos;
+                append_value $value, $item, $pos, $startpos;
             }
             else {
                 $ow_key = [ $key, $item ]
@@ -105,7 +106,7 @@ sub map_parse {
 
             # a semicolon indicates the termination of a pair.
             elsif ($char eq ';' && !$escaped) {
-
+                
                 # if there's no key, it is something like:
                 #   : value;
                 my $key_title;
@@ -158,7 +159,7 @@ sub map_parse {
                     value       => $value,         # value, text or block
                     key         => $key,           # actual hash key
                     is_block    => $is_block,      # true if value was a block
-                    pos         => { %$pos }       # position
+                    pos         => { %$startpos }  # position
                 };
 
                 # warn bad keys and values
@@ -175,7 +176,7 @@ sub map_parse {
 
                 # this is part of the value
                 if ($in_value) {
-                    $startpos = append_value $value, $char, $pos, $startpos;
+                    append_value $value, $char, $pos, $startpos;
                 }
 
                 # this must be part of the key

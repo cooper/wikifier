@@ -31,10 +31,11 @@ sub list_parse {
     # for each content item...
     ITEM: foreach ($block->content_visible_pos) {
         (my $item, $pos) = @$_;
+        $startpos ||= $pos;
         
         # if blessed, it's a block value, such as an image.
         if (blessed $item) {
-            $startpos = append_value $value, $item, $pos, $startpos;
+            append_value $value, $item, $pos, $startpos;
             next ITEM;
         }
 
@@ -51,14 +52,14 @@ sub list_parse {
 
             # a semicolon indicates the termination of a pair.
             elsif ($char eq ';' && !$escaped) {
-
+                
                 # fix the value.
                 fix_value $value;
 
                 # store the value.
                 push @{ $block->{list_array} }, {
                     value => $value,        # value
-                    pos   => $startpos      # position
+                    pos   => { %$pos }      # position
                 };
                 push @{ $block->{list_array_values} }, $value;
 
@@ -68,7 +69,7 @@ sub list_parse {
 
             # any other character
             else {
-                $startpos = append_value $value, $char, $pos, $startpos;
+                append_value $value, $char, $pos, $startpos;
                 $escaped = 0;
             }
 
