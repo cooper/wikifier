@@ -150,6 +150,9 @@ sub parse {
     my $type_ref = $block->{type_ref};
     return if $block->{did_parse}++;
 
+    # split up text nodes by line
+    $block->split_text;
+
     # parse this block.
     $block->_parse($type_ref, @_);
 
@@ -384,6 +387,34 @@ sub warning {
     $c->{temp_line} = $pos->{line};
     $c->{temp_col}  = $pos->{col};
     $c->warning($warn);
+}
+
+sub split_text {
+    my $block = shift;
+    my (@content, @position);
+
+    foreach ($block->content_pos) {
+        my ($item, $pos) = @$_;
+        
+        # leave blocks as they are
+        if (blessed $item) {
+            push @content,  $item;
+            push @position, $pos;
+            next;
+        }
+
+        # split up, incrementing line in the position
+        my @lines = split /\n/, $item;
+        my $n = $pos->{line};
+        foreach my $line (@lines) {
+            my $pos = { %$pos, line => $n++ };
+            push @content,  "$line\n";
+            push @position, $pos;
+        }
+    }
+    
+    $block->{content}  = \@content;
+    $block->{position} = \@position;
 }
 
 # remove empty content items.

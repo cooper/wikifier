@@ -24,8 +24,6 @@ our %block_types = (
     }
 );
 
-my $empty_lines = qr/([^\S\n]*\n+[^\S\n]*){2,}/;
-
 # this counts how many sections there are.
 # this is then compared in section_html to see if it's the last section.
 # if it is and page.enable.footer is enabled, the </div> is omitted
@@ -80,43 +78,48 @@ sub section_html {
 
         $el->add($heading);
     }
+    
+    my $create_paragraph = sub {
+        my ($text, $pos) = @_;
+        return if !length trim($text);
+        
+        # create the paragraph.
+        my $item = $page->wikifier->create_block(
+            parent      => $block,
+            type        => 'paragraph',
+            position    => [ { %$pos } ],
+            content     => [ $text ]
+        );
+
+        # adopt it.
+        $el->add($item->html($page));
+    };
 
     # add the contained elements.
-    ITEM: foreach ($block->content_visible_pos) {
-        my ($item, $pos) = @$_;
-
-        # if it's not blessed, it's text.
-        # sections interpret loose text as paragraphs.
-        if (!blessed $item) {
-            my @split = split $empty_lines, $item;
-            TEXT: while (my ($text, $ws) = splice @split, 0, 2) {
-            
-                # only create paragraph if it's not whitespace
-                if (length trim($text)) {
-                    
-                    # create the paragraph.
-                    $item = $page->wikifier->create_block(
-                        parent      => $block,
-                        type        => 'paragraph',
-                        position    => [ { %$pos } ],
-                        content     => [ $text ]
-                    );
-
-                    # adopt it.
-                    $el->add($item->html($page));
-                }
-                
-                # add whitespace newlines and text newlines
-                $pos->{line} += () = $ws =~ /\n/g;
-                $pos->{line} += () = $text =~ /\n/g;
-            }
-            next ITEM;
-        }
+    my ($text, $pos) = '';
+    foreach ($block->content_visible_pos) {
+        (my $item, $pos) = @$_;
 
         # this is blessed, so it's a block.
         # adopt this element.
-        $el->add($item->html($page));
+        if (blessed $item) {
+            $create_paragraph->($text, $pos);
+            $text = '';
+            $el->add($item->html($page));
+            next;
+        }
+
+        # if this is an empty line, start a new paragraph
+        if (!length trim($item)) {
+            $create_paragraph->($text, $pos);
+            $text = '';
+            next;
+        }
+
+        $text .= $item;
     }
+    
+    $create_paragraph->($text, $pos);
 }
 
 sub clear_html {
