@@ -17,7 +17,7 @@ use Wikifier::Utilities qw(
     no_length_undef filter_defined
 );
 
-my $stripper = HTML::Strip->new;
+my $stripper = HTML::Strip->new(emit_spaces => 0);
 
 # default options.
 our %wiki_defaults = (

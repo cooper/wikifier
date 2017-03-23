@@ -11,7 +11,7 @@ use Scalar::Util qw(blessed);
 use JSON::XS ();
 use HTML::Strip;
 
-my $stripper = HTML::Strip->new;
+my $stripper = HTML::Strip->new(emit_spaces => 0);
 my $json = JSON::XS->new->pretty(1);
 
 #############
