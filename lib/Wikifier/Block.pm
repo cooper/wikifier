@@ -404,7 +404,7 @@ sub split_text {
         }
 
         # split up, incrementing line in the position
-        my @lines = split /\n/, $item;
+        my @lines = split /\n/, $item, -1;
         my $n = $pos->{line};
         foreach my $line (@lines) {
             my $pos = { %$pos, line => $n++ };
