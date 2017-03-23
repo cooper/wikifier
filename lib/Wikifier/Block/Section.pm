@@ -80,15 +80,15 @@ sub section_html {
     }
     
     my $create_paragraph = sub {
-        my ($text, $pos) = @_;
-        return if !length trim($text);
+        my ($texts, $positions) = @_;
+        return if !@$texts;
         
         # create the paragraph.
         my $item = $page->wikifier->create_block(
             parent      => $block,
             type        => 'paragraph',
-            position    => [ { %$pos } ],
-            content     => [ $text ]
+            position    => [ @$positions ],
+            content     => [ @$texts ]
         );
 
         # adopt it.
@@ -96,33 +96,33 @@ sub section_html {
     };
 
     # add the contained elements.
-    my ($text, $startpos) = '';
+    my (@texts, @positions);
     foreach ($block->content_visible_pos) {
         my ($item, $pos) = @$_;
 
         # this is blessed, so it's a block.
         # adopt this element.
         if (blessed $item) {
-            $create_paragraph->($text, $pos);
-            $text = '';
-            undef $startpos;
+            $create_paragraph->(\@texts, \@positions);
+            @texts = ();
+            @positions = ();
             $el->add($item->html($page));
             next;
         }
 
         # if this is an empty line, start a new paragraph
         if (!length trim($item)) {
-            $create_paragraph->($text, $pos);
-            $text = '';
-            undef $startpos;
+            $create_paragraph->(\@texts, \@positions);
+            @texts = ();
+            @positions = ();
             next;
         }
 
-        $startpos ||= $pos;
-        $text .= $item;
+        push @texts, $item;
+        push @positions, $pos;
     }
     
-    $create_paragraph->($text, $startpos);
+    $create_paragraph->(\@texts, \@positions);
 }
 
 sub clear_html {
