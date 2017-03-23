@@ -510,8 +510,7 @@ sub redirect {
     # @page.redirect
     if (my $link = $page->get('page.redirect')) {
         my ($ok, $target) = $page->wikifier->parse_link($page, $link);
-        return undef if !$ok;
-        return $target;
+        return $target if $ok;
     }
 
     return undef;
@@ -554,6 +553,7 @@ sub page_info {
         mod_unix    => $page->modified,
         created     => $page->created,
         draft       => $page->draft,
+        redirect    => $page->redirect,
         fmt_title   => $page->fmt_title,
         title       => $page->title,
         author      => $page->author

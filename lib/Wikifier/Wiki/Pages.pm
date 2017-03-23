@@ -57,18 +57,24 @@ sub page_named {
 #
 #   for type 'redirect':
 #
-#       file            basename of the page we're redirecting to, with the
-#                       extension
+#       redirect        a relative or absolute URL to which the page should
+#                       redirect, suitable for use in a Location header
 #
-#       name            basename of the page we're redirecting to, without the
-#                       extension. this is usually used for the Location header
+#       file            basename of the page, with the extension. this is not
+#                       reliable for redirects, as it may be either the name of
+#                       this page itself or that of the redirect page
 #
-#       path            absolute file path of the page we're redirecting to
+#       name            basename of the page, without the extension. like 'file'
+#                       this is not well-defined for redirects
 #
-#       mime            'text/plain' (appropriate for Content-Type header)
+#       path            absolute file path of the page. like 'file' this is not
+#                       well-defined for redirects
 #
-#       content         a human-readable fallback message, displayed if the
-#                       frontend does not properly handle type 'redirect'
+#       mime            'text/html' (appropriate for Content-Type header)
+#
+#       content         a link to the redirect target, which normally will not
+#                       be displayed, but may if the frontend does not support
+#                       the 'redirect' type
 #
 #   for type 'page':
 #
@@ -162,17 +168,7 @@ sub _display_page {
     $result->{file} = $page->name;      # with extension
     $result->{name} = $page->name(1);   # without extension
     $result->{path} = $path;            # absolute path
-        
-    # redirect
-    my $redir = $page->redirect;
-    if (!$opts{no_redir} && $redir) {
-        $result->{type}     = 'redirect';
-        $result->{mime}     = 'text/plain';
-        $result->{content}  = "Redirect to '$$result{name}'";
-        $result->{redirect} = $redir;
-        return $result;
-    }
-
+    
     # page content
     $result->{type} = 'page';
     $result->{mime} = 'text/html';
@@ -199,12 +195,22 @@ sub _display_page {
     # update categories
     $wiki->cat_check_page($page);
 
-    # if this is a draft, pretend it doesn't exist.
+    # if this is a draft, so pretend it doesn't exist
     if ($page->draft && !$opts{draft_ok}) {
         return display_error(
             "Page has not yet been published.",
             draft => 1
         );
+    }
+
+    # redirect
+    my $redir = $page->redirect;
+    if (!$opts{no_redir} && $redir) {
+        $result->{type}     = 'redirect';
+        $result->{mime}     = 'text/html';
+        $result->{content}  = qq{<a href="$redir">Permanently moved</a>};
+        $result->{redirect} = $redir;
+        return $result;
     }
 
     # generate the HTML and headers.
@@ -254,13 +260,21 @@ sub get_page_cache {
         @$result{ keys %$jdata } = values %$jdata;
     }
 
-    # if this is a draft, pretend it doesn't exist.
+    # if this is a draft, so pretend it doesn't exist.
     if ($result->{draft} && !$opts->{draft_ok}) {
         return display_error(
             "Page has not yet been published.",
             draft  => 1,
             cached => 1
         );
+    }
+
+    # this is a redirect
+    if ($result->{redirect}) {
+        $result->{type}     = 'redirect';
+        $result->{content}  = qq{<a href="$redir">Permanently moved</a>};
+        $result->{redirect} = $redir;
+        return $result;
     }
 
     $result->{cached}   = 1;
