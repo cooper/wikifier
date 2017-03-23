@@ -312,6 +312,7 @@ sub generate_image {
     if ($wiki->opt('image.enable.cache')) {
 
         open my $fh, '>', $cache_file;
+        binmode $fh, ':raw';
         print {$fh} $result->{content};
         close $fh;
 

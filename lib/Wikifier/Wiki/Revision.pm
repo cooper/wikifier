@@ -20,6 +20,7 @@ sub write_page {
 
     # write the file
     open my $fh, '>', $page->path or return;
+    binmode $fh, ':utf8';
     print {$fh} $page->{content} if !ref $page->{content};
     close $fh;
 

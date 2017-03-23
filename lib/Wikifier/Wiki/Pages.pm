@@ -296,6 +296,7 @@ sub get_page_cache {
 sub write_page_cache {
     my ($wiki, $page, $result, $page_info) = @_;
     open my $fh, '>', $page->cache_path;
+    binmode $fh, ':utf8';
 
     # save prefixing data.
     print {$fh} $json->encode({
@@ -330,6 +331,7 @@ sub write_page_cache {
 sub write_page_text {
     my ($wiki, $page, $result) = @_;
     open my $fh, '>', $page->search_path;
+    binmode $fh, ':utf8';
     print {$fh} $stripper->parse($result->{content});
     close $fh;
     $result->{text_gen} = 1;
