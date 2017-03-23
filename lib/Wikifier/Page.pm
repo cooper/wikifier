@@ -546,6 +546,16 @@ sub cache_modified {
     return (stat $page->cache_path)[9];
 }
 
+# absolute path to search text file
+sub search_path {
+    my $page = shift;
+    return abs_path($page->{search_path})
+        if length $page->{search_path};
+    return $page->{abs_search_path} //= abs_path(
+        $page->wiki_opt('dir.cache').'/'.$page->name.'.txt'
+    );
+}
+
 # page info to be used in results, stored in cats/cache files
 sub page_info {
     my $page = shift;

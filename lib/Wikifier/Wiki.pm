@@ -34,7 +34,8 @@ our %wiki_defaults = (
     'image.rounding'                => 'up',
     'image.size_method'             => 'server',
     'image.sizer'                   => \&_wiki_default_sizer,   # from Images
-    'image.calc'                    => \&_wiki_default_calc     # from Images
+    'image.calc'                    => \&_wiki_default_calc ,   # from Images
+    'search.enable'                 => 1
 );
 
 # create a new wiki object.

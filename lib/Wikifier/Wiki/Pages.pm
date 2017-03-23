@@ -11,6 +11,7 @@ use Scalar::Util qw(blessed);
 use JSON::XS ();
 use HTML::Strip;
 
+my $stripper = HTML::Strip->new;
 my $json = JSON::XS->new->pretty(1);
 
 #############
@@ -99,6 +100,9 @@ sub page_named {
 #       cache_gen       true if the content generated in order to fulfill this
 #                       request was written to a cache file for later use. this
 #                       can only be true if 'generated' is true
+#
+#       text_gen        true if this request resulted in the generation of a
+#                       text file based on the contents of this page
 #
 #       draft           true if the page has not yet been published for public
 #                       viewing. this only ever occurs if the 'draft_ok' option
@@ -231,6 +235,10 @@ sub _display_page {
     $result = $wiki->write_page_cache($page, $result, $page_info)
         if $wiki->opt('page.enable.cache');
 
+    # search is enabled, so generate a text file
+    $result = $wiki->write_page_text($page, $result)
+        if $wiki->opt('search.enable');
+
     return $result;
 }
 
@@ -315,6 +323,16 @@ sub write_page_cache {
     $result->{modified}  = time2str($result->{mod_unix});
     $result->{cache_gen} = 1;
 
+    return $result;
+}
+
+# write page text for search
+sub write_page_text {
+    my ($wiki, $page, $result) = @_;
+    open my $fh, '>', $page->search_path;
+    print {$fh} $stripper->parse($result->{content});
+    close $fh;
+    $result->{text_gen} = 1;
     return $result;
 }
 
