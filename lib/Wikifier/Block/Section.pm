@@ -96,15 +96,16 @@ sub section_html {
     };
 
     # add the contained elements.
-    my ($text, $pos) = '';
+    my ($text, $startpos) = '';
     foreach ($block->content_visible_pos) {
-        (my $item, $pos) = @$_;
+        my ($item, $pos) = @$_;
 
         # this is blessed, so it's a block.
         # adopt this element.
         if (blessed $item) {
             $create_paragraph->($text, $pos);
             $text = '';
+            undef $startpos;
             $el->add($item->html($page));
             next;
         }
@@ -113,13 +114,15 @@ sub section_html {
         if (!length trim($item)) {
             $create_paragraph->($text, $pos);
             $text = '';
+            undef $startpos;
             next;
         }
 
+        $startpos ||= $pos;
         $text .= $item;
     }
     
-    $create_paragraph->($text, $pos);
+    $create_paragraph->($text, $startpos);
 }
 
 sub clear_html {
