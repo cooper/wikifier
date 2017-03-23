@@ -391,6 +391,9 @@ at the very top of a page source file.
   used by frontends to organize pages by author.
 * `@page.draft` - [Boolean](#assignment) value which marks the page as a draft.
   This means that it will not be served to unauthenticated users.
+* `@page.redirect` - Page redirect target. All [link types](#links) are
+  supported, including pages, categories, external wiki links, and external
+  site links.
 * `@page.enable` - Contains [boolean](#assignment) attributes which allow you to
   enable or disable certain features specific to the page.
     * `@page.enable.title` - Whether to display the page title (from
