@@ -497,10 +497,24 @@ sub rel_path {
     return $page->wiki_opt('dir.page').'/'.$page->rel_name;
 }
 
-# true if the page is a symbolic link
+# location to which this page redirects, if any, undef otherwise.
+# this may be a relative or absolute URL, suitable for use in a Location header.
 sub redirect {
     my $page = shift;
-    return -l $page->rel_path;
+    
+    # symbolic link redirect
+    if (-l $page->rel_path) {
+        return $page->wiki_opt('root.page').'/'.$page->name(1);
+    }
+    
+    # @page.redirect
+    if (my $link = $page->get('page.redirect')) {
+        my ($ok, $target) = $page->wikifier->parse_link($page, $link);
+        return undef if !$ok;
+        return $target;
+    }
+
+    return undef;
 }
 
 # page creation time from @page.created

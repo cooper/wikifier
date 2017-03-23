@@ -266,7 +266,7 @@ my %static_formats = (
     '/v'    => '</sub>',
     '/'     => '</span>',
     'nl'    => '<br />',                                        # line break
-    'br'    => '<br />',
+    'br'    => '<br />',                                        # (deprecated)
     '--'    => '&ndash;',                                       # en dash
     '---'   => '&mdash;'                                        # em dash
 );

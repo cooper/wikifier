@@ -164,10 +164,12 @@ sub _display_page {
     $result->{path} = $path;            # absolute path
         
     # redirect
-    if (!$opts{no_redir} && $page->redirect) {
-        $result->{type}    = 'redirect';
-        $result->{mime}    = 'text/plain';
-        $result->{content} = "Redirect to '$$result{name}'";
+    my $redir = $page->redirect;
+    if (!$opts{no_redir} && $redir) {
+        $result->{type}     = 'redirect';
+        $result->{mime}     = 'text/plain';
+        $result->{content}  = "Redirect to '$$result{name}'";
+        $result->{redirect} = $redir;
         return $result;
     }
 

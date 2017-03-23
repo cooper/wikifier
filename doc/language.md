@@ -422,7 +422,7 @@ formatting tokens.
 * `[i]italicized text[/i]` - *italicized text*
 * `superscript[^]text[/^]` - superscript<sup>text</sup>
 * `subscript[v]text[/v]` - subscript<sub>text</sub>
-* `[Aquamarine]some colored text by color name[/]`
+* `[aquamarine]some colored text by color name[/]`
 * `[#ff1337]some colored text by hex code[/]`
 
 ### Variables
