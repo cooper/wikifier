@@ -188,9 +188,6 @@ sub map_parse {
                 }
             }
 
-            # increment line position maybe
-            $pos->{line}++ if $char eq "\n";
-
         } # end of character loop.
     } # end of item loop.
 

@@ -72,10 +72,6 @@ sub list_parse {
                 append_value $value, $char, $pos, $startpos;
                 $escaped = 0;
             }
-
-            # increment line position maybe
-            $pos->{line}++ if $char eq "\n";
-
         }   # end of character loop.
     }       # end of item loop.
 

@@ -22,19 +22,17 @@ our %block_types = (
 sub paragraph_html {
     my ($block, $page, $el) = @_;
     $el->configure(type => 'p');
-    TEXT: foreach ($block->content_text_pos) {
-        my ($item, $pos) = @$_;
-        LINE: foreach my $line (split "\n", $item) {
+    LINE: foreach ($block->content_text_pos) {
+        my ($line, $pos) = @$_;
 
-            # trim after formatting so that position is accurate
-            $line = trim($page->parse_formatted_text($line, pos => $pos));
+        # trim after formatting so that position is accurate
+        $line = trim($page->parse_formatted_text($line, pos => $pos));
 
-            # skip if no length is left
-            $pos->{line}++;
-            next LINE unless length $line;
+        # skip if no length is left
+        $pos->{line}++;
+        next LINE unless length $line;
 
-            $el->add($line);
-        }
+        $el->add($line);
     }
 }
 

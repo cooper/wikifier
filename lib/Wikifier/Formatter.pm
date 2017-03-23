@@ -193,15 +193,6 @@ sub parse_formatted_text {
         my $last_char = $i == 0 ? '' : $chars[$i - 1];
         my $escaped = $last_char eq '\\';
 
-        # update position
-        if ($char eq "\n") {
-            $pos->{line}++;
-            $pos->{col} = 0;
-        }
-        else {
-            $pos->{col}++;
-        }
-
         # [ marks the beginning of a formatting element.
         if ($char eq '[' && !$escaped) {
             if (!$in_format++) {
