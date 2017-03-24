@@ -6,10 +6,13 @@ use strict;
 use 5.010;
 
 use HTTP::Date qw(time2str);
-use Wikifier::Utilities qw(page_name align L Lindent back);
 use Scalar::Util qw(blessed);
 use JSON::XS ();
 use HTML::Strip;
+use Wikifier::Utilities qw(
+    page_name align L Lindent back
+    no_items_undef no_length_undef filter_defined
+);
 
 my $stripper = HTML::Strip->new(emit_spaces => 0);
 my $json = JSON::XS->new->pretty(1);
@@ -51,9 +54,9 @@ sub page_named {
 #       error           a human-readable error string. sensitive info is never
 #                       included, so this may be shown to users
 #
-#       parse_error     true if the error occurred during parsing
+#       (parse_error)   true if the error occurred during parsing
 #
-#       draft           true if the page cannot be displayed because it has not
+#       (draft)         true if the page cannot be displayed because it has not
 #                       yet been published for public viewing
 #
 #   for type 'redirect':
@@ -89,27 +92,6 @@ sub page_named {
 #
 #       content         the page content (HTML)
 #
-#       css             CSS generated for the page
-#
-#       cached          true if the content being served was read from a cache
-#                       file (opposite of 'generated')
-#
-#       generated       true if the content being served was just generated in
-#                       order to fulfill this request (opposite of 'cached')
-#
-#       cache_gen       true if the content generated in order to fulfill this
-#                       request was written to a cache file for later use. this
-#                       can only be true if 'generated' is true
-#
-#       text_gen        true if this request resulted in the generation of a
-#                       text file based on the contents of this page
-#
-#       draft           true if the page has not yet been published for public
-#                       viewing. this only ever occurs if the 'draft_ok' option
-#                       was used; otherwise result would be of type 'not found'
-#
-#       warnings        an array reference of warnings produced by the parser
-#
 #       mod_unix        UNIX timestamp of when the page was last modified.
 #                       if 'cache_gen' is true, this is the current time.
 #                       if 'cached' is true, this is the modified date of the
@@ -119,25 +101,49 @@ sub page_named {
 #       modified        like 'mod_unix' except in HTTP date format, suitable for
 #                       use in the Last-Modified header
 #
-#       created         UNIX timestamp of when the page was created. this is
-#                       extracted from the special @page.created variable within
-#                       the page source, so it is not always available
+#       (css)           CSS generated for the page from style{} blocks. omitted
+#                       when the page does not include any styling
 #
-#       author          name of the author of the page, as extracted from the
-#                       special @page.author variable. not always available
+#       (cached)        true if the content being served was read from a cache
+#                       file (opposite of 'generated')
 #
-#       categories      array reference of categories the page belongs to. these
-#                       do not include the '.cat' extension. always present,
-#                       even if the page belongs to no categories, in which case
-#                       it is an empty array reference
+#       (generated)     true if the content being served was just generated in
+#                       order to fulfill this request (opposite of 'cached')
 #
-#       fmt_title       the human-readable page title, as extracted from the
+#       (cache_gen)     true if the content generated in order to fulfill this
+#                       request was written to a cache file for later use. this
+#                       can only be true if 'generated' is true
+#
+#       (text_gen)      true if this request resulted in the generation of a
+#                       text file based on the contents of this page
+#
+#       (draft)         true if the page has not yet been published for public
+#                       viewing. this only ever occurs if the 'draft_ok' option
+#                       was used; otherwise result would be of type 'not found'
+#
+#       (warnings)      an array reference of warnings produced by the parser.
+#                       omitted when no warnings were produced
+#
+#       (created)       UNIX timestamp of when the page was created, as
+#                       extracted from the special @page.created variable.
+#                       ommitted when @page.created is not set
+#
+#       (author)        name of the author of the page, as extracted from the
+#                       special @page.author variable. omitted when
+#                       @page.author is not set
+#
+#       (categories)    array reference of categories the page belongs to. these
+#                       do not include the '.cat' extension. omitted when the
+#                       page does not belong to any categories
+#
+#       (fmt_title)     the human-readable page title, as extracted from the
 #                       special @page.title variable, including any possible
-#                       HTML-encoded text formatting. not always available
+#                       HTML-encoded text formatting. omitted when @page.title
+#                       is not set
 #
-#       title           like 'fmt_title' except that all formatting has been
-#                       stripped. suitable for use in the <title> tag. not
-#                       always available
+#       (title)         like 'fmt_title' except that all formatting has been
+#                       stripped. suitable for use in the <title> tag. omitted
+#                       when @page.title is not set
 #
 sub display_page {
     my ($wiki, $page_name) = (shift, shift);
@@ -301,19 +307,19 @@ sub write_page_cache {
     binmode $fh, ':utf8';
 
     # save prefixing data.
-    print {$fh} $json->encode({
+    print {$fh} $json->encode(filter_defined {
 
         # page info
         %$page_info,
 
         # generated CSS
-        css => $result->{css},
+        css => no_length_undef $result->{css},
 
         # categories
-        categories => $page->{categories} || {},
+        categories => no_items_undef $page->{categories},
 
         # warnings
-        warnings => $result->{warnings}
+        warnings => no_items_undef $result->{warnings}
 
     }), "\n";
 

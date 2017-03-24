@@ -128,6 +128,13 @@ sub no_length_undef ($) {
     return $str;
 }
 
+sub no_items_undef ($) {
+    my $collection = shift;
+    return undef if ref $collection eq 'ARRAY' && !@$collection;
+    return undef if ref $collection eq 'HASH'  && !keys %$collection;
+    return $collection;
+}
+
 sub filter_defined ($) {
     my $hash = shift;
     ref $hash eq 'HASH' or return {};
