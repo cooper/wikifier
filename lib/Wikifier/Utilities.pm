@@ -147,7 +147,7 @@ sub filter_defined ($) {
     return \%new;
 }
 
-sub filter_nonempty {
+sub filter_defined ($) {
     my $hash = shift;
     ref $hash eq 'HASH' or return {};
     my %new;

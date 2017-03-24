@@ -9,10 +9,7 @@ use HTTP::Date qw(time2str);
 use Scalar::Util qw(blessed);
 use JSON::XS ();
 use HTML::Strip;
-use Wikifier::Utilities qw(
-    page_name align L Lindent back
-    no_items_undef no_length_undef filter_nonempty
-);
+use Wikifier::Utilities qw(page_name align L Lindent back filter_nonempty);
 
 my $stripper = HTML::Strip->new(emit_spaces => 0);
 my $json = JSON::XS->new->pretty(1);
@@ -313,13 +310,13 @@ sub write_page_cache {
         %$page_info,
 
         # generated CSS
-        css => no_length_undef $result->{css},
+        css => $result->{css},
 
         # categories
-        categories => no_items_undef $page->{categories},
+        categories => $page->{categories},
 
         # warnings
-        warnings => no_items_undef $result->{warnings}
+        warnings => $result->{warnings}
 
     }), "\n";
 
