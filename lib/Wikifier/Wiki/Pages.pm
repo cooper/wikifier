@@ -11,7 +11,7 @@ use JSON::XS ();
 use HTML::Strip;
 use Wikifier::Utilities qw(
     page_name align L Lindent back
-    no_items_undef no_length_undef filter_defined
+    no_items_undef no_length_undef filter_nonempty
 );
 
 my $stripper = HTML::Strip->new(emit_spaces => 0);
@@ -307,7 +307,7 @@ sub write_page_cache {
     binmode $fh, ':utf8';
 
     # save prefixing data.
-    print {$fh} $json->encode(filter_defined {
+    print {$fh} $json->encode(filter_nonempty {
 
         # page info
         %$page_info,

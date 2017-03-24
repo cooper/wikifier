@@ -14,7 +14,7 @@ use Cwd qw(abs_path);
 use HTML::Strip;
 use Wikifier::Utilities qw(
     L align page_name page_name_ne trim
-    no_length_undef filter_defined
+    no_length_undef filter_nonempty
 );
 
 my $stripper = HTML::Strip->new(emit_spaces => 0);
@@ -559,7 +559,7 @@ sub search_path {
 # page info to be used in results, stored in cats/cache files
 sub page_info {
     my $page = shift;
-    return filter_defined {
+    return filter_nonempty {
         mod_unix    => $page->modified,
         created     => $page->created,
         draft       => $page->draft,
