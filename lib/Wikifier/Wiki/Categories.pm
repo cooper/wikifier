@@ -190,6 +190,7 @@ sub cat_add_page {
         }
 
         # print the resulting JSON.
+        binmode $fh, ':utf8';
         print {$fh} $json->encode($cat);
         close $fh;
 
@@ -204,6 +205,7 @@ sub cat_add_page {
     }
 
     # the category does not yet exist.
+    binmode $fh, ':utf8';
     print {$fh} $json->encode({
         category   => cat_name_ne($cat_name),
         file       => $cat_name,
@@ -324,6 +326,7 @@ sub cat_get_pages {
             return;
         }
 
+        binmode $fh, ':utf8';
         print {$fh} $json->encode($cat);
         close $fh;
     }

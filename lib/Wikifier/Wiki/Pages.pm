@@ -234,6 +234,7 @@ sub _display_page {
     # caching is enabled, so let's save this for later.
     $result = $wiki->write_page_cache($page, $result, $page_info)
         if $wiki->opt('page.enable.cache');
+    return $result if $result->{error};
 
     # search is enabled, so generate a text file
     $result = $wiki->write_page_text($page, $result)
@@ -295,7 +296,8 @@ sub get_page_cache {
 # write page to cache
 sub write_page_cache {
     my ($wiki, $page, $result, $page_info) = @_;
-    open my $fh, '>', $page->cache_path;
+    open my $fh, '>', $page->cache_path
+        or return display_error('Could not write page cache file');
     binmode $fh, ':utf8';
 
     # save prefixing data.
@@ -330,7 +332,8 @@ sub write_page_cache {
 # write page text for search
 sub write_page_text {
     my ($wiki, $page, $result) = @_;
-    open my $fh, '>', $page->search_path;
+    open my $fh, '>', $page->search_path
+        or return display_error('Could not write page text file');
     binmode $fh, ':utf8';
     print {$fh} $stripper->parse($result->{content});
     close $fh;

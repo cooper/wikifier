@@ -310,8 +310,9 @@ sub generate_image {
     # caching is enabled, so let's save this for later.
     my $cache_file = $result->{cache_path};
     if ($wiki->opt('image.enable.cache')) {
-
-        open my $fh, '>', $cache_file;
+        
+        open my $fh, '>', $cache_file
+            or return display_error('Could not write image cache file');
         binmode $fh, ':raw';
         print {$fh} $result->{content};
         close $fh;
