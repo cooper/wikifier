@@ -13,7 +13,7 @@ use Wikifier::Utilities qw(
     keys_maybe hash_maybe L
 );
 
-my $json = JSON::XS->new->pretty(1);
+my $json = JSON::XS->new->pretty;
 
 ##################
 ### CATEGORIES ###

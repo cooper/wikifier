@@ -6,7 +6,7 @@ use strict;
 use 5.010;
 
 use JSON::XS ();
-use Wikifier::Utilities qw(L);
+use Wikifier::Utilities qw(L filter_defined);
 use Scalar::Util qw(weaken);
 
 my $json = JSON::XS->new->allow_blessed;
@@ -21,7 +21,7 @@ sub new {
 # write a line of JSON-encoded data.
 sub send {
     my ($conn, @etc) = @_;
-    my $json_text = $json->encode(\@etc);
+    my $json_text = $json->encode([ $command, filter_defined $args ]);
     print "S: $json_text\n" if $ENV{WIKIFIER_DEBUG};
     $conn->{stream}->write("$json_text\n");
 }
