@@ -20,7 +20,7 @@ sub new {
 
 # write a line of JSON-encoded data.
 sub send {
-    my ($conn, @etc) = @_;
+    my ($conn, $command, $args) = @_;
     my $json_text = $json->encode([ $command, filter_defined $args ]);
     print "S: $json_text\n" if $ENV{WIKIFIER_DEBUG};
     $conn->{stream}->write("$json_text\n");
