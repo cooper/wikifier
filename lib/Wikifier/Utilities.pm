@@ -147,6 +147,30 @@ sub filter_defined ($) {
     return \%new;
 }
 
+sub filter_nonempty {
+    my $hash = shift;
+    ref $hash eq 'HASH' or return {};
+    my %new;
+    foreach my $key (keys %$hash) {
+        my $value = $hash->{$key};
+        
+        # not defined
+        next if !defined $value;
+        
+        # empty arrayref
+        next if ref $value eq 'ARRAY' && !@$value;
+        
+        # empty hashref
+        next if ref $value eq 'HASH' && !keys %$value;
+        
+        # empty string
+        next if !ref $value && !length $value;
+        
+        $new{$key} = $value;
+    }
+    return \%new;
+}
+
 # human-readable truncation
 sub truncate_hr {
     my ($string, $max_chars) = @_;
