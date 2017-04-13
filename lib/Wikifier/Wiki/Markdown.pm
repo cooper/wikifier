@@ -122,7 +122,7 @@ sub generate_from_markdown {
             }
             $header_level = $level;
             
-            my $title = $node->get_title;
+            my $title = $node->get_literal;
             $add_line->("section [$title] {", 1);
         }
     }
