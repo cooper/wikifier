@@ -104,8 +104,8 @@ sub generate_from_markdown {
         $indent_change ||= 0;
         $indent += $indent_change if $indent_change < 0;
         foreach my $line (split /(\n)/, $text) {
-            $source .= $text;
-            $source .= ('    ' x $indent) if $text eq "\n";
+            $source .= $line;
+            $source .= ('    ' x $indent) if $line eq "\n";
         }
         $indent += $indent_change if $indent_change > 0;
     };
