@@ -155,15 +155,15 @@ sub gen_wiki {
 
     # markdown files
     foreach my $md_name ($wiki->all_markdowns) {
-        my $md_file   = "$md_dir/$md_name";
-        my $page_file = "$page_dir/$md_name.page";
+        my $md_path   = "$md_dir/$md_name";
+        my $page_path = "$page_dir/$md_name.page";
         
         # determine modification times
-        my $md_modified    = (stat $md_file   )[9];
-        my $page_modified  = (stat $page_file )[9] if $page_file;
+        my $md_modified    = (stat $md_path   )[9];
+        my $page_modified  = (stat $page_path )[9] if $page_path;
         
         # page is newer; skip this markdown
-        if ($page_modified && $cache_modified) {
+        if ($page_modified && $md_modified) {
             next if $page_modified >= $md_modified;
         }
 
@@ -173,12 +173,12 @@ sub gen_wiki {
 
     # pages
     foreach my $page_name ($wiki->all_pages) {
-        my $page_file  = "$page_dir/$page_name";
-        my $cache_file = "$cache_dir/$page_name.cache";
+        my $page_path  = "$page_dir/$page_name";
+        my $cache_path = "$cache_dir/$page_name.cache";
 
         # determine modification times.
-        my $page_modified  = (stat $page_file )[9];
-        my $cache_modified = (stat $cache_file)[9] if $cache_file;
+        my $page_modified  = (stat $page_path )[9];
+        my $cache_modified = (stat $cache_path)[9] if $cache_path;
 
         # cached copy is newer; skip this page.
         if ($page_modified && $cache_modified) {
