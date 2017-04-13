@@ -102,7 +102,7 @@ sub generate_from_markdown {
     my $add_text = sub {
         my ($text, $indent_change) = @_;
         $indent += $indent_change if $indent_change < 0;
-        $source .= ('    ' x $indent) if substr($source, -1) eq "\n";
+        $source .= "\n".('    ' x $indent) if substr($source, -1) eq "\n";
         $source .= $text;
         $indent += $indent_change if $indent_change > 0;
     };
@@ -138,7 +138,17 @@ sub generate_from_markdown {
             
             # closing the header starts the section block
             else {
-                $add_text->("] {", 1);
+                $add_text->("] {\n", 1);
+            }
+        }
+        
+        # paragraph
+        if ($node_type == NODE_PARAGRAPH) {
+            if ($ev_type == EVENT_ENTER) {
+                $add_text->("p {\n", 1);
+            }
+            else {
+                $add_text("}\n", -1);
             }
         }
         
