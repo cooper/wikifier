@@ -156,6 +156,16 @@ sub generate_from_markdown {
         if ($node_type == NODE_TEXT) {
             $add_text->($node->get_literal);
         }
+        
+        # soft line break
+        if ($node_type == NODE_SOFTBREAK) {
+            $add_text->("\n");
+        }
+        
+        # hard line break
+        if ($node_type == NODE_LINEBREAK) {
+            $add_text->("[nl]");
+        }
     }
     
     # close remaining sections
