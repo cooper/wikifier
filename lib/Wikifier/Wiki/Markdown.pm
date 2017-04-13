@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010;
 
-use Wikifier::Utilities qw(Lindent back);
+use Wikifier::Utilities qw(L Lindent back align);
 use Cwd qw(abs_path);
 
 # all markdown files
@@ -19,9 +19,10 @@ sub all_markdowns {
 sub display_markdown {
     my ($wiki, $md_name) = (shift, @_);
     Lindent "($md_name)";
-    my $ret = $wiki->_display_markdown(@_);
+    my $result = $wiki->_display_markdown(@_);
+    L align('Error', $result->{error}) if $result->{error};
     back;
-    return $ret;
+    return $result;
 }
 
 sub _display_markdown {
