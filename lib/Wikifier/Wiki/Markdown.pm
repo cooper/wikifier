@@ -100,14 +100,11 @@ sub generate_from_markdown {
     my $header_level = 0;
     
     my $add_text = sub {
-        my ($text, $indent_change) = @_;
-        $indent_change ||= 0;
-        $indent += $indent_change if $indent_change < 0;
+        my $text = shift;
         foreach my $line (split /(\n)/, $text) {
             $source .= $line;
             $source .= ('    ' x $indent) if $line eq "\n";
         }
-        $indent += $indent_change if $indent_change > 0;
     };
     
     # parse the markdown file
@@ -132,7 +129,7 @@ sub generate_from_markdown {
                 # biggest level.
                 my $level = $node->get_header_level;
                 if ($level <= $header_level) {
-                    $add_text->("}\n", -1) for $level..$header_level;
+                    $indent--, $add_text->("}\n") for $level..$header_level;
                 }
                 $header_level = $level;
                 
@@ -141,17 +138,20 @@ sub generate_from_markdown {
             
             # closing the header starts the section block
             else {
-                $add_text->("] {\n", 1);
+                $add_text->("] {\n");
+                $indent++;
             }
         }
         
         # paragraph
         if ($node_type == NODE_PARAGRAPH) {
             if ($ev_type == EVENT_ENTER) {
-                $add_text->("p {\n", 1);
+                $add_text->("p {\n");
+                $indent++;
             }
             else {
-                $add_text->("}\n", -1);
+                $indent--;
+                $add_text->("}\n");
             }
         }
         
@@ -173,7 +173,7 @@ sub generate_from_markdown {
     
     # close remaining sections
     if ($header_level) {
-        $add_text->("}\n", -1) for 1..$header_level;
+        $indent--, $add_text->("}\n") for 1..$header_level;
     }
     
     return $source;
