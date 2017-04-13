@@ -151,7 +151,7 @@ sub generate_from_markdown {
             }
             else {
                 $indent--;
-                $add_text->("}\n");
+                $add_text->("\n}\n");
             }
         }
         
