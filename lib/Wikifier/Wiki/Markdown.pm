@@ -89,7 +89,16 @@ sub _convert_markdown {
 
 sub generate_from_markdown {
     my ($wiki, $md_text, %opts) = @_;
+    my $source = '';
     my $indent = 0;
+    my $header_level = 0;
+    
+    my $add_line = sub {
+        my ($text, $indent_change) = @_;
+        $indent += $indent_change if $indent_change < 0;
+        $source .= ('    ' x $indent).$text."\n";
+        $indent += $indent_change if $indent_change > 0;
+    };
     
     # parse the markdown file
     my $doc = CommonMark->parse(string => $md_text);
@@ -98,10 +107,37 @@ sub generate_from_markdown {
     my $iter = $doc->iterator;
     while (my ($ev_type, $node) = $iter->next) {
         my $node_type = $node->get_type;
-        print "E $ev_type N $node_type\n";
+        my $node_type_s = $node->get_type_string;
+        print "E $ev_type N $node_type_s\n";
+        
+        # heading
+        if ($node_type == NODE_HEADING) {
+            
+            # if we already have a header of this level open, this terminates it
+            my $level = $node->get_header_level;
+            if ($level == $header_level) {
+                $push_text->('}', -1);
+            }
+            
+            # if we have a header of a lower level (higher number) open, this
+            # terminates it and all others up to the biggest level.
+            if ($level < $header_level) {
+                $push_text->('}', -1) for $level..$header_level;
+            }
+            
+            $header_level = $level;
+            
+            my $title = $node->get_literal;
+            $push_text->("section [$title] {", 1);
+        }
     }
     
-    return '';
+    # close remaining sections
+    if ($header_level) {
+        $push_text->('}', -1) for 0..$header_level;
+    }
+    
+    return $source;
 }
 
 1
