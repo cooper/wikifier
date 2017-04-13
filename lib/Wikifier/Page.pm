@@ -463,17 +463,15 @@ sub _image_round {
     return $size; # fallback.
 }
 
-sub _no_ext {
-    my ($file, $no_ext) = @_;
-    return page_name_ne($file) if $no_ext;
-    return $file;
-}
-
 # page filename, with or without extension.
 # this DOES take symbolic links into account.
 sub name {
-    my ($page, $no_ext) = @_;
-    return _no_ext($page->{abs_name} //= basename($page->path), $no_ext);
+    my $page = shift;
+    return $page->{abs_name} //= basename($page->path);
+}
+sub name_ne {
+    my $page = shift;
+    return page_name_ne($page->name);
 }
 
 # absolute path to page
@@ -485,8 +483,12 @@ sub path {
 # unresolved page filename, with or without extension.
 # this does NOT take symbolic links into account.
 sub rel_name {
-    my ($page, $no_ext) = @_;
-    return _no_ext($page->{name}, $no_ext);
+    my $page = shift;
+    return $page->{name};
+}
+sub rel_name_ne {
+    my $page = shift;
+    return page_name_ne($page->rel_name);
 }
 
 # unresolved path to page
@@ -504,7 +506,7 @@ sub redirect {
     
     # symbolic link redirect
     if (-l $page->rel_path) {
-        return $page->wiki_opt('root.page').'/'.$page->name(1);
+        return $page->wiki_opt('root.page').'/'.$page->name_ne;
     }
     
     # @page.redirect

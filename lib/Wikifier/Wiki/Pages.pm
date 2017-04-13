@@ -173,7 +173,7 @@ sub _display_page {
     
     # filename and path info
     $result->{file} = $page->name;      # with extension
-    $result->{name} = $page->name(1);   # without extension
+    $result->{name} = $page->name_ne;   # without extension
     $result->{path} = $path;            # absolute path
     
     # page content
