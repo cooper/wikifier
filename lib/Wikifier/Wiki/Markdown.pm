@@ -87,6 +87,12 @@ sub _convert_markdown {
 # NODE_THEMATIC_BREAK
 # NODE_HTML_INLINE
 
+my %es = (
+    EVENT_ENTER , 'ENTER',
+    EVENT_EXIT  , 'EXIT ',
+    EVENT_DONE  , 'DONE '
+);
+
 sub generate_from_markdown {
     my ($wiki, $md_text, %opts) = @_;
     my $source = '';
@@ -108,7 +114,7 @@ sub generate_from_markdown {
     while (my ($ev_type, $node) = $iter->next) {
         my $node_type = $node->get_type;
         my $node_type_s = $node->get_type_string;
-        print "E $ev_type N $node_type_s\n";
+        print "E $es{$ev_type} N $node_type_s\n";
         
         # heading
         if ($node_type == NODE_HEADING) {
