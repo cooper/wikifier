@@ -101,9 +101,12 @@ sub generate_from_markdown {
     
     my $add_text = sub {
         my ($text, $indent_change) = @_;
+        $indent_change ||= 0;
         $indent += $indent_change if $indent_change < 0;
-        $source .= ('    ' x $indent) if substr($source, -1) eq "\n";
-        $source .= $text;
+        foreach my $line (split /(\n)/, $text) {
+            $source .= $text;
+            $source .= ('    ' x $indent) if $text eq "\n";
+        }
         $indent += $indent_change if $indent_change > 0;
     };
     
