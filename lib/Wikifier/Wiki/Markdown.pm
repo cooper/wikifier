@@ -148,7 +148,7 @@ sub generate_from_markdown {
                 $add_text->("p {\n", 1);
             }
             else {
-                $add_text("}\n", -1);
+                $add_text->("}\n", -1);
             }
         }
         
