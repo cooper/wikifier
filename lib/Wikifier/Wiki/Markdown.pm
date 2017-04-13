@@ -54,3 +54,5 @@ sub display_markdown {
     
     return $result;
 }
+
+1
