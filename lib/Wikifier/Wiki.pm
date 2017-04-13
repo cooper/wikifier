@@ -390,8 +390,8 @@ sub file_contents {
         L "Cannot open file '$file': $!";
         return;
     }
-    binmode $fh, ':raw'  if  $binary;
-    binmode $fh, ':utf8' if !$binary;
+    binmode $fh, ':raw' if  $binary;
+    binmode $fh, ':encoding(utf8)' if !$binary;
     my $content = <$fh>;
     close $fh;
     return $content;

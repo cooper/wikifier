@@ -39,7 +39,7 @@ sub parse {
     if (!open $fh, '<', $file) {
         return "Couldn't open '$file': $!";
     }
-    binmode $fh, ':utf8';
+    binmode $fh, ':encoding(utf8)';
 
     # set initial parse info
     my $main_block = $page->{main_block};
