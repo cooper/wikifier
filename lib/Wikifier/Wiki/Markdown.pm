@@ -113,28 +113,22 @@ sub generate_from_markdown {
         # heading
         if ($node_type == NODE_HEADING) {
             
-            # if we already have a header of this level open, this terminates it
-            my $level = $node->get_header_level;
-            if ($level == $header_level) {
-                $add_line->('}', -1);
-            }
-            
-            # if we have a header of a lower level (higher number) open, this
-            # terminates it and all others up to the biggest level.
-            if ($level < $header_level) {
+            # if we already have a header of this level open, this terminates
+            # it. if we have a header of a lower level (higher number) open,
+            # this terminates it and all others up to the biggest level.
+            if ($level <= $header_level) {
                 $add_line->('}', -1) for $level..$header_level;
             }
-            
             $header_level = $level;
             
-            my $title = $node->get_literal;
+            my $title = $node->get_title;
             $add_line->("section [$title] {", 1);
         }
     }
     
     # close remaining sections
     if ($header_level) {
-        $add_line->('}', -1) for 0..$header_level;
+        $add_line->('}', -1) for 1..$header_level;
     }
     
     return $source;
