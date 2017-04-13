@@ -58,8 +58,7 @@ sub _display_markdown {
     # write to file
     open my $fh, '>', $page_path
         or return display_error('Unable to write page file.');
-    
-    print $fh $html;
+    print $fh "html{{\n$html\n}}\n";
     close $fh;
     
     return $result;
