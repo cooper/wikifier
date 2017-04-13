@@ -99,10 +99,11 @@ sub generate_from_markdown {
     my $indent = 0;
     my $header_level = 0;
     
-    my $add_line = sub {
+    my $add_text = sub {
         my ($text, $indent_change) = @_;
         $indent += $indent_change if $indent_change < 0;
-        $source .= ('    ' x $indent).$text."\n";
+        $source .= ('    ' x $indent) if substr($source, -1) eq "\n";
+        $source .= $text;
         $indent += $indent_change if $indent_change > 0;
     };
     
@@ -119,23 +120,37 @@ sub generate_from_markdown {
         # heading
         if ($node_type == NODE_HEADING) {
             
-            # if we already have a header of this level open, this terminates
-            # it. if we have a header of a lower level (higher number) open,
-            # this terminates it and all others up to the biggest level.
-            my $level = $node->get_header_level;
-            if ($level <= $header_level) {
-                $add_line->('}', -1) for $level..$header_level;
+            # entering the header
+            if ($ev_type == EVENT_ENTER) {
+                
+                # if we already have a header of this level open, this
+                # terminates it. if we have a header of a lower level (higher
+                # number) open, this terminates it and all others up to the
+                # biggest level.
+                my $level = $node->get_header_level;
+                if ($level <= $header_level) {
+                    $add_text->("}\n", -1) for $level..$header_level;
+                }
+                $header_level = $level;
+                
+                $add_text->("section [");
             }
-            $header_level = $level;
             
-            my $title = $node->get_literal;
-            $add_line->("section [$title] {", 1);
+            # closing the header starts the section block
+            else {
+                $add_text->("] {", 1);
+            }
+        }
+        
+        # plain text
+        if ($node_type == NODE_TEXT) {
+            $add_text->($node->get_literal);
         }
     }
     
     # close remaining sections
     if ($header_level) {
-        $add_line->('}', -1) for 1..$header_level;
+        $add_text->("}\n", -1) for 1..$header_level;
     }
     
     return $source;
