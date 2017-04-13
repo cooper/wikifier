@@ -116,6 +116,7 @@ sub generate_from_markdown {
             # if we already have a header of this level open, this terminates
             # it. if we have a header of a lower level (higher number) open,
             # this terminates it and all others up to the biggest level.
+            my $level = $node->get_header_level;
             if ($level <= $header_level) {
                 $add_line->('}', -1) for $level..$header_level;
             }
