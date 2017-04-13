@@ -101,7 +101,7 @@ sub generate_from_markdown {
     
     my $add_text = sub {
         my $text = shift;
-        foreach my $line (split /(\n)/, $text) {
+        foreach my $line (split /(\n)/, $text, -1) {
             $source .= $line;
             $source .= ('    ' x $indent) if $line eq "\n";
         }
@@ -138,16 +138,16 @@ sub generate_from_markdown {
             
             # closing the header starts the section block
             else {
-                $add_text->("] {\n");
                 $indent++;
+                $add_text->("] {\n");
             }
         }
         
         # paragraph
         if ($node_type == NODE_PARAGRAPH) {
             if ($ev_type == EVENT_ENTER) {
-                $add_text->("p {\n");
                 $indent++;
+                $add_text->("p {\n");
             }
             else {
                 $indent--;
