@@ -26,7 +26,7 @@ sub display_markdown {
 
 sub _display_markdown {
     my ($wiki, $md_name, %opts) = @_;
-    my $md_path   = abs_path($wiki->opt('dir.page')."/$md_name");
+    my $md_path   = abs_path($wiki->opt('dir.md')."/$md_name");
     my $page_path = $wiki->path_for_page($md_name);
     
     # no such markdown file
