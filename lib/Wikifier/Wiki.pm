@@ -21,6 +21,7 @@ use Wikifier::Wiki::Images;
 use Wikifier::Wiki::Models;
 use Wikifier::Wiki::Revision;
 use Wikifier::Wiki::Categories;
+use Wikifier::Wiki::Markdown;
 use Wikifier::Utilities qw(L);
 
 # default options.

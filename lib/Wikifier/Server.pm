@@ -140,6 +140,7 @@ sub gen_wiki {
     my $wiki = shift;
     my $page_dir  = $wiki->opt('dir.page');
     my $cache_dir = $wiki->opt('dir.cache');
+    my $md_dir    = $wiki->opt('dir.md');
 
     # create a file monitor.
     if (!$files{ $wiki->{name} }) {
@@ -151,6 +152,24 @@ sub gen_wiki {
     }
 
     Lindent "[$$wiki{name}]";
+
+    # markdown files
+    foreach my $md_name ($wiki->all_markdowns) {
+        my $md_file   = "$md_dir/$md_name";
+        my $page_file = "$page_dir/$md_name.page";
+        
+        # determine modification times
+        my $md_modified    = (stat $md_file   )[9];
+        my $page_modified  = (stat $page_file )[9] if $page_file;
+        
+        # page is newer; skip this markdown
+        if ($page_modified && $cache_modified) {
+            next if $page_modified >= $md_modified;
+        }
+
+        # markdown page has not been generated, or .md file has changed
+        $wiki->display_markdown($md_name);
+    }
 
     # pages
     foreach my $page_name ($wiki->all_pages) {
