@@ -101,9 +101,10 @@ sub generate_from_markdown {
     
     my $add_text = sub {
         my ($text, $indent_change) = @_;
+        $indent_change ||= 0;
         $indent += $indent_change if $indent_change < 0;
-        $source .= "\n".('    ' x $indent) if substr($source, -1) eq "\n";
         $source .= $text;
+        $source .= ('    ' x $indent) if substr($text, -1) eq "\n";
         $indent += $indent_change if $indent_change > 0;
     };
     
@@ -133,7 +134,7 @@ sub generate_from_markdown {
                 }
                 $header_level = $level;
                 
-                $add_text->("section [");
+                $add_text->("sec [");
             }
             
             # closing the header starts the section block
