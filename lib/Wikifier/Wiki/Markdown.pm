@@ -5,6 +5,7 @@ use warnings;
 use strict;
 use 5.010;
 
+use Wikifier::Utilities qw(Lindent back);
 use Cwd qw(abs_path);
 
 # all markdown files
@@ -16,6 +17,14 @@ sub all_markdowns {
 }
 
 sub display_markdown {
+    my ($wiki, $md_name) = (shift, @_);
+    Lindent "($md_name)";
+    my $ret = $wiki->_display_markdown(@_);
+    back;
+    return $ret;
+}
+
+sub _display_markdown {
     my ($wiki, $md_name, %opts) = @_;
     my $md_path   = abs_path($wiki->opt('dir.page')."/$md_name");
     my $page_path = $wiki->path_for_page($md_name);
