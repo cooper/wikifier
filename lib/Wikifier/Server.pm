@@ -168,7 +168,7 @@ sub gen_wiki {
         }
 
         # markdown page has not been generated, or .md file has changed
-        $wiki->display_markdown($md_name);
+        $wiki->convert_markdown($md_name);
     }
 
     # pages
