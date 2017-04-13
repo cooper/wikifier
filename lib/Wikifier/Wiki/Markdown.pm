@@ -45,8 +45,11 @@ sub _convert_markdown {
     $result->{type} = 'markdown';
     $result->{mime} = 'text/plain'; # wikifier language
     
+    # slurp the markdown file
+    my $md_text = file_contents($md_path);
+    
     # generate the wiki source
-    my $source = $wiki->generate_from_markdown($md_path, %opts);
+    my $source = $wiki->generate_from_markdown($md_text, %opts);
     $result->{content} = $source;
     
     # write to file
@@ -85,11 +88,11 @@ sub _convert_markdown {
 # NODE_HTML_INLINE
 
 sub generate_from_markdown {
-    my ($wiki, $md_path, %opts) = @_;
+    my ($wiki, $md_text, %opts) = @_;
     my $indent = 0;
     
     # parse the markdown file
-    my $doc = CommonMark->parse(file => $md_path);
+    my $doc = CommonMark->parse(string => $md_text);
     
     # iterate through nodes
     my $iter = $doc->iterator;
