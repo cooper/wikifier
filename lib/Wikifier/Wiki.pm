@@ -355,6 +355,7 @@ sub unique_files_in_dir {
     my $dh;
     return if !length $dir;
     
+    my %files;
     my $do_dir; $do_dir = sub {
         my ($pfx) = @_;
         my $dir = $dir.$pfx;
@@ -364,7 +365,6 @@ sub unique_files_in_dir {
             L "Cannot open dir '$dir': $!";
             return;
         }
-        my %files;
         while (my $file = readdir $dh) {
             print "FILE: $file\n";
             
