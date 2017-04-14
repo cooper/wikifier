@@ -374,7 +374,7 @@ sub unique_files_in_dir {
             next if substr($file, 0, 1) eq '.';
 
             # this is a directory
-            if (-d $file) {
+            if (-d $path) {
                 $do_dir->("$pfx$file/");
                 next;
             }
