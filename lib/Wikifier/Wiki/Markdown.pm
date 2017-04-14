@@ -117,7 +117,7 @@ sub generate_from_markdown {
                 
                 # e.g. going from # to ###
                 if ($header_level && $level > $header_level + 1) {
-                    $add_text->("sec {\n") for $level .. $header_level + 1;
+                    $add_text->("sec {\n") for ($header_level + 1)..$level;
                 }
                 
                 $header_level = $level;
