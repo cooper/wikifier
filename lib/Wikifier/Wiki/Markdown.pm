@@ -219,7 +219,7 @@ sub generate_from_markdown {
             my $code = $node->get_literal;
             my $old_indent = $indent;
             $indent = 0;
-            $add_text->("code{{\n$code\n}}\n");
+            $add_text->("code{{\n$code}}\n");
             $indent = $old_indent;
         }
         
