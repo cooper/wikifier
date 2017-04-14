@@ -468,24 +468,33 @@ sub __page_link {
     my $page_name_hr = $target;
     ($target, $section) = map page_name_link($_), $target, $section;
 
-    # make sure the page exists
+    $$target_ref  = '';
     my $errors;
     if (length $target) {
+        
+        # create page paths, respecting the page prefix
         my $safe_name = $typ eq 'category' ?
             cat_name($target) : page_name($target);
-        if (!-e $page->wiki_opt("dir.$typ")."/$safe_name") {
+        my $page_path = join '/', grep length,
+            $page->wiki_opt("dir.$typ"), $page->prefix, $safe_name;
+        my $page_target = join '/', grep length,
+            $page->wiki_opt("root.$typ"), $page->prefix, $target;
+        
+        # make sure the page exists
+        if (!-e $page_path) {
             $page->warning(
                 $opts{startpos},
                 "Page target '$page_name_hr' does not exist"
             ) unless $opts{no_warnings};
             $errors++;
         }
+        
+        # add the target
+        $$target_ref .= $page_target;
     }
 
-    # create link
-    $$target_ref  = '';
-    $$target_ref .= $page->wiki_opt("root.$typ")."/$target" if length $target;
-    $$target_ref .= "#$section"                             if length $section;
+    # add the section
+    $$target_ref .= "#$section" if length $section;
 
     return !$errors;
 }

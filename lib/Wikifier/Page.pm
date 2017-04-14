@@ -9,7 +9,7 @@ use warnings;
 use strict;
 use 5.010;
 use Scalar::Util qw(blessed looks_like_number);
-use File::Basename qw(basename);
+use File::Basename qw(basename fileparse);
 use Cwd qw(abs_path);
 use HTML::Strip;
 use Wikifier::Utilities qw(
@@ -483,6 +483,15 @@ sub name {
 sub name_ne {
     my $page = shift;
     return page_name_ne($page->name);
+}
+
+# if the page name is a/b.page, this is a.
+# if it is just a.page, this is undef.
+sub prefix {
+    my $page = shift;
+    my (undef, $prefix) = fileparse($page->name);
+    return undef if $prefix eq '.' || $prefix eq './';
+    return $prefix;
 }
 
 # absolute path to page
