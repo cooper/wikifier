@@ -366,12 +366,12 @@ sub unique_files_in_dir {
             return;
         }
         while (my $file = readdir $dh) {
-            print "FILE: $file\n";
-            my $path = "$dir/$pfx$file";
-            print "PATH: $path\n";
+            my $path = $dir.$file;
             
             # skip hidden files.
             next if substr($file, 0, 1) eq '.';
+            print "FILE: $file\n";
+            print "PATH: $path\n";
 
             # this is a directory
             if (-d $path) {
