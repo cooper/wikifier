@@ -142,10 +142,11 @@ sub gen_wiki {
     my $cache_dir = $wiki->opt('dir.cache');
     my $md_dir    = $wiki->opt('dir.md');
 
-    # create a file monitor.
-    if (!$files{ $wiki->{name} }) {
-        my $file = $files{ $wiki->{name} } = IO::Async::File->new(
-            filename => $page_dir,
+    # create file monitors
+    foreach my $path ($page_dir, $md_dir) {
+        next if $files{ $wiki->{name} }{$path};
+        my $file = $files{ $wiki->{name} }{$path} = IO::Async::File->new(
+            filename => $path,
             on_mtime_changed => sub { gen_wiki($wiki) }
         );
         $loop->add($file);
