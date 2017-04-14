@@ -113,6 +113,7 @@ sub generate {
         if ($$pfx eq '!') {
             $$pfx = '';
             $classes .= "$class ";
+            next;
         }
         $classes .= "wiki-$class ";
     }

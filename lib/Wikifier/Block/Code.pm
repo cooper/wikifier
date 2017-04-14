@@ -13,10 +13,10 @@ our %block_types = (code => {
 
 sub code_html {
     my ($block, $page, $el) = @_;
-    my @classes;
+    my @classes = 'code';
     if (length(my $lang = $block->name)) {
         push @classes, '!prettyprint';
-        push @classes, "lang-$lang";
+        push @classes, "!lang-$lang";
     }
     $el->configure(
         type      => 'pre',
