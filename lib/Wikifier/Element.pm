@@ -139,9 +139,9 @@ sub generate {
     foreach my $child (@{ $el->{content} }) {
         $content  = '' if not defined $content;
         if (not blessed $child) {
-            my $str   = $child;
-            $str     .= "\n" unless $el->{no_indent};
-            $content .= indent_str($str, $times, $prefix);
+            my $str = indent_str($child, $times, $prefix);
+            chomp $str if $el->{no_indent};
+            $content .= $str;
             next;
         }
         $content .= indent_str($child->generate, $times, $prefix);
