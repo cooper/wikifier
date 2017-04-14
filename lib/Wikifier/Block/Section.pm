@@ -48,9 +48,10 @@ sub section_html {
     my $class    = $is_intro ? 'section-page-title' : 'section-title';
 
     # determine the heading level.
-    my $l = $is_intro ? 1 : $block->{header_level};
-       $l = 6 if ($block->{header_level} || 0) > 6;
-
+    my $l = $is_intro ? 1 : $block->{header_level} || 1;
+    $l = 6 if $l > 6;
+    $block->{header_level} = $l;
+    
     # disable the footer if necessary.
     # this only works if the section is the last item in the main block.
     # FIXME: this needs to be somewhere other than here, since pages might
