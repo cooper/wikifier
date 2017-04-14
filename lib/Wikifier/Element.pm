@@ -139,7 +139,9 @@ sub generate {
     foreach my $child (@{ $el->{content} }) {
         $content  = '' if not defined $content;
         if (not blessed $child) {
-            $content .= indent_str("$child\n", $times, $prefix);
+            my $str   = $child;
+            $str     .= "\n" unless $el->{no_indent};
+            $content .= indent_str($str, $times, $prefix);
             next;
         }
         $content .= indent_str($child->generate, $times, $prefix);
@@ -151,8 +153,7 @@ sub generate {
         $html .= $el->{container} ? "</$$el{type}>" : ' />';
     }
     
-    $html .= "\n" unless $el->{no_indent};
-    return $el->{generated} = $html;
+    return $el->{generated} = "$html\n";
 }
 
 sub classes { @{ shift->{classes} || [] } }
