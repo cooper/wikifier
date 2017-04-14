@@ -28,12 +28,8 @@ sub indent_str {
     $prefix //= '';
     my $space = '    ' x $times;
     my $final_string = '';
-    foreach my $line (split /(\n)/, $string, -1) {
-        if ($line eq "\n") {
-            $final_string .= "\n";
-            next;
-        }
-        $final_string .= $prefix.$space.$line;
+    foreach my $line (split "\n", $string) {
+        $final_string .= "$prefix$space$line\n";
     }
     return $final_string;
 }
