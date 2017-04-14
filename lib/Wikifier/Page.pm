@@ -96,6 +96,7 @@ sub html {
     
     # remove indentations on things marked for no indentation
     $res =~ s/(\n)(\s*)\t\t\t/\n/g;
+    $res =~ s/(\n)(\s*)\t/$1$2    /g;
     
     return $res;
 }
