@@ -13,10 +13,15 @@ our %block_types = (code => {
 
 sub code_html {
     my ($block, $page, $el) = @_;
+    my @classes;
+    if (length(my $lang = $block->name)) {
+        push @classes, '!prettyprint';
+        push @classes, "lang-$lang";
+    }
     $el->configure(
         type      => 'pre',
         no_indent => 1,
-        classes   => [ '!prettyprint' ],
+        classes   => \@classes,
         content   => [ @{ $block->{content} } ] # copy
     );
 }
