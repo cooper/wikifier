@@ -129,7 +129,7 @@ sub generate_from_markdown {
                 # biggest level.
                 my $level = $node->get_header_level;
                 if ($level <= $header_level) {
-                    $indent--, $add_text->("}\n") for $level..$header_level;
+                    $indent--, $add_text->("\n}\n") for $level..$header_level;
                 }
                 $header_level = $level;
                 
@@ -173,7 +173,7 @@ sub generate_from_markdown {
     
     # close remaining sections
     if ($header_level) {
-        $indent--, $add_text->("}\n") for 1..$header_level;
+        $indent--, $add_text->("\n}\n") for 1..$header_level;
     }
     
     return $source;
