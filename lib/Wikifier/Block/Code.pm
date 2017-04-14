@@ -16,6 +16,7 @@ sub code_html {
     $el->configure(
         type      => 'pre',
         no_indent => 1,
+        classes   => [ '!prettyprint' ],
         content   => [ @{ $block->{content} } ] # copy
     );
 }

@@ -109,6 +109,11 @@ sub generate {
     my $classes = '';
     push @{ $el->{classes} }, $el->{id} if $el->{need_id};
     foreach my $class (@{ $el->{classes} }) {
+        my $pfx = \substr($class, 0, 1);
+        if ($$pfx eq '!') {
+            $$pfx = '';
+            $classes .= "$class ";
+        }
         $classes .= "wiki-$class ";
     }
     chop $classes;
