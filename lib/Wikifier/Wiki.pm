@@ -358,7 +358,7 @@ sub unique_files_in_dir {
     my %files;
     my $do_dir; $do_dir = sub {
         my ($pfx) = @_;
-        my $dir = $dir.$pfx;
+        my $dir = "$dir/$pfx";
         print "PFX: $pfx\n";
         print "DIR: $dir\n";
         if (!opendir $dh, $dir) {
