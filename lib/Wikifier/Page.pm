@@ -473,7 +473,11 @@ sub _image_round {
 # this DOES take symbolic links into account.
 sub name {
     my $page = shift;
-    return $page->{abs_name} //= basename($page->path);
+    return $page->{abs_name} //= do {
+        my $dir = $page->wiki_opt('dir.page');
+        (my $name = $page->path) =~ s/^\Q$dir\E//;
+        index($name, $dir) ? basename($page->path) : $name;
+    };
 }
 sub name_ne {
     my $page = shift;

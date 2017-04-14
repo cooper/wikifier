@@ -387,10 +387,7 @@ sub unique_files_in_dir {
             next if !$file; # couldn't resolve symlink.
             $file = basename($file);
 
-            # already got this one.
-            next if $files{$file};
-
-            $files{$pfx.$file} = 1;
+            $files{$pfx.$file}++;
         }
         closedir $dh;
     };

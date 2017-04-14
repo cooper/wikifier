@@ -22,7 +22,7 @@ my $json = JSON::XS->new->pretty(1);
 sub page_named {
     my ($wiki, $page_name, %opts) = @_;
     my $page = Wikifier::Page->new(
-        name     => page_name($page_name),
+        name     => $page_name,
         wiki     => $wiki,
         wikifier => $wiki->{wikifier},
         %opts
