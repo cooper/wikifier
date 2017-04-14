@@ -255,6 +255,8 @@ my %static_formats = (
     'i'     => '<span style="font-style: italic;">',            # italic
     'b'     => '<span style="font-weight: bold;">',             # bold
     's'     => '<span style="text-decoration: line-through;">', # strike
+    'c'     => '<code>',                                        # inline code
+    '/c'    => '</code>',
     '/s'    => '</span>',
     '/b'    => '</span>',
     '/i'    => '</span>',

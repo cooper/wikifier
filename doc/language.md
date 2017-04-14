@@ -423,6 +423,7 @@ formatting tokens.
 * `[b]bold text[/b]` - **bold text**
 * `[s]strikethrough text[/s]` - ~~strikethrough text~~
 * `[i]italicized text[/i]` - *italicized text*
+* `[c]inline code[/c]` - `inline code`
 * `superscript[^]text[/^]` - superscript<sup>text</sup>
 * `subscript[v]text[/v]` - subscript<sub>text</sub>
 * `[aquamarine]some colored text by color name[/]`
