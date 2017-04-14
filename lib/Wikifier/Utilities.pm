@@ -11,6 +11,7 @@ use 5.010;
 
 use Scalar::Util qw(blessed);
 use File::Basename qw(fileparse);
+use File::Path qw(make_path);
 
 sub import {
     my $package = caller;

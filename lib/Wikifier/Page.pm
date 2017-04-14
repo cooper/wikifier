@@ -10,7 +10,6 @@ use strict;
 use 5.010;
 use Scalar::Util qw(blessed looks_like_number);
 use File::Basename qw(basename);
-use File::Path qw(make_path);
 use Cwd qw(abs_path);
 use HTML::Strip;
 use Wikifier::Utilities qw(
