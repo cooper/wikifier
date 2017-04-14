@@ -194,11 +194,11 @@ sub generate_from_markdown {
         # NODE_LINK
         elsif ($node_type == NODE_LINK) {
             if ($ev_type == EVENT_ENTER) {
-                $add_text->('[')
+                $add_text->('[[ ')
             }
             else {
                 my $url = $node->get_url;
-                $add_text->("]($url)");
+                $add_text->("| $url ]]");
             }
         }
         
