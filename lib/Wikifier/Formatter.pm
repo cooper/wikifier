@@ -174,7 +174,8 @@ our %colors = (
 #
 sub parse_formatted_text {
     my ($wikifier, $page, $text, %opts) = @_;
-
+    return '' if !length $text;
+    
     # find and copy the position
     my $pos = $opts{pos} || $page->pos;
     $pos = $opts{pos} = { %$pos };
