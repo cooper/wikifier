@@ -18,6 +18,10 @@ sub import {
     *{$package.'::'.$_} = \&{__PACKAGE__.'::'.$_} foreach @_[1..$#_];
 }
 
+sub L(@);
+sub Lindent(@);
+sub Lback($);
+
 #################
 ### UTILITIES ###
 #################
