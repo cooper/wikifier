@@ -129,8 +129,10 @@ sub generate {
         my $value = encode_entities($val);
         $html    .= " $attr=\"$value\"";
     }
-    $html .= ">\n" if $el->{container};
 
+    $html .= ">"  if $el->{container};
+    $html .= "\n" if $el->{container} && !$el->{no_indent};
+    
     # add the inner content.
     my $content;
     my $times  = $el->{no_indent} ? 0 : 1;

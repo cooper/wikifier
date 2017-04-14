@@ -24,12 +24,16 @@ sub import {
 # Increase indention level by $times indents.
 sub indent_str {
     my ($string, $times, $prefix) = @_;
-    $times  ||= 1;
-    $prefix ||= '';
+    $times  //= 1;
+    $prefix //= '';
     my $space = '    ' x $times;
     my $final_string = '';
-    foreach my $line (split "\n", $string) {
-        $final_string .= "$prefix$space$line\n";
+    foreach my $line (split /(\n)/, $string, -1) {
+        if ($line eq "\n") {
+            $final_string .= "\n";
+            next;
+        }
+        $final_string .= $prefix.$space.$line;
     }
     return $final_string;
 }
