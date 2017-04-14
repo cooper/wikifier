@@ -151,7 +151,8 @@ sub generate {
         $html .= $el->{container} ? "</$$el{type}>" : ' />';
     }
     
-    return $el->{generated} = "$html\n";
+    $html .= "\n" unless $el->{no_indent};
+    return $el->{generated} = $html;
 }
 
 sub classes { @{ shift->{classes} || [] } }
