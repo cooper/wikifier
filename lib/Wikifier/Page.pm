@@ -476,7 +476,7 @@ sub name {
     return $page->{abs_name} //= do {
         my $dir  = $page->wiki_opt('dir.page');
         my $path = $page->path;
-        (my $name = $path) =~ s/^\Q$dir\E//;
+        (my $name = $path) =~ s/^\Q$dir\E(\/?)//;
         index($path, $dir) ? basename($page->path) : $name;
     };
 }
