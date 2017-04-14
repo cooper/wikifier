@@ -223,6 +223,18 @@ sub generate_from_markdown {
             $indent = $old_indent;
         }
         
+        # NODE_HTML_INLINE
+        elsif ($node_type == NODE_HTML_INLINE) {
+            my $html = $node->get_literal;
+            $add_text->("html{{$html}}");
+        }
+        
+        # NODE_HTML_BLOCK
+        elsif ($node_type == NODE_HTML_BLOCK) {
+            my $html = $node->get_literal;
+            $add_text->("html{{\n$html}}\n");
+        }
+        
         # do nothing
         elsif ($node_type == NODE_DOCUMENT) {
             
@@ -234,18 +246,8 @@ sub generate_from_markdown {
         }
         
         # TODO:
-        # NODE_NONE
-        # NODE_DOCUMENT
         # NODE_BLOCK_QUOTE
-        # NODE_HTML
-        # NODE_HEADER
-        # NODE_HRULE
-        # NODE_INLINE_HTML
-        # NODE_CUSTOM_BLOCK
-        # NODE_CUSTOM_INLINE
-        # NODE_HTML_BLOCK
         # NODE_THEMATIC_BREAK
-        # NODE_HTML_INLINE
     }
     
     # close remaining sections
