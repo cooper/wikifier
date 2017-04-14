@@ -210,7 +210,8 @@ sub generate_from_markdown {
         
         # NODE_CODE_BLOCK
         elsif ($node_type == NODE_CODE_BLOCK) {
-            # TODO
+            my $code = $node->get_literal;
+            $add_text->("code{{\n$code\n}}\n");
         }
         
         else {
