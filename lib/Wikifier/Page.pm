@@ -474,9 +474,10 @@ sub _image_round {
 sub name {
     my $page = shift;
     return $page->{abs_name} //= do {
-        my $dir = $page->wiki_opt('dir.page');
-        (my $name = $page->path) =~ s/^\Q$dir\E//;
-        index($name, $dir) ? basename($page->path) : $name;
+        my $dir  = $page->wiki_opt('dir.page');
+        my $path = $page->path;
+        (my $name = $path) =~ s/^\Q$dir\E//;
+        index($path, $dir) ? basename($page->path) : $name;
     };
 }
 sub name_ne {
