@@ -14,8 +14,9 @@ our %block_types = (code => {
 sub code_html {
     my ($block, $page, $el) = @_;
     $el->configure(
-        type    => 'pre',
-        content => [ @{ $block->{content} } ] # copy
+        type      => 'pre',
+        no_indent => 1,
+        content   => [ @{ $block->{content} } ] # copy
     );
 }
 
