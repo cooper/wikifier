@@ -58,7 +58,7 @@ sub page_name_link {
     return undef if !defined $page_name;
     
     # replace non-alphanumerics with _ and lowercase.
-    $page_name =~ s/[^\w\.\-]/_/g;
+    $page_name =~ s/[^\w\.\-\/]/_/g;
     $page_name = lc $page_name unless $no_lc;
 
     return $page_name;
