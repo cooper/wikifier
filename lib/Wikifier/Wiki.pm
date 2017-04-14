@@ -367,6 +367,8 @@ sub unique_files_in_dir {
         }
         while (my $file = readdir $dh) {
             print "FILE: $file\n";
+            my $path = "$dir/$pfx$file";
+            print "PATH: $path\n";
             
             # skip hidden files.
             next if substr($file, 0, 1) eq '.';
@@ -381,7 +383,7 @@ sub unique_files_in_dir {
             next if $ext && $file !~ m/.+\.($ext)$/;
 
             # resolve symlinks.
-            my $file = abs_path("$dir/$file");
+            my $file = abs_path($path);
             next if !$file; # couldn't resolve symlink.
             $file = basename($file);
 
