@@ -47,16 +47,30 @@ p.clear-right {
 
 ## Code
 
-Used to wrap some code. The contents will not be formatted, except that
-curly brackets must be escaped.
+Used to wrap some code. The contents will not be formatted. Using the
+[brace escape](language.md#escaping) is recommended so that you do not have to
+escape curly brackets within the code. Note also that, unlike usually, the
+leading whitespace is significant and will be displayed.
 
 ```
-code {
-    someCode();
-    function someCode() \{
-        return "You have to escape those.";
-    \}
+code {{
+someCode();
+function someCode() {
+    return true;
 }
+}}
+```
+
+The language may be specified as the name of the block. This is used for syntax
+highlighting with Google
+[code-prettify](https://github.com/google/code-prettify). Look there for a list
+of supported languages.
+
+```
+code [perl] {{
+$_ = "wftedskaebjgdpjgidbsmnjgc";
+tr/a-z/oh, turtleneck Phrase Jar!/; print;    
+}}
 ```
 
 ## Format
