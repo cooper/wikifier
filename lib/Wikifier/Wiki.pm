@@ -22,7 +22,7 @@ use Wikifier::Wiki::Models;
 use Wikifier::Wiki::Revision;
 use Wikifier::Wiki::Categories;
 use Wikifier::Wiki::Markdown;
-use Wikifier::Utilities qw(L make_dir);
+use Wikifier::Utilities qw(L Lindent back make_dir);
 
 # default options.
 our %wiki_defaults = (
@@ -68,10 +68,12 @@ sub read_config {
     );
 
     # error.
+    Lindent "($file)";
     if (my $err = $conf->parse) {
         L "Failed to parse configuration: $err";
         return;
     }
+    back;
 
     # global wiki variables
     my %vars_maybe = $conf->get_hash('var');
@@ -86,10 +88,12 @@ sub read_config {
         );
 
         # error.
+        Lindent "($private_file)";
         if (my $err = $pconf->parse) {
             L "Failed to parse private configuration: $err";
             return;
         }
+        back;
     }
 
     # if there's no private conf, assume the main conf also
