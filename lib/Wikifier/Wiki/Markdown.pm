@@ -89,9 +89,6 @@ sub generate_from_markdown {
     my $iter = $doc->iterator;
     while (my ($ev_type, $node) = $iter->next) {
         my $node_type = $node->get_type;
-        my $node_type_s = $node->get_type_string;
-        print "E $es{$ev_type} N $node_type_s\n";
-        
         
         # NODE_TEXT
         # plain text
@@ -216,6 +213,11 @@ sub generate_from_markdown {
             # TODO
         }
         
+        else {
+            my $node_type_s = $node->get_type_string;
+            L "Unknown markdown node $node_type_s ($es{$ev_type})";
+        }
+        
         # TODO:
         # NODE_NONE
         # NODE_DOCUMENT
@@ -249,7 +251,7 @@ sub generate_from_markdown {
         next if ref $v && !$$v;
         next if !length $v;
         $meta_source .= "\@$k";
-        $meta_source .= $v if !ref $v;
+        $meta_source .= ": $v" if !ref $v;
         $meta_source .= ";\n";
     }
     
