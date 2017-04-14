@@ -139,6 +139,7 @@ sub generate {
     foreach my $child (@{ $el->{content} }) {
         $content  = '' if not defined $content;
         if (not blessed $child) {
+            print "CHILD: $child\n";
             $content .= indent_str($child, $times, $prefix);
             next;
         }
