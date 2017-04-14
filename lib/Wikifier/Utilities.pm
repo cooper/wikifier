@@ -273,12 +273,13 @@ sub html_value (\$@) {
 }
 
 # convert value to human-readable form
-sub hr_value (@) {
+sub  hr_value (@) { &_hr_value }
+sub _hr_value {
     my @stuff = map {
         my $thing = ref $_ ? $_ : trim($_);
         my $res   =
             ref $thing eq 'ARRAY'                                   ?
-                join(' ', grep defined, map hr_value($_), @$thing)  :
+                join(' ', grep defined, map _hr_value($_), @$thing)  :
             !length $thing                                          ?
                 undef                                               :
             blessed $thing                                          ?
