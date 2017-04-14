@@ -95,7 +95,7 @@ sub html {
     L('Generate', sub { $res = $res->generate                               });
     
     # remove indentations on things marked for no indentation
-    $res =~ s/(\n)(\s*)\t\t\t(\s*)/\n/g;
+    $res =~ s/(\n)(\s*)\t\t\t/\n/g;
     
     return $res;
 }

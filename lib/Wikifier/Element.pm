@@ -133,14 +133,15 @@ sub generate {
 
     # add the inner content.
     my $content;
+    my $times  = $el->{no_indent} ? 0 : 1;
     my $prefix = $el->{no_indent} ? "\t\t\t" : '';
     foreach my $child (@{ $el->{content} }) {
         $content  = '' if not defined $content;
         if (not blessed $child) {
-            $content .= indent_str("$child\n", 1, $prefix);
+            $content .= indent_str("$child\n", $times, $prefix);
             next;
         }
-        $content .= indent_str($child->generate, 1, $prefix);
+        $content .= indent_str($child->generate, $times, $prefix);
     }
     $html .= $content if defined $content;
 
