@@ -9,13 +9,13 @@ use warnings;
 use strict;
 use 5.010;
 use Scalar::Util qw(blessed looks_like_number);
-use File::Basename qw(basename fileparse);
+use File::Basename qw(basename);
 use File::Path qw(make_path);
 use Cwd qw(abs_path);
 use HTML::Strip;
 use Wikifier::Utilities qw(
     L align page_name page_name_ne trim
-    no_length_undef filter_nonempty
+    no_length_undef filter_nonempty make_dir
 );
 
 my $stripper = HTML::Strip->new(emit_spaces => 0);
@@ -549,7 +549,7 @@ sub cache_path {
     my $page = shift;
     return abs_path($page->{cache_path})
         if length $page->{cache_path};
-    _make($page, $page->wiki_opt('dir.cache'));
+    make_dir($page->wiki_opt('dir.cache'), $page->name);
     return $page->{abs_cache_path} //= abs_path(
         $page->wiki_opt('dir.cache').'/'.$page->name.'.cache'
     );
@@ -566,7 +566,7 @@ sub search_path {
     my $page = shift;
     return abs_path($page->{search_path})
         if length $page->{search_path};
-    _make($page, $page->wiki_opt('dir.cache'));
+    make_dir($page->wiki_opt('dir.cache'), $page->name);
     return $page->{abs_search_path} //= abs_path(
         $page->wiki_opt('dir.cache').'/'.$page->name.'.txt'
     );
@@ -615,15 +615,6 @@ sub title {
 sub title_or_name {
     my $page = shift;
     return $page->title // $page->name;
-}
-
-# make a path if necessary
-sub _make {
-    my ($page, $dir) = @_;
-    my (undef, $prefix) = fileparse($page->name);
-    return if $prefix eq '.' || $prefix eq './';
-    make_path("$dir/$prefix", { error => \my $err });
-    L "mkdir $dir/$prefix: @$err" if @$err;
 }
 
 # get position

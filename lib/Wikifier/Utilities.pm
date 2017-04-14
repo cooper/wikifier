@@ -10,6 +10,7 @@ use strict;
 use 5.010;
 
 use Scalar::Util qw(blessed);
+use File::Basename qw(fileparse);
 
 sub import {
     my $package = caller;
@@ -98,6 +99,15 @@ sub cat_name_ne {
     my $cat_name = cat_name(shift);
     $cat_name =~ s/\.cat$//;
     return $cat_name;
+}
+
+# make a path if necessary
+sub make_dir {
+    my ($dir, $name) = @_;
+    my (undef, $prefix) = fileparse($name);
+    return if $prefix eq '.' || $prefix eq './';
+    make_path("$dir/$prefix", { error => \my $err });
+    L "mkdir $dir/$prefix: @$err" if @$err;
 }
 
 # removes leading and trailing whitespace from a string.
