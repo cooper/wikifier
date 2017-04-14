@@ -352,7 +352,6 @@ sub path_for_model {
 sub unique_files_in_dir {
     my ($dir, @ext) = @_;
     my $ext = join '|', @ext;
-    my $dh;
     return if !length $dir;
     
     my %files;
@@ -361,6 +360,7 @@ sub unique_files_in_dir {
         my $dir = "$dir/$pfx";
         print "PFX: $pfx\n";
         print "DIR: $dir\n";
+        my $dh;
         if (!opendir $dh, $dir) {
             L "Cannot open dir '$dir': $!";
             return;
