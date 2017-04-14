@@ -193,9 +193,13 @@ sub generate_from_markdown {
         
         # NODE_LINK
         elsif ($node_type == NODE_LINK) {
-            my $content = $node->get_literal;
-            my $url = $node->get_url;
-            $add_text->("[$content]($url)");
+            if ($ev_type == EVENT_ENTER) {
+                $add_text->('[')
+            }
+            else {
+                my $url = $node->get_url;
+                $add_text("]($url)");
+            }
         }
         
         # NODE_IMAGE
