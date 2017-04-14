@@ -201,15 +201,24 @@ sub generate_from_markdown {
             # TODO
         }
         
+        # NODE_CODE
+        elsif ($node_type == NODE_CODE) {
+            # FIXME
+            $add_text->('html{{<code>'.$node->get_literal.'</code>}}');
+        }
+        
+        # NODE_CODE_BLOCK
+        elsif ($node_type == NODE_CODE_BLOCK) {
+            # TODO
+        }
+        
         # TODO:
         # NODE_NONE
         # NODE_DOCUMENT
         # NODE_BLOCK_QUOTE
-        # NODE_CODE_BLOCK
         # NODE_HTML
         # NODE_HEADER
         # NODE_HRULE
-        # NODE_CODE
         # NODE_INLINE_HTML
         # NODE_CUSTOM_BLOCK
         # NODE_CUSTOM_INLINE
