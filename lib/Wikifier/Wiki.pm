@@ -358,21 +358,21 @@ sub unique_files_in_dir {
     my $do_dir; $do_dir = sub {
         my ($pfx) = @_;
         my $dir = "$dir/$pfx";
-        print "PFX: $pfx\n";
-        print "DIR: $dir\n";
+        
+        # can't open
         my $dh;
         if (!opendir $dh, $dir) {
             L "Cannot open dir '$dir': $!";
             return;
         }
+        
+        # read each filename
         while (my $file = readdir $dh) {
             my $path = $dir.$file;
             
             # skip hidden files.
             next if substr($file, 0, 1) eq '.';
-            print "FILE: $file\n";
-            print "PATH: $path\n";
-
+            
             # this is a directory
             if (-d $path) {
                 $do_dir->("$pfx$file/");
@@ -393,7 +393,6 @@ sub unique_files_in_dir {
     };
     
     $do_dir->('');
-    print "RETURN: ", join(' ', keys %files), "\n";
     return keys %files;
 }
 
