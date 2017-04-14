@@ -23,7 +23,7 @@ sub import {
 
 # Increase indention level by $times indents.
 sub indent_str {
-    my ($string, $tims, $prefix) = @_;
+    my ($string, $times, $prefix) = @_;
     $times  ||= 1;
     $prefix ||= '';
     my $space = '    ' x $times;
