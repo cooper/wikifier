@@ -15,6 +15,7 @@ p.wiki-paragraph {
 
 /* sections */
 
+h1.wiki-section-title,
 h1.wiki-section-page-title {
     margin: 0 0 15px 0;
     clear: left;
