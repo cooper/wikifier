@@ -252,7 +252,7 @@ sub generate_from_markdown {
     
     # close remaining sections
     if ($header_level) {
-        $indent--, $add_text->("\n}\n") for 1..$header_level;
+        $indent--, $add_text->("\n}\n") for 2..$header_level;
     }
     
     # page metadata
