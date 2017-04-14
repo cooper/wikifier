@@ -211,7 +211,10 @@ sub generate_from_markdown {
         # NODE_CODE_BLOCK
         elsif ($node_type == NODE_CODE_BLOCK) {
             my $code = $node->get_literal;
+            my $old_indent = $indent;
+            $indent = 0;
             $add_text->("code{{\n$code\n}}\n");
+            $indent = $old_indent;
         }
         
         else {
