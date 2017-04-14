@@ -193,7 +193,9 @@ sub generate_from_markdown {
         
         # NODE_LINK
         elsif ($node_type == NODE_LINK) {
-            # TODO
+            my $content = $node->get_literal;
+            my $url = $node->get_url;
+            $add_text->("[$content]($url)");
         }
         
         # NODE_IMAGE
@@ -217,9 +219,14 @@ sub generate_from_markdown {
             $indent = $old_indent;
         }
         
+        # do nothing
+        elsif ($node_type == NODE_DOCUMENT) {
+            
+        }
+        
         else {
             my $node_type_s = $node->get_type_string;
-            L "Unknown markdown node $node_type_s ($es{$ev_type})";
+            L "Unknown markdown node '$node_type_s' ($es{$ev_type})";
         }
         
         # TODO:
