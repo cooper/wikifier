@@ -130,8 +130,7 @@ sub generate {
         $html    .= " $attr=\"$value\"";
     }
 
-    $html .= ">"  if $el->{container};
-    $html .= "\n" if $el->{container} && !$el->{no_indent};
+    $html .= ">\n" if $el->{container};
     
     # add the inner content.
     my $content;
