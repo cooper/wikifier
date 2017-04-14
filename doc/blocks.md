@@ -82,7 +82,7 @@ used with [models](#model).
 format {
     <div>
         This is some HTML.
-        b]wikifier formatting[/b] is allowed.
+        [b]wikifier formatting[/b] is allowed.
     </div>
 }
 ```
@@ -164,7 +164,7 @@ wikifier variable attribute syntax.
 };
 
 /* display the infobox */
-@person {}
+{@person}
 
 /* access attributes from it elsewhere
    btw this works for all map-based block types */
