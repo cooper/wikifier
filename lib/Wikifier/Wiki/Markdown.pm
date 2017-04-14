@@ -242,7 +242,7 @@ sub generate_from_markdown {
         
         else {
             my $node_type_s = $node->get_type_string;
-            L "Unknown markdown node '$node_type_s' ($es{$ev_type})";
+            L "Unknown Markdown node '$node_type_s' ($es{$ev_type})";
         }
         
         # TODO:
@@ -252,7 +252,8 @@ sub generate_from_markdown {
     
     # close remaining sections
     if ($header_level) {
-        $indent--, $add_text->("\n}\n") for 2..$header_level;
+        $header_level--;
+        $indent--, $add_text->("\n}\n") for 1..$header_level;
     }
     
     # page metadata
