@@ -400,9 +400,6 @@ at the very top of a page source file.
       `@page.title`) as the header of the first `section{}` block. Overrides the
       wiki configuration option
       [page.enable.title](configuration.md#pageenabletitle).
-    * `@page.enable.footer` - Whether to omit the closing `<div>` tags such that
-      a page footer can be injected. Overrides the wiki configuration option
-      [page.enable.footer](configuration.md#pageenablefooter).
 
 `@category` is used to mark the page as belonging to a category. Each
 attribute of it is a boolean. If present, the page belongs to that category.
