@@ -226,6 +226,7 @@ sub cat_get_pages {
     my ($wiki, $cat_name, $cat_type) = @_;
     $cat_name = cat_name($cat_name);
     my $cat_name_ne = cat_name_ne($cat_name);
+    
     # this should read a file for pages of a category.
     # it should then check if the 'asof' time is older than the modification
     # date of the page file in question. if it is, it should check the page
