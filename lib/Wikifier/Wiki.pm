@@ -142,7 +142,7 @@ sub check_directories {
         # create it
         L "Creating \@dir.$dir ($path)";
         my $err;
-        next if make_path($path, { err => \$err });
+        next if make_path($path, { error => \$err });
 
         L "... Failed: @$err"
     }
