@@ -394,6 +394,7 @@ sub unique_files_in_dir {
     };
     
     $do_dir->('');
+    print "RETURN: ", join(' ', keys %files), "\n";
     return keys %files;
 }
 
