@@ -96,7 +96,7 @@ sub generate_from_markdown {
         # plain text
         if ($node_type == NODE_TEXT) {
             my $text = $node->get_literal;
-            # FIXME: escape square brackets
+            $text =~ s/([\{\}\[\]])/\\$1/g;
             $page_title = $text if !length $page_title && $header_level;
             $add_text->($text);
         }
@@ -216,7 +216,6 @@ sub generate_from_markdown {
         
         # NODE_CODE
         elsif ($node_type == NODE_CODE) {
-            # FIXME
             my $code = $node->get_literal;
             $add_text->("[c]$code\[/c]");
         }
