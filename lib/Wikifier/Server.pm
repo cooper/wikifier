@@ -144,6 +144,7 @@ sub gen_wiki {
 
     # create file monitors
     foreach my $path ($page_dir, $md_dir) {
+        next if !length $path;
         next if $files{ $wiki->{name} }{$path};
         my $file = $files{ $wiki->{name} }{$path} = IO::Async::File->new(
             filename => $path,
