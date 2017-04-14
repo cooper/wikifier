@@ -61,32 +61,6 @@ sub _convert_markdown {
     return $result;
 }
 
-# NODE_NONE
-# NODE_DOCUMENT
-# NODE_BLOCK_QUOTE
-# NODE_LIST
-# NODE_ITEM
-# NODE_CODE_BLOCK
-# NODE_HTML
-# NODE_PARAGRAPH
-# NODE_HEADER
-# NODE_HRULE
-# NODE_TEXT
-# NODE_SOFTBREAK
-# NODE_LINEBREAK
-# NODE_CODE
-# NODE_INLINE_HTML
-# NODE_EMPH
-# NODE_STRONG
-# NODE_LINK
-# NODE_IMAGE
-# NODE_CUSTOM_BLOCK
-# NODE_CUSTOM_INLINE
-# NODE_HTML_BLOCK
-# NODE_HEADING
-# NODE_THEMATIC_BREAK
-# NODE_HTML_INLINE
-
 my %es = (
     EVENT_ENTER , 'ENTER',
     EVENT_EXIT  , 'EXIT ',
@@ -117,8 +91,17 @@ sub generate_from_markdown {
         my $node_type_s = $node->get_type_string;
         print "E $es{$ev_type} N $node_type_s\n";
         
+        
+        # NODE_TEXT
+        # plain text
+        if ($node_type == NODE_TEXT) {
+            # FIXME: escape square brackets
+            $add_text->($node->get_literal);
+        }
+        
+        # NODE_HEADING
         # heading
-        if ($node_type == NODE_HEADING) {
+        elsif ($node_type == NODE_HEADING) {
             
             # entering the header
             if ($ev_type == EVENT_ENTER) {
@@ -143,8 +126,9 @@ sub generate_from_markdown {
             }
         }
         
+        # NODE_PARAGRAPH
         # paragraph
-        if ($node_type == NODE_PARAGRAPH) {
+        elsif ($node_type == NODE_PARAGRAPH) {
             if ($ev_type == EVENT_ENTER) {
                 $indent++;
                 $add_text->("p {\n");
@@ -155,20 +139,83 @@ sub generate_from_markdown {
             }
         }
         
-        # plain text
-        if ($node_type == NODE_TEXT) {
-            $add_text->($node->get_literal);
-        }
-        
+        # NODE_SOFTBREAK
         # soft line break
-        if ($node_type == NODE_SOFTBREAK) {
+        elsif ($node_type == NODE_SOFTBREAK) {
             $add_text->("\n");
         }
         
+        # NODE_LINEBREAK
         # hard line break
-        if ($node_type == NODE_LINEBREAK) {
+        elsif ($node_type == NODE_LINEBREAK) {
             $add_text->("[nl]");
         }
+        
+        # NODE_LIST
+        elsif ($node_type == NODE_LIST) {
+            if ($ev_type == EVENT_ENTER) {
+                # TODO: respect list type $node->get_list_type
+                $indent++;
+                $add_text->("list {\n");
+            }
+            else {
+                $indent--;
+                $add_text->("\n}\n");
+            }
+        }
+        
+        # NODE_ITEM
+        elsif ($node_type == NODE_ITEM) {
+            if ($ev_type == EVENT_EXIT) {
+                $add_text->(";\n");
+            }
+        }
+    
+        # NODE_EMPH
+        elsif ($node_type == NODE_EMPH) {
+            if ($ev_type == EVENT_ENTER) {
+                $add_text->('[i]');
+            }
+            else {
+                $add_text->('[/i]');
+            }
+        }
+        
+        # NODE_STRONG
+        elsif ($node_type == NODE_STRONG) {
+            if ($ev_type == EVENT_ENTER) {
+                $add_text->('[b]');
+            }
+            else {
+                $add_text->('[/b]');
+            }
+        }
+        
+        # NODE_LINK
+        elsif ($node_type == NODE_LINK) {
+            # TODO
+        }
+        
+        # NODE_IMAGE
+        elsif ($node_type == NODE_IMAGE) {
+            # TODO
+        }
+        
+        # TODO:
+        # NODE_NONE
+        # NODE_DOCUMENT
+        # NODE_BLOCK_QUOTE
+        # NODE_CODE_BLOCK
+        # NODE_HTML
+        # NODE_HEADER
+        # NODE_HRULE
+        # NODE_CODE
+        # NODE_INLINE_HTML
+        # NODE_CUSTOM_BLOCK
+        # NODE_CUSTOM_INLINE
+        # NODE_HTML_BLOCK
+        # NODE_THEMATIC_BREAK
+        # NODE_HTML_INLINE
     }
     
     # close remaining sections
