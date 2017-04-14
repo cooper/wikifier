@@ -205,7 +205,7 @@ sub generate_from_markdown {
         elsif ($node_type == NODE_CODE) {
             # FIXME
             my $code = $node->get_literal;
-            $add_text->("[c]$code[/c]");
+            $add_text->("[c]$code\[/c]");
         }
         
         # NODE_CODE_BLOCK
