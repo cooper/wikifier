@@ -45,6 +45,7 @@ table.wiki-infobox {
     margin: 0.5em 0 0.5em 1em;
     float: right;
     clear: right;
+    color: #000;
     background-color: #f7f7f7;
     border: 1px solid #ccc;
     font-size: 0.88em;
@@ -224,6 +225,7 @@ td.wiki-history-value {
 /* code */
 
 pre.wiki-code {
+    color: #000;
     background-color: #f8f8f8;
     border: 1px solid #ccc;
     font-size: 13px;
