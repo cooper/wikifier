@@ -139,14 +139,15 @@ sub generate {
     foreach my $child (@{ $el->{content} }) {
         $content  = '' if not defined $content;
         if (not blessed $child) {
-            my $str = indent_str($child, $times, $prefix);
-            chomp $str if $el->{no_indent};
-            $content .= $str;
+            $content .= indent_str($child, $times, $prefix);
             next;
         }
         $content .= indent_str($child->generate, $times, $prefix);
     }
-    $html .= $content if defined $content;
+    if (defined $content) {
+        chomp $content if $el->{no_indent};
+        $html .= $content;
+    }
 
     # close it off.
     unless ($el->{no_close_tag}) {
