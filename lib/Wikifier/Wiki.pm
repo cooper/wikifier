@@ -354,30 +354,46 @@ sub unique_files_in_dir {
     my $ext = join '|', @ext;
     my $dh;
     return if !length $dir;
-    if (!opendir $dh, $dir) {
-        L "Cannot open dir '$dir': $!";
-        return;
-    }
-    my %files;
-    while (my $file = readdir $dh) {
+    
+    my $do_dir; $do_dir = sub {
+        my ($pfx) = @_;
+        my $dir = $dir.$pfx;
+        print "PFX: $pfx\n";
+        print "DIR: $dir\n";
+        if (!opendir $dh, $dir) {
+            L "Cannot open dir '$dir': $!";
+            return;
+        }
+        my %files;
+        while (my $file = readdir $dh) {
+            print "FILE: $file\n";
+            
+            # skip hidden files.
+            next if substr($file, 0, 1) eq '.';
 
-        # skip hidden files.
-        next if substr($file, 0, 1) eq '.';
+            # this is a directory
+            if (-d $file) {
+                $do_dir->("$pfx$file/");
+                next;
+            }
 
-        # skip files without desired extension.
-        next if $ext && $file !~ m/.+\.($ext)$/;
+            # skip files without desired extension.
+            next if $ext && $file !~ m/.+\.($ext)$/;
 
-        # resolve symlinks.
-        my $file = abs_path("$dir/$file");
-        next if !$file; # couldn't resolve symlink.
-        $file = basename($file);
+            # resolve symlinks.
+            my $file = abs_path("$dir/$file");
+            next if !$file; # couldn't resolve symlink.
+            $file = basename($file);
 
-        # already got this one.
-        next if $files{$file};
+            # already got this one.
+            next if $files{$file};
 
-        $files{$file} = 1;
-    }
-    closedir $dh;
+            $files{$pfx.$file} = 1;
+        }
+        closedir $dh;
+    };
+    
+    $do_dir->('');
     return keys %files;
 }
 

@@ -204,7 +204,7 @@ sub generate_from_markdown {
             }
             else {
                 my $url = $node->get_url;
-                $add_text->("| $url ]]");
+                $add_text->(" | $url ]]");
             }
         }
         
