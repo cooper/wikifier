@@ -23,11 +23,13 @@ sub import {
 
 # Increase indention level by $times indents.
 sub indent_str {
-    my ($string, $times) = (shift, shift || 1);
+    my ($string, $tims, $prefix) = @_;
+    $times  ||= 1;
+    $prefix ||= '';
     my $space = '    ' x $times;
     my $final_string = '';
     foreach my $line (split "\n", $string) {
-        $final_string .= "$space$line\n";
+        $final_string .= "$prefix$space$line\n";
     }
     return $final_string;
 }

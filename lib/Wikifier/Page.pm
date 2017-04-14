@@ -88,9 +88,15 @@ sub parse {
 # returns the generated page HTML.
 sub html {
     my $page = shift;
+    
+    # generate HTML
     my $res;
     L('HTML',     sub { $res = $page->{wikifier}{main_block}->html($page)   });
     L('Generate', sub { $res = $res->generate                               });
+    
+    # remove indentations on things marked for no indentation
+    $html =~ /(\n)(\s*)\t\t\t(\s*)/\n/g;
+    
     return $res;
 }
 

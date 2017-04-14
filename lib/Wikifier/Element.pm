@@ -133,13 +133,14 @@ sub generate {
 
     # add the inner content.
     my $content;
+    my $prefix = $el->{no_indent} ? "\t\t\t" : '';
     foreach my $child (@{ $el->{content} }) {
         $content  = '' if not defined $content;
         if (not blessed $child) {
-            $content .= indent_str("$child\n");
+            $content .= indent_str("$child\n", 1, $prefix);
             next;
         }
-        $content .= indent_str($child->generate);
+        $content .= indent_str($child->generate, 1, $prefix);
     }
     $html .= $content if defined $content;
 
@@ -147,7 +148,7 @@ sub generate {
     unless ($el->{no_close_tag}) {
         $html .= $el->{container} ? "</$$el{type}>" : ' />';
     }
-
+    
     return $el->{generated} = "$html\n";
 }
 
