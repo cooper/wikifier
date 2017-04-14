@@ -47,7 +47,8 @@ sub _convert_markdown {
     
     # slurp the markdown file
     my $md_text = file_contents($md_path);
-    
+    $md_text =~ s/(\n)(\s*)\t/$1$2    /g;
+
     # generate the wiki source
     my $source = $wiki->generate_from_markdown($md_text, %opts);
     $result->{content} = $source;
