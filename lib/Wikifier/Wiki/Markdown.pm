@@ -284,7 +284,9 @@ sub generate_from_markdown {
 
 sub md_escape {
     my $text = shift;
+    print "md_escape($text) -> ";
     $text =~ s/([\{\}\[\]])/\\$1/g;
+    print $text, "\n";
     return $text;
 }
 
