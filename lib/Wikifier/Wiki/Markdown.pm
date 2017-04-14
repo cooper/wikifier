@@ -95,8 +95,7 @@ sub generate_from_markdown {
         # NODE_TEXT
         # plain text
         if ($node_type == NODE_TEXT) {
-            my $text = $node->get_literal;
-            $text =~ s/([\{\}\[\]])/\\$1/g;
+            my $text = md_escape($node->get_literal);
             $page_title = $text if !length $page_title && $header_level;
             $add_text->($text);
         }
@@ -216,7 +215,7 @@ sub generate_from_markdown {
         
         # NODE_CODE
         elsif ($node_type == NODE_CODE) {
-            my $code = $node->get_literal;
+            my $code = md_escape($node->get_literal);
             $add_text->("[c]$code\[/c]");
         }
         
@@ -281,6 +280,12 @@ sub generate_from_markdown {
     }
     
     return "$meta_source\n$source";
+}
+
+sub md_escape {
+    my $text = shift;
+    $text =~ s/([\{\}\[\]])/\\$1/g;
+    return $text;
 }
 
 1
