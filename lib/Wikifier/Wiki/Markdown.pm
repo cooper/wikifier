@@ -72,6 +72,7 @@ sub generate_from_markdown {
     my $source = '';
     my $indent = 0;
     my $header_level = 0;
+    my $page_title;
     
     my $add_text = sub {
         my $text = shift;
@@ -95,8 +96,10 @@ sub generate_from_markdown {
         # NODE_TEXT
         # plain text
         if ($node_type == NODE_TEXT) {
+            my $text = $node->get_literal;
             # FIXME: escape square brackets
-            $add_text->($node->get_literal);
+            $page_title = $text if !length $page_title && $header_level;
+            $add_text->($text);
         }
         
         # NODE_HEADING
@@ -233,7 +236,24 @@ sub generate_from_markdown {
         $indent--, $add_text->("\n}\n") for 1..$header_level;
     }
     
-    return $source;
+    # page metadata
+    
+    my @meta = (
+        'page.title'        => $page_title,
+        'page.author'       => 'Markdown',
+        'page.generated'    => \1
+    );
+    
+    my $meta_source = '';
+    while (my ($k, $v) = splice @meta, 0, 2) {
+        next if ref $v && !$$v;
+        next if !length $v;
+        $meta_source .= "\@$k";
+        $meta_source .= $v if !ref $v;
+        $meta_source .= ";\n";
+    }
+    
+    return "$meta_source\n$source";
 }
 
 1
