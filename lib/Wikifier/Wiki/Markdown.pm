@@ -114,8 +114,13 @@ sub generate_from_markdown {
                 if ($level <= $header_level) {
                     $indent--, $add_text->("\n}\n") for $level..$header_level;
                 }
-                $header_level = $level;
                 
+                # e.g. going from # to ###
+                if ($header_level && $level > $header_level + 1) {
+                    $add_text->("sec {\n") for $level .. $header_level + 1;
+                }
+                
+                $header_level = $level;
                 $add_text->("sec [");
             }
             
