@@ -30,11 +30,11 @@ our %block_types = (
 # in order to leave room for a footer.
 sub section_parse {
     my ($block, $page) = @_;
-
-    # determine header level.
-    $block->{header_level} = ($block->parent->{header_level} || 1) + 1;
-
-    $page->{section_n}++;
+    my $is_intro = $block->{is_intro} = !$page->{section_n}++;
+    my $l = ($block->parent->{header_level} || 1) + 1;
+    $l = 1 if $is_intro;
+    $l = 6 if $l > 6;
+    $block->{header_level} = $l;
 }
 
 sub section_html {
@@ -44,13 +44,9 @@ sub section_html {
     $el->configure(clear => 1);
 
     # determine if this is the intro section.
-    my $is_intro = !$page->{c_section_n}++;
-    my $class    = $is_intro ? 'section-page-title' : 'section-title';
-
-    # determine the heading level.
-    my $l = $is_intro ? 1 : $block->{header_level} || 1;
-    $l = 6 if $l > 6;
-    $block->{header_level} = $l;
+    my $l = $block->{header_level};
+    my $is_intro = $block->{is_intro};
+    my $class = $is_intro ? 'section-page-title' : 'section-title';
     
     # disable the footer if necessary.
     # this only works if the section is the last item in the main block.
