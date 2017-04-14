@@ -22,7 +22,7 @@ use Wikifier::Wiki::Models;
 use Wikifier::Wiki::Revision;
 use Wikifier::Wiki::Categories;
 use Wikifier::Wiki::Markdown;
-use Wikifier::Utilities qw(L);
+use Wikifier::Utilities qw(L make_dir);
 
 # default options.
 our %wiki_defaults = (
@@ -321,8 +321,9 @@ sub display_error {
 
 # return abs path for a page
 sub path_for_page {
-    my ($wiki, $page_name) = @_;
+    my ($wiki, $page_name, $make_dir) = @_;
     $page_name = page_name($page_name);
+    make_dir($wiki->opt('dir.page'), $page_name) if $make_dir;
     return abs_path($wiki->opt('dir.page')."/$page_name");
 }
 
