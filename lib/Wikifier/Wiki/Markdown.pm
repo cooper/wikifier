@@ -227,7 +227,7 @@ sub generate_from_markdown {
             $lang = length $lang ? "[$lang] " : '';
             my $old_indent = $indent;
             $indent = 0;
-            $add_text->("code $lang{{\n$code}}\n");
+            $add_text->("code $lang\{{\n$code}}\n");
             $indent = $old_indent;
         }
         
