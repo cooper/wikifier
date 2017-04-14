@@ -26,10 +26,23 @@ our %block_types = (
 
 sub section_parse {
     my ($block, $page) = @_;
-    my $is_intro = $block->{is_intro} = !$page->{section_n}++;
-    my $l = ($block->parent->{header_level} || 1) + 1;
+    my $enable = $page->page_opt('page.enable.title');
+    $enable = $enable ? 1 : 0;
+    
+    # @page.enable.title causes the first header to be larger than the
+    # rest. it also uses @page.title as the first header if no other text
+    # is provided.
+    my $is_intro = $block->{is_intro} =
+        !$page->{section_n}++ && $enable;
+        
+    # top-level headers start at h2 when @page.enable.title is true, since the
+    # page title is the sole h1. otherwise, h1 is top-level.
+    my $l = ($block->parent->{header_level} || $enable) + 1;
+    
+    # intro is always h1, max is h6
     $l = 1 if $is_intro;
     $l = 6 if $l > 6;
+    
     $block->{header_level} = $l;
 }
 
@@ -44,12 +57,13 @@ sub section_html {
     my $is_intro = $block->{is_intro};
     my $class = $is_intro ? 'section-page-title' : 'section-title';
 
-    # determine the page title if necessary.
+    # use the page title if no other title is provided and @page.enable.title
+    # is true.
     my $title = $block->name;
-       $title = $page->get('page.title') if $is_intro && !length $title;
+    $title = $page->get('page.title') if $is_intro && !length $title;
 
     # if we have a title and this type of title is enabled.
-    if (length $title and $is_intro ? $page->page_opt('page.enable.title') : 1) {
+    if (length $title) {
 
         # create the heading.
         my $heading = Wikifier::Element->new(
