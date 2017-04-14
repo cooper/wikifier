@@ -133,14 +133,13 @@ sub generate {
 
     # add the inner content.
     my $content;
-    my $indent = !$el->{no_indent};
     foreach my $child (@{ $el->{content} }) {
         $content  = '' if not defined $content;
         if (not blessed $child) {
-            $content .= $indent ? indent_str("$child\n") : "$child\n";
+            $content .= indent_str("$child\n");
             next;
         }
-        $content .= $indent ? indent_str($child->generate) : $child->generate;
+        $content .= indent_str($child->generate);
     }
     $html .= $content if defined $content;
 
