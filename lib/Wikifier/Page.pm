@@ -507,6 +507,7 @@ sub rel_path {
     my $page = shift;
     return $page->{file_path}
         if length $page->{file_path};
+    make_dir($page->wiki_opt('dir.page'), $page->rel_name);
     return $page->wiki_opt('dir.page').'/'.$page->rel_name;
 }
 
