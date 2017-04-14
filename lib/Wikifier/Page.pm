@@ -9,7 +9,7 @@ use warnings;
 use strict;
 use 5.010;
 use Scalar::Util qw(blessed looks_like_number);
-use File::Basename qw(basename);
+use File::Basename qw(basename fileparse);
 use File::Path qw(make_path);
 use Cwd qw(abs_path);
 use HTML::Strip;
@@ -622,7 +622,8 @@ sub _make {
     my ($page, $dir) = @_;
     my (undef, $prefix) = fileparse($page->name);
     return if $prefix eq '.' || $prefix eq './';
-    make_path("$dir/$prefix");
+    make_path("$dir/$prefix", { error => \my $err });
+    L "mkdir $dir/$prefix: @$err" if @$err;
 }
 
 # get position
