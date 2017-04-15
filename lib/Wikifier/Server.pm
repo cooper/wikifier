@@ -21,7 +21,7 @@ our ($loop, $conf, %wikis, %files, %sessions);
 
 # start the server.
 sub start {
-    ($loop, my $conf_file) = @_;
+    ($loop, my $conf_file, $stdio) = @_;
     Lindent 'Initializing server';
 
     # load configuration.
@@ -38,23 +38,9 @@ sub start {
     $timer->start;
     $loop->add($timer);
 
-    # create a new listener and add it to the loop.
-    my $listener = IO::Async::Listener->new(on_stream => \&handle_stream);
-    $loop->add($listener);
 
-    # if a file already exists and is a socket, I assume we should delete it.
-    my $path = $conf->get('server.socket.path');
-    unlink $path if $path && -S $path;
-
-    # create the socket.
-    my $socket = IO::Socket::UNIX->new(
-        Local  => $path || die("No socket file path specified\n"),
-        Listen => 1
-    ) or die "Can't create UNIX socket: $!\n";
-
-    # begin listening.
-    $listener->listen(handle => $socket);
-    L align('Listen', $path);
+    listen_unix();
+    listen_stdio() if $stdio;
     back;
 
     # set up handlers.
@@ -69,12 +55,43 @@ sub start {
     $loop->run;
 }
 
+sub listen_unix {
+    
+    # unix is disabled
+    return if !length $path;
+    
+    # create a new listener and add it to the loop.
+    my $listener = IO::Async::Listener->new(on_stream => \&handle_stream);
+    $loop->add($listener);
+    
+    # if a file already exists and is a socket, I assume we should delete it.
+    my $path = $conf->get('server.socket.path');
+    unlink $path if $path && -S $path;
+
+    # create the socket.
+    my $socket = IO::Socket::UNIX->new(
+        Local  => $path || die("No socket file path specified\n"),
+        Listen => 1
+    ) or die "Can't create UNIX socket: $!\n";
+
+    # begin listening.
+    $listener->listen(handle => $socket);
+    L align('Listen', $path);
+}
+
+sub listen_stdio {
+    my $stream = IO::Async::Stream->new_for_stdio;
+    handle_stream(undef, $stream, 'stdio');
+    L align('Listen', '(stdio)');
+}
+
 # handle a new stream.
 sub handle_stream {
-    my (undef, $stream) = @_;
-
+    my (undef, $stream, $type) = @_;
+    $type ||= 'unix';
+    
     $stream->{conn} = Wikifier::Server::Connection->new($stream);
-    $stream->{conn}->l('New connection');
+    $stream->{conn}->l("New connection ($type)");
 
     # configure the stream.
     my $close = sub { shift->{conn}->close };

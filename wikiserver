@@ -14,5 +14,14 @@ die "Please provide the configuration file as the first argument\n" unless @ARGV
 # create a loop.
 my $loop = IO::Async::Loop->new;
 
+my ($conf, $stdio);
+for (@ARGV) {
+    if ($_ eq '--std') {
+        $stdio++;
+        next;
+    }
+    $conf ||= $_;
+}
+
 # start the server.
-Wikifier::Server::start($loop, shift @ARGV);
+Wikifier::Server::start($loop, $conf, $stdio);

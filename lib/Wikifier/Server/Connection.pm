@@ -26,7 +26,7 @@ sub send {
         filter_nonempty($args),
         @rest
     ]);
-    print "S: $json_text\n" if $ENV{WIKIFIER_DEBUG};
+    print STDERR "S: $json_text\n" if $ENV{WIKIFIER_DEBUG};
     $conn->{stream}->write("$json_text\n");
 }
 
@@ -53,7 +53,7 @@ sub error {
 sub handle {
     my ($conn, $line) = @_;
     my $return = undef;
-    print "C: $line\n" if $ENV{WIKIFIER_DEBUG};
+    print STDERR "C: $line\n" if $ENV{WIKIFIER_DEBUG};
 
     # not interested if we're dropping the connection
     return if $conn->{closed};
