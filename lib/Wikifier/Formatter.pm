@@ -182,7 +182,6 @@ sub parse_formatted_text {
 
     my @items;
     my $string       = '';
-
     my $format_type  = '';   # format name such as 'i' or '/b'
     my $in_format    = 0;    # inside a formatting element.
     my $escaped      = 0;    # this character was escaped.
@@ -192,7 +191,6 @@ sub parse_formatted_text {
     CHAR: foreach my $i (0..$#chars) {
         my $char = $chars[$i];
         my $last_char = $i == 0 ? '' : $chars[$i - 1];
-        my $escaped = $last_char eq '\\';
 
         # update position
         if ($char eq "\n") {
@@ -232,7 +230,8 @@ sub parse_formatted_text {
         }
         
         # an unescaped backslash should not appear in the result.
-        next if $char eq '\\' && !$escaped;
+        $escaped = $char eq '\\' && !$escaped;
+        next if $escaped;
 
         # if we're in the format type, append to it.
         if ($in_format) { $format_type .= $char }
