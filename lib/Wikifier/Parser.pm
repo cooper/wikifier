@@ -193,6 +193,11 @@ sub handle_character {
                     $block_type = $last_char.$block_type;
                     next BACKCHAR;
                 }
+                
+                # tilde can terminate the block type
+                elsif ($last_char eq '~' && length $block_type) {
+                    last BACKCHAR;
+                }
 
                 # this could be a space between things.
                 elsif ($last_char =~ m/\s/ && !length $block_type) {

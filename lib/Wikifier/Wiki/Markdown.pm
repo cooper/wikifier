@@ -118,11 +118,11 @@ sub generate_from_markdown {
                 
                 # e.g. going from # to ###
                 if ($level > $header_level + 1) {
-                    $indent++, $add_text->("sec {\n") for ($header_level + 2)..$level;
+                    $indent++, $add_text->("~sec {\n") for ($header_level + 2)..$level;
                 }
                 
                 $header_level = $level;
-                $add_text->("sec [");
+                $add_text->("~sec [");
             }
             
             # closing the header starts the section block
@@ -137,7 +137,7 @@ sub generate_from_markdown {
         elsif ($node_type == NODE_PARAGRAPH) {
             if ($ev_type == EVENT_ENTER) {
                 $indent++;
-                $add_text->("p {\n");
+                $add_text->("~p {\n");
             }
             else {
                 $indent--;
@@ -162,7 +162,7 @@ sub generate_from_markdown {
             if ($ev_type == EVENT_ENTER) {
                 # TODO: respect list type $node->get_list_type
                 $indent++;
-                $add_text->("list {\n");
+                $add_text->("~list {\n");
             }
             else {
                 $indent--;
@@ -226,20 +226,20 @@ sub generate_from_markdown {
             $lang = length $lang ? "[$lang] " : '';
             my $old_indent = $indent;
             $indent = 0;
-            $add_text->("code $lang\{{\n$code}}\n");
+            $add_text->("~code $lang\{{\n$code}}\n");
             $indent = $old_indent;
         }
         
         # NODE_HTML_INLINE
         elsif ($node_type == NODE_HTML_INLINE) {
             my $html = $node->get_literal;
-            $add_text->("html {{$html}}");
+            $add_text->("~html {{$html}}");
         }
         
         # NODE_HTML_BLOCK
         elsif ($node_type == NODE_HTML_BLOCK) {
             my $html = $node->get_literal;
-            $add_text->("html {{\n$html}}\n");
+            $add_text->("~html {{\n$html}}\n");
         }
         
         # do nothing
