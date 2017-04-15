@@ -76,14 +76,14 @@ sub listen_unix {
     ) or die "Can't create UNIX socket: $!\n";
 
     # begin listening.
-    $listener->listen(handle => $socket);
     L align('Listen', $path);
+    $listener->listen(handle => $socket);
 }
 
 sub listen_stdio {
+    L align('Listen', '(stdio)');
     my $stream = IO::Async::Stream->new_for_stdio;
     handle_stream(undef, $stream, 'stdio');
-    L align('Listen', '(stdio)');
 }
 
 # handle a new stream.
