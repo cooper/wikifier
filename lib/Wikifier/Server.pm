@@ -21,7 +21,7 @@ our ($loop, $conf, %wikis, %files, %sessions);
 
 # start the server.
 sub start {
-    ($loop, my $conf_file, $stdio) = @_;
+    ($loop, my $conf_file, my $stdio) = @_;
     Lindent 'Initializing server';
 
     # load configuration.
@@ -58,15 +58,16 @@ sub start {
 sub listen_unix {
     
     # unix is disabled
+    my $path = $conf->get('server.socket.path');
     return if !length $path;
+    
+    # if a file already exists and is a socket, I assume we should delete it.
+    unlink $path if $path && -S $path;
     
     # create a new listener and add it to the loop.
     my $listener = IO::Async::Listener->new(on_stream => \&handle_stream);
     $loop->add($listener);
-    
-    # if a file already exists and is a socket, I assume we should delete it.
-    my $path = $conf->get('server.socket.path');
-    unlink $path if $path && -S $path;
+
 
     # create the socket.
     my $socket = IO::Socket::UNIX->new(
