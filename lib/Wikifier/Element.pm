@@ -165,9 +165,10 @@ sub generate {
     # close it off.
     if (!$el->{no_tags} && !$el->{no_close_tag}) {
         $html .= $el->{container} ? "</$$el{type}>" : ' />';
+        $html .= "\n";
     }
     
-    return $el->{generated} = "$html\n";
+    return $el->{generated} = $html;
 }
 
 sub classes { @{ shift->{classes} || [] } }
