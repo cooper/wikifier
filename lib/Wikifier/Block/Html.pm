@@ -16,6 +16,7 @@ our %block_types = (
 
 sub html_html {
     my ($format, $block, $page, $el) = @_;
+    $el->configure(no_indent => 1, no_tags => 1);
     foreach ($block->content_visible_pos) {
         my ($item, $pos) = @$_;
         if (blessed $item) {

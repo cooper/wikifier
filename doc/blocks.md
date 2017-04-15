@@ -212,16 +212,21 @@ history {
 
 ## Html
 
-Used to embed some HTML. See also [`format{}`](#format).
+Used to embed some HTML. The contents will not be formatted. Using the
+[brace escape](language.md#escaping) is recommended so that you do not have to
+escape curly brackets within. Note also that, unlike usually, the
+leading whitespace is significant and will be displayed.
+
+See also [`format{}`](#format).
 
 ```
-html {
-    <div>
-        This is HTML. Nothing inside will be changed,
-        but please note that curly brackets \{ and \}
-        must be escaped.
-    </div>
-}
+html {{
+<div>
+    This is HTML. Nothing inside will be changed,
+    but please note that curly brackets \{ and \}
+    must be escaped.
+</div>
+}}
 ```
 
 ## Image

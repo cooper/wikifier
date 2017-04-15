@@ -99,44 +99,51 @@ sub remove_class {
 # generate HTML.
 sub generate {
     my $el = shift;
+    
+    # already generated
     return $el->{generated} if defined $el->{generated};
-    my $html = "<$$el{type}";
-
+    
     # quickly determine if this is a container.
     $el->{container} ||= scalar @{ $el->{content} };
+    
+    # opening tag
+    my $html;
+    unless ($el->{no_tags}) {
+        $html .= "<$$el{type}";
 
-    # add classes.
-    my $classes = '';
-    push @{ $el->{classes} }, $el->{id} if $el->{need_id};
-    foreach my $class (@{ $el->{classes} }) {
-        my $pfx = \substr($class, 0, 1);
-        if ($$pfx eq '!') {
-            $$pfx = '';
-            $classes .= "$class ";
-            next;
+        # add classes.
+        my $classes = '';
+        push @{ $el->{classes} }, $el->{id} if $el->{need_id};
+        foreach my $class (@{ $el->{classes} }) {
+            my $pfx = \substr($class, 0, 1);
+            if ($$pfx eq '!') {
+                $$pfx = '';
+                $classes .= "$class ";
+                next;
+            }
+            $classes .= "wiki-$class ";
         }
-        $classes .= "wiki-$class ";
-    }
-    chop $classes;
-    $html .= " class=\"$classes\"" if length $classes;
+        chop $classes;
+        $html .= " class=\"$classes\"" if length $classes;
 
-    # add styles.
-    my $styles;
-    foreach my $style (keys %{ $el->{styles} }) {
-        $styles ||= '';
-        $styles  .= "$style: ".$el->{styles}{$style}.'; ';
-    }
-    $html .= " style=\"$styles\"" if defined $styles;
+        # add styles.
+        my $styles;
+        foreach my $style (keys %{ $el->{styles} }) {
+            $styles ||= '';
+            $styles  .= "$style: ".$el->{styles}{$style}.'; ';
+        }
+        $html .= " style=\"$styles\"" if defined $styles;
 
-    # add other attributes.
-    foreach my $attr (keys %{ $el->{attributes} }) {
-        my $val = $el->{attributes}{$attr};
-        next if !defined $val;
-        my $value = encode_entities($val);
-        $html    .= " $attr=\"$value\"";
-    }
+        # add other attributes.
+        foreach my $attr (keys %{ $el->{attributes} }) {
+            my $val = $el->{attributes}{$attr};
+            next if !defined $val;
+            my $value = encode_entities($val);
+            $html    .= " $attr=\"$value\"";
+        }
 
-    $html .= ">\n" if $el->{container};
+        $html .= ">\n" if $el->{container};
+    }
     
     # add the inner content.
     my $content;
@@ -156,7 +163,7 @@ sub generate {
     }
 
     # close it off.
-    unless ($el->{no_close_tag}) {
+    if (!$el->{no_tags} && !$el->{no_close_tag}) {
         $html .= $el->{container} ? "</$$el{type}>" : ' />';
     }
     
