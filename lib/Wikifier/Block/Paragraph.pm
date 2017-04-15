@@ -22,11 +22,18 @@ our %block_types = (
 sub paragraph_html {
     my ($block, $page, $el) = @_;
     $el->configure(type => 'p');
-    LINE: foreach ($block->content_text_pos) {
-        my ($line, $pos) = @$_;
+    LINE: foreach ($block->content_visible_pos) {
+        my ($item, $pos) = @$_;
+
+        # this is blessed, so it's a block.
+        # adopt this element.
+        if (blessed $item) {
+            $el->add($item->html($page));
+            next;
+        }
 
         # trim after formatting so that position is accurate
-        $line = trim($page->parse_formatted_text($line, pos => $pos));
+        my $line = trim($page->parse_formatted_text($item, pos => $pos));
 
         # skip if no length is left
         $pos->{line}++;
