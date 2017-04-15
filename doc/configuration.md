@@ -151,6 +151,7 @@ certainly most efficient.
 | `dir.page`        | Page files stored here                                |
 | `dir.image`       | Image originals stored here                           |
 | `dir.model`       | Model files stored here                               |
+| `dir.md`          | Markdown page files stored here                       |
 | `dir.cache`       | Generated page and image cache files stored here      |
 | `dir.category`    | Generated category files stored here                  |
 

@@ -253,7 +253,10 @@ sub all_models {
 
 # an array of file names in the image directory.
 sub all_images {
-    return unique_files_in_dir(shift->opt('dir.image'), ['png', 'jpg', 'jpeg']);
+    return unique_files_in_dir(
+        shift->opt('dir.image'),
+        ['png', 'jpg', 'jpeg']
+    );
 }
 
 # all markdown files
