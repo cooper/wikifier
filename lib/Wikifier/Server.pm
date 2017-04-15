@@ -6,7 +6,7 @@ use strict;
 
 use IO::Async::Loop;
 use IO::Async::File;
-use IO::Async::Listener;
+use IO::Async::Stream;
 use IO::Async::Timer::Periodic;
 use IO::Socket::UNIX;
 use File::Basename qw(basename);
@@ -65,9 +65,9 @@ sub listen_unix {
     unlink $path if $path && -S $path;
     
     # create a new listener and add it to the loop.
+    require IO::Async::Listener;
     my $listener = IO::Async::Listener->new(on_stream => \&handle_stream);
     $loop->add($listener);
-
 
     # create the socket.
     my $socket = IO::Socket::UNIX->new(
