@@ -40,7 +40,6 @@ sub _convert_markdown {
     # slurp the markdown file
     my $md_text = file_contents($md_path);
     $md_text =~ s/(\n)(\s*)\t/$1$2    /g;   # unindent code and html blocks
-    $md_text =~ s/([;:])/\\$1/g;            # escape semicolon and colon
     $md_text =~ s/\xa0/ /g;                 # replace non-breaking space
 
     # generate the wiki source
@@ -277,8 +276,7 @@ sub generate_from_markdown {
 
 sub md_escape {
     my $text = shift;
-    $text =~ s/\\/\\\\/g;
-    $text =~ s/([\{\}\[\]])/\\$1/g;
+    $text =~ s/([;:\\]\{\}\[\])/\\$1/g;
     return $text;
 }
 
