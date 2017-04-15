@@ -9,14 +9,6 @@ use Wikifier::Utilities qw(L Lindent back align);
 use CommonMark qw(:node :event :list);
 use Cwd qw(abs_path);
 
-# all markdown files
-sub all_markdowns {
-    my $wiki = shift;
-    my $dir = $wiki->opt('dir.md');
-    return if !length $dir;
-    return unique_files_in_dir($dir, 'md');
-}
-
 sub convert_markdown {
     my ($wiki, $md_name) = (shift, @_);
     Lindent "($md_name)";

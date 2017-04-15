@@ -256,6 +256,14 @@ sub all_images {
     return unique_files_in_dir(shift->opt('dir.image'), ['png', 'jpg', 'jpeg']);
 }
 
+# all markdown files
+sub all_markdowns {
+    my $wiki = shift;
+    my $dir = $wiki->opt('dir.md');
+    return if !length $dir;
+    return unique_files_in_dir($dir, 'md');
+}
+
 ######################
 ### AUTHENTICATION ###
 ######################
