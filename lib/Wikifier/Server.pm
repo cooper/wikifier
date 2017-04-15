@@ -157,6 +157,8 @@ sub gen_wiki {
 
     # markdown files
     foreach my $md_name ($wiki->all_markdowns) {
+        require Wikifier::Wiki::Markdown;
+
         my $md_path   = "$md_dir/$md_name";
         my $page_path = "$page_dir/$md_name.page";
         

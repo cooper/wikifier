@@ -397,7 +397,9 @@ at the very top of a page source file.
 * `@page.enable` - Contains [boolean](#assignment) attributes which allow you to
   enable or disable certain features specific to the page.
     * `@page.enable.title` - Whether to display the page title (from
-      `@page.title`) as the header of the first `section{}` block. Overrides the
+      `@page.title`) as the header of the first `section{}` block if no other
+      section title is specified. This assumes that the first section is an
+      introduction, so it will have the highest header level. Overrides the
       wiki configuration option
       [page.enable.title](configuration.md#pageenabletitle).
 

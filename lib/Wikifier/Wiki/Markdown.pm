@@ -254,7 +254,7 @@ sub generate_from_markdown {
         
         # TODO:
         # NODE_BLOCK_QUOTE
-        # NODE_THEMATIC_BREAK
+        # NODE_THEMATIC_BREAK (horizontal rule)
     }
     
     # close remaining sections
