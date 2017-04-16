@@ -199,7 +199,13 @@ sub gen_wiki {
 
     # markdown files
     foreach my $md_name ($wiki->all_markdowns) {
-        require Wikifier::Wiki::Markdown;
+        
+        # can't load
+        if (!eval { require Wikifier::Wiki::Markdown }) {
+            L 'Unable to load Markdown translator;';
+            L 'Please see docs for how to install CommonMark';
+            last;
+        }
 
         my $md_path   = "$md_dir/$md_name";
         my $page_name = page_name($md_name);
