@@ -301,7 +301,7 @@ This option is a comma-separated list of scales, such as
 
 to support @2x and @3x scaling both.
 
-__Default__: *2*
+__Default__: *2, 3*
 
 ### image.enable.pregeneration
 
@@ -354,7 +354,7 @@ __Default__: Enabled
 
 Number of pages to display on a single category posts page.
 
-__Default__: Unlimited
+__Default__: _5_
 
 ### cat.[name].main
 
