@@ -310,7 +310,7 @@ sub write_page_cache_maybe {
     
     # title, author, etc.
     my $page_info = $page->page_info;
-    @$result{ keys %$page_info } = values %$page_info;
+    @$res{ keys %$page_info } = values %$page_info;
 
     # caching is enabled, so let's save this for later.
     $res = $wiki->write_page_cache($page, $res, $page_info);
