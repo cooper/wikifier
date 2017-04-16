@@ -125,7 +125,7 @@ sub check_directories {
         [ 'category', $wiki->opt('dir.category')."/$_" ]
     } @pseudo_cats;
 
-    my %skipped;
+    my (%skipped, $suspicious);
     foreach (@directories) {
         my ($dir, $path) = @$_;
 
@@ -140,8 +140,8 @@ sub check_directories {
 
         # dir.wiki must not be defined
         if (index($path, '(null)') != -1) {
-            L "\@dir.$dir ($path) looks suspicious ".
-              '(did you forget to set @dir.wiki?)';
+            L "\@dir.$dir ($path) looks suspicious; skipped";
+            $suspicious++;
             next;
         }
 
@@ -161,6 +161,7 @@ sub check_directories {
 
         L "... Failed: @$err"
     }
+    L 'Maybe you forgot to set @dir.wiki?' if $suspicious;
 }
 
 # returns a wiki option.
