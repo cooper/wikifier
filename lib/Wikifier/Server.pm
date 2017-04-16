@@ -15,7 +15,7 @@ use Wikifier::Wiki;
 use Wikifier::Server::Message;
 use Wikifier::Server::Handlers;
 use Wikifier::Server::Connection;
-use Wikifier::Utilities qw(align L Lindent back);
+use Wikifier::Utilities qw(align L Lindent back page_name);
 
 our ($loop, $conf, %wikis, %files, %sessions);
 
@@ -199,7 +199,8 @@ sub gen_wiki {
         require Wikifier::Wiki::Markdown;
 
         my $md_path   = "$md_dir/$md_name";
-        my $page_path = "$page_dir/$md_name.page";
+        my $page_name = page_name($md_name);
+        my $page_path = "$page_dir/$page_name";
         
         # determine modification times
         my $md_modified    = (stat $md_path   )[9];
