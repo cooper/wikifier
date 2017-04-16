@@ -35,6 +35,7 @@ our %wiki_defaults = (
     'image.size_method'             => 'server',
     'image.sizer'                   => \&_wiki_default_sizer,   # from Images
     'image.calc'                    => \&_wiki_default_calc ,   # from Images
+    'dir.wiki'                      => \&_wiki_default_dir_wiki,
     'search.enable'                 => 1
 );
 
@@ -163,6 +164,12 @@ sub opt {
         $Wikifier::Page::wiki_defaults{$opt},   # page default value fallback
         @args
     );
+}
+
+sub _wiki_default_dir_wiki {
+    my $wiki = shift;
+    ref $wiki or return undef;
+    return $wiki->{dir_wiki};
 }
 
 #######################

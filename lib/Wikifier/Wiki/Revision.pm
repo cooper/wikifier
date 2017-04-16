@@ -155,7 +155,7 @@ sub rev_latest {
 sub _prepare_git {
     my $wiki = shift;
     if (!$wiki->{git}) {
-        my $dir = $wiki->opt('dir.wiki');
+        my $dir = $wiki->opt('dir.wiki', $wiki);
         if (!length $dir) {
             L 'Cannot commit; @dir.wiki not set';
             return;
