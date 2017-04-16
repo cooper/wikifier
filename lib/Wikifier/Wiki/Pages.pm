@@ -278,7 +278,7 @@ sub get_page_cache {
 
     # cached error
     if (length(my $err = $result->{error})) {
-        return display_error($err, %$result, cached => 1);
+        return display_error($err, cached => 1);
     }
 
     # this is a redirect
