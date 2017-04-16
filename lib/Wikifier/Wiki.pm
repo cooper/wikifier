@@ -36,8 +36,6 @@ our %wiki_defaults = (
     'image.sizer'                   => \&_wiki_default_sizer,   # from Images
     'image.calc'                    => \&_wiki_default_calc ,   # from Images
     'cat.per_page'                  => 5,
-    'dir.wiki'                      => \&_wiki_default_dir_wiki,
-    'dir.wikifier'                  => \&_wiki_default_dir_wikifier,
     'search.enable'                 => 1
 );
 
@@ -163,25 +161,14 @@ sub opt {
     my ($wiki, $opt, @args) = @_;
     return Wikifier::Page::_call_wiki_opt(
         $wiki->{opts}{$opt}         //          # provided to wiki initializer
-        $wiki->{conf}->get($opt)    //          # defined in configuration
+        ($wiki->{conf}               ?          # defined in configuration
+            $wiki->{conf}->get($opt) :
+            undef)                  //
         $wiki_defaults{$opt}        //          # wiki default value fallback
         $Wikifier::Page::wiki_defaults{$opt},   # page default value fallback
         @args
     );
 }
-
-sub _wiki_default_dir_wiki {
-    my $wiki = shift;
-    ref $wiki or return undef;
-    return $wiki->{dir_wiki};
-}
-
-sub _wiki_default_dir_wikifier {
-    my $wiki = shift;
-    ref $wiki or return undef;
-    return $wiki->{dir_wikifier};
-}
-
 
 #######################
 ### DISPLAY METHODS ###
