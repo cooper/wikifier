@@ -339,12 +339,16 @@ sub write_page_cache {
         categories => $page->{categories},
 
         # warnings
-        warnings => $result->{warnings}
+        warnings => $result->{warnings},
+        
+        # errors
+        error => $result->{error}
 
     }), "\n";
 
     # save the content.
-    print {$fh} $result->{content};
+    print {$fh} $result->{content}
+        if length $result->{content};
     close $fh;
 
     # overwrite modified date to actual.
