@@ -277,7 +277,7 @@ sub generate_from_markdown {
 sub md_escape {
     my $text = shift;
     print STDERR "md_escape($text) -> ";
-    $text =~ s/([;:\]\{\}\[\]\\)/\\$1/g;
+    $text =~ s/([;:\]\{\}\[\]\\])/\\$1/g;
     print STDERR "($text)\n";
     return $text;
 }
