@@ -61,6 +61,9 @@ sub new {
 # read options from a configuration page file.
 sub read_config {
     my ($wiki, $file, $private_file) = @_;
+    print "DIR.WIKI: ", $wiki->opt('dir.wiki'), "\n";
+    print "DIR.WIKIFIER: ", $wiki->opt('dir.wikifier'), "\n";
+
     my $conf = $wiki->{conf} = Wikifier::Page->new(
         file_path => $file,
         wiki      => $wiki,

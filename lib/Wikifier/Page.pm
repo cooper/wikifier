@@ -78,7 +78,7 @@ sub new {
 sub parse {
     my $page = shift;
     my ($err, $c);
-    L align('Parse'.($page->{vars_only} ? ' (vars only)' : '')), sub {
+    L align('Parse'.($page->{vars_only} ? ' vars' : '')), sub {
         ($err, $c) = $page->wikifier->parse($page);
     };
     L align('Error', $err) if $err;
