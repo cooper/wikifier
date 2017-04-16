@@ -38,7 +38,7 @@ sub start {
     $timer->start;
     $loop->add($timer);
 
-
+    # listen
     listen_unix();
     listen_stdio() if $stdio;
     back;
@@ -91,7 +91,11 @@ sub handle_stream {
     my (undef, $stream, $type) = @_;
     $type ||= 'unix';
     
-    $stream->{conn} = Wikifier::Server::Connection->new($stream);
+    # create a connection
+    $stream->{conn} = Wikifier::Server::Connection->new(
+        stream => $stream,
+        stdio  => $type eq 'stdio'
+    );
     $stream->{conn}->l("New connection ($type)");
 
     # configure the stream.
@@ -126,22 +130,39 @@ sub create_wikis {
     foreach my $name (keys %confwikis) {
         Lindent "[$name]";
 
-        # load the wiki.
+        # not enabled
+        next if !$conf->get("server.wiki.$name.enable");
+
+        # find the configuration --
+        # first, try @server.wiki.[name].config
+        # if not set, try [@server.dir.wiki]/[name]/wiki.conf
+        my $wiki_dir_wiki;
+        my $config = $conf->get("server.wiki.$name.config");
+        if (!length $config) {
+            my $dir_wiki = $conf->get('server.dir.wiki');
+            die "\@server.dir.wiki is required because ".
+                "\@server.wiki.$name.config is not set.\n"
+                if !length $dir_wiki;
+            $wiki_dir_wiki = "$dir_wiki/$name"
+            $config = "$wiki_dir_wiki/wiki.conf";
+        }
+
+        # load the wiki
         my $wiki = Wikifier::Wiki->new(
-            config_file  => $conf->get("server.wiki.$name.config"),
-            private_file => $conf->get("server.wiki.$name.private")
+            config_file  => $config,
+            private_file => $conf->get("server.wiki.$name.private"),
+            dir_wiki     => $wiki_dir_wiki
         );
 
-        # it failed.
+        # it failed
         unless ($wiki) {
             L 'Failed to initialize';
             next;
         }
 
-        # it succeeded.
+        # it succeeded
         $wikis{$name} = $wiki;
         $wiki->{name} = $name;
-
         back;
     }
 

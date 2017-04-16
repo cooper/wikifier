@@ -64,7 +64,8 @@ sub handle_wiki {
     }
 
     # see if the passwords match.
-    if ($msg->{password} ne $conf->get("server.wiki.$name.password")) {
+    my $ok = $conn->{stdio};
+    if (!$ok && $msg->{password} ne $conf->get("server.wiki.$name.password")) {
         $msg->error("Password does not match configuration");
         return;
     }
