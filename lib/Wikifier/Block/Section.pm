@@ -69,7 +69,9 @@ sub section_html {
         my $heading = Wikifier::Element->new(
             type      => "h$l",
             class     => $class,
-            content   => $title,
+            content   => $page->parse_formatted_text($title,
+                pos => $block->create_pos
+            ),
             container => 1
         );
 
