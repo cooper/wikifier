@@ -87,7 +87,7 @@ sub generate_from_markdown {
         # NODE_TEXT
         # plain text
         if ($node_type == NODE_TEXT) {
-            my $text = md_escape($node->get_literal);
+            my $text = md_escape_fmt($node->get_literal);
             $page_title = $text if !length $page_title && $header_level;
             $add_text->($text);
         }
@@ -207,31 +207,31 @@ sub generate_from_markdown {
         
         # NODE_CODE
         elsif ($node_type == NODE_CODE) {
-            my $code = md_escape($node->get_literal);
+            my $code = md_escape_fmt($node->get_literal);
             $add_text->("[c]$code\[/c]");
         }
         
         # NODE_CODE_BLOCK
         elsif ($node_type == NODE_CODE_BLOCK) {
-            my $code = $node->get_literal;
+            my $code = md_escape($node->get_literal);
             my $lang = $node->get_fence_info;
             $lang = length $lang ? "[$lang] " : '';
             my $old_indent = $indent;
             $indent = 0;
-            $add_text->("~code $lang\{{\n$code}}\n");
+            $add_text->("~code $lang\{\n$code}\n");
             $indent = $old_indent;
         }
         
         # NODE_HTML_INLINE
         elsif ($node_type == NODE_HTML_INLINE) {
-            my $html = $node->get_literal;
-            $add_text->("~html {{$html}}");
+            my $html = md_escape($node->get_literal);
+            $add_text->("~html {$html}");
         }
         
         # NODE_HTML_BLOCK
         elsif ($node_type == NODE_HTML_BLOCK) {
-            my $html = $node->get_literal;
-            $add_text->("~html {{\n$html}}\n");
+            my $html = md_escape($node->get_literal);
+            $add_text->("~html {\n$html}\n");
         }
         
         # do nothing
@@ -276,9 +276,15 @@ sub generate_from_markdown {
 
 sub md_escape {
     my $text = shift;
-    print STDERR "md_escape($text) -> ";
-    $text =~ s/([;:\]\{\}\[\]\\])/\\$1/g;
-    print STDERR "($text)\n";
+    $text =~ s/([\{\}\\])/\\$1/g;
+    return $text;
+}
+
+# escape markdown-extracted text for use in a block with text formatting
+# enabled. if it's a block without text formatting, use md_escape().
+sub md_escape_fmt {
+    my $text = shift;
+    $text =~ s/([;:\{\}\[\]\\])/\\$1/g;
     return $text;
 }
 
