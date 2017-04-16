@@ -138,6 +138,13 @@ sub check_directories {
             next;
         }
 
+        # dir.wiki must not be defined
+        if (index($path, '(null)') != -1) {
+            L "\@dir.$dir ($path) looks suspicious ".
+              '(did you forget to set @dir.wiki?)';
+            next;
+        }
+
         # looks like we are relative to the wikifier
         next if $skipped{$dir};
         my (undef, $parent_dir) = fileparse($path);
