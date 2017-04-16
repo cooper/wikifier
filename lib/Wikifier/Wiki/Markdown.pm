@@ -274,6 +274,7 @@ sub generate_from_markdown {
     return "$meta_source\n$source";
 }
 
+# escape markdown-extracted text.
 sub md_escape {
     my $text = shift;
     $text =~ s/([\{\}\\])/\\$1/g;

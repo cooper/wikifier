@@ -196,7 +196,7 @@ sub _display_page {
         $page->{vars_only}++;
         $page->parse;
         $wiki->cat_check_page($page);
-        return display_error($err, parse_error => 1);
+        return $wiki->display_error_cache($page, $err, parse_error => 1);
     }
 
     # update categories
@@ -204,7 +204,7 @@ sub _display_page {
 
     # if this is a draft, so pretend it doesn't exist
     if ($page->draft && !$opts{draft_ok}) {
-        return display_error(
+        return $wiki->display_error_cache($page,
             "Page has not yet been published.",
             draft => 1
         );
@@ -230,13 +230,8 @@ sub _display_page {
     $result->{css}        = $page->css;
     $result->{categories} = [ _cats_to_list($page->{categories}) ];
 
-    # title, author, etc.
-    my $page_info = $page->page_info;
-    @$result{ keys %$page_info } = values %$page_info;
-
-    # caching is enabled, so let's save this for later.
-    $result = $wiki->write_page_cache($page, $result, $page_info)
-        if $wiki->opt('page.enable.cache');
+    # write cache file if enabled
+    $result = $wiki->write_page_cache_maybe($page, $result);
     return $result if $result->{error};
 
     # search is enabled, so generate a text file
@@ -280,6 +275,11 @@ sub get_page_cache {
         );
     }
 
+    # cached error
+    if (length(my $err = $result->{error})) {
+        return display_error($err, %$result);
+    }
+
     # this is a redirect
     if (my $redir = $result->{redirect}) {
         $result->{type}     = 'redirect';
@@ -294,6 +294,28 @@ sub get_page_cache {
     $result->{modified} = $time_str;
 
     return $result;
+}
+
+# display an error and write the error to cache if enabled
+sub display_error_cache {
+    my ($wiki, $page, @opts) = @_;
+    my $res = display_error(@opts);
+    return $wiki->write_page_cache_maybe($page, $res);
+}
+
+# write page to cache only if enabled
+sub write_page_cache_maybe {
+    my ($wiki, $page, $res) = @_;
+    return $res if !$wiki->opt('page.enable.cache');
+    
+    # title, author, etc.
+    my $page_info = $page->page_info;
+    @$result{ keys %$page_info } = values %$page_info;
+
+    # caching is enabled, so let's save this for later.
+    $res = $wiki->write_page_cache($page, $res, $page_info);
+    
+    return $res;
 }
 
 # write page to cache
