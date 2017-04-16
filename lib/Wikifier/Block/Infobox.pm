@@ -42,7 +42,7 @@ sub infobox_html {
             type        => 'th',
             class       => 'infobox-title',
             attributes  => { colspan => 2 },
-            content     => \$page->parse_formatted_text(
+            content     => $page->parse_formatted_text(
                 $infobox->name,
                 pos => $infobox->create_pos
             )
@@ -110,13 +110,13 @@ sub table_add_row {
         $tr->create_child(
             type       => 'th',
             class      => 'infobox-key',
-            content    => \$key_title,
+            content    => $key_title,
             %td_opts
         );
         $tr->create_child(
             type       => 'td',
             class      => 'infobox-value',
-            content    => ref $value ? $value : \$value,
+            content    => $value,
             %td_opts
         );
     }
@@ -127,7 +127,7 @@ sub table_add_row {
             type       => 'td',
             class      => 'infobox-anon',
             attributes => { colspan => 2 },
-            content    => ref $value ? $value : \$value,
+            content    => $value,
             %td_opts
         );
         $td->add_class('infobox-text') if !$opts{is_block};

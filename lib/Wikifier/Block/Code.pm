@@ -18,11 +18,20 @@ sub code_html {
         push @classes, '!prettyprint';
         push @classes, "!lang-$lang";
     }
+    
+    # fetch text nodes and add them content as scalar refs.
+    # this tells the HTML generator to run encode_entities() on it.
+    my @text;
+    foreach my $item ($block->content_visible) {
+        next if ref $item;
+        push @text, \$item;
+    }
+    
     $el->configure(
         type      => 'pre',
         no_indent => 1,
         classes   => \@classes,
-        content   => [ @{ $block->{content} } ] # copy
+        content   => \@text
     );
 }
 
