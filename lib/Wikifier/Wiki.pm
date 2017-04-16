@@ -61,16 +61,17 @@ sub new {
 # read options from a configuration page file.
 sub read_config {
     my ($wiki, $file, $private_file) = @_;
-    print STDERR "DIR.WIKI: ", $wiki->opt('dir.wiki'), "\n";
-    print STDERR "DIR.WIKIFIER: ", $wiki->opt('dir.wikifier'), "\n";
-
     my $conf = $wiki->{conf} = Wikifier::Page->new(
         file_path => $file,
         wiki      => $wiki,
         wikifier  => $wiki->{wikifier},
         vars_only => 1
     );
-
+    
+    # set dir.wiki and dir.wikifier
+    $conf->set('dir.wiki'     => $wiki->opt('dir.wiki'));
+    $conf->set('dir.wikifier' => $wiki->opt('dir.wikifier'));
+    
     # error.
     my $bn_file = basename($file);
     Lindent "($bn_file)";
@@ -92,6 +93,10 @@ sub read_config {
             wikifier  => $wiki->{wikifier},
             vars_only => 1
         );
+
+        # set dir.wiki and dir.wikifier
+        $pconf->set('dir.wiki'     => $wiki->opt('dir.wiki'));
+        $pconf->set('dir.wikifier' => $wiki->opt('dir.wikifier'));
 
         # error.
         my $bn_private_file = basename($private_file);
