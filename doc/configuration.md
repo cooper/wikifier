@@ -483,7 +483,15 @@ the crypt set by [`admin.[username].crypt`](#adminusernamecrypt).
 
 ### server.dir.wikifier
 
+Path to the wikifier repository. This is optional but strongly recommended.
+Specifying it here is preferred over the [`dir.wikifier`](#dir) wiki option.
+
 ### server.dir.wiki
+
+Path to some directory where wikis are stored. Your wikis do not all have to be
+in the same directory, so this is optional. But if you do choose to do it that
+way, this is used to infer [`dir.wiki`](#dir) and
+[`server.wiki.[name].config`](#serverwikinameconfig).
 
 ### server.socket.path
 
