@@ -116,7 +116,7 @@ sub table_add_row {
         $tr->create_child(
             type       => 'td',
             class      => 'infobox-value',
-            content    => $value,
+            content    => ref $value ? $value : \$value,
             %td_opts
         );
     }
@@ -127,7 +127,7 @@ sub table_add_row {
             type       => 'td',
             class      => 'infobox-anon',
             attributes => { colspan => 2 },
-            content    => $value,
+            content    => ref $value ? $value : \$value,
             %td_opts
         );
         $td->add_class('infobox-text') if !$opts{is_block};
@@ -155,7 +155,7 @@ sub infosec_html {
         unshift @{ $infosec->{map_array} }, {
             is_title    => 1,
             key         => '_infosec_title_',
-            value       => \$page->parse_formatted_text(
+            value       => $page->parse_formatted_text(
                 $title, pos => $infosec->create_pos
             ),
         };
