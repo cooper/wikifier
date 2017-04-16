@@ -151,6 +151,7 @@ sub create_wikis {
         my $wiki = Wikifier::Wiki->new(
             config_file  => $config,
             private_file => $conf->get("server.wiki.$name.private"),
+            dir_wikifier => $conf->get("server.dir.wikifier"),
             dir_wiki     => $wiki_dir_wiki
         );
 

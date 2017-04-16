@@ -36,6 +36,7 @@ our %wiki_defaults = (
     'image.sizer'                   => \&_wiki_default_sizer,   # from Images
     'image.calc'                    => \&_wiki_default_calc ,   # from Images
     'dir.wiki'                      => \&_wiki_default_dir_wiki,
+    'dir.wikifier'                  => \&_wiki_default_dir_wikifier,
     'search.enable'                 => 1
 );
 
@@ -171,6 +172,13 @@ sub _wiki_default_dir_wiki {
     ref $wiki or return undef;
     return $wiki->{dir_wiki};
 }
+
+sub _wiki_default_dir_wikifier {
+    my $wiki = shift;
+    ref $wiki or return undef;
+    return $wiki->{dir_wikifier};
+}
+
 
 #######################
 ### DISPLAY METHODS ###
