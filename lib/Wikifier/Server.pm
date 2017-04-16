@@ -143,7 +143,7 @@ sub create_wikis {
             die "\@server.dir.wiki is required because ".
                 "\@server.wiki.$name.config is not set.\n"
                 if !length $dir_wiki;
-            $wiki_dir_wiki = "$dir_wiki/$name"
+            $wiki_dir_wiki = "$dir_wiki/$name";
             $config = "$wiki_dir_wiki/wiki.conf";
         }
 
