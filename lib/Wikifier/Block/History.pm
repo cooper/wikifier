@@ -34,7 +34,7 @@ sub history_html {
         $tr->create_child(
             type    => 'td',
             class   => 'history-key',
-            content => $page->parse_formatted_text(
+            content => \$page->parse_formatted_text(
                 $pair->{key_title},
                 pos => $pair->{pos}
             )

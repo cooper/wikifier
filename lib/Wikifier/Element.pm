@@ -152,6 +152,7 @@ sub generate {
     foreach my $child (@{ $el->{content} }) {
         $content  = '' if not defined $content;
         if (not blessed $child) {
+            $child = ref $child ? $$child : encode_entities($child);
             $content .= indent_str($child, $times, $prefix);
             next;
         }

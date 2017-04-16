@@ -11,7 +11,7 @@ use strict;
 use 5.010;
 
 use Scalar::Util qw(blessed);
-use HTML::Entities ();
+use HTML::Entities qw(encode_entities);
 use Wikifier::Utilities qw(page_name_link page_name cat_name trim);
 use URI::Escape qw(uri_escape);
 
@@ -250,7 +250,7 @@ sub parse_formatted_text {
     # join them together, adding HTML entities when necessary.
     return join '', map {
         my ($fmtd, $value) = @$_;
-        $fmtd ? $value : HTML::Entities::encode($value)
+        $fmtd ? $value : encode_entities($value)
     } @items;
 }
 

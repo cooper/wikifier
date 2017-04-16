@@ -30,6 +30,7 @@ sub Lback($);
 # Increase indention level by $times indents.
 sub indent_str {
     my ($string, $times, $prefix) = @_;
+    return undef if !defined $string;
     $times  //= 1;
     $prefix //= '';
     my $space = '    ' x $times;

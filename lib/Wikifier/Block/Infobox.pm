@@ -8,7 +8,6 @@ use warnings;
 use strict;
 
 use Scalar::Util qw(blessed);
-use HTML::Entities qw(encode_entities);
 use Wikifier::Utilities qw(hash_maybe);
 
 our %block_types = (
@@ -43,7 +42,7 @@ sub infobox_html {
             type        => 'th',
             class       => 'infobox-title',
             attributes  => { colspan => 2 },
-            content     => $page->parse_formatted_text(
+            content     => \$page->parse_formatted_text(
                 $infobox->name,
                 pos => $infobox->create_pos
             )
@@ -111,7 +110,7 @@ sub table_add_row {
         $tr->create_child(
             type       => 'th',
             class      => 'infobox-key',
-            content    => $key_title,
+            content    => \$key_title,
             %td_opts
         );
         $tr->create_child(
@@ -156,7 +155,7 @@ sub infosec_html {
         unshift @{ $infosec->{map_array} }, {
             is_title    => 1,
             key         => '_infosec_title_',
-            value       => $page->parse_formatted_text(
+            value       => \$page->parse_formatted_text(
                 $title, pos => $infosec->create_pos
             ),
         };

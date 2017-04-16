@@ -39,7 +39,7 @@ sub paragraph_html {
         $pos->{line}++;
         next LINE unless length $line;
 
-        $el->add($line);
+        $el->add(\$line);
     }
 }
 
