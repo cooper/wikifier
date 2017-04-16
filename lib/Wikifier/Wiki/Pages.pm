@@ -216,6 +216,7 @@ sub _display_page {
         $result->{type}     = 'redirect';
         $result->{content}  = qq{<a href="$redir">Permanently moved</a>};
         $result->{redirect} = $redir;
+        $wiki->write_page_cache_maybe($page, $result);
         return $result;
     }
 
