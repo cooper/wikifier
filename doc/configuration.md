@@ -42,9 +42,11 @@ of a full wiki, and others yet for the operation of a wiki server.
     * [admin\.[username]\.crypt](#adminusernamecrypt)
     * [admin\.[username]\.password](#adminusernamepassword)
   * [Wikifier::Server options](#wikifierserver-options)
-    * [server\.socket\.type](#serversockettype)
+    * [server\.dir\.wikifier](#serverdirwikifier)
+    * [server\.dir\.wiki](#serverdirwiki)
     * [server\.socket\.path](#serversocketpath)
     * [server\.enable\.pregeneration](#serverenablepregeneration)
+    * [server\.wiki\.[name]\.enable](#serverwikinameenable)
     * [server\.wiki\.[name]\.config](#serverwikinameconfig)
     * [server\.wiki\.[name]\.private](#serverwikinameprivate)
     * [server\.wiki\.[name]\.password](#serverwikinamepassword)
@@ -158,18 +160,17 @@ certainly most efficient.
 Directories on the filesystem. It is strongly recommended that they are
 absolute paths; otherwise they will be dictated by whichever directory the
 script is started from. All are required except `dir.wikifier` and `dir.wiki`.
-The directories will be created if they do not exist. Do not include
-trailing slashes.
 
-It may be useful to use `dir.wiki` within the definitions of the rest:
+It is recommended that all of the files related to one wiki exist within
+a master wiki directory (`dir.wiki`), but this is not technically required
+unless you are using Wikifer::Wiki's built-in revision tracking.
 
     @dir.wiki:      /home/www/mywiki;
     @dir.page:      [@dir.wiki]/pages;
     @dir.cache:     [@dir.wiki]/cache;
 
-It is recommended that all of the files related to one wiki exist within
-a master wiki directory (`dir.wiki`), but this is not technically required
-unless you are using Wikifer::Wiki's built-in revision tracking.
+`dir.wikifier` can be inferred from [`server.dir.wikifier`](#serverdirwikifier)
+if you are using a wikiserver with this directive set.
 
 ### external
 
@@ -437,7 +438,7 @@ supported depends on the frontend or template being used by the wiki.
 
 ### template
 
-Name of the template used by the wiki.
+Name or path of the template used by the wiki.
 
 ```
 @template: default;
@@ -480,15 +481,15 @@ the crypt set by [`admin.[username].crypt`](#adminusernamecrypt).
 
 ## Wikifier::Server options
 
-### server.socket.type
+### server.dir.wikifier
 
-The socket domain to use for listening. Currently, only UNIX is supported.
-
-__Default__: _unix_
+### server.dir.wiki
 
 ### server.socket.path
 
 The path of a UNIX socket to listen on.
+
+If unspecified, the server will not listen on a UNIX socket.
 
 ### server.enable.pregeneration
 
@@ -498,12 +499,20 @@ they are modified, greatly reducing the first page load time.
 
 __Requires__: [`page.enable.cache`](#pageenablecache)
 
-__Default__: Disabled (but recommended)
+__Default__: Disabled (but strongly recommended)
+
+### server.wiki.[name].enable
+
+Enables the wiki by the name of `[name]`. Any wikis configured that do not have
+this option present will be skipped. Any number of wikis can be configured on a
+single server using this.
 
 ### server.wiki.[name].config
 
-The path to the configuration file for the wiki by the name of `[name]`.
-Any number of wikis can be configured on a single server using this.
+The path to the configuration file for the wiki by the name of `[name]`. This is
+required for each wiki unless [`server.dir.wiki`](#serverdirwiki) is set.
+
+__Default__: [`server.dir.wiki`](#serverdirwiki)`/[name]/wiki.conf`
 
 ### server.wiki.[name].private
 
@@ -516,4 +525,6 @@ the HTTP server root or has proper permissions to deny access to it.
 ### server.wiki.[name].password
 
 The read authentication password for the wiki by the name of `[name]`
-in plain text.
+in plain text. This is required unless the wikiserver is reached via standard
+I/O (such as with the default [quiki](https://github.com/cooper/quiki)
+configuration).
