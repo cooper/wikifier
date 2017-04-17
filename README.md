@@ -1,6 +1,6 @@
 # wikifier
 
-wikifier is a file-based wiki suite.
+wikifier is a file-based wiki engine.
 
 ## Example
 
@@ -15,14 +15,14 @@ infobox {
     image {
         file: wikifier-logo.png;
     };
-    Type:           [[ Wiki ]] suite;
+    Type:           [[ Wiki engine | wp: Wiki software ]];
     Established:    February 2013;
     Author:         [[ Mitchell Cooper | https://github.com/cooper ]];
     Website:        [[ wikifier on GitHub | https://github.com/cooper/wikifier ]];
 }
 
 sec {
-    wikifier is a wiki suite. It is unique because it is completely
+    wikifier is a wiki engine. It is unique because it is completely
     file-based. There are no databases. Yet, it offers page caching, image
     sizing, session management/authentication, and lots of other things that
     fancy wikis use databases for.
