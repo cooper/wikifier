@@ -3,7 +3,7 @@
 This document describes all of the available configuration options. The options
 are categorized by the lowest-level wikifier interface at which they are used.
 Some are required for the generation of a single page, others for the operation
-of a full wiki, and others yet for the operation of a wiki server.
+of a full wiki, and others yet for the operation of a wikiserver.
 
 * [Configuration](#configuration)
     * [Configuration files](#configuration-files)
@@ -62,14 +62,14 @@ file. All wikifier configuration files are written in the wikifier language:
     @image.enable.pregeneration;        /* enable a boolean option */
     -@page.enable.title;                /* disable a boolean option */
 
-If you are using a **wiki server**, you must have a dedicated configuration file
+If you are using a **wikiserver**, you must have a dedicated configuration file
 for the server. This tells it where to listen and where to find the wikis you
 have configured on the server. This is typically called `wikiserver.conf`, and
 it is required as the first argument to the `wikiserver` executable.
 
 **Every wiki** also requires its own configuration file. It may make sense to
 store your wiki configuration file at a path outside of the wiki root, just in
-case it contains sensitive information. If you are using a wiki server, the path
+case it contains sensitive information. If you are using a wikiserver, the path
 of each wiki's configuration file is defined in the server configuration using
 the [`server.wiki.[name].config`](#serverwikinameconfig) option. If you are
 using Wikifier::Wiki directly, the path to the wiki configuration must be
@@ -82,7 +82,7 @@ Each wiki can optionally have a **private configuration** file. This is where
 the credentials of administrators can exist more securely than in the primary
 configuration. This file certainly should not be within the wiki root because
 that would probably allow anyone to download it from the web server. If you are
-using a wiki server, the path of the private configuration is defined by
+using a wikiserver, the path of the private configuration is defined by
 [`server.wiki.[name].private`](#serverwikinameprivate). If you are using
 Wikifier::Wiki directly, the path to the private configuration may be provided
 to the constructor:
@@ -125,6 +125,7 @@ __Default__: *Wiki*
 | `root.wiki`   | Wiki root     | '' (i.e. /)   |
 | `root.page`   | Page root     | */page*       |
 | `root.image`  | Image root    | */images*     |
+| `root.file`   | File root     | None          |
 
 HTTP roots. These are relative to the server HTTP root, NOT the wiki root.
 They are used for link targets and image URLs; they will never be used to
@@ -136,13 +137,17 @@ It may be useful to use `root.wiki` within the definitions of the rest:
     @root.page:     [@root.wiki]/page;
     @root.image:    [@root.wiki]/images;
 
-If you are using Wikifier::Wiki (or a wiki server) in conjunction with
+If you are using Wikifier::Wiki (or a wikiserver) in conjunction with
 [`image.enable.cache`](#imageenablecache) and
 [`image.enable.pregeneration`](#imageenablepregeneration), you should set
 root.image to wherever your cache directory can be found on the HTTP root. This
 is where generated images are cached, and full-sized images are symbolically
 linked to. This allows the web server to deliver images directly, which is
 certainly most efficient.
+
+If you specify `root.file`, the entire wiki directory (as specified by
+[`dir.wiki`](#dirwiki)) will be indexed by the web server at this path. Note
+that this will likely expose your wiki configuration.
 
 ### dir
 
@@ -153,7 +158,7 @@ certainly most efficient.
 | `dir.page`        | Page files stored here                                |
 | `dir.image`       | Image originals stored here                           |
 | `dir.model`       | Model files stored here                               |
-| `dir.md`          | Markdown page files stored here                       |
+| `dir.md`          | Markdown files stored here                            |
 | `dir.cache`       | Generated page and image cache files stored here      |
 | `dir.category`    | Generated category files stored here                  |
 
