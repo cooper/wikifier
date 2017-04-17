@@ -86,6 +86,7 @@ General
 * [Blocks](doc/blocks.md)               - wikifier built-in block types
 * [Models](doc/models.md)               - wikifier templates
 * [Styling](doc/styling.md)             - wikifier + CSS
+* [Markdown](doc/markdown.md)           - wikifier + Markdown
 
 Technical
 * [Parsing](doc/parsing.md)             - wikifier parsing stages
