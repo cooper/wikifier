@@ -31,7 +31,7 @@ sub parse {
 
     # no file given
     if (!defined $file) {
-        return "No file specified for parsing";
+        return 'Page does not exist';
     }
 
     # open the file

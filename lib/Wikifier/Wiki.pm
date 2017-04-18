@@ -76,7 +76,7 @@ sub read_config {
     my $bn_file = basename($file);
     Lindent "($bn_file)";
         if (my $err = $conf->parse) {
-            L "Failed to parse configuration: $err";
+            L "Failed to parse configuration";
             back;
             return;
         }
@@ -103,7 +103,7 @@ sub read_config {
         my $bn_private_file = basename($private_file);
         Lindent "($bn_private_file)";
             if (my $err = $pconf->parse) {
-                L "Failed to parse private configuration: $err";
+                L "Failed to parse private configuration";
                 back;
                 return;
             }
