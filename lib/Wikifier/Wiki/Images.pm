@@ -72,16 +72,16 @@ sub _display_image {
     #=== Retina scale support ===#
     #============================#
 
-    # HACK: this is not a retina request, but retina is enabled, and so is
+    # this is not a retina request, but retina is enabled, and so is
     # pregeneration. therefore, we will call ->generate_image() in order to
-    # pregenerate a retina version.
+    # pregenerate a retina version. this only happens if gen_override is true
+    # (pregenration request, not real request from user).
     if (my $retina = $wiki->opt('image.enable.retina')) {
-        my @scales = split /,/, $retina;
-        foreach (@scales) {
+        foreach (split /,/, $retina) {
 
             # the image is already retina, or pregeneration is disabled
             last if $image->{retina};
-            last if !$wiki->opt('image.enable.pregeneration');
+            last if !$opts{gen_override};
 
             # ignore scale 1 and non-integers
             s/^\s*//;
