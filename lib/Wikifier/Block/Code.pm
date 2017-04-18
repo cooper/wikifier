@@ -8,7 +8,8 @@ use warnings;
 use strict;
 
 our %block_types = (code => {
-    html => \&code_html
+    html  => \&code_html,
+    title => 1
 });
 
 sub code_html {
