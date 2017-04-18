@@ -277,7 +277,9 @@ sub get_page_cache {
 
     # SECOND redirect check - this cached page has @page.redirect
     if (length(my $redir = $result->{redirect})) {
-        return display_page_redirect($redir, $result);
+        $redir = display_page_redirect($redir, $result);
+        $redir->{cached} = 1;
+        return $redir;
     }
 
     $result->{cached}   = 1;
