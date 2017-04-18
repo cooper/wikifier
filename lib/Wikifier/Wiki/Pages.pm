@@ -210,6 +210,7 @@ sub _display_page {
     # redirect
     my $redir = $page->redirect;
     if (!$opts{no_redir} && $redir) {
+        L align 'Redirect', $redir;
         $result->{type}     = 'redirect';
         $result->{content}  = qq{<a href="$redir">Permanently moved</a>};
         $result->{redirect} = $redir;
@@ -281,6 +282,7 @@ sub get_page_cache {
 
     # this is a redirect
     if (my $redir = $result->{redirect}) {
+        L align 'Redirect', $redir;
         $result->{type}     = 'redirect';
         $result->{content}  = qq{<a href="$redir">Permanently moved</a>};
         $result->{redirect} = $redir;
