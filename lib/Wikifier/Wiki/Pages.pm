@@ -39,9 +39,6 @@ sub page_named {
 #
 #       draft_ok        if true, drafts will not be skipped
 #
-#       no_redir        if true, symbolic links will not be redirected. the
-#                       page content of the redirected page will be served
-#
 #   )
 #
 # Result
@@ -176,6 +173,10 @@ sub _display_page {
     $result->{type} = 'page';
     $result->{mime} = 'text/html';
 
+    # FIRST redirect check - this is for symbolic link redirects.
+    my $redir = display_page_redirect($page->redirect, $result);
+    return $redir if $redir;
+
     # caching is enabled, so let's check for a cached copy.
     if ($wiki->opt('page.enable.cache') && -f $cache_path) {
         $result = $wiki->get_page_cache($page, $result, \%opts);
@@ -207,16 +208,10 @@ sub _display_page {
         );
     }
 
-    # redirect
-    my $redir = $page->redirect;
-    if (!$opts{no_redir} && $redir) {
-        L align 'Redirect', $redir;
-        $result->{type}     = 'redirect';
-        $result->{content}  = qq{<a href="$redir">Permanently moved</a>};
-        $result->{redirect} = $redir;
-        $wiki->write_page_cache_maybe($page, $result);
-        return $result;
-    }
+    # THIRD redirect check - this is for pages we just generated with
+    # @page.redirect in them.
+    $redir = display_page_redirect($page->redirect, $result);
+    return $redir if $redir;
 
     # generate the HTML and headers.
     $result->{generated}  = 1;
@@ -280,13 +275,9 @@ sub get_page_cache {
         return display_error($err, cached => 1);
     }
 
-    # this is a redirect
-    if (my $redir = $result->{redirect}) {
-        L align 'Redirect', $redir;
-        $result->{type}     = 'redirect';
-        $result->{content}  = qq{<a href="$redir">Permanently moved</a>};
-        $result->{redirect} = $redir;
-        return $result;
+    # SECOND redirect check - this cached page has @page.redirect
+    if (length(my $redir = $result->{redirect})) {
+        return display_page_redirect($redir, $result);
     }
 
     $result->{cached}   = 1;
@@ -368,6 +359,16 @@ sub write_page_text {
     print {$fh} $stripper->parse($result->{content});
     close $fh;
     $result->{text_gen} = 1;
+    return $result;
+}
+
+# returns result for redirect if there is indeed a redirect, nothing otherwise.
+sub display_page_redirect {
+    my ($redir, $result) = @_;
+    return if !length $redir;
+    $result->{type}     = 'redirect';
+    $result->{content}  = qq{<a href="$redir">Permanently moved</a>};
+    $result->{redirect} = $redir;
     return $result;
 }
 
