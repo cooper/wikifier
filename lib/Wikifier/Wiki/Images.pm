@@ -118,7 +118,7 @@ sub _display_image {
 
     # we are not allowed to generate
     if ($wiki->opt('image.enable.restriction') && !$opts{gen_override}) {
-        my $dimension_str = "$$image{r_width}x$$image{r_height}";
+        my $dimension_str = "$$image{width}x$$image{height}";
         return display_error("Image does not exist at $dimension_str.");
     }
 
