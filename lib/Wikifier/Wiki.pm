@@ -75,10 +75,11 @@ sub read_config {
     # error.
     my $bn_file = basename($file);
     Lindent "($bn_file)";
-    if (my $err = $conf->parse) {
-        L "Failed to parse configuration: $err";
-        return;
-    }
+        if (my $err = $conf->parse) {
+            L "Failed to parse configuration: $err";
+            back;
+            return;
+        }
     back;
 
     # global wiki variables
@@ -101,10 +102,11 @@ sub read_config {
         # error.
         my $bn_private_file = basename($private_file);
         Lindent "($bn_private_file)";
-        if (my $err = $pconf->parse) {
-            L "Failed to parse private configuration: $err";
-            return;
-        }
+            if (my $err = $pconf->parse) {
+                L "Failed to parse private configuration: $err";
+                back;
+                return;
+            }
         back;
     }
 

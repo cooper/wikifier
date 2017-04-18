@@ -12,7 +12,7 @@ use Cwd qw(abs_path);
 sub convert_markdown {
     my ($wiki, $md_name) = (shift, @_);
     Lindent "($md_name)";
-    my $result = $wiki->_convert_markdown(@_);
+        my $result = $wiki->_convert_markdown(@_);
     back;
     return $result;
 }

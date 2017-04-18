@@ -27,7 +27,7 @@ my $json = JSON::XS->new->pretty;
 sub display_image {
     my $name = ref $_[1] ? $_[1][0] : $_[1];
     Lindent $name;
-    my $result = _display_image(@_);
+        my $result = _display_image(@_);
     back;
     return $result;
 }

@@ -24,32 +24,32 @@ sub start {
     ($loop, my $conf_file, my $stdio) = @_;
     Lindent 'Initializing server';
 
-    # load configuration.
-    ($conf = Wikifier::Page->new(
-        file_path => $conf_file,
-        name      => basename($conf_file)
-    ) or die "Error in configuration\n")->parse;
+        # load configuration.
+        ($conf = Wikifier::Page->new(
+            file_path => $conf_file,
+            name      => basename($conf_file)
+        ) or die "Error in configuration\n")->parse;
 
-    # create a timer for session disposal.
-    my $timer = IO::Async::Timer::Periodic->new(
-        interval => 300,
-        on_tick  => \&delete_old_sessions
-    );
-    $timer->start;
-    $loop->add($timer);
+        # create a timer for session disposal.
+        my $timer = IO::Async::Timer::Periodic->new(
+            interval => 300,
+            on_tick  => \&delete_old_sessions
+        );
+        $timer->start;
+        $loop->add($timer);
 
-    # listen
-    listen_unix();
-    listen_stdio() if $stdio;
-    back; # Initializing server
+        # listen
+        listen_unix();
+        listen_stdio() if $stdio;
+    back;
 
     # set up handlers.
     Wikifier::Server::Handlers::initialize();
 
     # create Wikifier::Wiki instances.
     Lindent 'Initializing wikis';
-    create_wikis();
-    pregenerate();
+        create_wikis();
+        pregenerate();
     back;
 
     # run forever.

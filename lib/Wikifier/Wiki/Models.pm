@@ -35,8 +35,8 @@ sub display_model {
     my $page = $page_name if blessed $page_name;
     $page_name = page_name($page_name);
     Lindent "($page_name)";
-    my $result = $wiki->_display_model($page_name, @_);
-    $page->{recent_result} = $result if $page;
+        my $result = $wiki->_display_model($page_name, @_);
+        $page->{recent_result} = $result if $page;
     back;
     return $result;
 }
@@ -107,7 +107,7 @@ sub display_model_code {
     my $page = $page_name if blessed $page_name;
     $page_name = page_name($page_name);
     Lindent "($page_name)";
-    my $result = $wiki->_display_model_code($page_name, @_);
+        my $result = $wiki->_display_model_code($page_name, @_);
     back;
     return $result;
 }
