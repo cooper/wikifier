@@ -41,14 +41,16 @@ sub start {
     # listen
     listen_unix();
     listen_stdio() if $stdio;
-    back;
+    back; # Initializing server
 
     # set up handlers.
     Wikifier::Server::Handlers::initialize();
 
     # create Wikifier::Wiki instances.
+    Lindent 'Initializing wikis';
     create_wikis();
     pregenerate();
+    back;
 
     # run forever.
     L 'Done initializing';
@@ -125,8 +127,6 @@ sub handle_data {
 sub create_wikis {
     my $w = $conf->get('server.wiki');
     my %confwikis = $conf->get_hash('server.wiki');
-    Lindent 'Initializing wikis';
-
     foreach my $name (keys %confwikis) {
         Lindent "[$name]";
 
@@ -169,8 +169,6 @@ sub create_wikis {
     } continue {
         back;
     }
-
-    back;
 }
 
 # if pregeneration is enabled, do so.
