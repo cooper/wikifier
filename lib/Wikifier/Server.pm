@@ -166,6 +166,7 @@ sub create_wikis {
         # it succeeded
         $wikis{$name} = $wiki;
         $wiki->{name} = $name;
+    } continue {
         back;
     }
 
