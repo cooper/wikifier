@@ -112,7 +112,7 @@ sub handle_wiki {
         $msg->reply(wiki => { config => \%conf });
     }
 
-    $msg->l("Successfully authenticated for read access");
+    $msg->l("Authenticated for read access");
 }
 
 # ro method 2: anonymous reauthentication
@@ -189,7 +189,7 @@ sub handle_login {
     $Wikifier::Server::sessions{$sess_id} = $conn->{sess}
         if length $sess_id;
 
-    $msg->l('Successfully authenticated for write access');
+    $msg->l("Authenticated for write access ($username)");
 }
 
 # rw method 2: session ID authentication
@@ -227,7 +227,6 @@ sub handle_page {
     my ($wiki, $msg) = read_required(@_, 'name') or return;
     my $result = $wiki->display_page($msg->{name});
     $msg->reply('page', $result);
-    $msg->l("Page '$$msg{name}' requested");
 }
 
 # page code request
@@ -245,7 +244,6 @@ sub handle_page_code {
         display_page => $msg->{display_page}
     );
     $msg->reply('page_code', $result);
-    $msg->l("Page '$$msg{name}' code requested");
 }
 
 # model code request
@@ -263,7 +261,6 @@ sub handle_model_code {
         $msg->{display_model}
     );
     $msg->reply('model_code', $result);
-    $msg->l("Model '$$msg{name}' code requested");
 }
 
 # page list
@@ -288,7 +285,6 @@ sub handle_page_list {
     @pages = sort { $sorter->($a, $b) } @pages;
 
     $msg->reply(page_list => { pages => \@pages });
-    $msg->l("Complete page list requested");
 }
 
 # model list
@@ -312,7 +308,6 @@ sub handle_model_list {
     @models = sort { $sorter->($a, $b) } @models;
 
     $msg->reply(model_list => { models => \@models });
-    $msg->l("Complete model list requested");
 }
 
 # image request
@@ -344,7 +339,6 @@ sub handle_image_list {
     @cats = sort { $sorter->($a, $b) } @cats;
 
     $msg->reply(image_list => { images => \@cats });
-    $msg->l("Complete image list requested");
 }
 
 # category posts
@@ -378,7 +372,6 @@ sub handle_cat_list {
     @cats = sort { $sorter->($a, $b) } @cats;
 
     $msg->reply(cat_list => { categories => \@cats });
-    $msg->l("Complete category list requested");
 }
 
 
