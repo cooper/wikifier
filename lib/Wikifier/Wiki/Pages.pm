@@ -343,8 +343,10 @@ sub write_page_cache {
     }), "\n";
 
     # save the content.
-    print {$fh} $result->{content}
-        if length $result->{content};
+    if (length(my $content = $result->{content})) {
+        chomp $content;
+        print {$fh} "$content\n";
+    }
     close $fh;
 
     # overwrite modified date to actual.
