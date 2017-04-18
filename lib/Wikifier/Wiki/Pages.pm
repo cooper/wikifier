@@ -255,13 +255,13 @@ sub get_page_cache {
     my @data = split /\n\n/, $cache_data, 2;
 
     # decode.
-    my $jdata = eval { $json->decode(shift @data) };
-    if (ref $jdata eq 'HASH') {
-        @$result{ keys %$jdata } = values %$jdata;
+    my $cache_data = eval { $json->decode(shift @data) };
+    if (ref $cache_data eq 'HASH') {
+        @$result{ keys %$cache_data } = values %$cache_data;
     }
 
     # if this is a draft, so pretend it doesn't exist.
-    if ($result->{draft} && !$opts->{draft_ok}) {
+    if ($cache_data->{draft} && !$opts->{draft_ok}) {
         L 'Draft';
         return display_error(
             "Page has not yet been published.",
@@ -271,12 +271,12 @@ sub get_page_cache {
     }
 
     # cached error
-    if (length(my $err = $result->{error})) {
+    if (length(my $err = $cache_data->{error})) {
         return display_error($err, cached => 1);
     }
 
     # SECOND redirect check - this cached page has @page.redirect
-    if (length(my $redir = $result->{redirect})) {
+    if (length(my $redir = $cache_data->{redirect})) {
         $redir = display_page_redirect($redir, $result);
         $redir->{cached} = 1;
         return $redir;
@@ -286,7 +286,6 @@ sub get_page_cache {
     $result->{content} .= shift @data;
     $result->{mod_unix} = $cache_modify;
     $result->{modified} = $time_str;
-
     return $result;
 }
 
