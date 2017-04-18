@@ -250,15 +250,19 @@ sub get_page_cache {
 
     $result->{content}  = "<!-- cached page dated $time_str -->\n\n";
 
-    # fetch the prefixing data.
+    # fetch the prefixing JSON manifest
     my $cache_data = file_contents($page->cache_path);
     my @data = split /\n\n/, $cache_data, 2;
 
-    # decode.
-    my $cache_data = eval { $json->decode(shift @data) };
-    if (ref $cache_data eq 'HASH') {
-        @$result{ keys %$cache_data } = values %$cache_data;
+    # decode the manifest
+    $cache_data = eval { $json->decode(shift @data) };
+    if (ref $cache_data ne 'HASH') {
+        L 'Malformed cache metadata!';
+        unlink $page->cache_path;
+        return display_error('Malformed cache metadata');
+        # NO cached (force regeneration)
     }
+    @$result{ keys %$cache_data } = values %$cache_data;
 
     # if this is a draft, so pretend it doesn't exist.
     if ($cache_data->{draft} && !$opts->{draft_ok}) {
