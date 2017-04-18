@@ -9,7 +9,7 @@ use GD;                             # image generation
 use HTTP::Date qw(time2str);        # HTTP date formatting
 use Digest::MD5 qw(md5_hex);        # etags
 use File::Spec ();                  # simplifying symlinks
-use Wikifier::Utilities qw(L align hash_maybe);
+use Wikifier::Utilities qw(L Lindent align back hash_maybe);
 use JSON::XS ();
 
 my $json = JSON::XS->new->pretty;
@@ -25,10 +25,10 @@ my $json = JSON::XS->new->pretty;
 #   gen_override    set true for pregeneration so we can generate any dimensions
 # )
 sub display_image {
-    my $result = _display_image(@_);
     my $name = ref $_[1] ? $_[1][0] : $_[1];
-    L align('Error', "'$name': $$result{error}")
-        if $result->{error};
+    Lindent $name;
+    my $result = _display_image(@_);
+    back;
     return $result;
 }
 sub _display_image {

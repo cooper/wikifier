@@ -13,7 +13,6 @@ sub convert_markdown {
     my ($wiki, $md_name) = (shift, @_);
     Lindent "($md_name)";
     my $result = $wiki->_convert_markdown(@_);
-    L align('Error', $result->{error}) if $result->{error};
     back;
     return $result;
 }

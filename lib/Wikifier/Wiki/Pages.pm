@@ -148,10 +148,6 @@ sub display_page {
     $page_name = page_name($page_name);
     Lindent "($page_name)";
     my $result = $wiki->_display_page($page_name, @_);
-    L align('Error', $result->{error})
-        if $result->{error} && !$result->{draft} && !$result->{parse_error};
-    L align('Draft', 'skipped')
-        if $result->{error} && $result->{draft};
     $page->{recent_result} = $result if $page;
     back;
     return $result;
@@ -204,6 +200,7 @@ sub _display_page {
 
     # if this is a draft, so pretend it doesn't exist
     if ($page->draft && !$opts{draft_ok}) {
+        L 'Draft';
         return $wiki->display_error_cache($page,
             "Page has not yet been published.",
             draft => 1
@@ -269,6 +266,7 @@ sub get_page_cache {
 
     # if this is a draft, so pretend it doesn't exist.
     if ($result->{draft} && !$opts->{draft_ok}) {
+        L 'Draft';
         return display_error(
             "Page has not yet been published.",
             draft  => 1,
@@ -392,8 +390,6 @@ sub display_page_code {
     $page_name = page_name($page_name);
     Lindent "($page_name)";
     my $result = $wiki->_display_page_code($page_name, @_);
-    L align('Error', $result->{error})
-        if $result->{error};
     back;
     return $result;
 }

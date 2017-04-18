@@ -36,10 +36,6 @@ sub display_model {
     $page_name = page_name($page_name);
     Lindent "($page_name)";
     my $result = $wiki->_display_model($page_name, @_);
-    L align('Error', $result->{error})
-        if $result->{error} && !$result->{draft} && !$result->{parse_error};
-    L align('Draft', 'skipped')
-        if $result->{draft};
     $page->{recent_result} = $result if $page;
     back;
     return $result;
@@ -84,6 +80,7 @@ sub _display_model {
 
     # if this is a draft, pretend it doesn't exist.
     if ($page->get('page.draft')) {
+        L 'Draft';
         return display_error(
             "Model has not yet been published.",
             draft => 1
@@ -111,8 +108,6 @@ sub display_model_code {
     $page_name = page_name($page_name);
     Lindent "($page_name)";
     my $result = $wiki->_display_model_code($page_name, @_);
-    L align('Error', $result->{error})
-        if $result->{error};
     back;
     return $result;
 }

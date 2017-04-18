@@ -349,6 +349,8 @@ sub verify_login {
 
 sub display_error {
     my ($error_str, %opts) = @_;
+    L align('Error', $error_str)
+        if !$opts{draft} && !$opts{parse_error};
     return {
         type => 'not found',
         error => $error_str,
@@ -375,14 +377,14 @@ sub path_for_category {
 # return abs path for an image
 sub path_for_image {
     my ($wiki, $image_name) = @_;
-    return abs_path($wiki->opt('dir.image').'/'.$image_name);
+    return abs_path($wiki->opt('dir.image')."/$image_name");
 }
 
 # return abs path for a model
 sub path_for_model {
     my ($wiki, $model_name) = @_;
     $model_name = page_name($model_name, '.model');
-    return abs_path($wiki->opt('dir.model').'/'.$model_name);
+    return abs_path($wiki->opt('dir.model')."/$model_name");
 }
 
 # files in directory.
