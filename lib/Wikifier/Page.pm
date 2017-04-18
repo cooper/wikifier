@@ -490,7 +490,7 @@ sub name_ne {
 sub prefix {
     my $page = shift;
     my (undef, $prefix) = fileparse($page->name);
-    $prefix =~ s/\///;
+    $prefix =~ s/\/$//;
     return undef if $prefix eq '.';
     return $prefix;
 }
