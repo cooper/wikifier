@@ -264,8 +264,7 @@ sub generate_image {
         $result->{use_fullsize} = 1;
         L align(
             'Skip',
-            "'$$image{name}' at ${width}x${height}" .
-            " >= original ${fi_width}x${fi_height}"
+            "${width}x${height} >= original ${fi_width}x${fi_height}"
         );
 
         # symlink to the full-size image.
@@ -332,7 +331,7 @@ sub generate_image {
 
     L align(
         'Generate',
-        "'$$image{name}' at ${width}x${height}" .
+        "${width}x${height}" .
         ($image->{retina} ? " (\@$$image{retina}x)" : '')
     );
     return; # success
