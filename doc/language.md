@@ -1,6 +1,6 @@
 # Language
 
-Wikifier's source language is designed to be easily legible by the naked eye.
+wikifier's source language is designed to be easily legible by the naked eye.
 
 * [Language](#language)
   * [Syntax](#syntax)

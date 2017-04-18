@@ -12,7 +12,7 @@ use File::Spec ();                  # simplifying symlinks
 use Wikifier::Utilities qw(L align hash_maybe);
 use JSON::XS ();
 
-my $json = JSON::XS->new->pretty(1);
+my $json = JSON::XS->new->pretty;
 
 ##############
 ### IMAGES ###
@@ -26,7 +26,8 @@ my $json = JSON::XS->new->pretty(1);
 # )
 sub display_image {
     my $result = _display_image(@_);
-    L align('Error', "'$_[1]': $$result{error}")
+    my $name = ref $_[1] ? $_[1][0] : $_[1];
+    L align('Error', "'$name': $$result{error}")
         if $result->{error};
     return $result;
 }
