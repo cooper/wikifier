@@ -118,7 +118,7 @@ sub _is_main_page {
 # deal with categories after parsing a page.
 sub cat_check_page {
     my ($wiki, $page) = @_;
-    $wiki->cat_add_page($page, 'pages', 'data');
+    $wiki->cat_add_page($page, 'pages', type => 'data');
 
     # actual categories.
     my $cats = $page->get('category');
@@ -131,17 +131,19 @@ sub cat_check_page {
     # image categories
     foreach my $image_name (keys_maybe $page->{images}) {
         last if !$wiki->opt('image.enable.tracking');
-        $wiki->cat_add_page($page, $image_name, 'image', {
-            dimensions => $page->{images}{$image_name}
-        }, {
-            width  => $page->{images_fullsize}{$image_name}[0],
-            height => $page->{images_fullsize}{$image_name}[1]
-        });
+        $wiki->cat_add_page($page, $image_name,
+            type        => 'image',
+            page_extras => { dimensions => $page->{images}{$image_name} },
+            cat_extras  => {
+                width   => $page->{images_fullsize}{$image_name}[0],
+                height  => $page->{images_fullsize}{$image_name}[1]
+            }
+        );
     }
 
     # model categories
     foreach my $model_name (keys_maybe $page->{models}) {
-        $wiki->cat_add_page($page, $model_name, 'model');
+        $wiki->cat_add_page($page, $model_name, type => 'model');
     }
 }
 
@@ -149,23 +151,26 @@ sub cat_check_page {
 # update the page data within the category if it is outdated.
 #
 # $cat_name     name of category, with or without extension
-# $cat_type     for pseudocategories, the type, such as 'image' or 'model'
-# $page_extras  for pseudocategories, a hash ref of additional page data
-# $cat_extras   for pseudocategories, a hash ref of additional cat data
+#
+# %opts = (
+#   cat_type        for pseudocategories, the type, such as 'image' or 'model'
+#   page_extras     for pseudocategories, a hash ref of additional page data
+#   cat_extras      for pseudocategories, a hash ref of additional cat data
+# )
 #
 # returns true on success. unchanged is also considered success.
 #
 sub cat_add_page {
-    my ($wiki, $page, $cat_name, $cat_type, $page_extras, $cat_extras) = @_;
+    my ($wiki, $page, $cat_name, %opts) = @_;
     $cat_name = cat_name($cat_name);
     my $time = time;
-    my $cat_file = $wiki->path_for_category($cat_name, $cat_type);
+    my $cat_file = $wiki->path_for_category($cat_name, $opts{cat_type});
 
     # set page infos.
     my $page_data = {
         asof => $time,
         hash_maybe $page->page_info,
-        hash_maybe $page_extras
+        hash_maybe $opts{page_extras}
     };
 
     # first, check if the category exists yet.
@@ -213,10 +218,10 @@ sub cat_add_page {
     # the category does not yet exist.
     binmode $fh, ':utf8';
     print {$fh} $json->encode({
-        hash_maybe $cat_extras,
+        hash_maybe $opts{cat_extras},
         category   => cat_name_ne($cat_name),
         file       => $cat_name,
-        cat_type   => $cat_type,
+        cat_type   => $opts{cat_type},
         created    => $time,
         mod_unix   => $time,
         pages      => { $page->name => $page_data }

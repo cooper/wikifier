@@ -68,7 +68,7 @@ sub _display_model {
     if ($err) {
         $page->{vars_only}++;
         $page->parse;
-        $wiki->cat_add_page($page, 'models', 'data');
+        $wiki->cat_add_page($page, 'models', type => 'data');
         return display_error($err, parse_error => 1);
     }
 
@@ -76,7 +76,7 @@ sub _display_model {
     $result->{warnings} = $page->{warnings};
 
     # update models category
-    $wiki->cat_add_page($page, 'models', 'data');
+    $wiki->cat_add_page($page, 'models', type => 'data');
 
     # if this is a draft, pretend it doesn't exist.
     if ($page->get('page.draft')) {
