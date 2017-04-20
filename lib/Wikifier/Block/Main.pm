@@ -23,19 +23,49 @@ our %block_types = (
 sub main_parse {
     my $block = shift;
 
-    # produce warnings for stray text.
-    foreach ($block->content_text_pos) {
-        my ($text, $pos) = @$_;
+    my $create_section = sub {
+        my ($items, $positions) = @_;
+        return if !@$items;
+        
+        # create the section.
+        my $item = $page->wikifier->create_block(
+            parent      => $block,
+            type        => 'section',
+            position    => [ @$positions ],
+            content     => [ @$items ]
+        );
 
+        # adopt it.
+        $el->add($item->html($page));
+    };
+
+    my (@items, @positions);
+    foreach ($block->content_visible_pos) {
+        my ($item, $pos) = @$_;
+        
+        # this is a top-level block.
+        if (blessed $item) { # && $item->type eq 'Section'
+            $create_section->(\@items, \@positions);
+            @items = ();
+            @positions = ();
+            $el->add($item->html($page));
+            next;
+        }
+
+        # this is text.
         # trim the text and increment the line number appropriately
-        ($text, my $removed) = trim_count($text);
-        $pos->{line} += $removed;
-
-        next unless length $text;
-        $text = truncate_hr($text, 30);
-        $block->warning($pos, "Stray text '$text' ignored");
+        if (!blessed $item) {
+            ($item, my $removed) = trim_count($item);
+            $pos->{line} += $removed;
+            next unless length $item;
+        }
+        
+        # stray items will be passed to a new section{}
+        push @items, $item;
+        push @positions, $pos;
     }
 
+    $create_section->(\@items, \@positions);
     return 1;
 }
 

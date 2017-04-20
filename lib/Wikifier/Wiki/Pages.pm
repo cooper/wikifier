@@ -374,7 +374,7 @@ sub display_page_redirect {
     my ($redir, $result) = @_;
     return if !length $redir;
     $result->{type}     = 'redirect';
-    $result->{content}  = qq{<a href="$redir">Permanently moved</a>};
+    $result->{content}  = qq{<a href="$redir">Permanently moved</a>.};
     $result->{redirect} = $redir;
     return $result;
 }

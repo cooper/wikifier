@@ -471,6 +471,7 @@ sub _image_round {
 
 # page filename, with or without extension.
 # this DOES take symbolic links into account.
+# this DOES include the page prefix, if applicable.
 sub name {
     my $page = shift;
     return $page->{abs_name} //= do {
