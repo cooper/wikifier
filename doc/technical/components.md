@@ -23,11 +23,11 @@ HTML. This is not to be used directly; instead set up a
 [WiWiki](#wikifierwiki) directly from code.
 
 The wikifier package is divided into several subpackages:
-* __Parser__ - Reads [wiki language](language.md) source files
+* __Parser__ - Reads [wiki language](../language.md) source files
   character-by-character and [parses](parsing.md) them.
-* __Formatter__ - Translates [formatted text](language.md#text-formatting) such
+* __Formatter__ - Translates [formatted text](../language.md#text-formatting) such
  as bolds, italics, and links to HTML.
-* __BlockManager__ - Dynamically loads and creates [blocks](language.md#blocks).
+* __BlockManager__ - Dynamically loads and creates [blocks](../language.md#blocks).
 * __Block__ - Base class of all blocks.
 * __Element__ - Represents a single HTML element.
 * __Elements__ - Represents a group of HTML elements.
@@ -38,7 +38,7 @@ The wikifier package is divided into several subpackages:
 **WiPage** (Wikifier::Page) is the most basic interface to the wikifier. As the
 name suggests, a Wikifier::Page object represents a single page of a wiki.
 Usually it is associated with a single `.page` file written in the
-[wikifier language](langauge.md). WiPage utilizes the wikifier package to
+[wikifier language](../langauge.md). WiPage utilizes the wikifier package to
 generate HTML from the source file.
 
 ## Wikifier::Wiki
@@ -86,9 +86,9 @@ One wikiserver can manage any number of [WiWikis](#wikifierwiki).
 ### Usage
 
 1. For each wiki, you will need to write a
-   [WiWiki configuration](configuration.md#wikifierwiki-public-options).
+   [WiWiki configuration](../configuration.md#wikifierwiki-public-options).
 2. Once your wikis are configured, write a
-   [wikiserver configuration](configuration.md#wikifierserver-options).
+   [wikiserver configuration](../configuration.md#wikifierserver-options).
 3. Set up a [web script](#interfaces) to connect to the wikiserver.
 4. Run the included `wikiserver` program.
 

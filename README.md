@@ -131,8 +131,8 @@ General
 * [Markdown](doc/markdown.md)           - wikifier + Markdown
 
 Technical
-* [Parsing](doc/parsing.md)             - wikifier parsing stages
-* [Components](doc/components.md)       - wikifier programming interfaces
+* [Parsing](doc/technical/parsing.md)       - wikifier parsing stages
+* [Components](doc/technical/components.md) - wikifier programming interfaces
 
 ## Contact
 

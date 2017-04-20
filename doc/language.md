@@ -28,7 +28,7 @@ wikifier's source language is designed to be easily legible by the naked eye.
 
 ## Syntax
 
-The wikifier source language is [parsed hierarchically](parsing.md).
+The wikifier source language is [parsed hierarchically](technical/parsing.md).
 The source is divided into components called [blocks](#blocks), each of which
 is responsible for parsing its inner contents. The master parser is
 concerned only with the most basic syntax:

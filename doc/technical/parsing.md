@@ -11,23 +11,23 @@ separate it into several blocks. Additionally, variable definitions are handled,
 and comments are removed. Anything within a block (besides comments and other
 blocks) is untouched by the master parser.
 
-2. [__Block parsers__](blocks.md): Each block type implements its own parser
+2. [__Block parsers__](../blocks.md): Each block type implements its own parser
 which parses the data within the block. Block types can be hereditary, in which
-case they may rely on another block type for parsing. [Map](blocks.md#map) and
-[List](blocks.md#list) are the most common parent block types.
+case they may rely on another block type for parsing. [Map](../blocks.md#map) and
+[List](../blocks.md#list) are the most common parent block types.
 
-3. [__Formatting parser__](language.md#text-formatting): Many block parsers make
+3. [__Formatting parser__](../language.md#text-formatting): Many block parsers make
 use of a formatting parser afterwards, the one which converts text formatting
 such as `[b]` and `[i]` to bold and italic text, etc. Values in
-[variable assignment](language.md#assignment) are also formatted.
+[variable assignment](../language.md#assignment) are also formatted.
 
 ## Master parser
 
 The master parser is concerned only with the most basic syntax:
-* Dividing the source into [blocks](language.md#blocks)
-* Stripping [comments](language.md#comments)
-* [Variable assignment](language.md#assignment)
-* [Conditionals](language.md#conditionals)
+* Dividing the source into [blocks](../language.md#blocks)
+* Stripping [comments](../language.md#comments)
+* [Variable assignment](../language.md#assignment)
+* [Conditionals](../language.md#conditionals)
 
 ### Current
 
@@ -44,8 +44,8 @@ Parser state information is stored in the **current** object:
 | `->pos`               | Position          | returns the current position as a hash
 | `->catch`             | [Catch](#catch)   | fetch or set the current catch  
 | `->clear_catch`       |                   | close the current catch, returning to its parent
-| `->block`             | [Block](language.md#blocks) | fetch or set the current block
-| `->is_comment`        | Boolean           | true if we are currently inside a [block comment](language.md#comments)
+| `->block`             | [Block](../language.md#blocks) | fetch or set the current block
+| `->is_comment`        | Boolean           | true if we are currently inside a [block comment](../language.md#comments)
 | `->mark_comment`      |                   | increment the block comment level
 | `->clear_comment`     |                   | decrease the block comment level
 | `->is_escaped`        | Boolean           | true if the current character was escaped (`{last_char} eq '\\'`)
@@ -54,7 +54,7 @@ Parser state information is stored in the **current** object:
 | `->is_ignored`        | Boolean           | true if the current character is a master parser character
 | `->mark_ignored`      |                   | mark the current character as ignored
 | `->clear_ignored`     |                   | clear the ignored state in preparation for the next character
-| `->is_curly`          | Boolean           | true if we are currently inside a [brace-escape](language.md#escaping)
+| `->is_curly`          | Boolean           | true if we are currently inside a [brace-escape](../language.md#escaping)
 | `->mark_curly`        |                   | increment the brace-escape level
 | `->clear_curly`       |                   | decrease the brace-escape level
 | `->warning`           | `$pos, $message`  | push a parser warning at `$pos` or the current position if unspecified
@@ -63,7 +63,7 @@ Parser state information is stored in the **current** object:
 | `->push_content_pos`  | `\@content, \@pos` | push the contents (mixed text/block) to the current catch at provided positions
 | `->append_content`    | `@content`        | push or append the contents (mixed text/block) to the current catch
 | `->clear_content`     |                   | purge all content and position information from the current catch
-| `->last_content`      | String or [Block](language.md#blocks) | fetch or set the last element of the current catch content
+| `->last_content`      | String or [Block](../language.md#blocks) | fetch or set the last element of the current catch content
 
 ### Catch
 
