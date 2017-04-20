@@ -113,6 +113,8 @@ sub list_html {
     $block->{list_array_values} = \@new;
 }
 
+sub TO_JSON { shift->to_data }
+
 sub to_data {
     my $list = shift;
     return $list->{list_array_values};

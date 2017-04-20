@@ -232,6 +232,8 @@ sub map_html {
     }
 }
 
+sub TO_JSON { shift->to_data }
+
 sub to_data {
     my $map = shift;
     return $map->{map_hash};
