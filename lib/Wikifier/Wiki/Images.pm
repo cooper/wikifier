@@ -451,7 +451,6 @@ sub get_image {
     my @stat = stat $path; # might be empty
     my $image_data = {
         file        => $filename,
-        title       => $filename,   # may be overwritten by category
         created     => $stat[10],   # ctime, probably overwritten
         mod_unix    => $stat[9]     # mtime, probably overwritten
     };
@@ -466,12 +465,13 @@ sub get_image {
     # in the category, "file" is the cat filename, and the "category"
     # is the normalized image filename. remove these to avoid confusion.
     # the original image filename is image_file, so overwrite file.
-    delete @cat{'file', 'category'};
+    delete @cat{'category', 'file'};
     $cat{file} = delete $cat{image_file} if length $cat{image_file};
-
+    
     # inject metadata from category
     @$image_data{ keys %cat } = values %cat;
-
+    $image_data->{title} //= $image_data->{file};
+    
     return $image_data;
 }
 
