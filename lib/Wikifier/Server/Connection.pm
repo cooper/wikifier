@@ -9,7 +9,7 @@ use JSON::XS ();
 use Wikifier::Utilities qw(L filter_nonempty);
 use Scalar::Util qw(weaken);
 
-my $json = JSON::XS->new->convert_blessed;
+my $json = JSON::XS->new->allow_blessed->convert_blessed;
 my $id = 'a';
 
 # create a new connection.
