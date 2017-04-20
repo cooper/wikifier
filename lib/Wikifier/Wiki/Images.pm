@@ -423,13 +423,18 @@ sub _wiki_default_sizer {
 
 # returns a filename-to-metadata hash for all images in the wiki
 sub get_images {
-    my ($wiki, %images, %done) = shift;
+    my ($wiki, %images) = shift;
     my @cat_names = map substr($_, 0, -4), $wiki->all_categories('image');
-    foreach my $filename ($wiki->all_images, @cat_names) {
-        next if $done{$filename}++;
+    
+    # do categories first.
+    # images without category files will be skipped.
+    foreach my $filename (@cat_names, $wiki->all_images) {
+        next if $images{$filename};
         my $image_data = $wiki->get_image($filename) or next;
+        $filename = $image_data->{file};
         $images{$filename} = $image_data;
     }
+    
     return \%images;
 }
 
@@ -440,7 +445,7 @@ sub get_image {
     my $cat_path = $wiki->path_for_category($filename, 'image');
 
     # neither the image nor a category for it exist. this is a ghost
-    next if !-f $path && !-f $cat_path;
+    return if !-f $path && !-f $cat_path;
 
     # basic info available for all images
     my @stat = stat $path; # might be empty
@@ -452,15 +457,17 @@ sub get_image {
     };
 
     # from this point on, we need the category
-    next unless -f $cat_path;
+    return $image_data unless -f $cat_path;
 
     # it exists; let's see what's inside.
     my %cat = hash_maybe eval { $json->decode(file_contents($cat_path)) };
-    next if !scalar keys %cat;
+    return $image_data if !scalar keys %cat;
 
     # in the category, "file" is the cat filename, and the "category"
-    # is the image filename. remove these to avoid confusion.
+    # is the normalized image filename. remove these to avoid confusion.
+    # the original image filename is image_file, so overwrite file.
     delete @cat{'file', 'category'};
+    $cat{file} = delete $cat{image_file} if length $cat{image_file};
 
     # inject metadata from category
     @$image_data{ keys %cat } = values %cat;
