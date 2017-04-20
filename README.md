@@ -133,6 +133,7 @@ General
 Technical
 * [Parsing](doc/technical/parsing.md)       - wikifier parsing stages
 * [Components](doc/technical/components.md) - wikifier programming interfaces
+* [Commands](doc/technical/server-commands.md) - wikiserver commands
 
 ## Contact
 

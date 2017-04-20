@@ -425,7 +425,7 @@ sub _display_page_code {
     $result->{mime}     = 'text/plain';
     $result->{type}     = 'page_code';
     $result->{content}  = $code;
-    $result->{length}   = length $result->{content};
+    $result->{length}   = length $result->{content}; # TODO: remove
 
     # we might want to also call ->display_page(). this would be useful
     # for determining where errors occur on the page.
