@@ -21,18 +21,24 @@ my $json = JSON::XS->new->pretty->convert_blessed;
 ##################
 
 # displays a pages from a category in a blog-like form.
+# %opts = (
+#   cat_type    category type
+#   page_n      page number
+# )
 sub display_cat_posts {
-    my ($wiki, $cat_name, $page_n, $cat_type) = @_; my $result = {};
+    my ($wiki, $cat_name, %opts) = @_; my $result = {};
     $cat_name = cat_name($cat_name);
     my $cat_name_ne = cat_name_ne($cat_name);
-    my ($pages, $title) = $wiki->cat_get_pages($cat_name, $cat_type);
+    my ($pages, $title) = $wiki->cat_get_pages($cat_name,
+        cat_type => $opts{cat_type}
+    );
 
     # no pages means no category.
     return display_error("Category does not exist.")
         if !$pages;
 
     $result->{type}     = 'cat_posts';
-    $result->{cat_type} = $cat_type;
+    $result->{cat_type} = $opts{cat_type};
     $result->{file}     = $cat_name;
     $result->{category} = $cat_name_ne;
     $result->{title}    = $wiki->opt("cat.$cat_name_ne.title") // $title;
@@ -118,7 +124,7 @@ sub _is_main_page {
 # deal with categories after parsing a page.
 sub cat_check_page {
     my ($wiki, $page) = @_;
-    $wiki->cat_add_page($page, 'pages', type => 'data');
+    $wiki->cat_add_page($page, 'pages', cat_type => 'data');
 
     # actual categories.
     my $cats = $page->get('category');
@@ -132,7 +138,7 @@ sub cat_check_page {
     foreach my $image_name (keys_maybe $page->{images}) {
         last if !$wiki->opt('image.enable.tracking');
         $wiki->cat_add_page($page, $image_name,
-            type        => 'image',
+            cat_type    => 'image',
             page_extras => { dimensions => $page->{images}{$image_name} },
             cat_extras  => {
                 width   => $page->{images_fullsize}{$image_name}[0],
@@ -143,7 +149,7 @@ sub cat_check_page {
 
     # model categories
     foreach my $model_name (keys_maybe $page->{models}) {
-        $wiki->cat_add_page($page, $model_name, type => 'model');
+        $wiki->cat_add_page($page, $model_name, cat_type => 'model');
     }
 }
 
@@ -235,7 +241,7 @@ sub cat_add_page {
 # if the category does not exist, returns nothing.
 # returns (page data, category title, error)
 sub cat_get_pages {
-    my ($wiki, $cat_name, $cat_type) = @_;
+    my ($wiki, $cat_name, %opts) = @_;
     $cat_name = cat_name($cat_name);
     my $cat_name_ne = cat_name_ne($cat_name);
     
@@ -247,7 +253,7 @@ sub cat_get_pages {
     # be removed from the cat file.
 
     # this category does not exist.
-    my $cat_file = $wiki->path_for_category($cat_name, $cat_type);
+    my $cat_file = $wiki->path_for_category($cat_name, $opts{cat_type});
     if (!-f $cat_file) {
         L "No such category $cat_file";
         return;
@@ -302,10 +308,10 @@ sub cat_get_pages {
             };
 
             # page is no longer member of category.
-            if (length $cat_type && $cat_type eq 'image') {
+            if (length $opts{cat_type} && $opts{cat_type} eq 'image') {
                 next PAGE unless $page->{images}{$cat_name_ne};
             }
-            elsif (length $cat_type && $cat_type eq 'model') {
+            elsif (length $opts{cat_type} && $opts{cat_type} eq 'model') {
                 next PAGE unless $page->{models}{$cat_name_ne};
             }
             else {
@@ -319,7 +325,7 @@ sub cat_get_pages {
     }
 
     # is this category now empty?
-    if ($wiki->cat_should_delete($cat_name_ne, $cat_type, \%final_pages)) {
+    if ($wiki->cat_should_delete($cat_name_ne, $opts{cat_type}, \%final_pages)) {
         unlink $cat_file;
         return (undef, undef, 'Purge');
     }

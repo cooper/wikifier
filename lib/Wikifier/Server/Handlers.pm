@@ -284,7 +284,7 @@ sub handle_page_list {
     my ($wiki, $msg) = write_required(@_, 'sort') or return;
 
     # get all pages
-    my $all = $wiki->cat_get_pages('pages', 'data');
+    my $all = $wiki->cat_get_pages('pages', cat_type => 'data');
     return if !$all || ref $all ne 'HASH';
     my %pages = %$all;
     my @pages = map {
