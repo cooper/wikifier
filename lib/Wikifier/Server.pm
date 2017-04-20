@@ -15,7 +15,7 @@ use Wikifier::Wiki;
 use Wikifier::Server::Message;
 use Wikifier::Server::Handlers;
 use Wikifier::Server::Connection;
-use Wikifier::Utilities qw(align L Lindent back page_name);
+use Wikifier::Utilities qw(align L Lindent back page_name cat_name);
 
 our ($loop, $conf, %wikis, %files, %sessions);
 
@@ -174,11 +174,11 @@ sub create_wikis {
 # if pregeneration is enabled, do so.
 sub pregenerate {
     return unless $conf->get('server.enable.pregeneration');
-    gen_wiki($_) foreach values %wikis;
+    gen_wiki($_, 1) foreach values %wikis;
 }
 
 sub gen_wiki {
-    my $wiki = shift;
+    my ($wiki, $initial) = @_;
     my $page_dir  = $wiki->opt('dir.page');
     my $cache_dir = $wiki->opt('dir.cache');
     my $md_dir    = $wiki->opt('dir.md');
@@ -195,6 +195,18 @@ sub gen_wiki {
     }
 
     Lindent "[$$wiki{name}]";
+
+    # check for conflicting image filenames
+    my %found_image;
+    foreach my $image_name ($wiki->all_images) {
+        last unless $initial;
+        my $cat_name = cat_name($image_name);
+        if (my $existing = $found_image{$cat_name}) {
+            L "Conflicting image filenames: $existing and $image_name";
+            next;
+        }
+        $found_image{$cat_name} = $image_name;
+    }
 
     # markdown files
     foreach my $md_name ($wiki->all_markdowns) {

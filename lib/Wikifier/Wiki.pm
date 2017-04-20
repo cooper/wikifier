@@ -275,6 +275,7 @@ sub all_models {
 }
 
 # an array of file names in the image directory.
+# you may be looking for ->get_images, which includes metadata.
 sub all_images {
     return unique_files_in_dir(
         shift->opt('dir.image'),
