@@ -417,8 +417,7 @@ sub unique_files_in_dir {
             
             # this is a directory
             if (-d $path) {
-                next if $this_dir_only;
-                $do_dir->("$pfx$file/");
+                $do_dir->("$pfx$file/") unless $this_dir_only;
                 next;
             }
 

@@ -8,6 +8,7 @@ use 5.010;
 use HTTP::Date qw(time2str);
 use JSON::XS ();
 use HTML::Strip;
+use Scalar::Util qw(blessed);
 use Wikifier::Utilities qw(
     page_names_equal cat_name cat_name_ne
     keys_maybe hash_maybe L
@@ -121,6 +122,7 @@ sub cat_check_page {
 
     # actual categories.
     my $cats = $page->get('category');
+    $cats = $cats->to_data if blessed $cats;
     if ($cats && ref $cats eq 'HASH') {
         $page->{categories} = $cats;
         $wiki->cat_add_page($page, $_) for keys %$cats;
