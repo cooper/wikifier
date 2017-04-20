@@ -12,7 +12,7 @@ use File::Spec ();                  # simplifying symlinks
 use Wikifier::Utilities qw(L Lindent align back hash_maybe);
 use JSON::XS ();
 
-my $json = JSON::XS->new->pretty;
+my $json = JSON::XS->new->pretty->convert_blessed;
 
 ##############
 ### IMAGES ###

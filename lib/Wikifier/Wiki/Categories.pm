@@ -14,7 +14,7 @@ use Wikifier::Utilities qw(
     keys_maybe hash_maybe L
 );
 
-my $json = JSON::XS->new->pretty;
+my $json = JSON::XS->new->pretty->convert_blessed;
 
 ##################
 ### CATEGORIES ###

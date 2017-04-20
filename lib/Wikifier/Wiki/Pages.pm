@@ -12,7 +12,7 @@ use HTML::Strip;
 use Wikifier::Utilities qw(page_name align L Lindent back filter_nonempty);
 
 my $stripper = HTML::Strip->new(emit_spaces => 0);
-my $json = JSON::XS->new->pretty(1);
+my $json = JSON::XS->new->pretty->convert_blessed;
 
 #############
 ### PAGES ###
