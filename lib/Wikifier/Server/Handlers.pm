@@ -19,6 +19,8 @@ sub initialize {
 #   a-  sort alphabetically             descending  (z-a)
 #   c+  sort by creation time           ascending   (oldest first)
 #   c-  sort by creation time           descending  (recent first)
+#   d+  sort by dimensions              ascending   (images only)
+#   d-  sort by dimensions              descending  (images only)
 #   m+  sort by modification time       ascending   (oldest first)
 #   m-  sort by modification time       descending  (recent first)
 #   u+  sort by author alphabetically   ascending   (a-z)
@@ -30,11 +32,22 @@ my %sort_options = (
     'a-' => sub { _t($_[1])                 cmp _t($_[0])                   },
     'c+' => sub {   ($_[0]{created}  ||  0) <=>   ($_[1]{created}  ||  0)   },
     'c-' => sub {   ($_[1]{created}  ||  0) <=>   ($_[0]{created}  ||  0)   },
+    'd+' => sub { _sort_dimensions(1, @_)                                   },
+    'd-' => sub { _sort_dimensions(0, @_)                                   },
     'm+' => sub {   ($_[0]{mod_unix} ||  0) <=>   ($_[1]{mod_unix} ||  0)   },
     'm-' => sub {   ($_[1]{mod_unix} ||  0) <=>   ($_[0]{mod_unix} ||  0)   },
     'u+' => sub { lc($_[0]{author}   // '') cmp lc($_[1]{author}   // '')   },
     'u-' => sub { lc($_[1]{author}   // '') cmp lc($_[0]{author}   // '')   }
 );
+
+sub _sort_dimensions {
+    my ($ascend, $img1, $img2) = @_;
+    return 0 if !defined $img1->{width};
+    $img1 = $img1->{width} * $img1->{height};
+    $img2 = $img2->{width} * $img2->{height};
+    return $img1 <=> $img2 if $ascend;
+    return $img2 <=> $img1;
+}
 
 sub _simplify_errors {
     my @errs = @_;
