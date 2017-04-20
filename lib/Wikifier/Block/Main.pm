@@ -21,8 +21,8 @@ our %block_types = (
 );
 
 sub main_parse {
-    my $block = shift;
-
+    my ($block, $page) = @_;
+    
     my $create_section = sub {
         my ($items, $positions) = @_;
         return if !@$items;
