@@ -12,6 +12,7 @@ use Scalar::Util qw(blessed looks_like_number);
 use File::Basename qw(basename fileparse);
 use Cwd qw(abs_path);
 use HTML::Strip;
+use HTTP::Date qw(str2time);
 use Wikifier::Utilities qw(
     L align page_name page_name_ne trim
     no_length_undef filter_nonempty make_dir
@@ -545,7 +546,8 @@ sub redirect {
 sub created {
     my $page = shift;
     my $created = trim $page->get('page.created');
-    return undef if !length $created || $created =~ m/\D/;
+    return undef if !length $created;
+    return str2time($created) if $created =~ m/\D/;
     return $created + 0;
 }
 

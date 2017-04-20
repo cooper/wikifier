@@ -384,9 +384,9 @@ at the very top of a page source file.
   the page, as well as in the `<h1>` above the first `section{}` block. The
   title can contain [formatted text](#text-formatting), but it may be stripped
   down to plaintext in certain places.
-* `@page.created` - UNIX timestamp of the page creation time. This is not used
-  in the wikifier itself, but can be used in frontends for sorting the page list
-  by creation date.
+* `@page.created` - UNIX timestamp or HTTP date format of the page creation
+  time. This is not used in the wikifier itself, but can be used in frontends
+  for sorting the page list by creation date.
 * `@page.author` - Name of the page author. This is also optional but may be
   used by frontends to organize pages by author.
 * `@page.draft` - [Boolean](#assignment) value which marks the page as a draft.
