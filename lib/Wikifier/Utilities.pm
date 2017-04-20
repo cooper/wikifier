@@ -334,9 +334,9 @@ sub L(@) {
         chomp $str;
         $str = ('    ' x $indent).$str;
         
-        # store last 100 lines
+        # store last 1000 lines
         push @logs, $str;
-        @logs = @logs[-100..-1] if @logs > 100;
+        @logs = @logs[-1000..-1] if @logs > 1000;
         
         say STDERR $str;
     }
