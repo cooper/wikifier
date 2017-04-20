@@ -10,6 +10,11 @@ These authentication commands are available to anonymous connections.
 
 Authenticates the connection for read access to a particular wiki.
 
+```
+C: ["wiki",{"config":true,"name":"mywiki","password":"secret"},3]
+S: ["wiki",{"config":{"root":{"page":"/page","image":"/file"}}},3]
+```
+
 * __name__ - wiki name.
 * __password__ - wiki password for read authentication in plain text.
 * __config__ - _optional_, if true, the wiki configuration is returned.
@@ -22,6 +27,10 @@ Authenticates the connection for read access to a particular wiki.
 After authenticating for multiple wikis with the [`wiki`](#wiki) command,
 `select` is used to switch between them without having to send the password
 again.
+
+```
+S: ["select",{"name":"mywiki"},6]
+```
 
 * __name__ - wiki name.
 
@@ -67,6 +76,11 @@ access.
 
 Returns the generated HTML and CSS content for a page as well as additional
 metadata.
+
+```
+C: ["page",{"name":"welcome"},5]
+S: ["page",{"content":"<!-- cached page dated Sun, 16 Apr 2017 16:52:33 GMT -->","type":"page","path":"/home/www/mywiki/pages/welcome.page","file":"welcome.page","fmt_title":"Welcome to My Wiki!","title":"Welcome to My Wiki!","mime":"text/html","cached":"1","mod_unix":"1492361553","name":"welcome","warnings":["Line 18:30: Page target 'about' does not exist"],"author":"John Doe","created":"1484537057","modified":"Sun, 16 Apr 2017 16:52:33 GMT"},5]
+```
 
 Response
 * __type__ - type of response, one of `not found`, `redirect`, or `page`.
@@ -189,15 +203,7 @@ Response
 Returns metadata for all pages in the wiki, suitable for displaying a page
 list.
 
-* __sort__ - how to sort the page list.
-    * `a+` - alphabetically by title ascending (a-z)
-    * `a-` - alphabetically by title descending (z-a)
-    * `c+` - by creation time ascending (oldest first)
-    * `c-` - by creation time descending (recent first)
-    * `m+` - by modification time ascending (oldest first)
-    * `m-` - by modification time descending (recent first)
-    * `u+` - alphabetically by author ascending (a-z)
-    * `u-` - alphabetically by author descending (z-a)
+* __sort__ - [how to sort](#sort-options) the page list.
     
 Response
 * __TODO__
@@ -223,15 +229,7 @@ Response
 Returns metadata for all models in the wiki, suitable for displaying a model
 list.
 
-* __sort__ - how to sort the model list.
-    * `a+` - alphabetically by title ascending (a-z)
-    * `a-` - alphabetically by title descending (z-a)
-    * `c+` - by creation time ascending (oldest first)
-    * `c-` - by creation time descending (recent first)
-    * `m+` - by modification time ascending (oldest first)
-    * `m-` - by modification time descending (recent first)
-    * `u+` - alphabetically by author ascending (a-z)
-    * `u-` - alphabetically by author descending (z-a)
+* __sort__ - [how to sort](#sort-options) the model list.
     
 Response
 * __TODO__
@@ -241,6 +239,11 @@ Response
 Returns the metadata for an image, including an absolute path on the filesystem.
 The image data itself is NOT transmitted over the wikiserver transport; instead,
 the frontend should serve the image file directly.
+
+```
+C: ["image",{"name":"200x200-the_crew@2x.jpg"},22]
+S: ["image",{"file":"the_crew.jpg","cached":"1","mime":"image/jpeg","length":"133566","cache_path":"/home/www/mywiki/cache/400x400-the_crew.jpg","path":"/home/www/mywiki/cache/400x400-the_crew.jpg","type":"image","image_type":"jpeg","modified":"Sun, 16 Apr 2017 16:52:32 GMT","mod_unix":"1492361552","etag":"\"26ee41497f7aa009ad0c2144dcf4694f\"","fullsize_path":"/home/www/mywiki/images/the_crew.jpg"},22]
+```
 
 * __name__ - image filename.
 * __width__ - _optional_, desired image width.
@@ -254,15 +257,7 @@ Response
 Returns metadata for all images in the wiki, suitable for displaying an image
 list.
 
-* __sort__ - how to sort the image list.
-    * `a+` - alphabetically by name ascending (a-z)
-    * `a-` - alphabetically by name descending (z-a)
-    * `c+` - by creation time ascending (oldest first)
-    * `c-` - by creation time descending (recent first)
-    * `m+` - by modification time ascending (oldest first)
-    * `m-` - by modification time descending (recent first)
-    * `u+` - alphabetically by author ascending (a-z)
-    * `u-` - alphabetically by author descending (z-a)
+* __sort__ - [how to sort](#sort-options) the image list.
     
 Response
 * __TODO__
@@ -278,15 +273,8 @@ displaying several related pages at once. The results may be paginated.
 Returns metadata for all categories in the wiki, suitable for displaying a
 category list.
 
-* __sort__ - how to sort the category list.
-    * `a+` - alphabetically by title ascending (a-z)
-    * `a-` - alphabetically by title descending (z-a)
-    * `c+` - by creation time ascending (oldest first)
-    * `c-` - by creation time descending (recent first)
-    * `m+` - by modification time ascending (oldest first)
-    * `m-` - by modification time descending (recent first)
-    * `u+` - alphabetically by author ascending (a-z)
-    * `u-` - alphabetically by author descending (z-a)
+* __sort__ - [how to sort](#sort-options) the category list.
+
     
 Response
 * __TODO__
@@ -331,3 +319,14 @@ Deletes a category. The changes are committed to the wiki revision tracker.
 
 Used by frontends to verify that a session is still active. Also, notifications
 from the wikiserver may be delivered in reply.
+
+# Sort options
+
+* `a+` - alphabetically by title ascending (a-z)
+* `a-` - alphabetically by title descending (z-a)
+* `c+` - by creation time ascending (oldest first)
+* `c-` - by creation time descending (recent first)
+* `m+` - by modification time ascending (oldest first)
+* `m-` - by modification time descending (recent first)
+* `u+` - alphabetically by author ascending (a-z)
+* `u-` - alphabetically by author descending (z-a)
