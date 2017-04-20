@@ -317,17 +317,28 @@ sub indent () { $indent++ }
 sub back   () { $indent-- }
 
 # log.
+our @logs;
 sub L(@) {
     my @lines = @_;
     foreach my $str (@lines) {
+        
+        # run code with indentation
         if (ref $str eq 'CODE') {
             indent;
             $str->();
             back;
             next;
         }
+        
+        # indent line
         chomp $str;
-        say STDERR (('    ' x $indent).$str);
+        $str = ('    ' x $indent).$str;
+        
+        # store last 100 lines
+        push @logs, $str;
+        @logs = @logs[-100..-1] if @logs > 100;
+        
+        say STDERR $str;
     }
 }
 

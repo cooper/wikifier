@@ -494,6 +494,12 @@ sub handle_ping {
     });
 }
 
+# get last 100 log lines
+sub handle_logs {
+    my ($wiki, $msg) = write_required(@_) or return;
+    $msg->reply(logs => \@Wikifier::Utilities::logs);
+}
+
 #################
 ### UTILITIES ###
 #################

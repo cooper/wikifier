@@ -326,6 +326,8 @@ from the wikiserver may be delivered in reply.
 * `a-` - alphabetically by title descending (z-a)
 * `c+` - by creation time ascending (oldest first)
 * `c-` - by creation time descending (recent first)
+* `d+` - by dimensional area ascending (images only)
+* `d-` - by dimensional area descending (images only)
 * `m+` - by modification time ascending (oldest first)
 * `m-` - by modification time descending (recent first)
 * `u+` - alphabetically by author ascending (a-z)
