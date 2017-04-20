@@ -15,13 +15,18 @@ use Wikifier::Utilities qw(trim_count truncate_hr);
 
 our %block_types = (
     main => {
-        parse => \&main_parse,
         html  => \&main_html
     }
 );
 
-sub main_parse {
-    my ($block, $page) = @_;
+sub main_html {
+    my ($block, $page, $el) = @_;
+    
+    # generate a better ID.
+    $el->configure(
+        id      => 'main-'.time.substr(md5_hex($page->path), 0, 5),
+        need_id => 1
+    );
     
     my $create_section = sub {
         my ($items, $positions) = @_;
@@ -67,20 +72,6 @@ sub main_parse {
 
     $create_section->(\@items, \@positions);
     return 1;
-}
-
-sub main_html {
-    my ($block, $page, $el) = @_;
-
-    # generate a better ID.
-    $el->configure(
-        id      => 'main-'.time.substr(md5_hex($page->path), 0, 5),
-        need_id => 1
-    );
-
-    foreach my $item ($block->content_blocks) {
-        $el->add($item->html($page));
-    }
 }
 
 __PACKAGE__
