@@ -37,13 +37,13 @@ sub write_page {
     $wiki->$display_method($page, draft_ok => 1);
 
     # commit the change
-    my $res = $wiki->rev_commit(
+    my @res = $wiki->rev_commit(
         message => $reason,
         add     => [ $page->path ]
     );
     
     back;
-    return $res;
+    return @res;
 }
 
 sub delete_page {
@@ -195,17 +195,20 @@ sub _rev_commit {
     my ($rm, $add, $mv) = @opts{'rm', 'add', 'mv'};
 
     # rm operation
-    if ($rm && ref $rm eq 'ARRAY') {
+    if ($rm && ref $rm eq 'ARRAY' && @$rm) {
+        L "git rm @$rm";
         capture_logs { $git->rm($_) } 'git rm' foreach @$rm;
     }
 
     # add operation
-    if ($add && ref $add eq 'ARRAY') {
+    if ($add && ref $add eq 'ARRAY' && @$add) {
+        L "git add @$add";
         capture_logs { $git->add($_) } 'git add' foreach @$add;
     }
 
     # mv operation
-    if ($mv && ref $mv eq 'HASH') {
+    if ($mv && ref $mv eq 'HASH' && keys %$mv) {
+        L 'git mv';
         foreach (keys %$mv) {
             capture_logs { $git->mv($_, $mv->{$_}) } 'git mv';
         }
