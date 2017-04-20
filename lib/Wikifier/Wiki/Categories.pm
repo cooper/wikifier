@@ -213,7 +213,7 @@ sub cat_add_page {
     # the category does not yet exist.
     binmode $fh, ':utf8';
     print {$fh} $json->encode({
-        %$cat_extras,
+        hash_maybe $cat_extras,
         category   => cat_name_ne($cat_name),
         file       => $cat_name,
         cat_type   => $cat_type,
