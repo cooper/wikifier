@@ -8,18 +8,26 @@ use warnings;
 use strict;
 use Git::Wrapper;
 use Scalar::Util qw(blessed);
-use Wikifier::Utilities qw(page_name L);
+use Wikifier::Utilities qw(page_name L back);
 
 sub write_page {
     my ($wiki, $page, $reason) = @_;
+    Lindent "WRITE($$page{name})";
 
     # determine reason
     $reason = length $reason            ?
         "Updated $$page{name}: $reason" :
         "Updated $$page{name}";
 
-    # write the file
-    open my $fh, '>', $page->path or return;
+    # open the file
+    my $fh;
+    if (!open $fh, '>', $page->path) {
+        L 'Failed to open page file for writing';
+        back;
+        return;
+    }
+    
+    # write
     binmode $fh, ':utf8';
     print {$fh} $page->{content} if !ref $page->{content};
     close $fh;
@@ -29,14 +37,18 @@ sub write_page {
     $wiki->$display_method($page, draft_ok => 1);
 
     # commit the change
-    return $wiki->rev_commit(
+    my $res = $wiki->rev_commit(
         message => $reason,
         add     => [ $page->path ]
     );
+    
+    back;
+    return $res;
 }
 
 sub delete_page {
     my ($wiki, $page) = @_;
+    Lindent "DELETE($$page{name})";
 
     # commit the change
     $wiki->rev_commit(
@@ -46,11 +58,15 @@ sub delete_page {
 
     unlink $page->cache_path;
     unlink $page->path;
+    
+    back;
     return 1;
 }
 
 sub move_page {
     my ($wiki, $page, $new_name) = @_;
+    Lindent "MOVE($$page{name} -> $new_name)";
+
     $new_name = page_name($new_name);
     my ($old_name, $old_path) = ($page->name, $page->path);
     
@@ -66,13 +82,6 @@ sub move_page {
     # delete the old cache file
     unlink $page->cache_path; # may or may not exist
 
-#    # move the file as well as the cache
-#    # consider: should we just let git mv move it?
-#    rename $old_path, $page->path or do {
-#        $page->{name} = $old_name;
-#        return;
-#    };
-
     # commit the change
     $wiki->rev_commit(
         message => "Moved $old_name -> $new_name",
@@ -83,6 +92,7 @@ sub move_page {
     my $display_method = $page->{is_model} ? 'display_model' : 'display_page';
     $wiki->$display_method($page);
 
+    back;
     return 1;
 }
 
