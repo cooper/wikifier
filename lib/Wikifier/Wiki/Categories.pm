@@ -141,8 +141,9 @@ sub cat_check_page {
             cat_type    => 'image',
             page_extras => { dimensions => $page->{images}{$image_name} },
             cat_extras  => {
-                width   => $page->{images_fullsize}{$image_name}[0],
-                height  => $page->{images_fullsize}{$image_name}[1]
+                image_file  => $image_name,
+                width       => $page->{images_fullsize}{$image_name}[0],
+                height      => $page->{images_fullsize}{$image_name}[1]
             }
         );
     }
