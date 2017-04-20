@@ -41,6 +41,8 @@ sub indent_str {
     return $final_string;
 }
 
+my $valid_page_extensions = join '|', qw(page conf model);
+
 # 'Some Article' -> 'some_article.page'
 sub page_name {
     my ($page_name, $ext) = @_;
@@ -50,7 +52,7 @@ sub page_name {
     $page_name = page_name_link($page_name);
 
     # append the extension if it isn't already there.
-    if ($page_name !~ m/\.(page|conf|model)$/) {
+    if ($page_name !~ m/\.($valid_page_extensions)$/) {
         $ext //= '.page';
         $page_name .= $ext;
     }
@@ -75,7 +77,7 @@ sub page_name_link {
 # 'some_article.page' -> 'some_article'
 sub page_name_ne {
     my $page_name = page_name(shift, '');
-    $page_name =~ s/\.(page|conf|model)$//;
+    $page_name =~ s/\.($valid_page_extensions)$//;
     return $page_name;
 }
 
@@ -88,8 +90,7 @@ sub page_names_equal {
 # 'Some Cat' -> 'some_cat.cat'
 # 'some_cat' -> 'some_cat.cat'
 sub cat_name {
-    my $cat_name = shift;
-    $cat_name = page_name_link($cat_name);
+    my $cat_name = page_name_link(@_);
 
     # append the extension if it isn't already there.
     if ($cat_name !~ m/\.cat$/) {
@@ -102,7 +103,7 @@ sub cat_name {
 # 'Some Cat' -> 'some_cat'
 # 'some_cat.cat' -> 'some_cat'
 sub cat_name_ne {
-    my $cat_name = cat_name(shift);
+    my $cat_name = cat_name(@_);
     $cat_name =~ s/\.cat$//;
     return $cat_name;
 }
