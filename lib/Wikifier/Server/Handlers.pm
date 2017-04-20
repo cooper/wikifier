@@ -225,7 +225,7 @@ sub handle_resume {
     $sess->{time} = time;
     $conn->{sess} = $sess;
 
-    $msg->l('Resuming write access');
+    $msg->l("Resuming write access ($$sess{username})");
 }
 
 #####################
@@ -238,6 +238,7 @@ sub handle_resume {
 #
 sub handle_page {
     my ($wiki, $msg) = read_required(@_, 'name') or return;
+    $msg->l("Page '$$msg{name}'");
     my $result = $wiki->display_page($msg->{name});
     $msg->reply('page', $result);
 }
@@ -252,6 +253,7 @@ sub handle_page {
 #
 sub handle_page_code {
     my ($wiki, $msg) = write_required(@_, 'name') or return;
+    $msg->l("Page code '$$msg{name}'");
     my $result = $wiki->display_page_code(
         $msg->{name},
         display_page => $msg->{display_page}
@@ -269,6 +271,7 @@ sub handle_page_code {
 #
 sub handle_model_code {
     my ($wiki, $msg) = write_required(@_, 'name') or return;
+    $msg->l("Model code '$$msg{name}'");
     my $result = $wiki->display_model_code(
         $msg->{name},
         $msg->{display_model}
@@ -282,7 +285,8 @@ sub handle_model_code {
 #
 sub handle_page_list {
     my ($wiki, $msg) = write_required(@_, 'sort') or return;
-
+    $msg->l('Page list');
+    
     # get all pages
     my $all = $wiki->cat_get_pages('pages', cat_type => 'data');
     return if !$all || ref $all ne 'HASH';
@@ -306,7 +310,8 @@ sub handle_page_list {
 #
 sub handle_model_list {
     my ($wiki, $msg) = write_required(@_, 'sort') or return;
-
+    $msg->l('Model list');
+    
     # get all models
     my @models;
     foreach my $model_name ($wiki->all_models) {
@@ -333,6 +338,7 @@ sub handle_model_list {
 #
 sub handle_image {
     my ($wiki, $msg) = read_required(@_, 'name') or return;
+    $msg->l("Image '$$msg{name}'");
     my $result = $wiki->display_image(
         [ $msg->{name}, $msg->{width} || 0, $msg->{height} || 0 ],
         dont_open => 1 # don't open the image
@@ -343,6 +349,7 @@ sub handle_image {
 
 sub handle_image_list {
     my ($wiki, $msg) = write_required(@_, 'sort') or return;
+    $msg->l('Image list');
 
     # get all images
     my @cats = values_maybe $wiki->get_images;
@@ -360,6 +367,7 @@ sub handle_image_list {
 #
 sub handle_cat_posts {
     my ($wiki, $msg) = read_required(@_, 'name') or return;
+    $msg->l("Category posts '$$msg{name}'");
     my $result = $wiki->display_cat_posts($msg->{name});
     $msg->reply('cat_posts', $result);
 }
@@ -370,6 +378,7 @@ sub handle_cat_posts {
 #
 sub handle_cat_list {
     my ($wiki, $msg) = write_required(@_, 'sort') or return;
+    $msg->l('Category list');
 
     # get all cats
     my @cats;
@@ -407,6 +416,7 @@ sub _handle_page_save {
     my $is_model = shift;
     my ($wiki, $msg) = write_required(@_, qw(name content)) or return;
     my $method;
+    $msg->l("Page save '$$msg{name}'");
 
     # remove carriage returns injected by the browser
     my $content = $msg->{content};
@@ -437,6 +447,7 @@ sub _handle_page_del {
     my $is_model = shift;
     my ($wiki, $msg) = write_required(@_, 'name') or return;
     my $method;
+    $msg->l("Page delete '$$msg{name}'");
 
     # delete the page
     $method  = $is_model ? 'model_named' : 'page_named';
@@ -456,6 +467,7 @@ sub _handle_page_move {
     my $is_model = shift;
     my ($wiki, $msg) = write_required(@_, qw(name new_name)) or return;
     my $method;
+    $msg->l("Page move '$$msg{name}' -> '$$msg{new_name}'");
 
     # rename the page
     $method  = $is_model ? 'model_named' : 'page_named';
@@ -488,6 +500,7 @@ sub handle_ping {
     my $conn = $msg->conn;
     my $notices = delete $conn->{sess}{notifications};
     $conn->{sess}{notifications} = [];
+    $msg->l("Ping");
     $msg->reply(pong => {
         connected     => 1,
         notifications => $notices
@@ -497,6 +510,7 @@ sub handle_ping {
 # get last 100 log lines
 sub handle_logs {
     my ($wiki, $msg) = write_required(@_) or return;
+    $msg->l("Logs");
     $msg->reply(logs => { logs => \@Wikifier::Utilities::logs });
 }
 
