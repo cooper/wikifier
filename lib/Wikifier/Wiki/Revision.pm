@@ -150,7 +150,7 @@ sub _rev_operation_finish {
 #
 sub rev_latest {
     my $wiki = shift;
-    my $git  = $wiki->_prepare_git();
+    my $git  = $wiki->_prepare_git() or return;
     my @logs = $git->log;
     my $last = shift @logs or return;
     return {
@@ -167,10 +167,14 @@ sub _prepare_git {
     if (!$wiki->{git}) {
         my $dir = $wiki->opt('dir.wiki');
         if (!length $dir) {
-            L 'Cannot commit; @dir.wiki not set';
+            L 'Revision tracking disabled; @dir.wiki not set';
             return;
         }
         $wiki->{git} = Git::Wrapper->new($dir);
+        if (!$wiki->{git}->has_git_in_path) {
+            L "Revision tracking disabled; can't find `git` in PATH";
+            return;
+        }
     }
     return $wiki->{git};
 }
@@ -179,7 +183,7 @@ sub _prepare_git {
 # returns a list of errors or an empty list on success
 sub rev_commit (@) {
     my ($wiki, %opts) = (shift, @_);
-    $wiki->_prepare_git();
+    my $git = $wiki->_prepare_git or return;
 
     # add the author maybe
     my $user = $wiki->{user};
@@ -187,7 +191,7 @@ sub rev_commit (@) {
         $opts{author} = "$$user{name} <$$user{email}>";
     }
 
-    return eval { _rev_commit($wiki->{git}, %opts) };
+    return eval { _rev_commit($git, %opts) };
 }
 
 sub _rev_commit {
