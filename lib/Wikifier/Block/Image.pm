@@ -128,7 +128,7 @@ sub image_parse {
 
         # remember that we use this image.
         push @{ $page->{images} { $image->{file} } ||= [] }, $w, $h;
-        $page->{images_fullsize}{ $image->{file} } = [ $w, $h ];
+        $page->{images_fullsize}{ $image->{file} } = [ $big_w, $big_h ];
     }
 
     # any dimensions still not set = auto.
