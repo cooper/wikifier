@@ -91,6 +91,7 @@ sub section_html {
         );
 
         # adopt it.
+        $item->parse($page);
         $el->add($item->html($page));
     };
 
