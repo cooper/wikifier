@@ -369,12 +369,13 @@ sub _wiki_default_calc {
     my $file = $wiki->path_for_image($img{file});
 
     # find the image size using GD.
-    my $full_image      = GD::Image->new($file) or return (0, 0);
+    my $full_image      = GD::Image->new($file) or return (0, 0, 0, 0);
     my ($big_w, $big_h) = $full_image->getBounds();
     undef $full_image;
 
     # call the default handler with these full dimensions.
-    my ($w, $h, $full_size) = Wikifier::Page::_default_calculator(
+    # provide big_width and big_height so that Image::Size is not used.
+    my ($w, $h, undef, undef, $full_size) = Wikifier::Page::_default_calculator(
         %img,
         big_width  => $big_w,
         big_height => $big_h
@@ -401,7 +402,7 @@ sub _wiki_default_calc {
             "$cache_dir/$img{file}";
     }
 
-    return ($w, $h, $full_size);
+    return ($w, $h, $big_w, $big_h, $full_size);
 }
 
 # default image sizer for a wiki.

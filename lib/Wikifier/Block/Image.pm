@@ -30,43 +30,43 @@ our %block_types = (
 # Map handles the actual parsing; this assigns
 # properties to the imagebox from the found values.
 sub image_parse {
-    my ($block, $page) = (shift, @_);
-    $block->parse_base(@_); # call hash parse.
+    my ($image, $page) = (shift, @_);
+    $image->parse_base(@_); # call hash parse.
 
     my ($w, $h);
 
     # get values from hash.
-    $block->{$_} = $block->{map_hash}{$_} foreach qw(
+    $image->{$_} = $image->{map_hash}{$_} foreach qw(
         file width height
         align float author license
     );
 
     # no dimensions; might be able to get them from a container
-    if (!$block->{width} && !$block->{height}) {
-        $block->{width} = 270 if $block->first_parent('infobox');
+    if (!$image->{width} && !$image->{height}) {
+        $image->{width} = 270 if $image->first_parent('infobox');
     }
 
     # force numeric value.
-    $block->{width}  =~ s/px// if length $block->{width};
-    $block->{height} =~ s/px// if length $block->{height};
-    $block->{width}  += 0;
-    $block->{height} += 0;
+    $image->{width}  =~ s/px// if length $image->{width};
+    $image->{height} =~ s/px// if length $image->{height};
+    $image->{width}  += 0;
+    $image->{height} += 0;
 
     # no width or height specified; fall back to full dimensions.
-    if (!$block->{width} && !$block->{height}) {
-        $block->{width}  =
-        $block->{height} = 0;
+    if (!$image->{width} && !$image->{height}) {
+        $image->{width}  =
+        $image->{height} = 0;
     }
 
     # no float; default to right.
-    $block->{float} ||= $block->{align} || 'right';
+    $image->{float} ||= $image->{align} || 'right';
 
-    $block->{image_root} = $page->wiki_opt('root.image');
+    $image->{image_root} = $page->wiki_opt('root.image');
 
     # no file - this is mandatory.
-    if (!length $block->{file}) {
-        $block->warning("No file specified for image\{}");
-        $block->{parse_failed}++;
+    if (!length $image->{file}) {
+        $image->warning("No file specified for image\{}");
+        $image->{parse_failed}++;
         return;
     }
 
@@ -75,9 +75,9 @@ sub image_parse {
     ##############
 
     # both dimensions were given, so we need to do no sizing.
-    if ($block->{width} && $block->{height}) {
-        $w = $block->{width};
-        $h = $block->{height};
+    if ($image->{width} && $image->{height}) {
+        $w = $image->{width};
+        $h = $image->{height};
     }
 
     # use javascript image sizing
@@ -87,17 +87,17 @@ sub image_parse {
     elsif (lc $page->wiki_opt('image.size_method') eq 'javascript') {
 
         # inject javascript resizer if no width is given.
-        if (!$block->{width}) {
-            $block->{javascript} = 1;
+        if (!$image->{width}) {
+            $image->{javascript} = 1;
         }
 
         # use the image root address options to determine URL.
 
         # width and height dummies will be overriden by JavaScript.
-        $w = $block->{width} || 200;    # width default 200
-        $h = $block->{height};          # zero means auto
+        $w = $image->{width} || 200;    # width default 200
+        $h = $image->{height};          # zero means auto
 
-        $block->{image_url} = "$$block{image_root}/$$block{file}";
+        $image->{image_url} = "$$image{image_root}/$$image{file}";
     }
 
     # use server-side image sizing.
@@ -108,42 +108,44 @@ sub image_parse {
     elsif (lc $page->wiki_opt('image.size_method') eq 'server') {
 
         # find the resized dimensions.
-        ($w, $h, my $full_size) = $page->wiki_opt('image.calc',
-            file   => $block->{file},
-            height => $block->{height},
-            width  => $block->{width},
+        ($w, $h, my $big_w, my $big_h, my $full_size) = $page->wiki_opt('image.calc',
+            file   => $image->{file},
+            height => $image->{height},
+            width  => $image->{width},
             page   => $page
         );
 
         # call the image_sizer.
-        my $url = $page->wiki_opt('image.sizer',
-            file   => $block->{file},
+        $image->{image_url} = $page->wiki_opt('image.sizer',
+            file   => $image->{file},
             height => $full_size ? 0 : $h,
             width  => $full_size ? 0 : $w,
             page   => $page
         );
+        
+        $w += 0;
+        $h += 0;
 
         # remember that we use this image.
-        push @{ $page->{images}{ $block->{file} } ||= [] }, $w + 0, $h + 0;
-
-        $block->{image_url} = $url;
+        push @{ $page->{images} { $image->{file} } ||= [] }, $w, $h;
+        $page->{images_fullsize}{ $image->{file} } = [ $w, $h ];
     }
 
     # any dimensions still not set = auto.
-    $block->{width}  = $w ? "${w}px" : 'auto';
-    $block->{height} = $h ? "${h}px" : 'auto';
+    $image->{width}  = $w ? "${w}px" : 'auto';
+    $image->{height} = $h ? "${h}px" : 'auto';
 
     return 1;
 }
 
 # HTML.
 sub image_html {
-    my ($box, $block, $page, $el) = (shift, shift, @_);
-    $block->html_base($page); # call hash html.
-    return if $block->{parse_failed};
+    my ($box, $image, $page, $el) = (shift, shift, @_);
+    $image->html_base($page); # call hash html.
+    return if $image->{parse_failed};
 
     # add the appropriate float class.
-    $el->add_class('imagebox-'.$block->{float}) if $box;
+    $el->add_class('imagebox-'.$image->{float}) if $box;
 
     # add data-rjs for retina.
     my $retina;
@@ -155,8 +157,8 @@ sub image_html {
 
     # fetch things we determined in image_parse().
  my ($height,          $width,          $image_root,          $image_url         ) =
-    ($block->{height}, $block->{width}, $block->{image_root}, $block->{image_url});
-    my $link_address = "$image_root/$$block{file}";
+    ($image->{height}, $image->{width}, $image->{image_root}, $image->{image_url});
+    my $link_address = "$image_root/$$image{file}";
 
     ############
     ### HTML ###
@@ -205,7 +207,7 @@ sub image_html {
         type       => 'img',
         attributes => {
             src => $image_url,
-            alt => $block->{file},
+            alt => $image->{file},
             'data-rjs' => $retina
         },
         styles     => {
@@ -218,11 +220,11 @@ sub image_html {
     $img->add_attribute(onload =>
         q{this.parentElement.parentElement.style.width = }.
         q{this.offsetWidth + 'px'; this.style.width = '100%';}
-    ) if $block->{javascript};
+    ) if $image->{javascript};
 
     # description. we have to extract this here instead of in ->parse()
     # because at the time of ->parse() its text is not yet formatted.
-    my $desc = $block->{map_hash}{description} // $block->{map_hash}{desc};
+    my $desc = $image->{map_hash}{description} // $image->{map_hash}{desc};
     if (length $desc) {
         $inner->create_child(
             class => 'imagebox-description'

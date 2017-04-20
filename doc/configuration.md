@@ -240,7 +240,7 @@ __Default__ (Wiki): _server_
 A code reference that calculates a missing dimension of an image.
 This is utilized only when [`image.size_method`](#imagesize_method) is _server_.
 
-Returns `(width, height)`.
+Returns `(scaled width, scaled height, full width, full height, fullsize)`.
 
 __Default__ (Page): built in, uses Image::Size
 
