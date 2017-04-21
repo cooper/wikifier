@@ -166,8 +166,8 @@ sub rev_latest {
 # returns a list of hash reference containing the same keys as rev_latest
 sub revs_matching_page {
     my ($wiki, $page_or_name) = @_;
-    return _revs_matching_file($page_or_name->path) if blessed $page_or_name;
-    return _revs_matching_file($wiki->path_for_page($page_or_name));
+    return $wiki->_revs_matching_file($page_or_name->path) if blessed $page_or_name;
+    return $wiki->_revs_matching_file($wiki->path_for_page($page_or_name));
 }
 
 # find all revisions involving the specified file by absolute path.
