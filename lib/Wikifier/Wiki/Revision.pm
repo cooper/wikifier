@@ -9,7 +9,6 @@ use strict;
 use Git::Wrapper;
 use Scalar::Util qw(blessed);
 use Wikifier::Utilities qw(page_name L back);
-use Cwd qw(abs_path);
 
 sub write_page {
     my ($wiki, $page, $reason) = @_;
@@ -176,37 +175,16 @@ sub _revs_matching_file {
     my ($wiki, $path) = @_;
     my @matches;
     
-    # ensure the path is valid
-    $path = abs_path($path);
-    return if !length $path;
-    
     # look for matching modifications
     my $git  = $wiki->_prepare_git or return;
-    my @logs = $git->log({ raw => 1 });
-    LOG: foreach my $log (@logs) {
-        MOD: foreach my $mod ($log->modifications) {
-            my $file_path = $mod->filename;
-            
-            # if the filename is not absolute, assume it is
-            # relative to @dir.wiki. we know @dir.wiki is set
-            # since _prepare_git succeeded.
-            if (index($file_path, '/')) {
-                $file_path = abs_path($wiki->opt('dir.wiki')."/$file_path");
-                next MOD if !length $file_path;
-            }
-        
-            # not the file we are concerned with
-            next MOD if $file_path ne $path;
-            
-            # matches
-            push @matches, {
-                id            => $log->id,
-                author        => $log->author,
-                date          => $log->date,
-                message       => $log->message
-            };
-            next LOG;
-        }
+    my @logs = $git->log('--', { path => $path });
+    foreach my $log (@logs) {
+        push @matches, {
+            id            => $log->id,
+            author        => $log->author,
+            date          => $log->date,
+            message       => $log->message
+        };
     }
     return @matches;
 }
