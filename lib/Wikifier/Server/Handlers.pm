@@ -480,6 +480,13 @@ sub _handle_page_move {
     });
 }
 
+# view revisions for a page
+sub handle_page_revs {
+    my ($wiki, $msg) = write_required(@_, qw(name)) or return;
+    my @revs = $wiki->revs_matching_page($msg->{name});
+    $msg->reply(page_revs => { revs => \@revs });
+}
+
 # Models
 
 # model save
