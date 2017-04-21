@@ -177,7 +177,7 @@ sub _revs_matching_file {
     
     # look for matching modifications
     my $git  = $wiki->_prepare_git or return;
-    my @logs = $git->log('--', { path => $path });
+    my @logs = $git->log('--', $path);
     foreach my $log (@logs) {
         push @matches, {
             id            => $log->id,
