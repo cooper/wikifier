@@ -169,6 +169,17 @@ sub revs_matching_page {
     return $wiki->_revs_matching_file($wiki->path_for_page($page_or_name));
 }
 
+# returns the diff for a page between the specified commits.
+# if $to is not provided, the current version is used.
+sub diff_for_page {
+    my ($wiki, $page_or_name, $from, $to) = @_;
+    my $git  = $wiki->_prepare_git or return;
+    $to ||= 'HEAD';
+    my $page_path = blessed $page_or_name ? $page_or_name->path :
+        $wiki->path_for_page($page_or_name);
+    return join "\n", $git->diff($from, $to, $page_path);
+}
+
 # find all revisions involving the specified file by absolute path.
 # returns a list of hash reference containing the same keys as rev_latest
 sub _revs_matching_file {

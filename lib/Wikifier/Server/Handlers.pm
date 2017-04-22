@@ -487,6 +487,13 @@ sub handle_page_revs {
     $msg->reply(page_revs => { revs => \@revs });
 }
 
+# view the diff for a page
+sub handle_page_diff {
+    my ($wiki, $msg) = write_required(@_, qw(name from)) or return;
+    my $diff = $wiki->diff_for_page($msg->{name}, $msg->{from}, $msg->{to});
+    $msg->reply(page_diff => { diff => $diff });
+}
+
 # Models
 
 # model save
