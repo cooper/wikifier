@@ -177,7 +177,7 @@ sub diff_for_page {
     $to ||= 'HEAD';
     my $page_path = blessed $page_or_name ? $page_or_name->path :
         $wiki->path_for_page($page_or_name);
-    return join "\n", $git->diff($from, $to, $page_path);
+    return join "\n", $git->diff("$from..$to", $page_path);
 }
 
 # find all revisions involving the specified file by absolute path.
