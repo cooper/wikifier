@@ -75,7 +75,7 @@ sub _display_image {
             width  => $width,
             wiki   => $wiki
         );
-        return $wiki->display_image([ $image_name, $width, $height ], %opts);
+        return $wiki->_display_image([ $image_name, $width, $height ], %opts);
     }
     
     #============================#
