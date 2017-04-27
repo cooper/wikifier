@@ -242,7 +242,7 @@ the frontend should serve the image file directly.
 
 ```
 C: ["image",{"name":"200x200-the_crew@2x.jpg"},22]
-S: ["image",{"file":"the_crew.jpg","cached":"1","mime":"image/jpeg","length":"133566","cache_path":"/home/www/mywiki/cache/400x400-the_crew.jpg","path":"/home/www/mywiki/cache/400x400-the_crew.jpg","type":"image","image_type":"jpeg","modified":"Sun, 16 Apr 2017 16:52:32 GMT","mod_unix":"1492361552","etag":"\"26ee41497f7aa009ad0c2144dcf4694f\"","fullsize_path":"/home/www/mywiki/images/the_crew.jpg"},22]
+S: ["image",{"file":"the_crew.jpg","cached":"1","mime":"image/jpeg","length":"133566","cache_path":"/home/www/mywiki/cache/400x400-the_crew.jpg","path":"/home/www/mywiki/cache/400x400-the_crew.jpg","type":"image","image_type":"jpeg","modified":"Sun, 16 Apr 2017 16:52:32 GMT","mod_unix":"1492361552","fullsize_path":"/home/www/mywiki/images/the_crew.jpg"},22]
 ```
 
 * __name__ - image filename.

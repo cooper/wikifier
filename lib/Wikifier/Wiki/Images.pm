@@ -7,7 +7,6 @@ use 5.010;
 
 use GD;                             # image generation
 use HTTP::Date qw(time2str);        # HTTP date formatting
-use Digest::MD5 qw(md5_hex);        # etags
 use File::Spec ();                  # simplifying symlinks
 use Wikifier::Utilities qw(L Lindent align back hash_maybe);
 use JSON::XS ();
@@ -161,7 +160,6 @@ sub get_image_full_size {
     $result->{modified}     = time2str($stat->[9]);
     $result->{mod_unix}     = $stat->[9];
     $result->{length}       = $stat->[7];
-    $result->{etag}         = make_etag($image->{name}, $stat->[9]);
 
     return $result;
 }
@@ -189,7 +187,6 @@ sub get_image_cache {
     $result->{cached}       = 1;
     $result->{modified}     = time2str($cache_modify);
     $result->{mod_unix}     = $cache_modify;
-    $result->{etag}         = make_etag($image->{name}, $cache_modify);
     $result->{length}       = -s $cache_file;
 
     # symlink scaled version if necessary.
@@ -321,7 +318,6 @@ sub generate_image {
     $result->{modified}     = time2str(time);
     $result->{mod_unix}     = time;
     $result->{length}       = length $result->{content};
-    $result->{etag}         = make_etag($image->{name}, time);
 
     # caching is enabled, so let's save this for later.
     my $cache_file = $result->{cache_path};
@@ -339,7 +335,6 @@ sub generate_image {
         $result->{modified}   = time2str($modified);
         $result->{mod_unix}   = $modified;
         $result->{cache_gen}  = 1;
-        $result->{etag}       = make_etag($image->{name}, $modified);
 
         # if this image is available in more than 1 scale, symlink.
         $wiki->symlink_scaled_image($image) if $image->{retina};
@@ -371,11 +366,6 @@ sub symlink_scaled_image {
     symlink $image->{full_name}, $scale_path;
 }
 
-# generate an etag
-sub make_etag {
-    my $md5 = md5_hex(join '', @_);
-    return "\"$md5\"";
-}
 
 # default image calculator for a wiki.
 sub _wiki_default_calc {

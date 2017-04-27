@@ -248,7 +248,6 @@ sub wiki_opt;
 #       modified:   the last modified date of the resource in HTTP date format
 #       mod_unix:   the modified UNIX timestamp
 #       length:     the length of the resource in bytes
-#       etag:       an HTTP etag for the resource in the form of an md5 string
 #       content:    the content or binary data to be sent to the client
 #
 #   if the type is 'not found'
