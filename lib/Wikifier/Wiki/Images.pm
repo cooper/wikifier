@@ -394,7 +394,7 @@ sub _wiki_default_calc {
     # this allows the direct use of the cache directory as served from
     # the web server, reducing the wikifier server's load when requesting
     # cached pages and their images.
-    if ($wiki->opt('image.enable.pregeneration')) {
+    if ($wiki->opt('image.enable.pregeneration') && $img{gen_override}) {
         my $res = $wiki->display_image(
             [ $img{file}, $w, $h ],
             dont_open       => 1,

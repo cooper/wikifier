@@ -112,7 +112,8 @@ sub image_parse {
             file   => $image->{file},
             height => $image->{height},
             width  => $image->{width},
-            page   => $page
+            page   => $page,
+            gen_override => 1
         );
 
         # call the image_sizer.
