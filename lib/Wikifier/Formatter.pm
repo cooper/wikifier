@@ -494,8 +494,7 @@ sub __page_link {
         
         # add the target
         push @{ $page->{target_pages}{$safe_name} ||= [] },
-            $opts{startpos} ? $opts{startpos}{line} : '?'
-            if $typ eq 'page';
+            $opts{startpos}{line} if $typ eq 'page';
         $$target_ref .= $page_target;
     }
 
