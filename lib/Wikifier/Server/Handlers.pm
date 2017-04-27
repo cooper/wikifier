@@ -576,6 +576,7 @@ sub _get_conf {
 
         $conf{$key} = $val->to_data;
     }
+    return \%conf;
 }
 
 1
