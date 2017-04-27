@@ -75,6 +75,12 @@ sub _display_image {
             width  => $width,
             wiki   => $wiki
         );
+        
+        # if the dimension calculator failed, fall back to the full-size image.
+        return $wiki->get_image_full_size($image, $result, \@stat, \%opts)
+            if !$width;
+        
+        # display the image with the calculated dimensions.
         return $wiki->_display_image([ $image_name, $width, $height ], %opts);
     }
     
