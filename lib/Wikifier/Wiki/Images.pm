@@ -70,7 +70,7 @@ sub _display_image {
     # if a dimension is missing, calculate it.
     if (!$width || !$height) {
         ($width, $height) = $wiki->opt('image.calc',
-            file   => $image->{file},
+            file   => $image_name,
             height => $height,
             width  => $width,
             wiki   => $wiki
