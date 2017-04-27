@@ -148,6 +148,11 @@ sub cat_check_page {
         );
     }
 
+    # page link categories
+    foreach my $page_name (keys_maybe $page->{target_pages}) {
+        $wiki->cat_add_page($page, $page_name, cat_type => 'page');
+    }
+
     # model categories
     foreach my $model_name (keys_maybe $page->{models}) {
         $wiki->cat_add_page($page, $model_name, cat_type => 'model');

@@ -475,16 +475,16 @@ sub __page_link {
     my $errors;
     if (length $target) {
         
-        # create page paths, respecting the page prefix
+        # create paths, respecting the page prefix
         my $safe_name = $typ eq 'category' ?
             cat_name($target) : page_name($target);
-        my $page_path = join '/', grep length,
+        my $path = join '/', grep length,
             $page->wiki_opt("dir.$typ"), $page->prefix, $safe_name;
         my $page_target = join '/', grep length,
             $page->wiki_opt("root.$typ"), $page->prefix, $target;
         
-        # make sure the page exists
-        if (!-e $page_path) {
+        # make sure the page/category exists
+        if (!-e $path) {
             $page->warning(
                 $opts{startpos},
                 "Page target '$page_name_hr' does not exist"
@@ -493,6 +493,7 @@ sub __page_link {
         }
         
         # add the target
+        $page->{target_pages}{$safe_name}++ if $typ eq 'page';
         $$target_ref .= $page_target;
     }
 
