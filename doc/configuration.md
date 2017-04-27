@@ -36,6 +36,7 @@ of a full wiki, and others yet for the operation of a wikiserver.
     * [main\_page](#main_page)
     * [navigation](#navigation)
     * [template](#template)
+    * [logo](#logo)
   * [Wikifier::Wiki private options](#wikifierwiki-private-options)
     * [admin\.[username]\.name](#adminusernamename)
     * [admin\.[username]\.email](#adminusernameemail)
@@ -447,6 +448,17 @@ Name or path of the template used by the wiki.
 
 ```
 @template: default;
+```
+
+### logo
+
+Filename for the wiki logo, relative to [`dir.image`](#dir).
+
+Frontends should automatically generate the logo in whatever dimensions are
+needed and display it where appropriate.
+
+```
+@logo: logo.png;
 ```
 
 ## Wikifier::Wiki private options
