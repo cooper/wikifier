@@ -98,31 +98,7 @@ sub handle_wiki {
     # normally we do not reply to this, but if the client requested the
     # wiki configuration, send it. see issue #27
     if ($msg->{config}) {
-        my %conf = hash_maybe $wiki->{conf}{variables};
-
-        # FIXME: this needs to be recursive! ->to_data might contain more objs!
-        # blessed objects will be serialized as null, so convert them to
-        # Pure Perl where posssible
-        my $nav;
-        foreach my $key (keys %conf) {
-            my $val = $conf{$key};
-            next if !blessed $val || !$val->can('to_data');
-
-            # special case for navigation, to preserve the order
-            if ($key eq 'navigation' && $val->can('map_array')) {
-                my (@keys, @vals);
-                for ($val->map_array) {
-                    my ($key_title, $val) = @$_{'key_title', 'value'};
-                    push @keys, $key_title;
-                    push @vals, $val;
-                }
-                $conf{$key} = [ \@keys, \@vals ];
-                next;
-            }
-
-            $conf{$key} = $val->to_data;
-        }
-        $msg->reply(wiki => { config => \%conf });
+        $msg->reply(wiki => { config => _get_conf($wiki) });
     }
 
     $msg->l("Authenticated for read access");
@@ -182,7 +158,7 @@ sub handle_login {
     $msg->reply(login => {
         logged_in => 1,
         %$user_info,
-        conf => $wiki->{conf}{variables} || {}
+        conf => _get_conf($wiki)
     });
 
     notice(user_logged_in => %$user_info);
@@ -567,6 +543,39 @@ sub write_required {
         return;
     }
     &read_required;
+}
+
+sub _get_conf {
+    my $wiki = shift;
+
+    # FIXME: we need to somewhere incorporate the default values from
+    # %Wikifier::Page::wiki_defaults and %Wikifier::Wiki::wiki_defaults!
+    my %conf = hash_maybe $wiki->{conf}{variables};
+
+    # FIXME: this needs to be recursive! ->to_data might contain more objs!
+    # blessed objects will be serialized as null, so convert them to
+    # Pure Perl where posssible
+    my $nav;
+    foreach my $key (keys %conf) {
+        my $val = $conf{$key};
+
+        # only concerned with convertible objects
+        next if !blessed $val || !$val->can('to_data');
+
+        # special case for navigation, to preserve the order
+        if ($key eq 'navigation' && $val->can('map_array')) {
+            my (@keys, @vals);
+            for ($val->map_array) {
+                my ($key_title, $val) = @$_{'key_title', 'value'};
+                push @keys, $key_title;
+                push @vals, $val;
+            }
+            $conf{$key} = [ \@keys, \@vals ];
+            next;
+        }
+
+        $conf{$key} = $val->to_data;
+    }
 }
 
 1
