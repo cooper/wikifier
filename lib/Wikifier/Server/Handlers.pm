@@ -306,9 +306,10 @@ sub handle_model_list {
 
 # image request
 #
-#   name:       the image filename
-#   width:      desired image width     (optional)
-#   height:     desired image height    (optional)
+#   name:           the image filename
+#   width:          desired image width     (optional)
+#   height:         desired image height    (optional)
+#   gen_override:   true if image dimension restrictions should be overridden
 #
 #   dimensions default to those of the original image
 #
@@ -317,7 +318,8 @@ sub handle_image {
     $msg->l("Image '$$msg{name}'");
     my $result = $wiki->display_image(
         [ $msg->{name}, $msg->{width} || 0, $msg->{height} || 0 ],
-        dont_open => 1 # don't open the image
+        dont_open    => 1, # don't open the image
+        gen_override => $msg->{gen_override}
     );
     delete $result->{content};
     $msg->reply('image', $result);
