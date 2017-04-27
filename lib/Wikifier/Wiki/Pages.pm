@@ -196,9 +196,6 @@ sub _display_page {
         return $wiki->display_error_cache($page, $err, parse_error => 1);
     }
 
-    # update categories
-    $wiki->cat_check_page($page);
-
     # if this is a draft, so pretend it doesn't exist
     if ($page->draft && !$opts{draft_ok}) {
         L 'Draft';
@@ -222,6 +219,9 @@ sub _display_page {
     $result->{modified}   = time2str($result->{mod_unix});
     $result->{content}    = $page->html;
     $result->{css}        = $page->css;
+    
+    # update categories. this must come after ->html
+    $wiki->cat_check_page($page);
     $result->{categories} = [ _cats_to_list($page->{categories}) ];
 
     # write cache file if enabled
