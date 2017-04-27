@@ -36,7 +36,7 @@ sub _display_image {
     my $result = {};
 
     # if $image_name is an array ref, it's [ name, width, height ]
-    # if width and height are both 0, parse the name normally
+    # if both dimensions are 0, parse the image name normally
     if (ref $image_name eq 'ARRAY') {
         my ($name, $w, $h) = @$image_name;
         $image_name = "${w}x${h}-$name";
@@ -63,11 +63,21 @@ sub _display_image {
                             $image->{ext} eq 'jpeg' ? 'jpeg' : 'png';
     $result->{mime} = $image->{ext} eq 'png' ? 'image/png' : 'image/jpeg';
 
-    # if a dimension is missing or image caching is disabled, display the
-    # full-size version of the image.
+    # if image caching is disabled, display the full-size version of the image.
     return $wiki->get_image_full_size($image, $result, \@stat, \%opts)
-        if !$width || !$height || !$wiki->opt('image.enable.cache');
+        if !$wiki->opt('image.enable.cache');
 
+    # if a dimension is missing, calculate it.
+    if (!$width || !$height) {
+        ($width, $height) = $wiki->opt('image.calc',
+            file   => $image->{file},
+            height => $height,
+            width  => $width,
+            wiki   => $wiki
+        );
+        return $wiki->display_image([ $image_name, $width, $height ], %opts);
+    }
+    
     #============================#
     #=== Retina scale support ===#
     #============================#
@@ -364,8 +374,7 @@ sub make_etag {
 # default image calculator for a wiki.
 sub _wiki_default_calc {
     my %img  = @_;
-    my $page = $img{page};
-    my $wiki = $page->{wiki};
+    my $wiki = $img{wiki} || $img{page}{wiki};
     my $file = $wiki->path_for_image($img{file});
 
     # find the image size using GD.
@@ -385,15 +394,15 @@ sub _wiki_default_calc {
     # this allows the direct use of the cache directory as served from
     # the web server, reducing the wikifier server's load when requesting
     # cached pages and their images.
-    if ($page->wiki_opt('image.enable.pregeneration')) {
+    if ($wiki->opt('image.enable.pregeneration')) {
         my $res = $wiki->display_image(
             [ $img{file}, $w, $h ],
             dont_open       => 1,
             gen_override    => 1
         );
         my ($image_dir, $cache_dir) = (
-            $page->wiki_opt('dir.image'),
-            $page->wiki_opt('dir.cache')
+            $wiki->opt('dir.image'),
+            $wiki->opt('dir.cache')
         );
         unlink
             "$cache_dir/$img{file}";
@@ -409,8 +418,7 @@ sub _wiki_default_calc {
 # this returns a URL for an image of the given dimensions.
 sub _wiki_default_sizer {
     my %img = @_;
-    my $page = $img{page};
-    my $wiki = $page->{wiki};
+    my $wiki = $img{wiki} || $img{page}{wiki};
 
     # full-size image.
     if (!$img{width} || !$img{height}) {
