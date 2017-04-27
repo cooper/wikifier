@@ -449,10 +449,11 @@ sub _handle_page_move {
     $method  = $is_model ? 'model_named' : 'page_named';
     my $page = $wiki->$method($msg->{name});
     $method  = $is_model ? 'move_model' : 'move_page';
-    $wiki->$method($page, $msg->{new_name});
+    my $err  = $wiki->$method($page, $msg->{new_name});
 
     $msg->reply($is_model ? 'model_move' : 'page_move' => {
-        moved => 1
+        moved => !defined $err,
+        error => $err
     });
 }
 

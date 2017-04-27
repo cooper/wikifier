@@ -63,16 +63,18 @@ sub delete_page {
     return 1;
 }
 
+# rename a page
+# returns nothing on success, error string on failure
 sub move_page {
-    my ($wiki, $page, $new_name) = @_;
+    my ($wiki, $page, $new_name, $allow_overwrite) = @_;
     Lindent "MOVE($$page{name} -> $new_name)";
-
     $new_name = page_name($new_name);
     my ($old_name, $old_path) = ($page->name, $page->path);
     
     # this should never happen
     if ($page->name ne $page->rel_name) {
-        die "move_page(): mismatch ->name and ->rel_name\n";
+        back;
+        return 'Page appears to be a symbolic link';
     }
     
     # change the name, but keep the old name until after we ->display_page().
@@ -80,8 +82,12 @@ sub move_page {
     $page->{name} = $new_name;
     $page->{old_name} = $old_name;
 
-    # consider: what if the destination page exists?
-
+    # trying to overwrite
+    if (!$allow_overwrite && -e $page->path) {
+        back;
+        return 'Destination filename already exists';
+    }
+    
     # delete the old cache file
     unlink $page->cache_path; # may or may not exist
 
@@ -97,7 +103,7 @@ sub move_page {
     delete $page->{old_name};
 
     back;
-    return 1;
+    return;
 }
 
 *write_model    = \&write_page;
