@@ -407,9 +407,11 @@ sub _call_wiki_opt {
 # default image dimension calculator. requires Image::Size.
 sub _default_calculator {
     my %img = @_;
+    my $page_or_wiki = $img{page} || $img{wiki};
+    my $round = $page_or_wiki->wiki_opt('image.rounding');
+    
+    # dimensions may already be provided.
     my ($width, $height) = ($img{width}, $img{height});
-
-    # maybe these were found for us already.
     my ($big_w, $big_h) = ($img{big_width}, $img{big_height});
 
     # gotta do it the hard way.
@@ -417,7 +419,7 @@ sub _default_calculator {
     # note: these are provided by GD in WiWiki.
     if (!$big_w || !$big_h) {
         require Image::Size;
-        my $dir = $img{page}->wiki_opt('dir.image');
+        my $dir = $page_or_wiki->wiki_opt('dir.image');
         ($big_w, $big_h) = Image::Size::imgsize("$dir/$img{file}");
     }
 
@@ -434,13 +436,13 @@ sub _default_calculator {
     if ($width) {
         $scale_factor = $big_w / $width;
         $final_w = $img{width};
-        $final_h = $img{page}->_image_round($big_h / $scale_factor);
+        $final_h = _image_round($big_h / $scale_factor, $round);
     }
 
     # height was given; calculate width.
     elsif ($height) {
         $scale_factor = $big_h / $height;
-        $final_w = $img{page}->_image_round($big_w / $scale_factor);
+        $final_w = _image_round($big_w / $scale_factor, $round);
         $final_h = $img{height};
     }
 
@@ -449,21 +451,21 @@ sub _default_calculator {
 
 sub _default_sizer {
     my %img = @_;
-    my $page = $img{page};
+    my $page_or_wiki = $img{page} || $img{wiki};
 
     # full-size image.
     if (!$img{width} || !$img{height}) {
-        return $page->wiki_opt('root.image').'/'.$img{file};
+        return $page_or_wiki->wiki_opt('root.image').'/'.$img{file};
     }
 
     # scaled image.
-    return $page->wiki_opt('root.image')."/$img{width}x$img{height}-$img{file}";
+    my $file = "/$img{width}x$img{height}-$img{file}";
+    return $page_or_wiki->wiki_opt('root.image').$file;
 }
 
 # round dimension according to setting.
 sub _image_round {
-    my ($page, $size) = @_;
-    my $round = $page->wiki_opt('image.rounding');
+    my ($size, $round) = @_;
     return int($size + 0.5 ) if $round eq 'normal';
     return int($size + 0.99) if $round eq 'up';
     return int($size       ) if $round eq 'down';
