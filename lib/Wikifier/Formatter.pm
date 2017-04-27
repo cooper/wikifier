@@ -482,7 +482,7 @@ sub __page_link {
             $page->wiki_opt("dir.$typ"), $page->prefix, $safe_name;
         my $page_target = join '/', grep length,
             $page->wiki_opt("root.$typ"), $page->prefix, $target;
-        
+            
         # make sure the page/category exists
         if (!-e $path) {
             $page->warning(

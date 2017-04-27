@@ -81,6 +81,7 @@ sub move_page {
     # this is used to update categories the page belongs to.
     $page->{name} = $new_name;
     $page->{old_name} = $old_name;
+    delete $page->{cached_props};
 
     # trying to overwrite
     if (!$allow_overwrite && -e $page->path) {
