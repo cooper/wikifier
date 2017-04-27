@@ -475,7 +475,9 @@ sub _image_round {
 # this DOES include the page prefix, if applicable.
 sub name {
     my $page = shift;
-    return $page->{abs_name} // $page->{cached_props}{name} //= do {
+    return $page->{abs_name}
+        if length $page->{abs_name};
+    return $page->{cached_props}{name} //= do {
         my $dir  = $page->wiki_opt('dir.page');
         my $path = $page->path;
         (my $name = $path) =~ s/^\Q$dir\E(\/?)//;
@@ -500,8 +502,9 @@ sub prefix {
 # absolute path to page
 sub path {
     my $page = shift;
-    return $page->{abs_path} //
-    $page->{cached_props}{path} //= abs_path($page->rel_path);
+    return $page->{abs_path}
+        if length $page->{abs_path};
+    return $page->{cached_props}{path} //= abs_path($page->rel_path);
 }
 
 # unresolved page filename, with or without extension.
@@ -564,8 +567,9 @@ sub cache_path {
     return abs_path($page->{cache_path})
         if length $page->{cache_path};
     make_dir($page->wiki_opt('dir.cache'), $page->name);
-    return $page->{abs_cache_path} //
-    $page->{cached_props}{cache} //= abs_path(
+    return $page->{abs_cache_path}
+        if length $page->{abs_cache_path};
+    return $page->{cached_props}{cache} //= abs_path(
         $page->wiki_opt('dir.cache').'/'.$page->name.'.cache'
     );
 }
@@ -582,8 +586,9 @@ sub search_path {
     return abs_path($page->{search_path})
         if length $page->{search_path};
     make_dir($page->wiki_opt('dir.cache'), $page->name);
-    return $page->{abs_search_path} //
-    $page->{cached_props}{search} //= abs_path(
+    return $page->{abs_search_path}
+        if length $page->{abs_search_path};
+    return $page->{cached_props}{search} //= abs_path(
         $page->wiki_opt('dir.cache').'/'.$page->name.'.txt'
     );
 }
