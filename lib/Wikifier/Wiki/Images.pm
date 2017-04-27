@@ -35,12 +35,12 @@ sub _display_image {
     my ($wiki, $image_name, %opts) = @_;
     my $result = {};
 
-    # if $image_name is an array ref, it's given in
-    # [ name, width, height ]
+    # if $image_name is an array ref, it's [ name, width, height ]
+    # if width and height are both 0, parse the name normally
     if (ref $image_name eq 'ARRAY') {
         my ($name, $w, $h) = @$image_name;
         $image_name = "${w}x${h}-$name";
-        $image_name = $name if !$w || !$h;
+        $image_name = $name if !$w && !$h;
     }
 
     # parse the image name.
