@@ -120,7 +120,7 @@ sub read_config {
 }
 
 our @main_dirs   = qw(image page cache model category);
-our @pseudo_cats = qw(data image model);
+our @pseudo_cats = qw(data image model page);
 
 sub check_directories {
     my $wiki = shift;
