@@ -75,7 +75,10 @@ sub move_page {
         die "move_page(): mismatch ->name and ->rel_name\n";
     }
     
+    # change the name, but keep the old name until after we ->display_page().
+    # this is used to update categories the page belongs to.
     $page->{name} = $new_name;
+    $page->{old_name} = $old_name;
 
     # consider: what if the destination page exists?
 
@@ -91,6 +94,7 @@ sub move_page {
     # update the page
     my $display_method = $page->{is_model} ? 'display_model' : 'display_page';
     $wiki->$display_method($page);
+    delete $page->{old_name};
 
     back;
     return 1;

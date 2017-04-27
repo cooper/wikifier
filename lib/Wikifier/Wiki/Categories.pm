@@ -189,6 +189,11 @@ sub cat_add_page {
             L "Error parsing JSON category '$cat_file': $@";
             return;
         }
+        
+        # if the page was just renamed, delete the old entry.
+        if (length(my $old_name = $page->{old_name})) {
+            delete $cat->{pages}{$old_name};
+        }
 
         # the page has not changed since the asof time, so do nothing.
         my $page_ref = $cat->{pages}{ $page->name } ||= {};
