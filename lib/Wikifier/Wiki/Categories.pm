@@ -150,7 +150,10 @@ sub cat_check_page {
 
     # page link categories
     foreach my $page_name (keys_maybe $page->{target_pages}) {
-        $wiki->cat_add_page($page, $page_name, cat_type => 'page');
+        $wiki->cat_add_page($page, $page_name,
+            cat_type    => 'page',
+            cat_extras  => { lines => $page->{target_pages}{$page_name} }
+        );
     }
 
     # model categories
