@@ -252,7 +252,7 @@ sub get_image_cache {
     $result->{length}       = -s $cache_path;
 
     # symlink scaled version if necessary.
-    $wiki->symlink_scaled_image($image) if $image->{retina};
+    $wiki->symlink_scaled_image($image);
 
     return $result;
 }
@@ -349,7 +349,7 @@ sub generate_image {
 
         # symlink to the full-size image.
         $image->{full_name} = $image->{name};
-        $wiki->symlink_scaled_image($image) if $image->{retina};
+        $wiki->symlink_scaled_image($image);
 
         return; # success
     }
@@ -404,7 +404,7 @@ sub generate_image {
         $result->{cache_gen}  = 1;
 
         # if this image is available in more than 1 scale, symlink.
-        $wiki->symlink_scaled_image($image) if $image->{retina};
+        $wiki->symlink_scaled_image($image);
     }
 
     L align(
