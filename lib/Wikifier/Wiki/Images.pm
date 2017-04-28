@@ -59,8 +59,8 @@ my $json = JSON::XS->new->pretty->convert_blessed;
 #
 #       (content)       binary image data. omitted with 'dont_open' option
 #
-#       (length)        bytelength of image data. omitted with 'dont_open'
-#                       option. suitable for the Content-Length header
+#       length          bytelength of image data, suitable for use in the
+#                       Content-Length header
 #
 #       mod_unix        UNIX timestamp of when the image was last modified.
 #                       if 'generated' is true, this is the current time.
