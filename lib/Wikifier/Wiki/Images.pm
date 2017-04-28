@@ -66,7 +66,11 @@ sub _display_image {
     return $wiki->get_image_full_size($image, $result, \@stat, \%opts)
         if !$wiki->opt('image.enable.cache');
 
-    # if a dimension is missing, calculate it.
+    # if both dimensions are missing, display the full-size image.
+    return $wiki->get_image_full_size($image, $result, \@stat, \%opts)
+        if $width + $height == 0;
+
+    # if one dimension is missing, calculate it.
     if (!$width || !$height) {
         ($width, $height) = $wiki->opt('image.calc',
             file   => $image_name,
