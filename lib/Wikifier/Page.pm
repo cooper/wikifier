@@ -513,8 +513,16 @@ sub path {
 # this does NOT take symbolic links into account.
 sub rel_name {
     my $page = shift;
-    return $page->{name};
+    return $page->{abs_rel_name}
+        if length $page->{abs_rel_name};
+    return $page->{cached_props}{rel_name} //= do {
+        my $dir  = $page->wiki_opt('dir.page');
+        my $path = $page->rel_path;
+        (my $name = $path) =~ s/^\Q$dir\E(\/?)//;
+        index($path, $dir) ? basename($page->rel_path) : $name;
+    };
 }
+
 sub rel_name_ne {
     my $page = shift;
     return page_name_ne($page->rel_name);
@@ -525,8 +533,9 @@ sub rel_path {
     my $page = shift;
     return $page->{file_path}
         if length $page->{file_path};
-    make_dir($page->wiki_opt('dir.page'), $page->rel_name);
-    return $page->wiki_opt('dir.page').'/'.$page->rel_name;
+    make_dir($page->wiki_opt('dir.page'), $page->{name});
+    return $page->{cached_props}{rel_path} //=
+        $page->wiki_opt('dir.page').'/'.$page->{name};
 }
 
 # location to which this page redirects, if any, undef otherwise.
