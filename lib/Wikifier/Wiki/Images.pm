@@ -200,7 +200,7 @@ sub _display_image {
     }
 
     # generate the image
-    my $err = $wiki->generate_image($image, $result);
+    my $err = $wiki->generate_image($image, $cache_file, $result);
     return $err if $err;
 
     # the generator says to use the full-size image.
@@ -322,7 +322,7 @@ sub parse_image_name {
 # generate an image of a certain size.
 # returns error on fail, nothing on success
 sub generate_image {
-    my ($wiki, $image, $result) = @_;
+    my ($wiki, $image, $cache_path, $result) = @_;
 
     # an error occurred.
     return display_error($image->{error})
@@ -387,7 +387,6 @@ sub generate_image {
     $result->{length}       = length $result->{content};
 
     # caching is enabled, so let's save this for later.
-    my $cache_file = $result->{cache_path};
     if ($wiki->opt('image.enable.cache')) {
         
         open my $fh, '>', $cache_file
