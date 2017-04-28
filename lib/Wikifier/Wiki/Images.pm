@@ -107,7 +107,7 @@ sub _display_image {
             next if m/\D/;
             next if $_ == 1;
 
-            my $retina_file = "$$image{f_name_ne}\@${_}x.$$image{ext}";
+            my $retina_file = "$$image{full_name_ne}\@${_}x.$$image{ext}";
             $wiki->display_image($retina_file,
                 dont_open    => 1,
                 gen_override => 1
@@ -241,18 +241,18 @@ sub parse_image_name {
     }
 
     return {
-        name        => $image_name,     # image name with extension,      no dimensions
-        name_wo_ext => $image_wo_ext,   # image name without extension,   no dimensions
-        name_scale  => $image_name_s,   # image name possibly with scale, no dimensions
-        ext         => $image_ext,      # image extension
-        full_name   => $full_name,      # image name with extension & dimensions
-        f_name_ne   => $full_name_ne,   # image name with dimensions, no extension
-        big_path    => $image_path,     # path to the full size image
-        width       => $width,          # possibly scaled width
-        height      => $height,         # possibly scaled height
-        r_width     => $real_width,     # width without retina scaling
-        r_height    => $real_height,    # height without retina scaling
-        retina      => $retina_request  # if scaled for retina, the scale (e.g. 2, 3)
+        name            => $image_name,     # image name with extension,      no dimensions
+        name_wo_ext     => $image_wo_ext,   # image name without extension,   no dimensions
+        name_scale      => $image_name_s,   # image name possibly with scale, no dimensions
+        ext             => $image_ext,      # image extension
+        full_name       => $full_name,      # image name with extension & dimensions
+        full_name_ne    => $full_name_ne,   # image name with dimensions, no extension
+        big_path        => $image_path,     # path to the full size image
+        width           => $width,          # possibly scaled width
+        height          => $height,         # possibly scaled height
+        r_width         => $real_width,     # width without retina scaling
+        r_height        => $real_height,    # height without retina scaling
+        retina          => $retina_request  # if scaled for retina, the scale (e.g. 2, 3)
     };
 }
 
@@ -358,7 +358,7 @@ sub symlink_scaled_image {
     my ($wiki, $image) = @_;
     return unless $image->{retina};
     
-    # first path: file-123x456@2x.png
+    # retina path: file-123x456@2x.png
     my $scale_path = sprintf '%s/%dx%d-%s@%dx.%s',
         $wiki->opt('dir.cache'),
         $image->{r_width},
@@ -369,7 +369,10 @@ sub symlink_scaled_image {
     symlink $image->{full_name}, $scale_path
         unless -e $scale_path;
 
-    # first path: file-246x912.png
+    # normal path: file-246x912.png
+    # usually this is the image we are symlinking to above,
+    # but if it doesn't exist, it is likely because {full_name}
+    # is the full-size image.
     $scale_path = sprintf '%s/%dx%d-%s.%s',
             $wiki->opt('dir.cache'),
             $image->{width},
