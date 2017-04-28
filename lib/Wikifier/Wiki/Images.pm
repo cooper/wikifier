@@ -273,35 +273,49 @@ sub parse_image_name {
     }
 
     # split image parts.
-    my ($image_wo_ext, $image_ext) = ($image_name =~ m/^(.+)\.(.+?)$/);
+    my ($image_name_ne, $image_ext) = ($image_name =~ m/^(.+)\.(.+?)$/);
 
-    # if this is a retina request; calculate 2x scaling.
+    # if this is a retina request, calculate scaled dimensions.
     my ($real_width, $real_height) = ($width, $height);
     my $retina_request;
-    if ($image_wo_ext =~ m/^(.+)\@(\d+)x$/) {
-        $image_wo_ext   = $1;
+    if ($image_name_ne =~ m/^(.+)\@(\d+)x$/) {
+        $image_name_ne  = $1;
         $retina_request = $2;
         $image_name     = "$1.$image_ext";
         $width  *= $retina_request;
         $height *= $retina_request;
     }
 
-    my $full_name    = $image_name;
-    my $full_name_ne = $image_wo_ext;
-   $full_name    = "${width}x${height}-${image_name}"   if $width || $height;
-   $full_name_ne = "${width}x${height}-${image_wo_ext}" if $width || $height;
+    my $full_name    = my $scale_name    = $image_name;
+    my $full_name_ne = my $scale_name_ne = $image_name_ne;
+    
+    # full name with scale
+    if ($real_width && $retina_request) {
+        $scale_name_ne = "${real_width}x${real_height}-${image_name_ne}\@$retina_request";
+        $scale_name    = "$scale_name_ne.$image_ext";
+    }
+    
+    # full name without scale
+    if ($width) {
+        $full_name      = "${width}x${height}-${image_name}";
+        $full_name_ne   = "${width}x${height}-${image_name_ne}";
+    }
 
-    return {
-        name            => $image_name,     # name;     e.g. image.png
-        name_ne         => $image_wo_ext,   # name;     e.g. image
-        ext             => $image_ext,      # extension e.g. png
-        full_name       => $full_name,      # full name e.g. 123x456-image.png
-        full_name_ne    => $full_name_ne,   # full name e.g. 123x456-image
-        width           => $width,          # possibly scaled width
-        height          => $height,         # possibly scaled height
-        r_width         => $real_width,     # width without scaling
-        r_height        => $real_height,    # height without scaling
-        retina          => $retina_request  # retina scale  e.g. 2
+    # for the examples, suppose this was supplied: 123x456-image@2x.png
+    return {                                # Field         Example
+                                            # ------------  --------------------
+        name            => $image_name,     # name          image.png
+        name_ne         => $image_name_ne,  #               image
+        ext             => $image_ext,      # extension     png
+        full_name       => $full_name,      # full name     246x912-image.png
+        full_name_ne    => $full_name_ne,   #               246x912-image
+        scale_name      => $scale_name,     # full name     123x456-image@2x.png
+        scale_name_ne   => $scale_name_ne,  #               123x456-image@2x
+        width           => $width,          # scaled width  246
+        height          => $height,         # scaled height 912
+        r_width         => $real_width,     # width         123
+        r_height        => $real_height,    # height        456
+        retina          => $retina_request  # scale         2
     };
 }
 
