@@ -483,7 +483,7 @@ sub name {
         my $dir  = $page->wiki_opt('dir.page');
         my $path = $page->path;
         (my $name = $path) =~ s/^\Q$dir\E(\/?)//;
-        index($path, $dir) ? basename($page->path) : $name;
+        index($path, $dir) ? $page->rel_name : $name;
     };
 }
 sub name_ne {
@@ -544,7 +544,7 @@ sub redirect {
     my $page = shift;
     
     # symbolic link redirect
-    if (-l $page->rel_path) {
+    if (-l $page->rel_path && !index($page->path, $page->wiki_opt('dir.page'))) {
         return $page->wiki_opt('root.page').'/'.$page->name_ne;
     }
     
