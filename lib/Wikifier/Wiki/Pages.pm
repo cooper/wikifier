@@ -87,7 +87,7 @@ sub page_named {
 #       content         the page content (HTML)
 #
 #       mod_unix        UNIX timestamp of when the page was last modified.
-#                       if 'cache_gen' is true, this is the current time.
+#                       if 'generated' is true, this is the current time.
 #                       if 'cached' is true, this is the modified date of the
 #                       cache file. otherwise, this is the modified date of the
 #                       page file itself

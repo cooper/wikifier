@@ -250,7 +250,52 @@ S: ["image",{"file":"the_crew.jpg","cached":"1","mime":"image/jpeg","length":"13
 * __height__ - _optional_, desired image height.
 
 Response
-* __TODO__
+```
+#   for type 'image':
+#
+#       file            basename of the scaled image file
+#
+#       path            absolute path to the scaled image. this file should be
+#                       served to the user
+#
+#       fullsize_path   absolute path to the full-size image. if the full-size
+#                       image is being displayed, this is the same as 'path'
+#
+#       image_type      'png' or 'jpeg'
+#
+#       mime            'image/png' or 'image/jpeg', suitable for the
+#                       Content-Type header
+#
+#       (content)       binary image data. omitted with 'dont_open' option
+#
+#       (length)        bytelength of image data. omitted with 'dont_open'
+#                       option. suitable for the Content-Length header
+#
+#       mod_unix        UNIX timestamp of when the image was last modified.
+#                       if 'generated' is true, this is the current time.
+#                       if 'cached' is true, this is the modified date of the
+#                       cache file. otherwise, this is the modified date of the
+#                       image file itself
+#
+#       modified        like 'mod_unix' except in HTTP date format, suitable for
+#                       use in the Last-Modified header
+#
+#       (cached)        true if the content being served was read from a cache
+#                       file (opposite of 'generated')
+#
+#       (generated)     true if the content being served was just generated in
+#                       order to fulfill this request (opposite of 'cached')
+#
+#       (cache_gen)     true if the content generated in order to fulfill this
+#                       request was written to a cache file for later use. this
+#                       can only be true if 'generated' is true
+#
+#   for type 'not found':
+#
+#       error           a human-readable error string. sensitive info is never
+#                       included, so this may be shown to users
+#
+```
 
 ## image_list
 

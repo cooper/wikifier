@@ -44,27 +44,42 @@ my $json = JSON::XS->new->pretty->convert_blessed;
 #
 #   for type 'image':
 #
-#       file
+#       file            basename of the scaled image file
 #
-#       path
+#       path            absolute path to the scaled image. this file should be
+#                       served to the user
 #
-#       image_type
+#       fullsize_path   absolute path to the full-size image. if the full-size
+#                       image is being displayed, this is the same as 'path'
 #
-#       mime
+#       image_type      'png' or 'jpeg'
 #
-#       (content)
+#       mime            'image/png' or 'image/jpeg', suitable for the
+#                       Content-Type header
 #
-#       (length)
+#       (content)       binary image data. omitted with 'dont_open' option
 #
-#       mod_unix
+#       (length)        bytelength of image data. omitted with 'dont_open'
+#                       option. suitable for the Content-Length header
 #
-#       modified
+#       mod_unix        UNIX timestamp of when the image was last modified.
+#                       if 'generated' is true, this is the current time.
+#                       if 'cached' is true, this is the modified date of the
+#                       cache file. otherwise, this is the modified date of the
+#                       image file itself
 #
-#       (cached)
+#       modified        like 'mod_unix' except in HTTP date format, suitable for
+#                       use in the Last-Modified header
 #
-#       (generated)
+#       (cached)        true if the content being served was read from a cache
+#                       file (opposite of 'generated')
 #
-#       (cache_gen)
+#       (generated)     true if the content being served was just generated in
+#                       order to fulfill this request (opposite of 'cached')
+#
+#       (cache_gen)     true if the content generated in order to fulfill this
+#                       request was written to a cache file for later use. this
+#                       can only be true if 'generated' is true
 #
 #   for type 'not found':
 #
