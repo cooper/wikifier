@@ -8,6 +8,7 @@ use 5.010;
 use GD;                             # image generation
 use HTTP::Date qw(time2str);        # HTTP date formatting
 use File::Spec ();                  # simplifying symlinks
+use List::Util qw(max);
 use Wikifier::Utilities qw(L Lindent align back hash_maybe);
 use File::Basename qw(basename);
 use JSON::XS ();
@@ -20,10 +21,56 @@ my $json = JSON::XS->new->pretty->convert_blessed;
 
 # Displays an image of the supplied dimensions.
 #
-# %opts = (
-#   dont_open       don't actually read the image; {content} will be omitted
-#   gen_override    set true for pregeneration so we can generate any dimensions
-# )
+# Input
+#
+#   $image_name     filename string or array ref of [ filename, width, height ]
+#                   1) image.png                    full-size
+#                   2) 123x456-image.png            scaled
+#                   3) 123x456-image.png            scaled with retina
+#                   4) [ 'image.png', 0,   0   ]    full-size
+#                   5) [ 'image.png', 123, 456 ]    scaled
+#                   6) [ 'image.png', 123, 0   ]    scaled with one dimension
+#
+#   if image.enable.restriction is true, images will not be generated in arbitrary
+#   dimensions, only those used within the wiki. this can be overriden with the
+#   gen_override option mentioned below.
+#
+#   %opts = (
+#       dont_open       don't actually read the image; {content} will be omitted
+#       gen_override    set true for pregeneration so we can generate any dimensions
+#   )
+#
+# Result
+#
+#   for type 'image':
+#
+#       file
+#
+#       path
+#
+#       image_type
+#
+#       mime
+#
+#       (content)
+#
+#       (length)
+#
+#       mod_unix
+#
+#       modified
+#
+#       (cached)
+#
+#       (generated)
+#
+#       (cache_gen)
+#
+#   for type 'not found':
+#
+#       error           a human-readable error string. sensitive info is never
+#                       included, so this may be shown to users
+#
 sub display_image {
     my $name = ref $_[1] ? $_[1][0] : $_[1];
     Lindent "($name)";
@@ -55,7 +102,6 @@ sub _display_image {
 
     # image name and full path.
     $result->{type} = 'image';
-    $result->{file} = $image_name;
     $result->{path} = $result->{fullsize_path} = $image->{big_path};
     $result->{file} = basename($result->{path});
 
@@ -110,18 +156,15 @@ sub _display_image {
         }
     }
 
-    # determine the full file name of the image.
-    # this may have doubled sizes for retina.
-    my $cache_file = $wiki->opt('dir.cache').'/'.$image->{full_name};
-    $result->{cache_path} = $cache_file;
-
     #=========================#
     #=== Find cached image ===#
     #=========================#
 
     # if caching is enabled, check if this exists in cache.
+    my $cache_file = $wiki->opt('dir.cache').'/'.$image->{full_name};
     if ($wiki->opt('image.enable.cache') && -f $cache_file) {
-        $result = $wiki->get_image_cache($image, $result, $stat[9], \%opts);
+        $result = $wiki->get_image_cache(
+            $image, $result, $stat[9], $cache_file, \%opts);
         return $result if $result->{cached};
     }
 
@@ -164,8 +207,7 @@ sub get_image_full_size {
 
 # get image from cache
 sub get_image_cache {
-    my ($wiki, $image, $result, $image_modify, $opts) = @_;
-    my $cache_file   = $result->{cache_path};
+    my ($wiki, $image, $result, $image_modify, $cache_file, $opts) = @_;
     my $cache_modify = (stat $cache_file)[9];
 
     # if the image's file is more recent than the cache file,
