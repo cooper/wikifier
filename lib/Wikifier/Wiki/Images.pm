@@ -182,10 +182,10 @@ sub _display_image {
     #=========================#
 
     # if caching is enabled, check if this exists in cache.
-    my $cache_file = $wiki->opt('dir.cache').'/'.$image->{full_name};
-    if ($wiki->opt('image.enable.cache') && -f $cache_file) {
+    my $cache_path = $wiki->opt('dir.cache').'/'.$image->{full_name};
+    if ($wiki->opt('image.enable.cache') && -f $cache_path) {
         $result = $wiki->get_image_cache(
-            $image, $result, $stat[9], $cache_file, \%opts);
+            $image, $result, $stat[9], $cache_path, \%opts);
         return $result if $result->{cached};
     }
 
@@ -200,7 +200,7 @@ sub _display_image {
     }
 
     # generate the image
-    my $err = $wiki->generate_image($image, $cache_file, $result);
+    my $err = $wiki->generate_image($image, $cache_path, $result);
     return $err if $err;
 
     # the generator says to use the full-size image.
@@ -228,28 +228,28 @@ sub get_image_full_size {
 
 # get image from cache
 sub get_image_cache {
-    my ($wiki, $image, $result, $image_modify, $cache_file, $opts) = @_;
-    my $cache_modify = (stat $cache_file)[9];
+    my ($wiki, $image, $result, $image_modify, $cache_path, $opts) = @_;
+    my $cache_modify = (stat $cache_path)[9];
 
     # if the image's file is more recent than the cache file,
     # discard the outdated cached copy.
     if ($image_modify > $cache_modify) {
-        unlink $cache_file;
+        unlink $cache_path;
         return $result;
     }
 
     # the cached file is newer, so use it.
 
     # only include the content if dont_open is false
-    $result->{content} = file_contents($cache_file, 1)
+    $result->{content} = file_contents($cache_path, 1)
         unless $opts->{dont_open};
 
-    $result->{path}         = $cache_file;
-    $result->{file}         = basename($cache_file);
+    $result->{path}         = $cache_path;
+    $result->{file}         = basename($cache_path);
     $result->{cached}       = 1;
     $result->{modified}     = time2str($cache_modify);
     $result->{mod_unix}     = $cache_modify;
-    $result->{length}       = -s $cache_file;
+    $result->{length}       = -s $cache_path;
 
     # symlink scaled version if necessary.
     $wiki->symlink_scaled_image($image) if $image->{retina};
@@ -389,16 +389,16 @@ sub generate_image {
     # caching is enabled, so let's save this for later.
     if ($wiki->opt('image.enable.cache')) {
         
-        open my $fh, '>', $cache_file
+        open my $fh, '>', $cache_path
             or return display_error('Could not write image cache file');
         binmode $fh, ':raw';
         print {$fh} $result->{content};
         close $fh;
 
         # overwrite modified date to actual.
-        my $modified = (stat $cache_file)[9];
-        $result->{path}       = $cache_file;
-        $result->{file}       = basename($cache_file);
+        my $modified = (stat $cache_path)[9];
+        $result->{path}       = $cache_path;
+        $result->{file}       = basename($cache_path);
         $result->{modified}   = time2str($modified);
         $result->{mod_unix}   = $modified;
         $result->{cache_gen}  = 1;
