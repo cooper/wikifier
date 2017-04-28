@@ -110,11 +110,9 @@ sub _display_image {
 
     # parse the image name.
     my $image = $wiki->parse_image_name($image_name);
-    return display_error($image->{error})
-        if $image->{error};
-        
-    # check if the file exists.
     $image_name = $image->{name};
+
+    # check if the file exists.
     my $big_path = $wiki->path_for_image($image_name);
     return display_error('Image does not exist.')
         if !-f $big_path;
