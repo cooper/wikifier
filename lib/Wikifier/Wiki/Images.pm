@@ -64,13 +64,10 @@ sub _display_image {
                             $image->{ext} eq 'jpeg' ? 'jpeg' : 'png';
     $result->{mime} = $image->{ext} eq 'png' ? 'image/png' : 'image/jpeg';
 
-    # if image caching is disabled, display the full-size version of the image.
+    # if image caching is disabled or both dimensions are missing,
+    # display the full-size version of the image.
     return $wiki->get_image_full_size($image, $result, \@stat, \%opts)
-        if !$wiki->opt('image.enable.cache');
-
-    # if both dimensions are missing, display the full-size image.
-    return $wiki->get_image_full_size($image, $result, \@stat, \%opts)
-        if $width + $height == 0;
+        if !$wiki->opt('image.enable.cache') || $width + $height == 0;
 
     # if one dimension is missing, calculate it.
     if (!$width || !$height) {
@@ -112,7 +109,7 @@ sub _display_image {
 
             my $retina_file = "$$image{f_name_ne}\@${_}x.$$image{ext}";
             $wiki->display_image($retina_file,
-                dont_open => 1,
+                dont_open    => 1,
                 gen_override => 1
             );
         }
@@ -205,7 +202,7 @@ sub get_image_cache {
 # parse an image name such as:
 #
 #   250x250-some_pic.png
-#   250x250-some_pic@2x.png (w/o slash)
+#   250x250-some_pic@2x.png
 #   some_pic.png
 #
 sub parse_image_name {
