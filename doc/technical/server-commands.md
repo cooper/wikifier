@@ -238,7 +238,8 @@ Response
 
 Returns the metadata for an image, including an absolute path on the filesystem.
 The image data itself is NOT transmitted over the wikiserver transport; instead,
-the frontend should serve the image file directly.
+the frontend should serve the image file directly from the `path` specified
+in the response.
 
 ```
 C: ["image",{"name":"200x200-the_crew@2x.jpg"},22]

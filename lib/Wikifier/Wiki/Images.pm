@@ -31,13 +31,16 @@ my $json = JSON::XS->new->pretty->convert_blessed;
 #                   5) [ 'image.png', 123, 456 ]    scaled
 #                   6) [ 'image.png', 123, 0   ]    scaled with one dimension
 #
-#   if image.enable.restriction is true, images will not be generated in arbitrary
-#   dimensions, only those used within the wiki. this can be overriden with the
-#   gen_override option mentioned below.
+#   if image.enable.restriction is true, images will not be generated in
+#   arbitrary dimensions, only those used within the wiki. this can be overriden
+#   with the gen_override option mentioned below.
 #
 #   %opts = (
+#
 #       dont_open       don't actually read the image; {content} will be omitted
-#       gen_override    set true for pregeneration so we can generate any dimensions
+#
+#       gen_override    true for pregeneration so we can generate any dimensions
+#
 #   )
 #
 # Result
@@ -109,15 +112,20 @@ sub _display_image {
     my $image = $wiki->parse_image_name($image_name);
     return display_error($image->{error})
         if $image->{error};
-
+        
+    # check if the file exists.
     $image_name = $image->{name};
+    my $big_path = $wiki->path_for_image($image_name);
+    return display_error('Image does not exist.')
+        if !-f $big_path;
+
     my $width   = $image->{width};
     my $height  = $image->{height};
-    my @stat    = stat $image->{big_path};
+    my @stat    = stat $big_path;
 
     # image name and full path.
     $result->{type} = 'image';
-    $result->{path} = $result->{fullsize_path} = $image->{big_path};
+    $result->{path} = $result->{fullsize_path} = $big_path;
     $result->{file} = basename($result->{path});
 
     # image type and mime type.
@@ -210,7 +218,7 @@ sub get_image_full_size {
     my ($wiki, $image, $result, $stat, $opts) = @_;
 
     # only include the content if dont_open is false
-    $result->{content} = file_contents($image->{big_path}, 1)
+    $result->{content} = file_contents($result->{fullsize_path}, 1)
         unless $opts->{dont_open};
 
     $result->{modified}     = time2str($stat->[9]);
@@ -268,7 +276,6 @@ sub parse_image_name {
 
     # split image parts.
     my ($image_wo_ext, $image_ext) = ($image_name =~ m/^(.+)\.(.+?)$/);
-    my $image_name_s = $image_name;
 
     # if this is a retina request; calculate 2x scaling.
     my ($real_width, $real_height) = ($width, $height);
@@ -286,25 +293,17 @@ sub parse_image_name {
    $full_name    = "${width}x${height}-${image_name}"   if $width || $height;
    $full_name_ne = "${width}x${height}-${image_wo_ext}" if $width || $height;
 
-    # check if the file exists.
-    my $image_path = $wiki->path_for_image($image_name);
-    if (!-f $image_path) {
-        return { error => "Image does not exist." };
-    }
-
     return {
-        name            => $image_name,     # image name with extension,      no dimensions
-        name_wo_ext     => $image_wo_ext,   # image name without extension,   no dimensions
-        name_scale      => $image_name_s,   # image name possibly with scale, no dimensions
-        ext             => $image_ext,      # image extension
-        full_name       => $full_name,      # image name with extension & dimensions
-        full_name_ne    => $full_name_ne,   # image name with dimensions, no extension
-        big_path        => $image_path,     # path to the full size image
+        name            => $image_name,     # name;     e.g. image.png
+        name_ne         => $image_wo_ext,   # name;     e.g. image
+        ext             => $image_ext,      # extension e.g. png
+        full_name       => $full_name,      # full name e.g. 123x456-image.png
+        full_name_ne    => $full_name_ne,   # full name e.g. 123x456-image
         width           => $width,          # possibly scaled width
         height          => $height,         # possibly scaled height
-        r_width         => $real_width,     # width without retina scaling
-        r_height        => $real_height,    # height without retina scaling
-        retina          => $retina_request  # if scaled for retina, the scale (e.g. 2, 3)
+        r_width         => $real_width,     # width without scaling
+        r_height        => $real_height,    # height without scaling
+        retina          => $retina_request  # retina scale  e.g. 2
     };
 }
 
@@ -415,7 +414,7 @@ sub symlink_scaled_image {
         $wiki->opt('dir.cache'),
         $image->{r_width},
         $image->{r_height},
-        $image->{name_wo_ext},
+        $image->{name_ne},
         $image->{retina},
         $image->{ext};
     symlink $image->{full_name}, $scale_path
@@ -429,7 +428,7 @@ sub symlink_scaled_image {
             $wiki->opt('dir.cache'),
             $image->{width},
             $image->{height},
-            $image->{name_wo_ext},
+            $image->{name_ne},
             $image->{ext};
     symlink $image->{full_name}, $scale_path
         unless -e $scale_path;
