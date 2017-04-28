@@ -119,7 +119,7 @@ sub _display_image {
     # this may have doubled sizes for retina.
     my $cache_file = $wiki->opt('dir.cache').'/'.$image->{full_name};
     $result->{cache_path} = $cache_file;
-print "cache file: $cache_file\n";
+print STDERR "cache file: $cache_file\n";
     #=========================#
     #=== Find cached image ===#
     #=========================#
