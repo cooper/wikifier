@@ -94,19 +94,14 @@ sub _display_image {
     # pregeneration. therefore, we will call ->generate_image() in order to
     # pregenerate a retina version. this only happens if gen_override is true
     # (pregenration request, not real request from user).
-    if (my $retina = $wiki->opt('image.enable.retina')) {
-        foreach (split /,/, $retina) {
-
-            # the image is already retina, or pregeneration is disabled
-            last if $image->{retina};
-            last if !$opts{gen_override};
-
-            # ignore scale 1 and non-integers
-            s/^\s*//;
-            s/\s*$//;
-            next if m/\D/;
-            next if $_ == 1;
-
+    my $retina = $wiki->opt('image.enable.retina');
+    if (!$image->{retina} && $opts{gen_override} && $retina) {
+        my $max_scale = max 0, grep {
+            s/^\s*//;           # ignore whitespace before
+            s/\s*$//;           # ignore whitespace after
+            !m/\D/ && $_ != 1;  # ignore non-digits and scale 1
+        } split /,/, $retina;
+        foreach (2..$max_scale) {
             my $retina_file = "$$image{full_name_ne}\@${_}x.$$image{ext}";
             $wiki->display_image($retina_file,
                 dont_open    => 1,

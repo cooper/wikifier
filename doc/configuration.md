@@ -301,13 +301,13 @@ __Default__: *100*
 Enable retina display support. Wikifier::Wiki will interpret and properly
 handle @2x or larger scaled versions of images.
 
-This option is a comma-separated list of scales, such as
+The value of this option is the max scale to support; e.g.
 
-    @image.enable.retina: 2,3;
+    @image.enable.retina: 3;
 
-to support @2x and @3x scaling both.
+to support both @2x and @3x scaling.
 
-__Default__: *2, 3*
+__Default__: *3*
 
 ### image.enable.pregeneration
 
