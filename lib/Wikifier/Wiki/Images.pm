@@ -421,21 +421,13 @@ sub symlink_scaled_image {
     my ($wiki, $image) = @_;
     return unless $image->{retina};
     
-    # retina path: file-123x456@2x.png
-    my $scale_path = sprintf '%s/%dx%d-%s@%dx.%s',
-        $wiki->opt('dir.cache'),
-        $image->{r_width},
-        $image->{r_height},
-        $image->{name_ne},
-        $image->{retina},
-        $image->{ext};
+    # file-123x456@2x.png -> file-246x912.png
+    my $scale_path = $wiki->opt('dir.cache').'/'.$image->{scale_name};
     symlink $image->{full_name}, $scale_path
         unless -e $scale_path;
 
-    # normal path: file-246x912.png
-    # usually this is the image we are symlinking to above,
-    # but if it doesn't exist, it is likely because {full_name}
-    # is the full-size image.
+    # file-246x912.png -> file.png
+    # for when the fullsize image is used
     $scale_path = sprintf '%s/%dx%d-%s.%s',
             $wiki->opt('dir.cache'),
             $image->{width},
@@ -443,7 +435,7 @@ sub symlink_scaled_image {
             $image->{name_ne},
             $image->{ext};
     symlink $image->{full_name}, $scale_path
-        unless -e $scale_path;
+        if $image->{width} && !-e $scale_path;
 }
 
 
