@@ -119,7 +119,7 @@ sub _display_image {
     # this may have doubled sizes for retina.
     my $cache_file = $wiki->opt('dir.cache').'/'.$image->{full_name};
     $result->{cache_path} = $cache_file;
-print STDERR "cache file: $cache_file\n";
+
     #=========================#
     #=== Find cached image ===#
     #=========================#
@@ -357,6 +357,8 @@ sub generate_image {
 sub symlink_scaled_image {
     my ($wiki, $image) = @_;
     return unless $image->{retina};
+    
+    # first path: file-123x456@2x.png
     my $scale_path = sprintf '%s/%dx%d-%s@%dx.%s',
         $wiki->opt('dir.cache'),
         $image->{r_width},
@@ -364,11 +366,18 @@ sub symlink_scaled_image {
         $image->{name_wo_ext},
         $image->{retina},
         $image->{ext};
-    return 1 if -e $scale_path;
+    symlink $image->{full_name}, $scale_path
+        unless -e $scale_path;
 
-    # note: using full_name rather than $cache_file
-    # results in a relative rather than absolute symlink.
-    symlink $image->{full_name}, $scale_path;
+    # first path: file-246x912.png
+    $scale_path = sprintf '%s/%dx%d-%s.%s',
+            $wiki->opt('dir.cache'),
+            $image->{width},
+            $image->{height},
+            $image->{name_wo_ext},
+            $image->{ext};
+    symlink $image->{full_name}, $scale_path
+        unless -e $scale_path;
 }
 
 
