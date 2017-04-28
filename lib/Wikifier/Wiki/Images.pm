@@ -168,7 +168,7 @@ sub _display_image {
             s/\s*$//;           # ignore whitespace after
             !m/\D/ && $_ != 1;  # ignore non-digits and scale 1
         } split /,/, $retina;
-        foreach (2..$max_scale) {
+        foreach (reverse 2..$max_scale) {
             my $retina_file = "$$image{full_name_ne}\@${_}x.$$image{ext}";
             $wiki->_display_image($retina_file,
                 dont_open    => 1,
