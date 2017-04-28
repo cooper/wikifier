@@ -170,7 +170,7 @@ sub _display_image {
         } split /,/, $retina;
         foreach (2..$max_scale) {
             my $retina_file = "$$image{full_name_ne}\@${_}x.$$image{ext}";
-            $wiki->display_image($retina_file,
+            $wiki->_display_image($retina_file,
                 dont_open    => 1,
                 gen_override => 1
             );
