@@ -9,6 +9,7 @@ use GD;                             # image generation
 use HTTP::Date qw(time2str);        # HTTP date formatting
 use File::Spec ();                  # simplifying symlinks
 use Wikifier::Utilities qw(L Lindent align back hash_maybe);
+use File::Basename qw(basename);
 use JSON::XS ();
 
 my $json = JSON::XS->new->pretty->convert_blessed;
@@ -56,6 +57,7 @@ sub _display_image {
     $result->{type} = 'image';
     $result->{file} = $image_name;
     $result->{path} = $result->{fullsize_path} = $image->{big_path};
+    $result->{file} = basename($result->{path});
 
     # image type and mime type.
     $result->{image_type} = $image->{ext} eq 'jpg' ||
@@ -188,6 +190,7 @@ sub get_image_cache {
         unless $opts->{dont_open};
 
     $result->{path}         = $cache_file;
+    $result->{file}         = basename($cache_file);
     $result->{cached}       = 1;
     $result->{modified}     = time2str($cache_modify);
     $result->{mod_unix}     = $cache_modify;
@@ -336,6 +339,7 @@ sub generate_image {
         # overwrite modified date to actual.
         my $modified = (stat $cache_file)[9];
         $result->{path}       = $cache_file;
+        $result->{file}       = basename($cache_file);
         $result->{modified}   = time2str($modified);
         $result->{mod_unix}   = $modified;
         $result->{cache_gen}  = 1;
