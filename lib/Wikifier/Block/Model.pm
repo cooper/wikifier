@@ -29,7 +29,7 @@ sub model_parse {
     $page->{models}{$file}++;
 
     # create a page
-    my $path  = abs_path($page->wiki_opt('dir.model')."/$file");
+    my $path  = abs_path($page->opt('dir.model')."/$file");
     my $model = $block->{model} = Wikifier::Page->new(
         is_model   => 1,
         file_path  => $path,

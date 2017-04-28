@@ -67,7 +67,7 @@ sub new {
     # create the page's main block.
     $page->{main_block} = $wikifier->{main_block} = $wikifier->create_block(
         line   => 1,
-        wdir   => $page->{wdir} // $page->wiki_opt('dir.wikifier'),
+        wdir   => $page->{wdir} // $page->opt('dir.wikifier'),
         type   => 'main',
         parent => undef     # main block has no parent.
     );
@@ -367,10 +367,10 @@ sub parse_formatted_text {
 }
 
 # returns a wiki option or the default.
-sub wiki_opt {
+sub opt {
     my ($page, $var, @args) = @_;
     return $page->{wiki}->opt($var, @args) if blessed $page->{wiki};
-    return _call_wiki_opt(
+    return _call_opt(
         $page->{opts}{$var} // $wiki_defaults{$var},
         @args
     );
@@ -393,10 +393,10 @@ sub page_opt {
     $val //= $page->{opts}{$var};   # opts => { ... } in the page constructor
     $val //= $wiki_defaults{$var};  # default options as a last resort
 
-    return _call_wiki_opt($val, @args);
+    return _call_opt($val, @args);
 }
 
-sub _call_wiki_opt {
+sub _call_opt {
     my ($val, @args) = @_;
     if (ref $val eq 'CODE') {
         return $val->(@args);
@@ -408,7 +408,7 @@ sub _call_wiki_opt {
 sub _default_calculator {
     my %img = @_;
     my $page_or_wiki = $img{page} || $img{wiki};
-    my $round = $page_or_wiki->wiki_opt('image.rounding');
+    my $round = $page_or_wiki->opt('image.rounding');
     
     # dimensions may already be provided.
     my ($width, $height) = ($img{width}, $img{height});
@@ -419,7 +419,7 @@ sub _default_calculator {
     # note: these are provided by GD in WiWiki.
     if (!$big_w || !$big_h) {
         require Image::Size;
-        my $dir = $page_or_wiki->wiki_opt('dir.image');
+        my $dir = $page_or_wiki->opt('dir.image');
         ($big_w, $big_h) = Image::Size::imgsize("$dir/$img{file}");
     }
 
@@ -455,12 +455,12 @@ sub _default_sizer {
 
     # full-size image.
     if (!$img{width} || !$img{height}) {
-        return $page_or_wiki->wiki_opt('root.image').'/'.$img{file};
+        return $page_or_wiki->opt('root.image').'/'.$img{file};
     }
 
     # scaled image.
     my $file = "/$img{width}x$img{height}-$img{file}";
-    return $page_or_wiki->wiki_opt('root.image').$file;
+    return $page_or_wiki->opt('root.image').$file;
 }
 
 # round dimension according to setting.
@@ -480,7 +480,7 @@ sub name {
     return $page->{abs_name}
         if length $page->{abs_name};
     return $page->{cached_props}{name} //= do {
-        my $dir  = $page->wiki_opt('dir.page');
+        my $dir  = $page->opt('dir.page');
         my $path = $page->path;
         (my $name = $path) =~ s/^\Q$dir\E(\/?)//;
         index($path, $dir) ? $page->rel_name : $name;
@@ -516,7 +516,7 @@ sub rel_name {
     return $page->{abs_rel_name}
         if length $page->{abs_rel_name};
     return $page->{cached_props}{rel_name} //= do {
-        my $dir  = $page->wiki_opt('dir.page');
+        my $dir  = $page->opt('dir.page');
         my $path = $page->rel_path;
         (my $name = $path) =~ s/^\Q$dir\E(\/?)//;
         index($path, $dir) ? basename($page->rel_path) : $name;
@@ -533,9 +533,9 @@ sub rel_path {
     my $page = shift;
     return $page->{file_path}
         if length $page->{file_path};
-    make_dir($page->wiki_opt('dir.page'), $page->{name});
+    make_dir($page->opt('dir.page'), $page->{name});
     return $page->{cached_props}{rel_path} //=
-        $page->wiki_opt('dir.page').'/'.$page->{name};
+        $page->opt('dir.page').'/'.$page->{name};
 }
 
 # location to which this page redirects, if any, undef otherwise.
@@ -544,8 +544,8 @@ sub redirect {
     my $page = shift;
     
     # symbolic link redirect
-    if (-l $page->rel_path && !index($page->path, $page->wiki_opt('dir.page'))) {
-        return $page->wiki_opt('root.page').'/'.$page->name_ne;
+    if (-l $page->rel_path && !index($page->path, $page->opt('dir.page'))) {
+        return $page->opt('root.page').'/'.$page->name_ne;
     }
     
     # @page.redirect
@@ -577,11 +577,11 @@ sub cache_path {
     my $page = shift;
     return abs_path($page->{cache_path})
         if length $page->{cache_path};
-    make_dir($page->wiki_opt('dir.cache'), $page->name);
+    make_dir($page->opt('dir.cache'), $page->name);
     return $page->{abs_cache_path}
         if length $page->{abs_cache_path};
     return $page->{cached_props}{cache} //= abs_path(
-        $page->wiki_opt('dir.cache').'/'.$page->name.'.cache'
+        $page->opt('dir.cache').'/'.$page->name.'.cache'
     );
 }
 
@@ -596,11 +596,11 @@ sub search_path {
     my $page = shift;
     return abs_path($page->{search_path})
         if length $page->{search_path};
-    make_dir($page->wiki_opt('dir.cache'), $page->name);
+    make_dir($page->opt('dir.cache'), $page->name);
     return $page->{abs_search_path}
         if length $page->{abs_search_path};
     return $page->{cached_props}{search} //= abs_path(
-        $page->wiki_opt('dir.cache').'/'.$page->name.'.txt'
+        $page->opt('dir.cache').'/'.$page->name.'.txt'
     );
 }
 

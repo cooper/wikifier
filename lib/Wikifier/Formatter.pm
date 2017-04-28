@@ -479,9 +479,9 @@ sub __page_link {
         my $safe_name = $typ eq 'category' ?
             cat_name($target) : page_name($target);
         my $path = join '/', grep length,
-            $page->wiki_opt("dir.$typ"), $page->prefix, $safe_name;
+            $page->opt("dir.$typ"), $page->prefix, $safe_name;
         my $page_target = join '/', grep length,
-            $page->wiki_opt("root.$typ"), $page->prefix, $target;
+            $page->opt("root.$typ"), $page->prefix, $target;
             
         # make sure the page/category exists
         if (!-e $path) {
@@ -508,7 +508,7 @@ sub __page_link {
 sub _external_link {
     my ($target_ref, $tooltip_ref, $display_ref, $page, $wiki_id, %opts) = @_;
     my ($wiki_name, $wiki_root, $wiki_normalizer) =
-        map $page->wiki_opt("external.$wiki_id.$_"), qw(name root type);
+        map $page->opt("external.$wiki_id.$_"), qw(name root type);
 
     # no such external wiki is configured
     my $errors;

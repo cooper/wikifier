@@ -61,7 +61,7 @@ sub image_parse {
     # no float; default to right.
     $image->{float} ||= $image->{align} || 'right';
 
-    $image->{image_root} = $page->wiki_opt('root.image');
+    $image->{image_root} = $page->opt('root.image');
 
     # no file - this is mandatory.
     if (!length $image->{file}) {
@@ -84,7 +84,7 @@ sub image_parse {
     # - uses full-size images directly and uses javascript to size imageboxes.
     # - this voids the validity as XHTML 1.0 Strict.
     # - causes slight flash on page load (when images are scaled.)
-    elsif (lc $page->wiki_opt('image.size_method') eq 'javascript') {
+    elsif (lc $page->opt('image.size_method') eq 'javascript') {
 
         # inject javascript resizer if no width is given.
         if (!$image->{width}) {
@@ -105,10 +105,10 @@ sub image_parse {
     # - eliminates flash on page load.
     # - faster (since image files are smaller.)
     # - require read access to local image directory.
-    elsif (lc $page->wiki_opt('image.size_method') eq 'server') {
+    elsif (lc $page->opt('image.size_method') eq 'server') {
 
         # find the resized dimensions.
-        ($w, $h, my $big_w, my $big_h, my $full_size) = $page->wiki_opt('image.calc',
+        ($w, $h, my $big_w, my $big_h, my $full_size) = $page->opt('image.calc',
             file   => $image->{file},
             height => $image->{height},
             width  => $image->{width},
@@ -117,7 +117,7 @@ sub image_parse {
         );
 
         # call the image_sizer.
-        $image->{image_url} = $page->wiki_opt('image.sizer',
+        $image->{image_url} = $page->opt('image.sizer',
             file   => $image->{file},
             height => $full_size ? 0 : $h,
             width  => $full_size ? 0 : $w,
@@ -150,7 +150,7 @@ sub image_html {
 
     # add data-rjs for retina.
     my $retina;
-    if ($retina = $page->wiki_opt('image.enable.retina')) {
+    if ($retina = $page->opt('image.enable.retina')) {
         my @scales = split /,/, $retina;
         $retina = max grep !m/\D/, map { trim($_) } @scales;
         $retina ||= undef;
