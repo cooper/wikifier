@@ -177,10 +177,9 @@ sub image_html {
             type       => 'img',
             attributes => {
                 src => $image_url,
-                alt => 'image',
+                alt => $image->{file},
                 'data-rjs' => $retina
             },
-            alt        => 'image',
             styles     => {
                 width  => $width,
                 height => $height
