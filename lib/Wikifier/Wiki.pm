@@ -177,7 +177,7 @@ sub check_directories {
 # returns a wiki option.
 sub opt {
     my ($wiki, $opt, @args) = @_;
-    return Wikifier::Page::_call_opt(
+    return Wikifier::Page::_call_wiki_opt(
         $wiki->{opts}{$opt}         //          # provided to wiki initializer
         ($wiki->{conf}               ?          # defined in configuration
             $wiki->{conf}->get($opt) :
@@ -187,6 +187,9 @@ sub opt {
         @args
     );
 }
+
+sub wiki_opt;
+*wiki_opt = \&opt;
 
 #######################
 ### DISPLAY METHODS ###
@@ -373,6 +376,7 @@ sub path_for_category {
     my ($wiki, $cat_name, $cat_type) = @_;
     $cat_name = cat_name($cat_name);
     $cat_type = length $cat_type ? "$cat_type/" : '';
+    make_dir($wiki->opt('dir.category'), $cat_type.$cat_name);
     return abs_path($wiki->opt('dir.category')."/$cat_type$cat_name");
 }
 
