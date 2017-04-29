@@ -267,11 +267,72 @@ sub get_image_cache {
     return $result;
 }
 
-# parse an image name such as:
+# Parse an image name
 #
-#   250x250-some_pic.png
-#   250x250-some_pic@2x.png
-#   some_pic.png
+# Input
+#
+#   (width)x(height)-(filename without extension)@(scale)x.(extension)
+#       250x250-some_pic@2x.png
+#
+#   (width)x(height)-(filename)
+#       250x250-some_pic.png
+#
+#   (filename)
+#       some_pic.png
+#
+# Result
+#
+#   name            fullsize image name without regard to the specified
+#                   dimensions or scale, such as image.png
+#
+#   name_ne         same as 'name' except the extension is not included
+#
+#   ext             image filename extension, 'png', 'jpg' or 'jpeg'
+#
+#   full_name       image name with dimensions. if no dimensions were provided,
+#                   this is the same as 'name'
+#
+#   full_name_ne    image name with dimensions but no extension. if no
+#                   dimensions were provided, this is the same as 'name_ne'
+#
+#   scale_name      image name with dimensions and retina scale. if no retina
+#                   scale was provided, this is the same as 'full_name'
+#
+#   scale_name_ne   image name with dimensions and retina scale but no
+#                   extension. if no retina scale was provided, this is the same
+#                   as 'full_name_ne'
+#
+#   r_width         "real" width without regard to the retina scale. if no
+#                   dimensions were provided, this is zero
+#
+#   r_height        "real" height without regard to the retina scale. if no
+#                   dimensions were provided, this is zero
+#
+#   retina          retina scale. if no retina scale was provided, this is zero
+#                   (NOT one)
+#
+#   width           possibly scaled width. if no retina scale was provided, this
+#                   is the same as 'r_width'
+#
+#   height          possibly scaled height. if no retina scale was provided,
+#                   this is the same as 'r_height'
+#
+#   if the provided image name does not include dimensions,
+#
+#       width           == 0
+#       height          == 0
+#       r_width         == 0
+#       r_height        == 0
+#       full_name       == name
+#       full_name_ne    == name_ne
+#
+#   if the provided image name does not include retina scale,
+#
+#       scale_name      == full_name
+#       scale_name_ne   == full_name_ne
+#       width           == r_width
+#       height          == r_height
+#       retina          == 0 (NOT 1)
 #
 sub parse_image_name {
     my ($wiki, $image_name) = @_;
@@ -288,7 +349,7 @@ sub parse_image_name {
 
     # if this is a retina request, calculate scaled dimensions.
     my ($real_width, $real_height) = ($width, $height);
-    my $retina_request;
+    my $retina_request = 0;
     if ($image_name_ne =~ m/^(.+)\@(\d+)x$/) {
         $image_name_ne  = $1;
         $retina_request = $2;
@@ -302,7 +363,8 @@ sub parse_image_name {
     
     # full name with scale
     if ($real_width && $retina_request) {
-        $scale_name_ne = "${real_width}x${real_height}-${image_name_ne}\@${retina_request}x";
+        $scale_name_ne = "${real_width}x${real_height}-${image_name_ne}" .
+                         "\@${retina_request}x";
         $scale_name    = "$scale_name_ne.$image_ext";
     }
     
@@ -312,7 +374,7 @@ sub parse_image_name {
         $full_name_ne   = "${width}x${height}-${image_name_ne}";
     }
 
-    # for the examples, suppose this was supplied: 123x456-image@2x.png
+    # for the below examples, suppose this was supplied: 123x456-image@2x.png
     return {                                # Field         Example
                                             # ------------  --------------------
         name            => $image_name,     # name          image.png
@@ -433,7 +495,7 @@ sub symlink_scaled_image {
     return unless $image->{retina};
     my $scale_path = $wiki->opt('dir.cache').'/'.$image->{scale_name};
     return if -e $scale_path;
-    symlink $image->{full_name}, $scale_path
+    symlink $image->{full_name}, $scale_path;
 }
 
 # default image calculator for a wiki.
