@@ -215,6 +215,7 @@ sub gen_wiki {
         if (!eval { require Wikifier::Wiki::Markdown }) {
             L 'Unable to load Markdown translator;';
             L 'Please see docs for how to install CommonMark';
+            L $@;
             last;
         }
 
