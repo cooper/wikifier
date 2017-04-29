@@ -177,7 +177,7 @@ sub check_directories {
 # returns a wiki option.
 sub opt {
     my ($wiki, $opt, @args) = @_;
-    return Wikifier::Page::_call_wiki_opt(
+    return Wikifier::Page::_call_opt(
         $wiki->{opts}{$opt}         //          # provided to wiki initializer
         ($wiki->{conf}               ?          # defined in configuration
             $wiki->{conf}->get($opt) :
@@ -187,9 +187,6 @@ sub opt {
         @args
     );
 }
-
-sub wiki_opt;
-*wiki_opt = \&opt;
 
 #######################
 ### DISPLAY METHODS ###
