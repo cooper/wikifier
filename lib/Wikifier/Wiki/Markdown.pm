@@ -269,7 +269,7 @@ sub generate_from_markdown {
         $meta_source .= ": $v" if !ref $v;
         $meta_source .= ";\n";
     }
-    return <<END;
+    return qq{
 $meta_source
 
 /* DO NOT EDIT THIS PAGE!
@@ -277,8 +277,7 @@ $meta_source
    the next time the page is generated. Instead, edit $md_name directly.
 */
 
-$source
-END
+$source};
 }
 
 # escape markdown-extracted text.
