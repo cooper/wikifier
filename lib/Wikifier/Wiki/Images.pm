@@ -182,8 +182,10 @@ sub _display_image {
     #=========================#
 
     # if caching is enabled, check if this exists in cache.
-    my $cache_path = $wiki->opt('dir.cache').'/'.$image->{full_name};
-    if ($wiki->opt('image.enable.cache') && -f $cache_path) {
+    foreach my $full_name ($image->{full_name}, $image->{scale_name}) {
+        last if !$wiki->opt('image.enable.cache');
+        my $cache_path = $wiki->opt('dir.cache').'/'.$full_name;
+        next if !-f $cache_path;
         $result = $wiki->get_image_cache(
             $image, $result, $stat[9], $cache_path, \%opts);
         return $result if $result->{cached};
@@ -416,27 +418,14 @@ sub generate_image {
 }
 
 # symlink an image to its scaled version
+# file-123x456@2x.png -> file-246x912.png
 sub symlink_scaled_image {
     my ($wiki, $image) = @_;
     return unless $image->{retina};
-    
-    # file-123x456@2x.png -> file-246x912.png
     my $scale_path = $wiki->opt('dir.cache').'/'.$image->{scale_name};
+    return if -e $scale_path;
     symlink $image->{full_name}, $scale_path
-        unless -e $scale_path;
-
-    # file-246x912.png -> file.png
-    # for when the fullsize image is used
-    $scale_path = sprintf '%s/%dx%d-%s.%s',
-            $wiki->opt('dir.cache'),
-            $image->{width},
-            $image->{height},
-            $image->{name_ne},
-            $image->{ext};
-    symlink $image->{full_name}, $scale_path
-        if $image->{width} && !-e $scale_path;
 }
-
 
 # default image calculator for a wiki.
 sub _wiki_default_calc {
