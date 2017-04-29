@@ -269,15 +269,16 @@ sub generate_from_markdown {
         $meta_source .= ": $v" if !ref $v;
         $meta_source .= ";\n";
     }
-    return qq{
+    return <<END;
 $meta_source
 
-/* DO NOT EDIT THIS PAGE!
+/* !!! DO NOT EDIT THIS PAGE !!!
    This page is auto-generated from $md_name. Any changes will be overwritten
    the next time the page is generated. Instead, edit $md_name directly.
 */
 
-$source};
+$source
+END
 }
 
 # escape markdown-extracted text.
