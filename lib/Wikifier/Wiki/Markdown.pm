@@ -42,7 +42,7 @@ sub _convert_markdown {
     $md_text =~ s/\xa0/ /g;                 # replace non-breaking space
 
     # generate the wiki source
-    my $source = $wiki->generate_from_markdown($md_text, %opts);
+    my $source = $wiki->generate_from_markdown($md_name, $md_text, %opts);
     $result->{content} = $source;
     
     # write to file
@@ -61,7 +61,7 @@ my %es = (
 );
 
 sub generate_from_markdown {
-    my ($wiki, $md_text, %opts) = @_;
+    my ($wiki, $md_name, $md_text, %opts) = @_;
     my $source = '';
     my $indent = 0;
     my $header_level = 0;
