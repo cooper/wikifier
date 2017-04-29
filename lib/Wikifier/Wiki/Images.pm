@@ -154,6 +154,7 @@ sub _display_image {
         # create name for new image
         my $new_name = "${new_w}x${new_h}-$$image{name_ne}";
         $new_name .= "\@$$image{retina}x" if $image->{retina};
+        $new_name .= ".$$image{ext}";
 
         # display the image with the calculated dimensions.
         return $wiki->_display_image($wiki->parse_image_name($new_name), %opts);
