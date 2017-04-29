@@ -272,10 +272,9 @@ sub generate_from_markdown {
     return qq{
 $meta_source
 
-/* DO NOT EDIT THIS PAGE!
-   This page is auto-generated from $md_name. Any changes will be overwritten
-   the next time the page is generated. Instead, edit $md_name directly.
-*/
+DO NOT EDIT THIS PAGE!
+This page is auto-generated from $md_name. Any changes will be overwritten
+the next time the page is generated. Instead, edit $md_name directly.
 
 $source};
 }
