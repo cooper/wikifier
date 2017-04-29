@@ -23,13 +23,15 @@ my $json = JSON::XS->new->pretty->convert_blessed;
 #
 # Input
 #
-#   $image_name     filename string or array ref of [ filename, width, height ]
+#   $image_name     filename string
 #                   1) image.png                    full-size
 #                   2) 123x456-image.png            scaled
 #                   3) 123x456-image.png            scaled with retina
+#                   array ref of [ filename, width, height ]
 #                   4) [ 'image.png', 0,   0   ]    full-size
 #                   5) [ 'image.png', 123, 456 ]    scaled
 #                   6) [ 'image.png', 123, 0   ]    scaled with one dimension
+#                   precompiled image name hash reference
 #
 #   if image.enable.restriction is true, images will not be generated in
 #   arbitrary dimensions, only those used within the wiki. this can be overriden
@@ -138,19 +140,23 @@ sub _display_image {
 
     # if one dimension is missing, calculate it.
     if (!$width || !$height) {
-        ($width, $height) = $wiki->opt('image.calc',
+        my ($new_w, $new_h) = $wiki->opt('image.calc',
             file   => $image_name,
-            height => $height,
-            width  => $width,
+            height => $image->{r_height},   # use non-scaled dimensions,
+            width  => $image->{r_width},    # just as we normally would
             wiki   => $wiki
         );
         
         # if the dimension calculator failed, fall back to the full-size image.
         return $wiki->get_image_full_size($image, $result, \@stat, \%opts)
-            if !$width;
-        
+            if !$new_w;
+
+        # create name for new image
+        my $new_name = "${new_w}x${new_h}-$$image{name_ne}";
+        $new_name .= "\@$$image{retina}x" if $image->{retina};
+
         # display the image with the calculated dimensions.
-        return $wiki->_display_image([ $image_name, $width, $height ], %opts);
+        return $wiki->_display_image($wiki->parse_image_name($new_name), %opts);
     }
     
     #============================#
@@ -182,9 +188,10 @@ sub _display_image {
     #=========================#
 
     # if caching is enabled, check if this exists in cache.
+    my $cache_path;
     foreach my $full_name ($image->{full_name}, $image->{scale_name}) {
         last if !$wiki->opt('image.enable.cache');
-        my $cache_path = $wiki->opt('dir.cache').'/'.$full_name;
+        $cache_path = $wiki->opt('dir.cache').'/'.$full_name;
         next if !-f $cache_path;
         $result = $wiki->get_image_cache(
             $image, $result, $stat[9], $cache_path, \%opts);
@@ -267,6 +274,7 @@ sub get_image_cache {
 #
 sub parse_image_name {
     my ($wiki, $image_name) = @_;
+    return $image_name if ref $image_name eq 'HASH';
     my ($width, $height) = (0, 0);
 
     # height and width were given, so it's a resized image.
