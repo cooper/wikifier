@@ -20,7 +20,7 @@ sub convert_markdown {
 sub _convert_markdown {
     my ($wiki, $md_name, %opts) = @_;
     my $md_path   = abs_path($wiki->opt('dir.md')."/$md_name");
-    my $page_path = $wiki->path_for_page($md_name);
+    my $page_path = $wiki->path_for_page($md_name, 1);
     
     # no such markdown file
     return display_error('Markdown file does not exist.')

@@ -533,7 +533,6 @@ sub rel_path {
     my $page = shift;
     return $page->{file_path}
         if length $page->{file_path};
-    make_dir($page->opt('dir.page'), $page->{name});
     return $page->{cached_props}{rel_path} //=
         $page->opt('dir.page').'/'.$page->{name};
 }

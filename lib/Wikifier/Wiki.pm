@@ -362,18 +362,18 @@ sub display_error {
 
 # return abs path for a page
 sub path_for_page {
-    my ($wiki, $page_name) = @_;
+    my ($wiki, $page_name, $create_ok) = @_;
     $page_name = page_name($page_name);
-    make_dir($wiki->opt('dir.page'), $page_name);
+    make_dir($wiki->opt('dir.page'), $page_name) if $create_ok;
     return abs_path($wiki->opt('dir.page')."/$page_name");
 }
 
 # return abs path for a category
 sub path_for_category {
-    my ($wiki, $cat_name, $cat_type) = @_;
+    my ($wiki, $cat_name, $cat_type, $create_ok) = @_;
     $cat_name = cat_name($cat_name);
     $cat_type = length $cat_type ? "$cat_type/" : '';
-    make_dir($wiki->opt('dir.category'), $cat_type.$cat_name);
+    make_dir($wiki->opt('dir.category'), $cat_type.$cat_name) if $create_ok;
     return abs_path($wiki->opt('dir.category')."/$cat_type$cat_name");
 }
 

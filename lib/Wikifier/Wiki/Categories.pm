@@ -152,7 +152,8 @@ sub cat_check_page {
     foreach my $page_name (keys_maybe $page->{target_pages}) {
         $wiki->cat_add_page($page, $page_name,
             cat_type    => 'page',
-            page_extras => { lines => $page->{target_pages}{$page_name} }
+            page_extras => { lines => $page->{target_pages}{$page_name} },
+            create_ok   => 1
         );
     }
 
@@ -168,9 +169,15 @@ sub cat_check_page {
 # $cat_name     name of category, with or without extension
 #
 # %opts = (
+#
 #   cat_type        for pseudocategories, the type, such as 'image' or 'model'
+#
 #   page_extras     for pseudocategories, a hash ref of additional page data
+#
 #   cat_extras      for pseudocategories, a hash ref of additional cat data
+#
+#   create_ok       for page pseudocategories, allows ->path_for_category
+#                   to create new paths in dir.category as needed
 # )
 #
 # returns true on success. unchanged is also considered success.
@@ -179,7 +186,11 @@ sub cat_add_page {
     my ($wiki, $page, $cat_name, %opts) = @_;
     $cat_name = cat_name($cat_name);
     my $time = time;
-    my $cat_file = $wiki->path_for_category($cat_name, $opts{cat_type});
+    my $cat_file = $wiki->path_for_category(
+        $cat_name,
+        $opts{cat_type},
+        $opts{create_ok}
+    );
 
     # set page infos.
     my $page_data = {
@@ -268,7 +279,7 @@ sub cat_get_pages {
 
     # this category does not exist.
     my $cat_file = $wiki->path_for_category($cat_name, $opts{cat_type});
-    if (!-f $cat_file) {
+    if (!defined $cat_file || !-f $cat_file) {
         L "No such category $cat_file";
         return;
     }
@@ -289,7 +300,7 @@ sub cat_get_pages {
 
         # page no longer exists.
         my $page_path = $wiki->path_for_page($page_name);
-        if (!-f $page_path) {
+        if (!defined $page_path || !-f $page_path) {
             $changed++;
             next PAGE;
         }

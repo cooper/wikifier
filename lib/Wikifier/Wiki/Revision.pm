@@ -188,6 +188,7 @@ sub diff_for_page {
     $to ||= 'HEAD';
     my $page_path = blessed $page_or_name ? $page_or_name->path :
         $wiki->path_for_page($page_or_name);
+    return if !defined $page_path;
     L "git diff $from..$to $page_path";
     return join "\n", $git->diff("$from..$to", $page_path);
 }
@@ -196,6 +197,7 @@ sub diff_for_page {
 # returns a list of hash reference containing the same keys as rev_latest
 sub _revs_matching_file {
     my ($wiki, $path) = @_;
+    return if !defined $path;
     my @matches;
     
     # look for matching modifications

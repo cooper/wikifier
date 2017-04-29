@@ -520,7 +520,7 @@ sub get_image {
     my $cat_path = $wiki->path_for_category($filename, 'image');
 
     # neither the image nor a category for it exist. this is a ghost
-    return if !-f $path && !-f $cat_path;
+    return if !-f $path && (!defined $cat_path || !-f $cat_path);
 
     # basic info available for all images
     my @stat = stat $path; # might be empty

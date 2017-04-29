@@ -409,7 +409,7 @@ sub _display_page_code {
     my $result = {};
 
     # file does not exist.
-    if (!-f $path) {
+    if (!defined $path || !-f $path) {
         return display_error("Page does not exist.");
     }
 
