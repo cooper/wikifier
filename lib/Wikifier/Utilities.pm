@@ -22,7 +22,7 @@ sub import {
 sub L(@);
 sub E(@);
 sub Lindent(@);
-sub Lback($);
+sub Lback(@);
 
 #################
 ### UTILITIES ###
