@@ -135,7 +135,7 @@ sub generate_from_markdown {
                 $section_id =~ s/ /-/g;                     # replace spaces with dashes
                 $section_id = md_escape_fmt($section_id);
                 $add_text->("meta { section: $section_id; }\n");
-                undef $current_header_text
+                undef $current_header_text;
             }
         }
         

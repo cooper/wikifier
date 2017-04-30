@@ -11,7 +11,8 @@ use Scalar::Util 'blessed';
 
 our %block_types = (
     meta => {
-        base => 'map'
+        base => 'map',
+        invis  => 1
     }
 );
 
