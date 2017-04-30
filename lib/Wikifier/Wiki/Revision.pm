@@ -126,7 +126,7 @@ sub _rev_op_commit (&$) {
         
     # git exception occurred
     if ($@ && ref $@ eq 'Git::Wrapper::Exception') {
-        my $message "`$command` exited with status ".$@->status.'. ';
+        my $message = "`$command` exited with status ".$@->status.'. ';
         $message .= $@->error.$/.$@->output;
         E $message;
         push @op_errors, $message;
