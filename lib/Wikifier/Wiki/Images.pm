@@ -391,7 +391,7 @@ sub parse_image_name {
         retina          => $retina_request  # scale         2
     };
     use Data::Dumper;
-    print Dumper($res);
+    print STDERR Dumper($res);
     return $res;
 }
 
