@@ -366,7 +366,7 @@ sub parse_image_name {
     }
 
     # full name with scale
-    my ($scale_name, $scale_name_e) = ($full_name, $full_name_ne);
+    my ($scale_name, $scale_name_ne) = ($full_name, $full_name_ne);
     if ($real_width && $retina_request) {
         $scale_name_ne = "${real_width}x${real_height}-${image_name_ne}" .
                          "\@${retina_request}x";
