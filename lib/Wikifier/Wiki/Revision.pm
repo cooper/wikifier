@@ -8,7 +8,7 @@ use warnings;
 use strict;
 use Git::Wrapper;
 use Scalar::Util qw(blessed);
-use Wikifier::Utilities qw(page_name L back);
+use Wikifier::Utilities qw(page_name L E back);
 use File::Spec;
 
 sub write_page {
@@ -23,7 +23,7 @@ sub write_page {
     # open the file
     my $fh;
     if (!open $fh, '>', $page->path) {
-        L 'Failed to open page file for writing';
+        E 'Failed to open page file for writing';
         back;
         return;
     }
@@ -119,15 +119,16 @@ sub move_page {
 my @op_errors;
 sub _rev_op_commit (&$) {
     my ($code, $command) = @_;
+    L $command;
     
     # call in list context
     my @ret = eval { $code->() };
         
     # git exception occurred
     if ($@ && ref $@ eq 'Git::Wrapper::Exception') {
-        my $message = $command.' exited with code '.$@->status.'. ';
+        my $message "`$command` exited with status ".$@->status.'. ';
         $message .= $@->error.$/.$@->output;
-        L $message;
+        E $message;
         push @op_errors, $message;
         return;
     }
@@ -135,7 +136,7 @@ sub _rev_op_commit (&$) {
     # other error occurred
     elsif ($@) {
         my $message = 'Unspecified git error';
-        L $message;
+        E $message;
         push @op_errors, $message;
         return;
     }
@@ -199,10 +200,9 @@ sub diff_for_page {
     return if !defined $page_path;
     
     # run git diff
-    L "git diff $from..$to $page_path";
     my @lines = _rev_op_commit {
         $git->diff("$from..$to", $page_path)
-    } 'git diff';
+    } "git diff $from..$to $page_path";
     
     # check for error
     my $err = _rev_op_complete;
@@ -267,7 +267,6 @@ sub _prepare_git {
                 'create .gitignore' => sub {
                     my $cache_dir = $wiki->opt('dir.cache');
                     $cache_dir = File::Spec->abs2rel($cache_dir, $dir);
-                    my $fh;
                     open my $fh, '>', "$dir/.gitignore" or return $!;
                     print $fh <<END;
 .DS_Store
@@ -291,7 +290,7 @@ END
             while (my ($comment, $code) = splice @create, 0, 2) {
                 my @errors = $code->();
                 next unless @errors;
-                L @errors;
+                E @errors;
                 return;
             }
         }
@@ -320,19 +319,16 @@ sub _rev_commit {
 
     # rm operation
     if ($rm && ref $rm eq 'ARRAY' && @$rm) {
-        L "git rm @$rm";
-        _rev_op_commit { $git->rm($_) } 'git rm' foreach @$rm;
+        _rev_op_commit { $git->rm($_) } "git rm $_" foreach @$rm;
     }
 
     # add operation
     if ($add && ref $add eq 'ARRAY' && @$add) {
-        L "git add @$add";
-        _rev_op_commit { $git->add($_) } 'git add' foreach @$add;
+        _rev_op_commit { $git->add($_) } "git add $_" foreach @$add;
     }
 
     # mv operation
     if ($mv && ref $mv eq 'HASH' && keys %$mv) {
-        L 'git mv';
         foreach (keys %$mv) {
             _rev_op_commit { $git->mv($_, $mv->{$_}) } 'git mv';
         }
@@ -347,7 +343,6 @@ sub _rev_commit {
     }
 
     # commit operations
-    L "git commit: $opts{message}";
     _rev_op_commit {
 
         $git->commit({

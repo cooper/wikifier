@@ -20,6 +20,7 @@ sub import {
 }
 
 sub L(@);
+sub E(@);
 sub Lindent(@);
 sub Lback($);
 
@@ -340,6 +341,10 @@ sub L(@) {
         
         say STDERR $str;
     }
+}
+
+sub E(@) {
+    return L map "error: $_", @_;
 }
 
 # log and then indent.
