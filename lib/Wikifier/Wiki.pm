@@ -10,10 +10,11 @@ use strict;
 use 5.010;
 
 use HTTP::Date qw(time2str);
+use Scalar::Util qw(blessed);
 use Cwd qw(abs_path);
 use File::Basename qw(basename fileparse);
 use File::Path qw(make_path);
-use Scalar::Util qw(blessed);
+use File::Spec;
 
 use Wikifier;
 use Wikifier::Wiki::Pages;
@@ -428,7 +429,11 @@ sub unique_files_in_dir {
             # resolve symlinks.
             my $file = abs_path($path);
             next if !$file; # couldn't resolve symlink.
-            $file = basename($file);
+            
+            # use the basename only if the target file is in the same
+            # directory.
+            my $same_dir = index(File::Spec->abs2rel($file, $dir), '/') == -1;
+            $file = basename($file) if $same_dir;
 
             $files{$pfx.$file}++;
         }
