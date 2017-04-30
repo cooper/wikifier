@@ -129,7 +129,8 @@ sub generate_from_markdown {
                 # figure the anchor. modeled after what github uses:
                 # https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/toc_filter.rb
                 # the -n suffixes are added automatically as needed in Section.pm
-                my $section_id = lc $current_header_text;   # downcase
+                my $section_id = $current_header_text;
+                $section_id =~ tr/A-Z/a-z/;                 # ASCII downcase
                 $section_id =~ s/$punctuation_re//g;        # remove punctuation
                 $section_id =~ s/ /-/g;                     # replace spaces with dashes
                 $section_id = md_escape_fmt($section_id);
