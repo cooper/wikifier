@@ -15,6 +15,7 @@ my $stripper = HTML::Strip->new(emit_spaces => 0);
 
 our %block_types = (
     section => {
+        init  => \&section_init,
         parse => \&section_parse,
         html  => \&section_html,
         title => 1
@@ -27,42 +28,48 @@ our %block_types = (
     }
 );
 
+# blank lines are needed for paragraph separation
+sub section_init {
+    my $sec = shift;
+    $sec->{dont_remove_blank}++;
+}
+
 sub section_parse {
-    my ($block, $page) = @_;
+    my ($sec, $page) = @_;
     my $enable = $page->page_opt('page.enable.title');
     $enable = $enable ? 1 : 0;
     
     # @page.enable.title causes the first header to be larger than the
     # rest. it also uses @page.title as the first header if no other text
     # is provided.
-    my $is_intro = $block->{is_intro} =
+    my $is_intro = $sec->{is_intro} =
         !$page->{section_n}++ && $enable;
         
     # top-level headers start at h2 when @page.enable.title is true, since the
     # page title is the sole h1. otherwise, h1 is top-level.
-    my $l = ($block->parent->{header_level} || $enable) + 1;
+    my $l = ($sec->parent->{header_level} || $enable) + 1;
     
     # intro is always h1, max is h6
     $l = 1 if $is_intro;
     $l = 6 if $l > 6;
     
-    $block->{header_level} = $l;
+    $sec->{header_level} = $l;
 }
 
 sub section_html {
-    my ($block, $page, $el) = @_;
+    my ($sec, $page, $el) = @_;
 
     # clear at end of element.
     $el->configure(clear => 1);
 
     # determine if this is the intro section.
-    my $l = $block->{header_level};
-    my $is_intro = $block->{is_intro};
+    my $l = $sec->{header_level};
+    my $is_intro = $sec->{is_intro};
     my $class = $is_intro ? 'section-page-title' : 'section-title';
 
     # use the page title if no other title is provided and @page.enable.title
     # is true.
-    my $title = $block->name;
+    my $title = $sec->name;
     $title = $page->get('page.title') if $is_intro && !length $title;
 
     # if we have a title and this type of title is enabled.
@@ -70,11 +77,11 @@ sub section_html {
         
         # parse text formatting in title
         my $title_fmt = $page->parse_formatted_text($title,
-            pos => $block->create_pos
+            pos => $sec->create_pos
         );
         
         # meta section may be the heading ID
-        my $heading_id = $block->meta('section');
+        my $heading_id = $sec->meta('section');
         
         # otherwise textify the title, collapse whitespace, and normalize
         # in the usual wikifier way
@@ -106,7 +113,7 @@ sub section_html {
         
         # create the paragraph.
         my $item = $page->wikifier->create_block(
-            parent      => $block,
+            parent      => $sec,
             type        => 'paragraph',
             position    => [ @$positions ],
             content     => [ @$texts ]
@@ -119,7 +126,7 @@ sub section_html {
 
     # add the contained elements.
     my (@texts, @positions);
-    foreach ($block->content_visible_pos) {
+    foreach ($sec->content_visible_pos) {
         my ($item, $pos) = @$_;
 
         # this is blessed, so it's a block.
@@ -148,7 +155,7 @@ sub section_html {
 }
 
 sub clear_html {
-    my ($block, $page, $el) = @_;
+    my ($sec, $page, $el) = @_;
     $el->add_class('clear');
 }
 

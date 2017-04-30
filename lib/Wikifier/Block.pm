@@ -440,6 +440,8 @@ sub split_text {
 # remove empty content items.
 sub remove_blank {
     my $block = shift;
+    return if $block->{dont_remove_blank};
+    
     my (@content, @position);
     my $i = 0;
     foreach my $item ($block->content) {
