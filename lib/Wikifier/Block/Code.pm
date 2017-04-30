@@ -15,7 +15,9 @@ our %block_types = (code => {
 sub code_html {
     my ($block, $page, $el) = @_;
     my @classes = 'code';
-    if (length(my $lang = $block->name)) {
+    
+    my $lang = length $block->name ? $block->name : $block->meta('lang');
+    if (length $lang) {
         push @classes, '!prettyprint';
         push @classes, "!lang-$lang";
     }
