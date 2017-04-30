@@ -138,6 +138,10 @@ sub generate {
         foreach my $attr (keys %{ $el->{attributes} }) {
             my $val = $el->{attributes}{$attr};
             next if !defined $val;
+            if (ref $val eq 'SCALAR' && $$val) { # \1 for boolean
+                $html .= " $attr";
+                next;
+            }
             my $value = encode_entities($val);
             $html    .= " $attr=\"$value\"";
         }

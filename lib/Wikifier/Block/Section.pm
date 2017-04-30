@@ -8,7 +8,10 @@ use warnings;
 use strict;
 
 use Scalar::Util qw(blessed);
-use Wikifier::Utilities qw(trim);
+use Wikifier::Utilities qw(trim page_name_link);
+use HTML::Strip;
+
+my $stripper = HTML::Strip->new(emit_spaces => 0);
 
 our %block_types = (
     section => {
@@ -64,14 +67,29 @@ sub section_html {
 
     # if we have a title and this type of title is enabled.
     if (length $title) {
-
+        
+        # parse text formatting in title
+        my $title_fmt = $page->parse_formatted_text($title,
+            pos => $block->create_pos
+        );
+        
+        # meta section may be the heading ID
+        my $heading_id = $block->meta('section');
+        
+        # otherwise textify the title, collapse whitespace, and normalize
+        # in the usual wikifier way
+        if (!length $heading_id) {
+            $heading_id = $stripper->parse($title_fmt);
+            $heading_id =~ s/\s+/ /g;
+            $heading_id = page_name_link($heading_id);
+        }
+        
         # create the heading.
         my $heading = Wikifier::Element->new(
-            type      => "h$l",
-            class     => $class,
-            content   => $page->parse_formatted_text($title,
-                pos => $block->create_pos
-            ),
+            type       => "h$l",
+            class      => $class,
+            attributes => { id => $heading_id },
+            content    => $title_fmt,
             container => 1
         );
 
