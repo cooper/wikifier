@@ -343,6 +343,7 @@ sub L(@) {
     }
 }
 
+# error.
 sub E(@) {
     my @caller = caller 1;
     (my $sub = $caller[3]) =~ s/(.+)::(.+)/$2/;
@@ -354,12 +355,13 @@ sub E(@) {
 sub Lindent(@) {
     L shift;
     indent;
+    L @_;
 }
 
 # go back and then log.
-sub Lback($) {
+sub Lback(@) {
     back;
-    L shift;
+    L @_;
 }
 
 sub align {
@@ -371,6 +373,7 @@ sub notice {
     my ($type, %opts) = @_;
     my $noti = { %opts, type => $type };
     foreach my $sess (values %Wikifier::Server::sessions) {
+        # TODO: some notifications should be specific to a wiki
         # TODO: make it possible to subscribe to specific types of notifications
         push @{ $sess->{notifications} }, $noti;
     }
