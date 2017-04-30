@@ -116,11 +116,15 @@ sub move_page {
 ####################################
 
 my @op_errors;
-sub capture_logs(&$) {
+sub _rev_op_commit (&$) {
     my ($code, $command) = @_;
+    
+    # call in list or scalar context
     my ($ret, @ret);
     @ret = eval { $code->() } if  wantarray;
     $ret = eval { $code->() } if !wantarray;
+    
+    # git exception occurred
     if ($@ && ref $@ eq 'Git::Wrapper::Exception') {
         my $message = $command.' exited with code '.$@->status.'. ';
         $message .= $@->error.$/.$@->output;
@@ -128,12 +132,15 @@ sub capture_logs(&$) {
         push @op_errors, $message;
         return;
     }
+    
+    # other error occurred
     elsif ($@) {
         my $message = 'Unspecified git error';
         L $message;
         push @op_errors, $message;
         return;
     }
+    
     return wantarray ? $ret : @ret;
 }
 
@@ -143,7 +150,7 @@ sub capture_logs(&$) {
 # if all operations were successful,
 # this returns an empty list
 #
-sub _rev_operation_finish {
+sub _rev_op_complete () {
     my @ops = @op_errors;
     @op_errors = ();
     return wantarray ? @ops : $ops[0];
@@ -160,8 +167,8 @@ sub _rev_operation_finish {
 sub rev_latest {
     my $wiki = shift;
     my $git  = $wiki->_prepare_git() or return;
-    my @logs = capture_logs { $git->log } 'git log';
-    my $err  = _rev_operation_finish();
+    my @logs = _rev_op_commit { $git->log } 'git log';
+    my $err  = _rev_op_complete;
     return { error => $err } if $err;
     my $last = shift @logs or return;
     return {
@@ -194,12 +201,12 @@ sub diff_for_page {
     
     # run git diff
     L "git diff $from..$to $page_path";
-    my @lines = capture_logs {
+    my @lines = _rev_op_commit {
         $git->diff("$from..$to", $page_path)
     } 'git diff';
     
     # check for error
-    my $err = _rev_operation_finish();
+    my $err = _rev_op_complete;
     return if $err; # TODO: return the error somehow
     
     return join "\n", @lines;
@@ -214,10 +221,10 @@ sub _revs_matching_file {
     
     # look for matching modifications
     my $git  = $wiki->_prepare_git or return;
-    my @logs = capture_logs { $git->log('--', $path) } 'git log';
+    my @logs = _rev_op_commit { $git->log('--', $path) } 'git log';
     
     # check for error
-    my $err = _rev_operation_finish();
+    my $err = _rev_op_complete;
     return if $err; # TODO: return the error somehow
     
     foreach my $log (@logs) {
@@ -271,20 +278,20 @@ sub _rev_commit {
     # rm operation
     if ($rm && ref $rm eq 'ARRAY' && @$rm) {
         L "git rm @$rm";
-        capture_logs { $git->rm($_) } 'git rm' foreach @$rm;
+        _rev_op_commit { $git->rm($_) } 'git rm' foreach @$rm;
     }
 
     # add operation
     if ($add && ref $add eq 'ARRAY' && @$add) {
         L "git add @$add";
-        capture_logs { $git->add($_) } 'git add' foreach @$add;
+        _rev_op_commit { $git->add($_) } 'git add' foreach @$add;
     }
 
     # mv operation
     if ($mv && ref $mv eq 'HASH' && keys %$mv) {
         L 'git mv';
         foreach (keys %$mv) {
-            capture_logs { $git->mv($_, $mv->{$_}) } 'git mv';
+            _rev_op_commit { $git->mv($_, $mv->{$_}) } 'git mv';
         }
     }
 
@@ -298,7 +305,7 @@ sub _rev_commit {
 
     # commit operations
     L "git commit: $opts{message}";
-    capture_logs {
+    _rev_op_commit {
 
         $git->commit({
             message => $opts{message} // 'Unspecified',
@@ -308,7 +315,7 @@ sub _rev_commit {
     } 'git commit';
 
     # return errors
-    return _rev_operation_finish();
+    return _rev_op_complete;
 }
 
 # convert objects to file paths.
