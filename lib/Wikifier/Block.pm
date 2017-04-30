@@ -13,6 +13,7 @@ use warnings;
 use strict;
 
 use Scalar::Util qw(blessed weaken);
+use List::Util qw(first);
 use Wikifier::Utilities qw(E truncate_hr trim);
 
 # Properties of blocks
