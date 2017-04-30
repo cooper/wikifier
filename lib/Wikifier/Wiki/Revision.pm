@@ -9,6 +9,7 @@ use strict;
 use Git::Wrapper;
 use Scalar::Util qw(blessed);
 use Wikifier::Utilities qw(page_name L back);
+use File::Spec;
 
 sub write_page {
     my ($wiki, $page, $reason) = @_;
@@ -240,15 +241,58 @@ sub _revs_matching_file {
 sub _prepare_git {
     my $wiki = shift;
     if (!$wiki->{git}) {
+        
+        # check for dir.wiki
         my $dir = $wiki->opt('dir.wiki');
         if (!length $dir) {
             L 'Revision tracking disabled; @dir.wiki not set';
             return;
         }
+        
+        # create `git` wrapper
         $wiki->{git} = Git::Wrapper->new($dir);
         if (!$wiki->{git}->has_git_in_path) {
             L "Revision tracking disabled; can't find `git` in PATH";
             return;
+        }
+        
+        # check if the repository exists. if not, initialize it
+        if (!-d "$dir/.git") {
+            my @create = (
+                'git init' => sub {
+                    _rev_op_commit { $git->init() };
+                    return _rev_op_complete;
+                },
+                'create .gitignore' => sub {
+                    my $cache_dir = $wiki->opt('dir.cache');
+                    $cache_dir = File::Spec->abs2rel($cache_dir, $dir);
+                    my $fh;
+                    open my $fh, '>', "$dir/.gitignore" or return $!;
+                    print $fh <<END;
+.DS_Store
+*~
+*.old
+*.save
+*.sock
+private/*
+$cache_dir/*
+END
+                    close $fh;
+                    return;
+                },
+                'initial commit' => sub {
+                    return $wiki->rev_commit(
+                        message => 'initial commit',
+                        add     => $dir
+                    );
+                }
+            );
+            while (my ($comment, $code) = splice @create, 0, 2) {
+                my @errors = $code->();
+                next unless @errors;
+                L @errors;
+                return;
+            }
         }
     }
     return $wiki->{git};
