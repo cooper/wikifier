@@ -240,7 +240,8 @@ sub _revs_matching_file {
 # create a git object for this wiki if there isn't one
 sub _prepare_git {
     my $wiki = shift;
-    if (!$wiki->{git}) {
+    my $git = $wiki->{git};
+    if (!$git) {
         
         # check for dir.wiki
         my $dir = $wiki->opt('dir.wiki');
@@ -250,7 +251,7 @@ sub _prepare_git {
         }
         
         # create `git` wrapper
-        $wiki->{git} = Git::Wrapper->new($dir);
+        $git = $wiki->{git} = Git::Wrapper->new($dir);
         if (!$wiki->{git}->has_git_in_path) {
             L "Revision tracking disabled; can't find `git` in PATH";
             return;
@@ -260,7 +261,7 @@ sub _prepare_git {
         if (!-d "$dir/.git") {
             my @create = (
                 'git init' => sub {
-                    _rev_op_commit { $git->init() };
+                    _rev_op_commit { $git->init() } 'git init';
                     return _rev_op_complete;
                 },
                 'create .gitignore' => sub {
