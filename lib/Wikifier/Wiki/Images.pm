@@ -375,7 +375,7 @@ sub parse_image_name {
     }
 
     # for the below examples, suppose this was supplied: 123x456-image@2x.png
-    return {                                # Field         Example
+    my $res= {                                # Field         Example
                                             # ------------  --------------------
         name            => $image_name,     # name          image.png
         name_ne         => $image_name_ne,  #               image
@@ -390,6 +390,9 @@ sub parse_image_name {
         r_height        => $real_height,    # height        456
         retina          => $retina_request  # scale         2
     };
+    use Data::Dumper;
+    print Dumper($res);
+    return $res;
 }
 
 # generate an image of a certain size.
