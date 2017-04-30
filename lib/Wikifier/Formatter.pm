@@ -231,7 +231,7 @@ sub parse_formatted_text {
         
         # an unescaped backslash should not appear in the result.
         $escaped = $char eq '\\' && !$escaped;
-        next if $escaped;
+        next if $escaped && !$in_format;
 
         # if we're in the format type, append to it.
         if ($in_format) { $format_type .= $char }
