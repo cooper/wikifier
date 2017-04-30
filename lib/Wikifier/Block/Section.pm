@@ -92,7 +92,7 @@ sub section_html {
         my $heading = Wikifier::Element->new(
             type       => "h$l",
             class      => $class,
-            attributes => { id => $heading_id },
+            attributes => { id => "wiki-anchor-$heading_id" },
             content    => $title_fmt,
             container => 1
         );
