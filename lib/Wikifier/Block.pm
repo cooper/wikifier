@@ -317,6 +317,25 @@ sub content_text_pos {
     return grep { !blessed $_->[0] } shift->content_pos;
 }
 
+################
+### METADATA ###
+################
+
+sub meta {
+    my ($block, $key) = @_;
+    my $meta = $block->_find_meta or return;
+    return $meta->to_data->{$key};
+}
+
+sub _find_meta {
+    my $block = shift;
+    my $meta = first { $_->isa('Wikifier::Block::Meta') } $block->content_blocks;
+    return if !$meta;
+    # $meta->parse();
+    # TODO: parse if not yet parsed, use current page if $block is being parsed
+    return $meta;
+}
+
 #############
 ### OTHER ###
 #############
