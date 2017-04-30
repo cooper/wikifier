@@ -115,28 +115,26 @@ sub move_page {
 ### LOW-LEVEL REVISION FUNCTIONS ###
 ####################################
 
-# returns a scalar reference error on fail.
-# returns 1 on success.
 my @op_errors;
 sub capture_logs(&$) {
-    my $ret = _capture_logs(@_);
-    push @op_errors, $$ret if ref $ret;
-    return $ret;
-}
-sub _capture_logs(&$) {
     my ($code, $command) = @_;
-    eval { $code->() };
+    my ($ret, @ret);
+    @ret = eval { $code->() } if  wantarray;
+    $ret = eval { $code->() } if !wantarray;
     if ($@ && ref $@ eq 'Git::Wrapper::Exception') {
         my $message = $command.' exited with code '.$@->status.'. ';
         $message .= $@->error.$/.$@->output;
         L $message;
-        return \$message;
+        push @op_errors, $message;
+        return;
     }
     elsif ($@) {
-        L 'Unspecified git error';
-        return \ 'Unknown error';
+        my $message = 'Unspecified git error';
+        L $message;
+        push @op_errors, $message;
+        return;
     }
-    return 1;
+    return wantarray ? $ret : @ret;
 }
 
 # return the results of the operations
@@ -148,7 +146,7 @@ sub _capture_logs(&$) {
 sub _rev_operation_finish {
     my @ops = @op_errors;
     @op_errors = ();
-    return @ops;
+    return wantarray ? @ops : $ops[0];
 }
 
 # get info about the latest revision (commit)
@@ -162,7 +160,9 @@ sub _rev_operation_finish {
 sub rev_latest {
     my $wiki = shift;
     my $git  = $wiki->_prepare_git() or return;
-    my @logs = $git->log;
+    my @logs = capture_logs { $git->log } 'git log';
+    my $err  = _rev_operation_finish();
+    return { error => $err } if $err;
     my $last = shift @logs or return;
     return {
         id            => $last->id,
@@ -184,13 +184,25 @@ sub revs_matching_page {
 # if $to is not provided, the current version is used.
 sub diff_for_page {
     my ($wiki, $page_or_name, $from, $to) = @_;
-    my $git  = $wiki->_prepare_git or return;
+    my $git = $wiki->_prepare_git or return;
     $to ||= 'HEAD';
+
+    # determine page path
     my $page_path = blessed $page_or_name ? $page_or_name->path :
         $wiki->path_for_page($page_or_name);
     return if !defined $page_path;
+    
+    # run git diff
     L "git diff $from..$to $page_path";
-    return join "\n", $git->diff("$from..$to", $page_path);
+    my @lines = capture_logs {
+        $git->diff("$from..$to", $page_path)
+    } 'git diff';
+    
+    # check for error
+    my $err = _rev_operation_finish();
+    return if $err; # TODO: return the error somehow
+    
+    return join "\n", @lines;
 }
 
 # find all revisions involving the specified file by absolute path.
@@ -202,7 +214,12 @@ sub _revs_matching_file {
     
     # look for matching modifications
     my $git  = $wiki->_prepare_git or return;
-    my @logs = $git->log('--', $path);
+    my @logs = capture_logs { $git->log('--', $path) } 'git log';
+    
+    # check for error
+    my $err = _rev_operation_finish();
+    return if $err; # TODO: return the error somehow
+    
     foreach my $log (@logs) {
         push @matches, {
             id            => $log->id,
