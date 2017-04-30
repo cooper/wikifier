@@ -344,7 +344,10 @@ sub L(@) {
 }
 
 sub E(@) {
-    return L map "error: $_", @_;
+    my @caller = caller 1;
+    (my $sub = $caller[3]) =~ s/(.+)::(.+)/$2/;
+    my $info = $sub && $sub ne '(eval)' ? "$sub()" : $caller[0];
+    return L map "error: $info: $_", @_;
 }
 
 # log and then indent.
