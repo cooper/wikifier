@@ -358,24 +358,23 @@ sub parse_image_name {
         $height *= $retina_request;
     }
 
-    my $full_name    = my $scale_name    = $image_name;
-    my $full_name_ne = my $scale_name_ne = $image_name_ne;
-    
-    # full name with scale
-    if ($real_width && $retina_request) {
-        $scale_name_ne = "${real_width}x${real_height}-${image_name_ne}" .
-                         "\@${retina_request}x";
-        $scale_name    = "$scale_name_ne.$image_ext";
-    }
-    
     # full name without scale
+    my ($full_name, $full_name_ne) = ($image_name, $image_name_ne);
     if ($width) {
         $full_name      = "${width}x${height}-${image_name}";
         $full_name_ne   = "${width}x${height}-${image_name_ne}";
     }
 
+    # full name with scale
+    my ($scale_name, $scale_name_e) = ($full_name, $full_name_ne);
+    if ($real_width && $retina_request) {
+        $scale_name_ne = "${real_width}x${real_height}-${image_name_ne}" .
+                         "\@${retina_request}x";
+        $scale_name    = "$scale_name_ne.$image_ext";
+    }
+
     # for the below examples, suppose this was supplied: 123x456-image@2x.png
-    my $res= {                                # Field         Example
+    return {                                # Field         Example
                                             # ------------  --------------------
         name            => $image_name,     # name          image.png
         name_ne         => $image_name_ne,  #               image
@@ -390,19 +389,12 @@ sub parse_image_name {
         r_height        => $real_height,    # height        456
         retina          => $retina_request  # scale         2
     };
-    use Data::Dumper;
-    print STDERR Dumper($res);
-    return $res;
 }
 
 # generate an image of a certain size.
 # returns error on fail, nothing on success
 sub generate_image {
     my ($wiki, $image, $cache_path, $result) = @_;
-
-    # an error occurred.
-    return display_error($image->{error})
-        if $image->{error};
 
     # if we are restricting to only sizes used in the wiki, check.
     my ($width, $height, $r_width, $r_height) =
@@ -429,6 +421,12 @@ sub generate_image {
 
         return; # success
     }
+    
+    L align(
+        'Generate',
+        "${width}x${height}" .
+        ($image->{retina} ? " (\@$$image{retina}x)" : '')
+    );
 
     # create resized image.
     my $sized_image = GD::Image->new($width, $height);
@@ -482,12 +480,7 @@ sub generate_image {
         # if this image is available in more than 1 scale, symlink.
         $wiki->symlink_scaled_image($image);
     }
-
-    L align(
-        'Generate',
-        "${width}x${height}" .
-        ($image->{retina} ? " (\@$$image{retina}x)" : '')
-    );
+    
     return; # success
 }
 
