@@ -427,15 +427,15 @@ sub unique_files_in_dir {
             next if $ext && $file !~ m/.+\.($ext)$/;
 
             # resolve symlinks.
-            my $file = abs_path($path);
-            next if !$file; # couldn't resolve symlink.
+            my $abs = abs_path($path);
+            next if !$abs; # couldn't resolve symlink.
             
-            # use the basename only if the target file is in the same
-            # directory.
-            my $same_dir = index(File::Spec->abs2rel($file, $dir), '/') == -1;
-            $file = basename($file) if $same_dir;
+            # use the basename of the resolved path only if the target file is
+            # in the same directory. otherwise use the original path.
+            my $same_dir = index(File::Spec->abs2rel($abs, $dir), '/') == -1;
+            my $filename = basename($same_dir ? $abs : $path);
 
-            $files{$pfx.$file}++;
+            $files{$pfx.$filename}++;
         }
         closedir $dh;
     };
