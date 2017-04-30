@@ -283,7 +283,7 @@ END
                 'initial commit' => sub {
                     return $wiki->rev_commit(
                         message => 'initial commit',
-                        add     => $dir
+                        add     => [ $dir ]
                     );
                 }
             );
