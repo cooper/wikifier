@@ -119,11 +119,9 @@ my @op_errors;
 sub _rev_op_commit (&$) {
     my ($code, $command) = @_;
     
-    # call in list or scalar context
-    my ($ret, @ret);
-    @ret = eval { $code->() } if  wantarray;
-    $ret = eval { $code->() } if !wantarray;
-    
+    # call in list context
+    my @ret = eval { $code->() };
+        
     # git exception occurred
     if ($@ && ref $@ eq 'Git::Wrapper::Exception') {
         my $message = $command.' exited with code '.$@->status.'. ';
@@ -141,7 +139,7 @@ sub _rev_op_commit (&$) {
         return;
     }
     
-    return wantarray ? $ret : @ret;
+    return @ret;
 }
 
 # return the results of the operations
