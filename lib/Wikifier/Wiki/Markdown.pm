@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010;
 
-use Wikifier::Utilities qw(L Lindent back align);
+use Wikifier::Utilities qw(E Lindent back align);
 use CommonMark qw(:node :event :list);
 use Cwd qw(abs_path);
 
@@ -240,7 +240,7 @@ sub generate_from_markdown {
         
         else {
             my $node_type_s = $node->get_type_string;
-            L "Unknown Markdown node '$node_type_s' ($es{$ev_type})";
+            E "Unknown Markdown node '$node_type_s' ($es{$ev_type})";
         }
         
         # TODO:

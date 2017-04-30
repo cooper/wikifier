@@ -13,7 +13,7 @@ use warnings;
 use strict;
 
 use Scalar::Util qw(blessed weaken);
-use Wikifier::Utilities qw(L truncate_hr trim);
+use Wikifier::Utilities qw(E truncate_hr trim);
 
 # Properties of blocks
 #
@@ -121,7 +121,7 @@ sub init_base {
     my $block = shift;
     my $base_ref = $block->{type_ref}{base_ref};
     if (!$base_ref) {
-        L $block->hr_type.' called ->init_base(), but it has no base';
+        E $block->hr_type.' called ->init_base(), but it has no base';
         return;
     }
     $block->_init($base_ref, @_);
@@ -169,7 +169,7 @@ sub parse_base {
     my $block = shift;
     my $base_ref = $block->{type_ref}{base_ref};
     if (!$base_ref) {
-        L $block->hr_type.' called ->parse_base(), but it has no base';
+        E $block->hr_type.' called ->parse_base(), but it has no base';
         return;
     }
     $block->_parse($base_ref, @_);
@@ -226,7 +226,7 @@ sub html_base {
     my $block = shift;
     my $base_ref = $block->{type_ref}{base_ref};
     if (!$base_ref) {
-        L $block->hr_type.' called ->html_base(), but it has no base';
+        E $block->hr_type.' called ->html_base(), but it has no base';
         return;
     }
     $block->_html($base_ref, @_);

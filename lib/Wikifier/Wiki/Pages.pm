@@ -9,7 +9,7 @@ use HTTP::Date qw(time2str);
 use Scalar::Util qw(blessed);
 use JSON::XS ();
 use HTML::Strip;
-use Wikifier::Utilities qw(page_name align L Lindent back filter_nonempty);
+use Wikifier::Utilities qw(page_name align L E Lindent back filter_nonempty);
 
 my $stripper = HTML::Strip->new(emit_spaces => 0);
 my $json = JSON::XS->new->pretty->convert_blessed;
@@ -257,7 +257,7 @@ sub get_page_cache {
     # decode the manifest
     $cache_data = eval { $json->decode(shift @data) };
     if (ref $cache_data ne 'HASH') {
-        L 'Malformed cache metadata!';
+        E 'Malformed cache metadata!';
         unlink $page->cache_path;
         return display_error('Malformed cache metadata');
         # NO cached (force regeneration)

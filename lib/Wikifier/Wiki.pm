@@ -21,7 +21,7 @@ use Wikifier::Wiki::Images;
 use Wikifier::Wiki::Models;
 use Wikifier::Wiki::Revision;
 use Wikifier::Wiki::Categories;
-use Wikifier::Utilities qw(L Lindent back make_dir);
+use Wikifier::Utilities qw(L E Lindent back make_dir);
 
 # default options.
 our %wiki_defaults = (
@@ -76,7 +76,7 @@ sub read_config {
     my $bn_file = basename($file);
     Lindent "($bn_file)";
         if (my $err = $conf->parse) {
-            L "Failed to parse configuration";
+            E "Failed to parse configuration";
             back;
             return;
         }
@@ -103,7 +103,7 @@ sub read_config {
         my $bn_private_file = basename($private_file);
         Lindent "($bn_private_file)";
             if (my $err = $pconf->parse) {
-                L "Failed to parse private configuration";
+                E "Failed to parse private configuration";
                 back;
                 return;
             }
@@ -144,13 +144,13 @@ sub check_directories {
 
         # exists but not a directory
         if (-e $path) {
-            L "\@dir.$dir ($path) exists but is not a directory";
+            E "\@dir.$dir ($path) exists but is not a directory";
             next;
         }
 
         # dir.wiki must not be defined
         if (index($path, '(null)') != -1) {
-            L "\@dir.$dir ($path) looks suspicious; skipped";
+            E "\@dir.$dir ($path) looks suspicious; skipped";
             $suspicious++;
             next;
         }
@@ -160,7 +160,7 @@ sub check_directories {
         my (undef, $parent_dir) = fileparse($path);
         if (-e "$parent_dir/wiki.example.conf") {
             $skipped{$dir}++;
-            L "\@dir.$dir is relative to the wikifier dir; skipped";
+            E "\@dir.$dir is relative to the wikifier dir; skipped";
             next;
         }
 
@@ -169,9 +169,9 @@ sub check_directories {
         my $err;
         next if make_path($path, { error => \$err });
 
-        L "... Failed: @$err"
+        E "... Failed: @$err"
     }
-    L 'Maybe you forgot to set @dir.wiki?' if $suspicious;
+    E 'Maybe you forgot to set @dir.wiki?' if $suspicious;
 }
 
 # returns a wiki option.
@@ -304,7 +304,7 @@ my %crypts = (
 sub verify_login {
     my ($wiki, $username, $password) = @_;
     if (!$wiki->{pconf}) {
-        L 'Attempted verify_login() without configured credentials';
+        E 'Attempted verify_login() without configured credentials';
         return;
     }
 
@@ -331,7 +331,7 @@ sub verify_login {
 
     # error
     if (!defined $hash) {
-        L "Error with $crypt: $@";
+        E "Error with $crypt: $@";
         return;
     }
 
@@ -405,7 +405,7 @@ sub unique_files_in_dir {
         # can't open
         my $dh;
         if (!opendir $dh, $dir) {
-            L "Cannot open dir '$dir': $!";
+            E "Cannot open dir '$dir': $!";
             return;
         }
         
@@ -445,7 +445,7 @@ sub file_contents {
     local $/ = undef;
     my $fh;
     if (!open $fh, '<', $file) {
-        L "Cannot open file '$file': $!";
+        E "Cannot open file '$file': $!";
         return;
     }
     binmode $fh, ':raw' if  $binary;

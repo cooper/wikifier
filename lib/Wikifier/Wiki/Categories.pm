@@ -11,7 +11,7 @@ use HTML::Strip;
 use Scalar::Util qw(blessed);
 use Wikifier::Utilities qw(
     page_names_equal cat_name cat_name_ne
-    keys_maybe hash_maybe L
+    keys_maybe hash_maybe L E
 );
 
 my $json = JSON::XS->new->pretty->convert_blessed;
@@ -205,7 +205,7 @@ sub cat_add_page {
 
         # JSON error or the value is not a hash.
         if (!$cat || ref $cat ne 'HASH') {
-            L "Error parsing JSON category '$cat_file': $@";
+            E "Error parsing JSON category '$cat_file': $@";
             return;
         }
         
@@ -227,7 +227,7 @@ sub cat_add_page {
         # open the file or log error.
         my $fh;
         if (!open $fh, '>', $cat_file) {
-            L "Cannot open '$cat_file': $!";
+            E "Cannot open '$cat_file': $!";
             return;
         }
 
@@ -242,7 +242,7 @@ sub cat_add_page {
     # open file or error.
     my $fh;
     if (!open $fh, '>', $cat_file) {
-        L "Cannot open '$cat_file': $!";
+        E "Cannot open '$cat_file': $!";
         return;
     }
 
@@ -289,7 +289,7 @@ sub cat_get_pages {
 
     # JSON error or the value is not a hash.
     if (!$cat || ref $cat ne 'HASH') {
-        L "Error parsing JSON category '$cat_file': $@";
+        E "Error parsing JSON category '$cat_file': $@";
         return;
     }
 
@@ -366,7 +366,7 @@ sub cat_get_pages {
         # unable to open.
         my $fh;
         if (!open $fh, '>', $cat_file) {
-            L "Cannot open '$cat_file': $!";
+            E "Cannot open '$cat_file': $!";
             return;
         }
 

@@ -15,7 +15,7 @@ use Wikifier::Wiki;
 use Wikifier::Server::Message;
 use Wikifier::Server::Handlers;
 use Wikifier::Server::Connection;
-use Wikifier::Utilities qw(align L Lindent back page_name cat_name);
+use Wikifier::Utilities qw(align L E Lindent back page_name cat_name);
 
 our ($loop, $conf, %wikis, %files, %sessions);
 
@@ -202,7 +202,7 @@ sub gen_wiki {
         last unless $initial;
         my $cat_name = cat_name($image_name);
         if (my $existing = $found_image{$cat_name}) {
-            L "Conflicting image filenames: $existing and $image_name";
+            E "Conflicting image filenames: $existing and $image_name";
             next;
         }
         $found_image{$cat_name} = $image_name;
@@ -213,9 +213,9 @@ sub gen_wiki {
         
         # can't load
         if (!eval { require Wikifier::Wiki::Markdown }) {
-            L 'Unable to load Markdown translator;';
-            L 'Please see docs for how to install CommonMark';
-            L $@;
+            E 'Unable to load Markdown translator;';
+            E 'Please see docs for how to install CommonMark';
+            E $@;
             last;
         }
 

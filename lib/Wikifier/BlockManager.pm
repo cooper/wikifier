@@ -11,7 +11,7 @@ use warnings;
 use strict;
 use 5.010;
 
-use Wikifier::Utilities qw(L);
+use Wikifier::Utilities qw(L E);
 
 our %block_types = (
     if          => { title => 1 },
@@ -80,7 +80,7 @@ sub load_block {
     # do the file.
     my $main_package = do $file;
     if (!$main_package) {
-        L "Error loading ${type}{} block: ".($@ || $!);
+        E "Error loading ${type}{} block: ".($@ || $!);
         return;
     }
 
@@ -93,7 +93,7 @@ sub load_block {
 
     # none? probably the package didn't return the correct name
     if (!keys %blocks) {
-        L "Error loading ${type}{} block: No blocks found. " .
+        E "Error loading ${type}{} block: No blocks found. " .
           "Perhaps the returned package '$main_package' is incorrect?";
         return;
     }
