@@ -610,6 +610,7 @@ sub page_info {
         mod_unix    => $page->modified,
         created     => $page->created,
         draft       => $page->draft,
+        draft       => $page->generated,
         redirect    => $page->redirect,
         fmt_title   => $page->fmt_title,
         title       => $page->title,
@@ -621,6 +622,12 @@ sub page_info {
 sub draft {
     my $page = shift;
     return !!$page->get('page.draft');
+}
+
+# page generated from @page.generated
+sub generated {
+    my $page = shift;
+    return !!$page->get('page.generated');
 }
 
 # page author from @page.author
