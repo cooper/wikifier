@@ -3,11 +3,13 @@ package Wikifier::Wiki;
 
 use warnings;
 use strict;
-use 5.010;
+use 5.014; # for /u
 
 use Wikifier::Utilities qw(E Lindent back align);
 use CommonMark qw(:node :event :list);
 use Cwd qw(abs_path);
+
+my $punctuation_re = qr/[^\p{Word}\- ]/u;
 
 sub convert_markdown {
     my ($wiki, $md_name) = (shift, @_);
@@ -65,6 +67,7 @@ sub generate_from_markdown {
     my $source = '';
     my $indent = 0;
     my $header_level = 0;
+    my $current_header_text;
     my $page_title;
     
     my $add_text = sub {
@@ -89,6 +92,7 @@ sub generate_from_markdown {
             my $text = md_escape_fmt($node->get_literal);
             $page_title = $text if !length $page_title && $header_level;
             $add_text->($text);
+            $current_header_text .= $text if defined $current_header_text;
         }
         
         # NODE_HEADING
@@ -114,12 +118,23 @@ sub generate_from_markdown {
                 
                 $header_level = $level;
                 $add_text->("~sec [");
+                $current_header_text = '';
             }
             
             # closing the header starts the section block
             else {
                 $indent++;
                 $add_text->("] {\n");
+                
+                # figure the anchor. modeled after what github uses:
+                # https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/toc_filter.rb
+                # the -n suffixes are added automatically as needed in Section.pm
+                my $section_id = lc $current_header_text;   # downcase
+                $section_id =~ s/$punctuation_re//g;        # remove punctuation
+                $section_id =~ s/ /-/g;                     # replace spaces with dashes
+                $section_id = md_escape_fmt($section_id);
+                $add_text->("meta { section: $section_id; }\n");
+                undef $current_header_text
             }
         }
         

@@ -84,6 +84,10 @@ sub section_html {
             $heading_id = page_name_link($heading_id);
         }
         
+        # add -n as needed if this is already used
+        my $n = $page->{heading_ids}{$heading_id}++;
+        $heading_id .= "-$n" if $n;
+        
         # create the heading.
         my $heading = Wikifier::Element->new(
             type       => "h$l",
