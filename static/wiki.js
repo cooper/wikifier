@@ -8,5 +8,8 @@ function hashLoad() {
         hash = hash.substring(1);
     var anchor = 'wiki-anchor-' + hash;
     var el = $(anchor);
-    if (el) window.location.hash = anchor;
+    if (el) {
+        pos = el.getPosition();
+        scrollTo(pos.x, pos.y);
+    }
 }
