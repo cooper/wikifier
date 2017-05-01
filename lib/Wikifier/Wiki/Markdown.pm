@@ -367,12 +367,13 @@ sub md_table_replace {
             my $row_ref = $cells[$row];
             my $tr = Wikifier::Element->new(type => 'tr');
             for my $col (0..$#$row_ref) {
+                my $text  = $row_ref->[$col];
                 my $align = $aligns[$col];
                 $align = "text-align: $align;" if $align;
                 $tr->add(Wikifier::Element->new(
                     type        => 'td',
                     attributes  => { style => $align },
-                    content     => md_to_html_np($header)
+                    content     => md_to_html_np($text)
                 ));
             }
             $tbody->add($tr);
