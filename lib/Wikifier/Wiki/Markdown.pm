@@ -10,6 +10,7 @@ use CommonMark qw(:node :event :list);
 use Cwd qw(abs_path);
 
 my $punctuation_re = qr/[^\p{Word}\- ]/u;
+my $table_re = qr/ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/;
 
 sub convert_markdown {
     my ($wiki, $md_name) = (shift, @_);
@@ -69,6 +70,9 @@ sub generate_from_markdown {
     my $header_level = 0;
     my $current_header_text;
     my $page_title;
+    
+    # before anything else, convert GFM tables to HTML
+    $md_text = $wiki->md_table_replace($md_text);
     
     my $add_text = sub {
         my $text = shift;
@@ -295,6 +299,98 @@ $meta_source
 
 $source
 END
+}
+
+# replace GFM tables with HTML
+sub md_table_replace {
+    my ($wiki, $md_text) = @_;
+    while ($md_text =~ s/$reg/!!TABLE!!/) {
+        my ($header, $align, $cell) = ($1, $2, $3);
+        
+        # extract header cells
+        $header =~ s/^ *| *\| *$//g;
+        my @headers = split m/ *\| */, $header;
+        
+        # extract alignment
+        $align =~ s/^ *|\| *$//g;
+        my @aligns = split m/ *\| */, $align;
+        
+        # extract body cells
+        $cell =~ s/(?: *\| *)?\n$//;
+        my @cells = split m/\n/, $cell;
+
+        # determine the alignment
+        @aligns = map {
+            my $align;
+            if (/^ *-+: *$/) {
+                $align = 'right';
+            }
+            elsif (/^ *:-+: *$/) {
+                $align = 'center';
+            }
+            elsif (m/^ *:-+ *$/) {
+                $align = 'left';
+            }
+            $align;
+        } @aligns;
+
+        # split up the body cells
+        for my $i (0..$#cells) {
+             my $cell = $cells[$i];
+             $cell =~ s/^ *\| *| *\| *$//g;
+             $cells[$i] = [ split m/ *\| */, $cell ]
+        }
+        
+        # create table
+        my $table       = Wikifier::Element->new(type => 'table', class => 'table');
+        my $thead       = Wikifier::Element->new(type => 'thead');
+        my $thead_tr    = Wikifier::Element->new(type => 'tr');
+        my $tbody       = Wikifier::Element->new(type => 'tbody');
+        $thead->add($thead_tr);
+        $table->add($thead);
+        $table->add($tbody);
+        
+        # add headers
+        for my $col (0..$#headers) {
+            my $header = $headers[$col];
+            my $align  = $aligns[$col];
+            $align = "text-align: $align;" if $align;
+            $thead_tr->add(Wikifier::Element->new(
+                type => 'th',
+                attributes => { style => $align },
+                content => \md_to_html($header)
+                # scalar ref means don't run entities
+            ));
+        }
+        
+        # add body cells
+        for my $row (0..$#cells) {
+            my $row_ref = $cells[$row];
+            my $tr = Wikifier::Element->new(type => 'tr');
+            for my $col (0..$#$row_ref) {
+                my $align = $aligns[$col];
+                $align = "text-align: $align;" if $align;
+                $tr->add(Wikifier::Element->new(
+                    type => 'td',
+                    attributes => { style => $align },
+                    content => \md_to_html($header)
+                    # scalar ref means don't run entities
+                ));
+            }
+            $tbody->add($tr);
+        }
+        
+        # make the replacement
+        my $html = $table->generate;
+        $md_text =~ s/!!TABLE!!/$html/;
+    }
+    return $md_text;
+}
+
+# convert markdown to html
+sub md_to_html {
+    my $md_text = shift;
+    return CommonMark->markdown_to_html($md_text);
 }
 
 # escape markdown-extracted text.

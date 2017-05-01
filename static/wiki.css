@@ -237,7 +237,7 @@ pre.wiki-code {
     margin: 15px 0 !important;
     white-space: pre;
     display: block;
-    font-family: Consolas, "Liberation Mono", Courier, monospace;
+    font-family: Consolas, 'Liberation Mono', Courier, monospace;
 }
 
 /* lists */
