@@ -163,14 +163,16 @@ div.wiki-image {
 a.wiki-link-internal,
 a.wiki-link-external,
 a.wiki-link-category,
-a.wiki-link-other {
+a.wiki-link-other,
+table.wiki-table a { /* fix for GFM tables */
     text-decoration: none;
     padding: 0;
     margin: 0;
 }
 
 a.wiki-link-internal,
-a.wiki-link-category {
+a.wiki-link-category,
+table.wiki-table a {
     color: #0084FF;
 }
 
@@ -189,7 +191,8 @@ a.wiki-link-other.invalid {
 a.wiki-link-internal:hover,
 a.wiki-link-external:hover,
 a.wiki-link-category:hover,
-a.wiki-link-other:hover {
+a.wiki-link-other:hover,
+table.wiki-table a:hover { /* fix for GFM tables */
     color: blue;
 }
 
@@ -272,6 +275,30 @@ a.wiki-ref-anchor {
 
 a.wiki-ref-anchor:hover {
     color: blue;
+}
+
+/* tables */
+
+table.wiki-table {
+    display: block;
+    width: 100%;
+    overflow: auto;
+    margin-top: 0;
+    margin-bottom: 16px;
+    border-spacing: 0;
+    border-collapse: collapse;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    word-wrap: break-word;
+}
+
+table.wiki-table tr:nth-child(2n) {
+    background-color: #f8f8f8;
+}
+
+table.wiki-table td {
+    padding: 6px 13px;
+    border: 1px solid #ccc;
 }
 
 /* built-in classes */
