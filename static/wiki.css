@@ -205,7 +205,7 @@ td.wiki-history-value {
 
 /* code */
 
-pre.wiki-code, .wiki-main code {
+pre.wiki-code, .wiki-main code, .wiki-main a code {
     background-color: #f8f8f8;
     border: 1px solid;
     border-color: #ccc !important;
