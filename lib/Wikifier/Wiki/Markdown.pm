@@ -343,40 +343,36 @@ sub md_table_replace {
         
         # create table
         my $table       = Wikifier::Element->new(type => 'table', class => 'table');
-        my $thead       = Wikifier::Element->new(type => 'thead');
-        my $thead_tr    = Wikifier::Element->new(type => 'tr');
-        my $tbody       = Wikifier::Element->new(type => 'tbody');
-        $thead->add($thead_tr);
-        $table->add($thead);
-        $table->add($tbody);
+        my $thead       = $table->new_child(type => 'thead');
+        my $thead_tr    = $thead->new_child(type => 'tr');
+        my $tbody       = $table->new_child(type => 'tbody');
         
         # add headers
         for my $col (0..$#headers) {
             my $header = $headers[$col];
             my $align  = $aligns[$col];
             $align = "text-align: $align;" if $align;
-            $thead_tr->add(Wikifier::Element->new(
+            $thead_tr->new_child(
                 type        => 'th',
                 attributes  => { style => $align },
                 content     => md_to_html_np($header)
-            ));
+            );
         }
         
         # add body cells
         for my $row (0..$#cells) {
             my $row_ref = $cells[$row];
-            my $tr = Wikifier::Element->new(type => 'tr');
+            my $tr = $tbody->new_child(type => 'tr');
             for my $col (0..$#$row_ref) {
                 my $text  = $row_ref->[$col];
                 my $align = $aligns[$col];
                 $align = "text-align: $align;" if $align;
-                $tr->add(Wikifier::Element->new(
+                $tr->new_child(
                     type        => 'td',
                     attributes  => { style => $align },
                     content     => md_to_html_np($text)
-                ));
+                );
             }
-            $tbody->add($tr);
         }
         
         # make the replacement
