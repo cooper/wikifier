@@ -380,7 +380,7 @@ sub md_table_replace {
         
         # make the replacement
         my $html = $table->generate;
-        $md_text =~ s/!!TABLE!!/$html/;
+        $md_text =~ s/!!TABLE!!/\n$html\n/;
     }
     return $md_text;
 }
