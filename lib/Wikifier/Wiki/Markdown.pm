@@ -343,16 +343,16 @@ sub md_table_replace {
         
         # create table
         my $table       = Wikifier::Element->new(type => 'table', class => 'table');
-        my $thead       = $table->new_child(type => 'thead');
-        my $thead_tr    = $thead->new_child(type => 'tr');
-        my $tbody       = $table->new_child(type => 'tbody');
+        my $thead       = $table->create_child(type => 'thead');
+        my $thead_tr    = $thead->create_child(type => 'tr');
+        my $tbody       = $table->create_child(type => 'tbody');
         
         # add headers
         for my $col (0..$#headers) {
             my $header = $headers[$col];
             my $align  = $aligns[$col];
             $align = "text-align: $align;" if $align;
-            $thead_tr->new_child(
+            $thead_tr->create_child(
                 type        => 'th',
                 attributes  => { style => $align },
                 content     => md_to_html_np($header)
@@ -362,12 +362,12 @@ sub md_table_replace {
         # add body cells
         for my $row (0..$#cells) {
             my $row_ref = $cells[$row];
-            my $tr = $tbody->new_child(type => 'tr');
+            my $tr = $tbody->create_child(type => 'tr');
             for my $col (0..$#$row_ref) {
                 my $text  = $row_ref->[$col];
                 my $align = $aligns[$col];
                 $align = "text-align: $align;" if $align;
-                $tr->new_child(
+                $tr->create_child(
                     type        => 'td',
                     attributes  => { style => $align },
                     content     => md_to_html_np($text)
