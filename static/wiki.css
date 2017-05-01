@@ -153,46 +153,23 @@ div.wiki-imagebox-description-inner {
     line-height: 1.3em;
 }
 
-/* images */
-
 div.wiki-image {
 }
 
 /* links */
 
-a.wiki-link-internal,
-a.wiki-link-external,
-a.wiki-link-category,
-a.wiki-link-other,
-table.wiki-table a { /* fix for GFM tables */
+.wiki-main a {
     text-decoration: none;
     padding: 0;
     margin: 0;
-}
-
-a.wiki-link-internal,
-a.wiki-link-category,
-table.wiki-table a {
     color: #0084FF;
 }
 
-a.wiki-link-external,
-a.wiki-link-other {
-    color: #0084FF;
-}
-
-a.wiki-link-internal.invalid,
-a.wiki-link-external.invalid,
-a.wiki-link-category.invalid,
-a.wiki-link-other.invalid {
+.wiki-main a.invalid {
     color: #FF3D50;
 }
 
-a.wiki-link-internal:hover,
-a.wiki-link-external:hover,
-a.wiki-link-category:hover,
-a.wiki-link-other:hover,
-table.wiki-table a:hover { /* fix for GFM tables */
+.wiki-main a:hover {
     color: blue;
 }
 
