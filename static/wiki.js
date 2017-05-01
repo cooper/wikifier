@@ -1,3 +1,6 @@
+var wikifier = {};
+(function (exports) {
+
 document.addEvent('domready', hashLoad);
 window.addEvent('hashchange', hashLoad);
 
@@ -13,3 +16,11 @@ function hashLoad() {
         scrollTo(pos.x, pos.y);
     }
 }
+
+// javascript image sizing
+exports.imageResize = function (img) {
+    img.parentElement.parentElement.setStyle('width', img.offsetWidth + 'px');
+    img.setStyle('width', '100%');
+};
+
+})(wikifier);

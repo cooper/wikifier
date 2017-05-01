@@ -217,10 +217,8 @@ sub image_html {
     );
 
     # insert javascript if using browser sizing.
-    $img->add_attribute(onload =>
-        q{this.parentElement.parentElement.style.width = }.
-        q{this.offsetWidth + 'px'; this.style.width = '100%';}
-    ) if $image->{javascript};
+    $img->add_attribute(onload => 'wikifier.imageResize(this);')
+        if $image->{javascript};
 
     # description. we have to extract this here instead of in ->parse()
     # because at the time of ->parse() its text is not yet formatted.
