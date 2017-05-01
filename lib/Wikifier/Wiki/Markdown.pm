@@ -304,7 +304,7 @@ END
 # replace GFM tables with HTML
 sub md_table_replace {
     my ($wiki, $md_text) = @_;
-    while ($md_text =~ s/$reg/!!TABLE!!/) {
+    while ($md_text =~ s/$table_re/!!TABLE!!/) {
         my ($header, $align, $cell) = ($1, $2, $3);
         
         # extract header cells
