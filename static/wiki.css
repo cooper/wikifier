@@ -228,6 +228,16 @@ td.wiki-history-value {
 
 /* code */
 
+pre.wiki-code, .wiki-main code {
+    color: #000;
+    background-color: #f8f8f8;
+    border: 1px solid;
+    border-color: #ccc !important;
+    font-size: 90%;
+    border-radius: 3px;
+    font-family: Consolas, 'Liberation Mono', Courier, monospace;
+}
+
 pre.wiki-code {
     line-height: 19px;
     overflow: auto;
@@ -239,16 +249,6 @@ pre.wiki-code {
 
 .wiki-main code {
     padding: 2px 4px;
-}
-
-pre.wiki-code .wiki-main code {
-    color: #000;
-    background-color: #f8f8f8;
-    border: 1px solid;
-    border-color: #ccc !important;
-    font-size: 90%;
-    border-radius: 3px;
-    font-family: Consolas, 'Liberation Mono', Courier, monospace;
 }
 
 /* lists */
