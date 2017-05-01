@@ -288,7 +288,7 @@ table.wiki-table {
     border-spacing: 0;
     border-collapse: collapse;
     box-sizing: border-box;
-    border: 1px solid #ccc;
+    border-color: #ccc;
     word-wrap: break-word;
 }
 
@@ -296,9 +296,13 @@ table.wiki-table tr:nth-child(2n) {
     background-color: #f8f8f8;
 }
 
-table.wiki-table td {
+table.wiki-table td, table.wiki-table th {
     padding: 6px 13px;
     border: 1px solid #ccc;
+}
+
+table.wiki-table th {
+    font-weight: bold;
 }
 
 /* built-in classes */
