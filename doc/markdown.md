@@ -13,7 +13,9 @@ translates each Markdown file to the wikifier source language. These generated
 wiki source files are then served just like any other page file.
 
 wikifier uses the [cmark](https://github.com/jgm/cmark) Markdown parser, which
-implements the [CommonMark](http://commonmark.org) specification.
+implements the [CommonMark](http://commonmark.org) specification. wikifier also
+supports [GFM](https://guides.github.com/features/mastering-markdown/#GitHub-flavored-markdown)
+tables via a custom extension.
 
 ## Setup
 
