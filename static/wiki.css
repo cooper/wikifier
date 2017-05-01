@@ -228,13 +228,13 @@ td.wiki-history-value {
 pre.wiki-code {
     color: #000;
     background-color: #f8f8f8;
-    border: 1px solid #ccc;
+    border: 1px solid #ccc !important;
     font-size: 13px;
     line-height: 19px;
     overflow: auto;
-    padding: 6px 10px;
+    padding: 6px 10px !important;
     border-radius: 3px;
-    margin: 15px 0;
+    margin: 15px 0 !important;
     white-space: pre;
     display: block;
     font-family: Consolas, "Liberation Mono", Courier, monospace;
