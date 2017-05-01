@@ -356,10 +356,9 @@ sub md_table_replace {
             my $align  = $aligns[$col];
             $align = "text-align: $align;" if $align;
             $thead_tr->add(Wikifier::Element->new(
-                type => 'th',
-                attributes => { style => $align },
-                content => \md_to_html($header)
-                # scalar ref means don't run entities
+                type        => 'th',
+                attributes  => { style => $align },
+                content     => md_to_html_np($header)
             ));
         }
         
@@ -371,10 +370,9 @@ sub md_table_replace {
                 my $align = $aligns[$col];
                 $align = "text-align: $align;" if $align;
                 $tr->add(Wikifier::Element->new(
-                    type => 'td',
-                    attributes => { style => $align },
-                    content => \md_to_html($header)
-                    # scalar ref means don't run entities
+                    type        => 'td',
+                    attributes  => { style => $align },
+                    content     => md_to_html_np($header)
                 ));
             }
             $tbody->add($tr);
@@ -391,6 +389,13 @@ sub md_table_replace {
 sub md_to_html {
     my $md_text = shift;
     return CommonMark->markdown_to_html($md_text);
+}
+
+# strip outer <p></p>
+sub md_to_html_np {
+    my $html = md_to_html(@_);
+    $html =~ s/^\s*<p>(.+)<\/p>\s*$/$1/;
+    return $html;
 }
 
 # escape markdown-extracted text.
