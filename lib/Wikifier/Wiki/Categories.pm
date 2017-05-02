@@ -20,11 +20,75 @@ my $json = JSON::XS->new->pretty->convert_blessed;
 ### CATEGORIES ###
 ##################
 
-# displays a pages from a category in a blog-like form.
+# Categories are stored as JSON objects with the following properties.
+#
+#   category        category name without extension
+#
+#   file            category filename, including the .cat extension
+#
+#   created         UNIX timestamp of when the category was created
+#
+#   mod_unix        UNIX timestamp of when the category was last modified.
+#                   this is updated when pages are added and deleted
+#
+#   pages           object of pages in the category. keys are page filenames,
+#                   and values are objects with page metadata from ->page_info
+#
+#                       asof        UNIX timestamp at which the page metadata
+#                                   in this category file was last updated.
+#                                   this is compared against page file
+#                                   modification time
+#
+#                       mod_unix    UNIX timestamp at which the page was last
+#                                   modified. this may not be the actual page
+#                                   modification time, just that as of the
+#                                   last update (as indicated by 'asof')
+#
+#                       (created)   UNIX timestamp at which the page was created
+#
+#                       (draft)     true if the page is marked as a draft
+#
+#                       (generated) true if the page was auto-generated
+#
+#                       (redirect)  page redirect target, if applicable
+#
+#                       (fmt_title) human-readable page title, including any
+#                                   possible HTML formatting
+#
+#                       (title)     human-readable page title in plain text,
+#                                   with HTML tags removed
+#
+#                       (author)    full name of the page author
+#
+#                       (dimensions)    for cat_type 'image', an array of
+#                                   image dimensions used on this page.
+#                                   dimensions are guaranteed to be positive
+#                                   integers. the number of elements will
+#                                   always be even, since each occurence of the
+#                                   image produces two (width and then height)
+#
+#                       (lines)     for cat_type 'page', an array of line
+#                                   numbers on which the target page is
+#                                   referenced from this page
+#
+#   (cat_type)      if applicable, this is the type of pseudocategory. examples
+#                   include 'image', 'model', and 'page'
+#
+#   (image_file)    for cat_type 'image', the image filename
+#
+#   (width)         for cat_type 'image', the image width
+#
+#   (height)        for cat_type 'image', the image height
+#
+
+
+# Displays a pages from a category in a blog-like form.
+#
 # %opts = (
 #   cat_type    category type
 #   page_n      page number
 # )
+#
 sub display_cat_posts {
     my ($wiki, $cat_name, %opts) = @_; my $result = {};
     $cat_name = cat_name($cat_name);
