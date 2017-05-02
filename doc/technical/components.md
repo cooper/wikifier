@@ -38,7 +38,7 @@ The wikifier package is divided into several subpackages:
 **WiPage** (Wikifier::Page) is the most basic interface to the wikifier. As the
 name suggests, a Wikifier::Page object represents a single page of a wiki.
 Usually it is associated with a single `.page` file written in the
-[wikifier language](../langauge.md). WiPage utilizes the wikifier package to
+[wikifier language](../language.md). WiPage utilizes the wikifier package to
 generate HTML from the source file.
 
 ## Wikifier::Wiki
