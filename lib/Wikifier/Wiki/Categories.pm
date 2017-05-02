@@ -71,14 +71,24 @@ my $json = JSON::XS->new->pretty->convert_blessed;
 #                                   numbers on which the target page is
 #                                   referenced from this page
 #
+#   (title)         human-readable category title
+#
+#
+#   Category extras
+#
+#
 #   (cat_type)      if applicable, this is the type of pseudocategory. examples
 #                   include 'image', 'model', and 'page'
 #
 #   (image_file)    for cat_type 'image', the image filename
 #
-#   (width)         for cat_type 'image', the image width
+#   (width)         for cat_type 'image', the image width. this may be omitted
+#                   if the image does not exist but is referenced by at least
+#                   one page
 #
-#   (height)        for cat_type 'image', the image height
+#   (height)        for cat_type 'image', the image height. this may be omitted
+#                   if the image does not exist but is referenced by at least
+#                   one page
 #
 
 
@@ -93,9 +103,13 @@ sub display_cat_posts {
     my ($wiki, $cat_name, %opts) = @_; my $result = {};
     $cat_name = cat_name($cat_name);
     my $cat_name_ne = cat_name_ne($cat_name);
-    my ($pages, $title) = $wiki->cat_get_pages($cat_name,
+    my ($err, $pages, $title) = $wiki->cat_get_pages($cat_name,
         cat_type => $opts{cat_type}
     );
+
+    # some error in fetching
+    return display_error($err)
+        if $err;
 
     # no pages means no category.
     return display_error("Category does not exist.")
@@ -328,7 +342,7 @@ sub cat_add_page {
 
 # returns a name-to-metadata hash of the pages in the given category.
 # if the category does not exist, returns nothing.
-# returns (page data, category title, error)
+# returns (error, page data, category title)
 sub cat_get_pages {
     my ($wiki, $cat_name, %opts) = @_;
     $cat_name = cat_name($cat_name);
@@ -344,8 +358,7 @@ sub cat_get_pages {
     # this category does not exist.
     my $cat_file = $wiki->path_for_category($cat_name, $opts{cat_type});
     if (!defined $cat_file || !-f $cat_file) {
-        L "No such category $cat_file";
-        return;
+        return 'No such category';
     }
 
     # it exists; let's see what's inside.
@@ -354,7 +367,7 @@ sub cat_get_pages {
     # JSON error or the value is not a hash.
     if (!$cat || ref $cat ne 'HASH') {
         E "Error parsing JSON category '$cat_file': $@";
-        return;
+        return 'Error parsing category file';
     }
 
     # check each page's modification date.
@@ -387,7 +400,7 @@ sub cat_get_pages {
             my $err = $page->parse;
             if ($err) {
                 $changed--;
-                return;
+                next PAGE;
             }
 
             # update data.
@@ -416,7 +429,7 @@ sub cat_get_pages {
     # is this category now empty?
     if ($wiki->cat_should_delete($cat_name_ne, $cat, \%final_pages)) {
         unlink $cat_file;
-        return (undef, undef, 'Purge');
+        return 'Purge';
     }
 
     # it looks like something has changed. we need to update the cat file.
@@ -431,7 +444,7 @@ sub cat_get_pages {
         my $fh;
         if (!open $fh, '>', $cat_file) {
             E "Cannot open '$cat_file': $!";
-            return;
+            return 'Cannot write category file';
         }
 
         binmode $fh, ':utf8';
@@ -439,7 +452,7 @@ sub cat_get_pages {
         close $fh;
     }
 
-    return wantarray ? (\%final_pages, $cat->{title}) : \%final_pages;
+    return (undef, \%final_pages, $cat->{title});
 }
 
 # returns true if a category should be deleted.

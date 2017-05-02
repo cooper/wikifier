@@ -264,8 +264,8 @@ sub handle_page_list {
     $msg->l('Page list');
     
     # get all pages
-    my $all = $wiki->cat_get_pages('pages', cat_type => 'data');
-    return if !$all || ref $all ne 'HASH';
+    my ($err, $all) = $wiki->cat_get_pages('pages', cat_type => 'data');
+    return if $err;
     my %pages = %$all;
     my @pages = map {
         my $ref = $pages{$_};
