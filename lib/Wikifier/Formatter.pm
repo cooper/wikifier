@@ -482,8 +482,8 @@ sub __page_link {
             $page->prefix, $safe_name;
         my $path = join '/',
             $page->opt("dir.$typ"), $safe_name;
-        my $page_target = join '/',
-            $page->opt("root.$typ"), $target;
+        my $page_target = join '/', grep length,
+            $page->opt("root.$typ"), $page->prefix, $target;
             
         # make sure the page/category exists
         if (!-e $path) {
