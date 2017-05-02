@@ -73,6 +73,8 @@ my $json = JSON::XS->new->pretty->convert_blessed;
 #
 #   (title)         human-readable category title
 #
+#   (preserve)      if true, the category will be preserved even if it has no
+#                   pages belonging to it
 #
 #   Category extras
 #
@@ -257,7 +259,7 @@ sub cat_check_page {
 # returns true on success. unchanged is also considered success.
 #
 sub cat_add_page {
-    my ($wiki, $page, $cat_name, %opts) = @_;
+    my ($wiki, $page_maybe, $cat_name, %opts) = @_;
     $cat_name = cat_name($cat_name);
     my $time = time;
     my $cat_file = $wiki->path_for_category(
@@ -267,15 +269,18 @@ sub cat_add_page {
     );
 
     # set page infos.
-    my $page_data = {
+    my ($page_data, $pages_ref);
+    $page_data = {
         asof => $time,
         hash_maybe $page->page_info,
         hash_maybe $opts{page_extras}
-    };
+    } if $page_maybe;
 
     # first, check if the category exists yet.
-    if (-f $cat_file) {
-        my $cat = eval { $json->decode(file_contents($cat_file)) };
+    my $cat;
+    for ($cat) {
+        last if !-f $cat_file;
+        $cat = eval { $json->decode(file_contents($cat_file)) };
 
         # JSON error or the value is not a hash.
         if (!$cat || ref $cat ne 'HASH') {
@@ -283,34 +288,23 @@ sub cat_add_page {
             return;
         }
         
+        last if !$page_maybe;
+        
         # if the page was just renamed, delete the old entry.
-        if (length(my $old_name = $page->{old_name})) {
+        if (length(my $old_name = $page_maybe->{old_name})) {
             delete $cat->{pages}{$old_name};
         }
 
         # the page has not changed since the asof time, so do nothing.
-        my $page_ref = $cat->{pages}{ $page->name } ||= {};
-        if ($page_ref->{asof} && $page_ref->{asof} >= $page->modified) {
+        my $page_ref = $cat->{pages}{ $page_maybe->name } ||= {};
+        if ($page_ref->{asof} && $page_ref->{asof} >= $page_maybe->modified) {
             return 1;
         }
 
         # update information for this page,
         # or add it if it is not there already.
         %$page_ref = %$page_data;
-
-        # open the file or log error.
-        my $fh;
-        if (!open $fh, '>', $cat_file) {
-            E "Cannot open '$cat_file': $!";
-            return;
-        }
-
-        # print the resulting JSON.
-        binmode $fh, ':utf8';
-        print {$fh} $json->encode($cat);
-        close $fh;
-
-        return 1;
+        $pages_ref = { $page->name => $page_data };
     }
 
     # open file or error.
@@ -319,17 +313,30 @@ sub cat_add_page {
         E "Cannot open '$cat_file': $!";
         return;
     }
+    
+    # if this is a new category and it has zero pages,
+    # it had better have the preserve flag
+    if (!$cat && !$pages_ref && !$opts{preserve}) {
+        E "Tried to create category '$cat_name' with no pages";
+        return;
+    }
 
-    # the category does not yet exist.
+    # the category does not yet exist
+    $cat ||= {
+        created => $time,
+        pages   => $pages_ref || {}
+    };
+    
+    # write the category file
     binmode $fh, ':utf8';
     print {$fh} $json->encode({
+        %$cat,  # stuff from before
         hash_maybe $opts{cat_extras},
         category   => cat_name_ne($cat_name),
         file       => $cat_name,
         cat_type   => $opts{cat_type},
-        created    => $time,
-        mod_unix   => $time,
-        pages      => { $page->name => $page_data }
+        preserve   => $opts{preserve},
+        mod_unix   => $time
     });
 
     close $fh;
@@ -412,13 +419,13 @@ sub cat_get_pages {
             elsif (length $opts{cat_type} && $opts{cat_type} eq 'model') {
                 next PAGE unless $page->{models}{$cat_name_ne};
             }
+            # TODO: page target
             else {
                 next PAGE unless $page->get("category.$cat_name_ne");
             }
         }
 
         # this one made it.
-        $page_data->{mod_unix}   = $mod_date;
         $final_pages{$page_name} = $page_data;
     }
 
