@@ -120,8 +120,9 @@ sub read_config {
     return 1;
 }
 
-our @main_dirs   = qw(image page cache model category);
-our @pseudo_cats = qw(data image model page);
+our @main_dirs  = qw(page image model cache category);
+our @cat_dirs   = qw(page image model data);
+our @cache_dirs = qw(page image);
 
 sub check_directories {
     my $wiki = shift;
@@ -134,7 +135,12 @@ sub check_directories {
     # pseudocategory dirs
     push @directories, map {
         [ 'category', $wiki->opt('dir.category')."/$_" ]
-    } @pseudo_cats;
+    } @cat_dirs;
+    
+    # cache dirs
+    push @directories, map {
+        [ 'cache', $wiki->opt('dir.cache')."/$_" ]
+    } @cache_dirs;
 
     my (%skipped, $suspicious);
     foreach (@directories) {
