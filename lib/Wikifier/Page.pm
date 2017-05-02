@@ -576,11 +576,11 @@ sub cache_path {
     my $page = shift;
     return abs_path($page->{cache_path})
         if length $page->{cache_path};
-    make_dir($page->opt('dir.cache'), $page->name);
+    make_dir($page->opt('dir.cache').'/page', $page->name);
     return $page->{abs_cache_path}
         if length $page->{abs_cache_path};
     return $page->{cached_props}{cache} //= abs_path(
-        $page->opt('dir.cache').'/'.$page->name.'.cache'
+        $page->opt('dir.cache').'/page/'.$page->name.'.cache'
     );
 }
 
@@ -595,11 +595,11 @@ sub search_path {
     my $page = shift;
     return abs_path($page->{search_path})
         if length $page->{search_path};
-    make_dir($page->opt('dir.cache'), $page->name);
+    make_dir($page->opt('dir.cache').'/page', $page->name);
     return $page->{abs_search_path}
         if length $page->{abs_search_path};
     return $page->{cached_props}{search} //= abs_path(
-        $page->opt('dir.cache').'/'.$page->name.'.txt'
+        $page->opt('dir.cache').'/page/'.$page->name.'.txt'
     );
 }
 

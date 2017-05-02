@@ -192,7 +192,7 @@ sub _display_image {
     my $cache_path;
     foreach my $full_name ($image->{full_name}, $image->{scale_name}) {
         last if !$wiki->opt('image.enable.cache');
-        $cache_path = $wiki->opt('dir.cache').'/'.$full_name;
+        $cache_path = $wiki->opt('dir.cache').'/image/'.$full_name;
         next if !-f $cache_path;
         $result = $wiki->get_image_cache(
             $image, $result, $stat[9], $cache_path, \%opts);
@@ -489,7 +489,7 @@ sub generate_image {
 sub symlink_scaled_image {
     my ($wiki, $image) = @_;
     return unless $image->{retina};
-    my $scale_path = $wiki->opt('dir.cache').'/'.$image->{scale_name};
+    my $scale_path = $wiki->opt('dir.cache').'/image/'.$image->{scale_name};
     return if -e $scale_path;
     symlink $image->{full_name}, $scale_path;
 }
@@ -525,7 +525,7 @@ sub _wiki_default_calc {
         );
         my ($image_dir, $cache_dir) = (
             $wiki->opt('dir.image'),
-            $wiki->opt('dir.cache')
+            $wiki->opt('dir.cache').'/image'
         );
         unlink
             "$cache_dir/$img{file}";

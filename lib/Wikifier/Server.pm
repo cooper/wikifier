@@ -239,7 +239,7 @@ sub gen_wiki {
     # pages
     foreach my $page_name ($wiki->all_pages) {
         my $page_path  = "$page_dir/$page_name";
-        my $cache_path = "$cache_dir/$page_name.cache";
+        my $cache_path = "$cache_dir/page/$page_name.cache";
 
         # determine modification times.
         my $page_modified  = (stat $page_path )[9];
