@@ -107,13 +107,9 @@ sub display_cat_posts {
         cat_type => $opts{cat_type}
     );
 
-    # some error in fetching
+    # some error in fetching pages
     return display_error($err)
         if $err;
-
-    # no pages means no category.
-    return display_error("Category does not exist.")
-        if !$pages;
 
     $result->{type}     = 'cat_posts';
     $result->{cat_type} = $opts{cat_type};
@@ -358,7 +354,7 @@ sub cat_get_pages {
     # this category does not exist.
     my $cat_file = $wiki->path_for_category($cat_name, $opts{cat_type});
     if (!defined $cat_file || !-f $cat_file) {
-        return 'No such category';
+        return 'Category does not exist.';
     }
 
     # it exists; let's see what's inside.
@@ -367,7 +363,7 @@ sub cat_get_pages {
     # JSON error or the value is not a hash.
     if (!$cat || ref $cat ne 'HASH') {
         E "Error parsing JSON category '$cat_file': $@";
-        return 'Error parsing category file';
+        return 'Malformed category file';
     }
 
     # check each page's modification date.
