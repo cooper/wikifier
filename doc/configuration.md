@@ -147,7 +147,7 @@ linked to. This allows the web server to deliver images directly, which is
 certainly most efficient.
 
 If you specify `root.file`, the entire wiki directory (as specified by
-[`dir.wiki`](#dirwiki)) will be indexed by the web server at this path. Note
+[`dir.wiki`](#dir)) will be indexed by the web server at this path. Note
 that this will likely expose your wiki configuration.
 
 ### dir
