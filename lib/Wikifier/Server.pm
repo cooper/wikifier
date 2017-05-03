@@ -49,7 +49,7 @@ sub start {
     # create Wikifier::Wiki instances
     Lindent 'Initialize wikis';
         create_wikis();
-    back
+    back;
     
     # pregenerate
     Lindent 'Pregenerate';
