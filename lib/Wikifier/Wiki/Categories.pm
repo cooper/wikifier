@@ -213,11 +213,9 @@ sub cat_check_page {
     # image categories
     foreach my $image_name (keys_maybe $page->{images}) {
         last if !$wiki->opt('image.enable.tracking');
-        $wiki->cat_add_page($page, $image_name,
-            cat_type    => 'image',
+        $wiki->cat_add_image($image_name, $page,
             page_extras => { dimensions => $page->{images}{$image_name} },
             cat_extras  => {
-                image_file  => $image_name,
                 width       => $page->{images_fullsize}{$image_name}[0],
                 height      => $page->{images_fullsize}{$image_name}[1]
             }
@@ -341,6 +339,34 @@ sub cat_add_page {
 
     close $fh;
     return 1;
+}
+
+# like cat_add_page() except for images.
+sub cat_add_image {
+    my ($wiki, $image_name, $page_maybe, %opts) = @_;
+    $opts{cat_type} = 'image';
+    $opts{cat_extras}{image_file} = $image_name;
+
+    # if the category does not yet exist, or if the image has been modified
+    # since the last time we checked, we have to find the image dimensions
+    if (!$opts{cat_extras}{width} || !$opts{cat_extras}{height}) {
+        my $path = $wiki->path_for_category($image_name,
+            'image', $opts{create_ok});
+        my @cat_stat = stat $path;
+        my @img_stat = stat $wiki->path_for_image($image_name);
+        if (!@cat_stat || || !@img_stat || $img_stat[9] > $cat_stat[9]) {
+            my ($w, $h) = $wiki->opt('image.calc',
+                file   => $image_name,
+                width  => 0,
+                height => 0,
+                wiki   => $wiki
+            );
+            $opts{cat_extras}{width}    = $w;
+            $opts{cat_extras}{height}   = $h;
+        }
+    }
+    
+    $wiki->cat_add_page($page_maybe, $image_name, %opts);
 }
 
 # returns a name-to-metadata hash of the pages in the given category.

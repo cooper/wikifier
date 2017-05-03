@@ -180,11 +180,12 @@ sub pregenerate {
 sub gen_wiki {
     my ($wiki, $initial) = @_;
     my $page_dir  = $wiki->opt('dir.page');
-    my $cache_dir = $wiki->opt('dir.cache');
+    my $image_dir = $wiki->opt('dir.image');
     my $md_dir    = $wiki->opt('dir.md');
+    my $cache_dir = $wiki->opt('dir.cache');
 
     # create file monitors
-    foreach my $path ($page_dir, $md_dir) {
+    foreach my $path ($page_dir, $md_dir, $image_dir) {
         next if !length $path;
         next if $files{ $wiki->{name} }{$path};
         my $file = $files{ $wiki->{name} }{$path} = IO::Async::File->new(
@@ -205,6 +206,7 @@ sub gen_wiki {
             E "Conflicting image filenames: $existing and $image_name";
             next;
         }
+        $wiki->cat_add_image($image_name, $page);
         $found_image{$cat_name} = $image_name;
     }
 
