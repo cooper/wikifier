@@ -309,25 +309,23 @@ sub cat_add_page {
         $pages_ref = { $page_maybe->name => $page_data };
     }
 
-    # open file or error.
-    my $fh;
-    if (!open $fh, '>', $cat_file) {
-        E "Cannot open '$cat_file': $!";
-        return;
-    }
-    
     # if this is a new category and it has zero pages,
     # it had better have the preserve flag
     if (!$cat && !$pages_ref && !$opts{preserve}) {
         E "Tried to create category '$cat_name' with no pages";
-        close $fh;
-        unlink $cat_file;
         return;
     }
     
     # if this is an existing category and $page_maybe
     # is not provided, do nothing.
     if ($cat && !$pages_ref) {
+        return;
+    }
+    
+    # open file or error.
+    my $fh;
+    if (!open $fh, '>', $cat_file) {
+        E "Cannot open '$cat_file': $!";
         return;
     }
 
