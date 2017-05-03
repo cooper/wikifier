@@ -324,6 +324,12 @@ sub cat_add_page {
         unlink $cat_file;
         return;
     }
+    
+    # if this is an existing category and $page_maybe
+    # is not provided, do nothing.
+    if ($cat && !$pages_ref) {
+        return;
+    }
 
     # the category does not yet exist
     $cat ||= {
