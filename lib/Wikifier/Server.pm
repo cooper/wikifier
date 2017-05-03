@@ -22,7 +22,7 @@ our ($loop, $conf, %wikis, %files, %sessions);
 # start the server.
 sub start {
     ($loop, my $conf_file, my $stdio) = @_;
-    Lindent 'Initializing server';
+    Lindent 'Initialize server';
 
         # load configuration.
         ($conf = Wikifier::Page->new(
@@ -46,9 +46,13 @@ sub start {
     # set up handlers.
     Wikifier::Server::Handlers::initialize();
 
-    # create Wikifier::Wiki instances.
-    Lindent 'Initializing wikis';
+    # create Wikifier::Wiki instances
+    Lindent 'Initialize wikis';
         create_wikis();
+    back
+    
+    # pregenerate
+    Lindent 'Pregenerate';
         pregenerate();
     back;
 
