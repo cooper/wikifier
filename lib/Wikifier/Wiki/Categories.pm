@@ -403,6 +403,7 @@ sub cat_get_pages {
     # JSON error or the value is not a hash.
     if (!$cat || ref $cat ne 'HASH') {
         E "Error parsing JSON category '$cat_file': $@";
+        unlink $cat_file;
         return 'Malformed category file';
     }
 
