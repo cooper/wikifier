@@ -205,7 +205,6 @@ sub gen_wiki {
     # check for conflicting image filenames
     my %found_image;
     foreach my $image_name ($wiki->all_images) {
-        last unless $initial;
         my $cat_name = cat_name($image_name);
         if (my $existing = $found_image{$cat_name}) {
             E "Conflicting image filenames: $existing and $image_name";
