@@ -227,13 +227,17 @@ sub cat_check_page {
         $wiki->cat_add_page($page, $page_name,
             cat_type    => 'page',
             page_extras => { lines => $page->{target_pages}{$page_name} },
-            create_ok   => 1
+            create_ok   => 1,
+            preserve    => 1
         );
     }
 
     # model categories
     foreach my $model_name (keys_maybe $page->{models}) {
-        $wiki->cat_add_page($page, $model_name, cat_type => 'model');
+        $wiki->cat_add_page($page, $model_name,
+            cat_type => 'model',
+            preserve => 1
+        );
     }
 }
 
@@ -316,6 +320,8 @@ sub cat_add_page {
     # it had better have the preserve flag
     if (!$cat && !$pages_ref && !$opts{preserve}) {
         E "Tried to create category '$cat_name' with no pages";
+        close $fh;
+        unlink $cat_file;
         return;
     }
 
@@ -345,6 +351,7 @@ sub cat_add_page {
 sub cat_add_image {
     my ($wiki, $image_name, $page_maybe, %opts) = @_;
     $opts{cat_type} = 'image';
+    $opts{preserve} = 1;
     $opts{cat_extras}{image_file} = $image_name;
 
     # if the category does not yet exist, or if the image has been modified
