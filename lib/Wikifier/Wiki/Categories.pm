@@ -354,7 +354,7 @@ sub cat_add_image {
             'image', $opts{create_ok});
         my @cat_stat = stat $path;
         my @img_stat = stat $wiki->path_for_image($image_name);
-        if (!@cat_stat || || !@img_stat || $img_stat[9] > $cat_stat[9]) {
+        if (!@cat_stat || !@img_stat || $img_stat[9] > $cat_stat[9]) {
             my ($w, $h) = $wiki->opt('image.calc',
                 file   => $image_name,
                 width  => 0,
