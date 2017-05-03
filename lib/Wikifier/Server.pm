@@ -184,6 +184,8 @@ sub gen_wiki {
     my $md_dir    = $wiki->opt('dir.md');
     my $cache_dir = $wiki->opt('dir.cache');
 
+    Lindent "[$$wiki{name}]";
+
     # create file monitors
     foreach my $path ($page_dir, $md_dir, $image_dir) {
         next if !length $path;
@@ -195,8 +197,6 @@ sub gen_wiki {
         L align('Monitor', $path);
         $loop->add($file);
     }
-
-    Lindent "[$$wiki{name}]";
 
     # check for conflicting image filenames
     my %found_image;
