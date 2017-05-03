@@ -419,7 +419,9 @@ sub cat_get_pages {
             elsif (length $opts{cat_type} && $opts{cat_type} eq 'model') {
                 next PAGE unless $page->{models}{$cat_name_ne};
             }
-            # TODO: page target
+            elsif (length $opts{cat_type} && $opts{cat_type} eq 'page') {
+                next PAGE unless $page->{target_pages}{$cat_name_ne};
+            }
             else {
                 next PAGE unless $page->get("category.$cat_name_ne");
             }
@@ -473,6 +475,11 @@ sub cat_should_delete {
     # no pages using the model, and the model doesn't exist
     if ($cat->{cat_type} && $cat->{cat_type} eq 'model') {
         return !-e $wiki->path_for_model($cat_name_ne);
+    }
+    
+    # no pages using the page, and the page doesn't exist
+    if ($cat->{cat_type} && $cat->{cat_type} eq 'page') {
+        return !-e $wiki->path_for_page($cat_name_ne);
     }
 
     return !$cat->{preserve};
