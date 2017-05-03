@@ -272,7 +272,7 @@ sub cat_add_page {
     my ($page_data, $pages_ref);
     $page_data = {
         asof => $time,
-        hash_maybe $page->page_info,
+        hash_maybe $page_maybe->page_info,
         hash_maybe $opts{page_extras}
     } if $page_maybe;
 
@@ -304,7 +304,7 @@ sub cat_add_page {
         # update information for this page,
         # or add it if it is not there already.
         %$page_ref = %$page_data;
-        $pages_ref = { $page->name => $page_data };
+        $pages_ref = { $page_maybe->name => $page_data };
     }
 
     # open file or error.
