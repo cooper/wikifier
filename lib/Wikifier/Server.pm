@@ -192,6 +192,7 @@ sub gen_wiki {
             filename => $path,
             on_mtime_changed => sub { gen_wiki($wiki) }
         );
+        L align('Monitor', $path);
         $loop->add($file);
     }
 
