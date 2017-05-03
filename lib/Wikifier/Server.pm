@@ -206,7 +206,7 @@ sub gen_wiki {
             E "Conflicting image filenames: $existing and $image_name";
             next;
         }
-        $wiki->cat_add_image($image_name, $page);
+        $wiki->cat_add_image($image_name);
         $found_image{$cat_name} = $image_name;
     }
 
