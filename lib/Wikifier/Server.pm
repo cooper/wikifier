@@ -243,6 +243,13 @@ sub gen_wiki {
         my $page_path  = "$page_dir/$page_name";
         my $cache_path = "$cache_dir/page/$page_name.cache";
 
+        # create page category
+        $wiki->cat_add_page(undef, $page_name,
+            cat_type    => 'page',
+            create_ok   => 1,
+            preserve    => 1
+        );
+
         # determine modification times.
         my $page_modified  = (stat $page_path )[9];
         my $cache_modified = (stat $cache_path)[9] if $cache_path;
