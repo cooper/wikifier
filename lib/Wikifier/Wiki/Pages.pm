@@ -447,9 +447,8 @@ sub get_pages {
     my ($wiki, %pages) = shift;
     my @cat_names = map substr($_, 0, -4), $wiki->all_categories('page');
     
-    # do categories first.
     # pages without category files will be skipped.
-    foreach my $filename (@cat_names, $wiki->all_pages) {
+    foreach my $filename ($wiki->all_pages, @cat_names) {
         next if $pages{$filename};
         my $page_data = $wiki->get_page($filename, 1) or next;
         $filename = $page_data->{file};

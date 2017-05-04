@@ -562,7 +562,7 @@ sub get_images {
     
     # do categories first.
     # images without category files will be skipped.
-    foreach my $filename (@cat_names, $wiki->all_images) {
+    foreach my $filename ($wiki->all_images, @cat_names) {
         next if $images{$filename};
         my $image_data = $wiki->get_image($filename) or next;
         $filename = $image_data->{file};
