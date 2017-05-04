@@ -133,6 +133,9 @@ sub _display_image {
                             $image->{ext} eq 'jpeg' ? 'jpeg' : 'png';
     $result->{mime} = $image->{ext} eq 'png' ? 'image/png' : 'image/jpeg';
 
+    # update image category as needed
+    $wiki->cat_add_image($image_name);
+
     # if image caching is disabled or both dimensions are missing,
     # display the full-size version of the image.
     return $wiki->get_image_full_size($image, $result, \@stat, \%opts)
