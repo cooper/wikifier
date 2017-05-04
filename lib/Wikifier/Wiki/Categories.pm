@@ -392,10 +392,10 @@ sub cat_add_image {
                 height => 0,
                 wiki   => $wiki
             );
-            $image_data->{created}  = $stat[10];
-            $image_data->{mod_unix} = $stat[9];
-            $image_data->{width}    = $w;
-            $image_data->{height}   = $h;
+            $image_data->{created}  = $img_stat[10] if @img_stat;
+            $image_data->{mod_unix} = $img_stat[9]  if @img_stat;
+            $image_data->{width}    = $w            if $w;
+            $image_data->{height}   = $h            if $h;
         }
     }
     
