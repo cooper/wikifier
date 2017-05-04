@@ -200,9 +200,17 @@ sub _is_main_page {
 # deal with categories after parsing a page.
 sub cat_check_page {
     my ($wiki, $page) = @_;
+    
+    # page metadata categories
     $wiki->cat_add_page($page, 'pages', cat_type => 'data');
+    $wiki->cat_add_page(undef, $page->name,
+        cat_type    => 'page',
+        cat_extras  => $page->page_info,
+        create_ok   => 1,
+        preserve    => 1
+    );
 
-    # actual categories.
+    # actual categories
     my $cats = $page->get('category');
     $cats = $cats->to_data if blessed $cats;
     if ($cats && ref $cats eq 'HASH') {

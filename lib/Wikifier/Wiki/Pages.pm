@@ -438,4 +438,57 @@ sub _display_page_code {
     return $result;
 }
 
+
+# returns a filename-to-metadata hash for all pages in the wiki
+sub get_pages {
+    my ($wiki, %pages) = shift;
+    my @cat_names = map substr($_, 0, -4), $wiki->all_categories('page');
+    
+    # do categories first.
+    # pages without category files will be skipped.
+    foreach my $filename (@cat_names, $wiki->all_pages) {
+        next if $pages{$filename};
+        my $page_data = $wiki->get_page($filename, 1) or next;
+        $filename = $page_data->{file};
+        $pages{$filename} = $page_data;
+    }
+    
+    return \%pages;
+}
+
+# returns metadata for a page
+sub get_page {
+    my ($wiki, $filename, $create_ok) = @_;
+    my $path = $wiki->path_for_page($filename, $create_ok);
+    my $cat_path = $wiki->path_for_category($filename, 'page');
+
+    # neither the page nor a category for it exist. this is a ghost
+    return if !-f $path && (!defined $cat_path || !-f $cat_path);
+
+    # basic info available for all pages
+    my @stat = stat $path; # might be empty
+    my $page_data = {
+        file        => $filename,
+        created     => $stat[10],   # ctime, probably overwritten
+        mod_unix    => $stat[9]     # mtime, probably overwritten
+    };
+
+    # from this point on, we need the category
+    return $page_data unless -f $cat_path;
+
+    # it exists; let's see what's inside.
+    my %cat = hash_maybe eval { $json->decode(file_contents($cat_path)) };
+    return $page_data if !scalar keys %cat;
+
+    # in the category, "file" is the cat filename, and the "category"
+    # is the normalized page filename. fix these to avoid confusion.
+    $cat{file} = delete $cat{category};
+    
+    # inject metadata from category
+    @$page_data{ keys %cat } = values %cat;
+    $page_data->{title} //= $page_data->{file};
+    
+    return $page_data;
+}
+
 1
