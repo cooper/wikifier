@@ -204,10 +204,11 @@ sub cat_check_page {
     # page metadata categories
     $wiki->cat_add_page($page, 'pages', cat_type => 'data');
     $wiki->cat_add_page(undef, $page->name,
-        cat_type    => 'page',
-        cat_extras  => $page->page_info,
-        create_ok   => 1,
-        preserve    => 1
+        cat_type        => 'page',
+        cat_extras      => $page->page_info,    # page metadata
+        create_ok       => 1,                   # allow prefix to be created
+        preserve        => 1,                   # keep the cat until page delete
+        force_update    => 1                    # always rewrite page metadata
     );
 
     # actual categories
@@ -252,6 +253,10 @@ sub cat_check_page {
 # add a page to a category if it is not in it already.
 # update the page data within the category if it is outdated.
 #
+# $page_maybe   a page object to add to the category. if not provided, the
+#               category will be rewritten only with metadata and no pages.
+#               $page_maybe may only be omitted with the 'preserve' option
+#
 # $cat_name     name of category, with or without extension
 #
 # %opts = (
@@ -264,6 +269,12 @@ sub cat_check_page {
 #
 #   create_ok       for page pseudocategories, allows ->path_for_category
 #                   to create new paths in dir.category as needed
+#
+#   preserve        if a category has no pages in it, it is purged. this option
+#                   tells the wiki to preserve the category even when empty
+#
+#   force_update    if a category exists and $page_maybe is not provided,
+#                   the category file is not rewritten. this forces rewrite
 # )
 #
 # returns true on success. unchanged is also considered success.
@@ -327,7 +338,7 @@ sub cat_add_page {
     
     # if this is an existing category and $page_maybe
     # is not provided, do nothing.
-    if ($cat && !$pages_ref) {
+    if ($cat && !$opts{force_update} && !$page_maybe) {
         return;
     }
     
