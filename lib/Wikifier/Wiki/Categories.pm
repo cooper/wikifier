@@ -320,7 +320,7 @@ sub cat_add_page {
 
     # if this is a new category and it has zero pages,
     # it had better have the preserve flag
-    if (!$cat && !$pages_ref && !$opts{preserve}) {
+    if (!$cat && !$page_maybe && !$opts{preserve}) {
         E "Tried to create category '$cat_name' with no pages";
         return;
     }
