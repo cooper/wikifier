@@ -481,7 +481,7 @@ sub get_page {
 
     # it exists; let's see what's inside.
     my %cat = hash_maybe eval { $json->decode(file_contents($cat_path)) };
-    %cat    = hash_maybe $cat{page_data};
+    %cat    = hash_maybe $cat{page_info};
     return $page_data if !scalar keys %cat;
     
     # inject metadata from category
