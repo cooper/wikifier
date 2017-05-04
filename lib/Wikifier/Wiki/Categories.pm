@@ -223,10 +223,10 @@ sub cat_check_page {
         last if !$wiki->opt('image.enable.tracking');
         $wiki->cat_add_image($image_name, $page,
             page_extras => { dimensions => $page->{images}{$image_name} },
-            cat_extras  => {
+            cat_extras  => { image_info => {
                 width       => $page->{images_fullsize}{$image_name}[0],
                 height      => $page->{images_fullsize}{$image_name}[1]
-            }
+            } }
         );
     }
 
@@ -375,11 +375,12 @@ sub cat_add_image {
     my ($wiki, $image_name, $page_maybe, %opts) = @_;
     $opts{cat_type} = 'image';
     $opts{preserve} = 1;
-    $opts{cat_extras}{image_file} = $image_name;
-
+    my $image_data = $opts{cat_extras}{image_info} ||= {};
+    $image_data->{file} = $image_name;
+    
     # if the category does not yet exist, or if the image has been modified
     # since the last time we checked, we have to find the image dimensions
-    if (!$opts{cat_extras}{width} || !$opts{cat_extras}{height}) {
+    if (!$image_data->{width} || !$image_data->{height}) {
         my $path = $wiki->path_for_category($image_name,
             'image', $opts{create_ok});
         my @cat_stat = stat $path;
@@ -391,8 +392,8 @@ sub cat_add_image {
                 height => 0,
                 wiki   => $wiki
             );
-            $opts{cat_extras}{width}    = $w;
-            $opts{cat_extras}{height}   = $h;
+            $image_data->{width}    = $w;
+            $image_data->{height}   = $h;
         }
     }
     

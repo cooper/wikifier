@@ -591,16 +591,11 @@ sub get_image {
 
     # from this point on, we need the category
     return $image_data unless -f $cat_path;
-
+    
     # it exists; let's see what's inside.
     my %cat = hash_maybe eval { $json->decode(file_contents($cat_path)) };
+    %cat    = hash_maybe $cat{image_info};
     return $image_data if !scalar keys %cat;
-
-    # in the category, "file" is the cat filename, and the "category"
-    # is the normalized image filename. remove these to avoid confusion.
-    # the original image filename is image_file, so overwrite file.
-    delete @cat{'category', 'file'};
-    $cat{file} = delete $cat{image_file} if length $cat{image_file};
     
     # inject metadata from category
     @$image_data{ keys %cat } = values %cat;
