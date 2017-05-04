@@ -9,7 +9,10 @@ use HTTP::Date qw(time2str);
 use Scalar::Util qw(blessed);
 use JSON::XS ();
 use HTML::Strip;
-use Wikifier::Utilities qw(page_name align L E Lindent back filter_nonempty);
+use Wikifier::Utilities qw(
+    page_name align L E Lindent back
+    filter_nonempty hash_maybe
+);
 
 my $stripper = HTML::Strip->new(emit_spaces => 0);
 my $json = JSON::XS->new->pretty->convert_blessed;
