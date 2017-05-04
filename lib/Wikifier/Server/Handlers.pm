@@ -262,22 +262,15 @@ sub handle_model_code {
 sub handle_page_list {
     my ($wiki, $msg) = write_required(@_, 'sort') or return;
     $msg->l('Page list');
-    
+
     # get all pages
-    my ($err, $all) = $wiki->cat_get_pages('pages', cat_type => 'data');
-    return if $err;
-    my %pages = %$all;
-    my @pages = map {
-        my $ref = $pages{$_};
-        $ref->{file} = $_;
-        $ref
-    } keys %pages;
+    my @cats = values_maybe $wiki->get_pages;
 
     # sort
     my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
-    @pages = sort { $sorter->($a, $b) } @pages;
+    @cats = sort { $sorter->($a, $b) } @cats;
 
-    $msg->reply(page_list => { pages => \@pages });
+    $msg->reply(page_list => { pages => \@cats });
 }
 
 # model list
