@@ -392,6 +392,8 @@ sub cat_add_image {
                 height => 0,
                 wiki   => $wiki
             );
+            $image_data->{created}  = $stat[10];
+            $image_data->{mod_unix} = $stat[9];
             $image_data->{width}    = $w;
             $image_data->{height}   = $h;
         }
