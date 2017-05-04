@@ -481,11 +481,8 @@ sub get_page {
 
     # it exists; let's see what's inside.
     my %cat = hash_maybe eval { $json->decode(file_contents($cat_path)) };
+    %cat    = hash_maybe $cat{page_data};
     return $page_data if !scalar keys %cat;
-
-    # in the category, "file" is the cat filename, and the "category"
-    # is the normalized page filename. fix these to avoid confusion.
-    $cat{file} = delete $cat{category};
     
     # inject metadata from category
     @$page_data{ keys %cat } = values %cat;

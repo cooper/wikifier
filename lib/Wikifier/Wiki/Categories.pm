@@ -205,7 +205,7 @@ sub cat_check_page {
     $wiki->cat_add_page($page, 'pages', cat_type => 'data');
     $wiki->cat_add_page(undef, $page->name,
         cat_type        => 'page',
-        cat_extras      => $page->page_info,    # page metadata
+        cat_extras      => { page_info => $page->page_info },   # page metadata
         create_ok       => 1,                   # allow prefix to be created
         preserve        => 1,                   # keep the cat until page delete
         force_update    => 1                    # always rewrite page metadata
