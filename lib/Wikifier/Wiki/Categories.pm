@@ -201,8 +201,7 @@ sub _is_main_page {
 sub cat_check_page {
     my ($wiki, $page) = @_;
     
-    # page metadata categories
-    $wiki->cat_add_page($page, 'pages', cat_type => 'data');
+    # page metadata category
     $wiki->cat_add_page(undef, $page->name,
         cat_type        => 'page',
         cat_extras      => { page_info => $page->page_info },   # page metadata
