@@ -9,8 +9,9 @@ use Wikifier::Utilities qw(E Lindent back align);
 use CommonMark qw(:node :event :list);
 use Cwd qw(abs_path);
 
-my $punctuation_re = qr/[^\p{Word}\- ]/u;
-my $table_re = qr/ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/;
+my $punctuation_re  = qr/[^\p{Word}\- ]/u;
+my $table_re        = qr/ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/;
+my $np_table_re     = qr/ *(\S.*\|.*)\n *([-:]+ *\|[-| :]*)\n((?:.*\|.*(?:\n|$))*)\n*/;
 
 sub convert_markdown {
     my ($wiki, $md_name) = (shift, @_);
@@ -305,81 +306,88 @@ END
 sub md_table_replace {
     my ($wiki, $md_text) = @_;
     while ($md_text =~ s/$table_re/!!TABLE!!/) {
-        my ($header, $align, $cell) = ($1, $2, $3);
-        
-        # extract header cells
-        $header =~ s/^ *| *\| *$//g;
-        my @headers = split m/ *\| */, $header;
-        
-        # extract alignment
-        $align =~ s/^ *|\| *$//g;
-        my @aligns = split m/ *\| */, $align;
-        
-        # extract body cells
-        $cell =~ s/(?: *\| *)?\n$//;
-        my @cells = split m/\n/, $cell;
-
-        # determine the alignment
-        @aligns = map {
-            my $align;
-            if (/^ *-+: *$/) {
-                $align = 'right';
-            }
-            elsif (/^ *:-+: *$/) {
-                $align = 'center';
-            }
-            elsif (m/^ *:-+ *$/) {
-                $align = 'left';
-            }
-            $align;
-        } @aligns;
-
-        # split up the body cells
-        for my $i (0..$#cells) {
-             my $cell = $cells[$i];
-             $cell =~ s/^ *\| *| *\| *$//g;
-             $cells[$i] = [ split m/ *\| */, $cell ]
-        }
-        
-        # create table
-        my $table       = Wikifier::Element->new(type => 'table', class => 'table');
-        my $thead       = $table->create_child(type => 'thead');
-        my $thead_tr    = $thead->create_child(type => 'tr');
-        my $tbody       = $table->create_child(type => 'tbody');
-        
-        # add headers
-        for my $col (0..$#headers) {
-            my $header = $headers[$col];
-            my $align  = $aligns[$col];
-            $align = "text-align: $align;" if $align;
-            $thead_tr->create_child(
-                type        => 'th',
-                attributes  => { style => $align },
-                content     => md_to_html_np($header)
-            );
-        }
-        
-        # add body cells
-        for my $row (0..$#cells) {
-            my $row_ref = $cells[$row];
-            my $tr = $tbody->create_child(type => 'tr');
-            for my $col (0..$#$row_ref) {
-                my $text  = $row_ref->[$col];
-                my $align = $aligns[$col];
-                $align = "text-align: $align;" if $align;
-                $tr->create_child(
-                    type        => 'td',
-                    attributes  => { style => $align },
-                    content     => md_to_html_np($text)
-                );
-            }
-        }
-        
-        # make the replacement
-        my $html = $table->generate;
-        $md_text =~ s/!!TABLE!!/\n$html\n/;
+        _md_table_replace(\$md_text, $1, $2, $3);
+    }
+    while ($md_text =~ s/$np_table_re/!!TABLE!!/) {
+        _md_table_replace(\$md_text, $1, $2, $3);
     }
     return $md_text;
+}
+
+sub _md_table_replace {
+    my ($md_text_ref, $header, $align, $cell) = @_;
+    
+    # extract header cells
+    $header =~ s/^ *| *\| *$//g;
+    my @headers = split m/ *\| */, $header;
+    
+    # extract alignment
+    $align =~ s/^ *|\| *$//g;
+    my @aligns = split m/ *\| */, $align;
+    
+    # extract body cells
+    $cell =~ s/(?: *\| *)?\n$//;
+    my @cells = split m/\n/, $cell;
+
+    # determine the alignment
+    @aligns = map {
+        my $align;
+        if (/^ *-+: *$/) {
+            $align = 'right';
+        }
+        elsif (/^ *:-+: *$/) {
+            $align = 'center';
+        }
+        elsif (m/^ *:-+ *$/) {
+            $align = 'left';
+        }
+        $align;
+    } @aligns;
+
+    # split up the body cells
+    for my $i (0..$#cells) {
+         my $cell = $cells[$i];
+         $cell =~ s/^ *\| *| *\| *$//g;
+         $cells[$i] = [ split m/ *\| */, $cell ]
+    }
+    
+    # create table
+    my $table       = Wikifier::Element->new(type => 'table', class => 'table');
+    my $thead       = $table->create_child(type => 'thead');
+    my $thead_tr    = $thead->create_child(type => 'tr');
+    my $tbody       = $table->create_child(type => 'tbody');
+    
+    # add headers
+    for my $col (0..$#headers) {
+        my $header = $headers[$col];
+        my $align  = $aligns[$col];
+        $align = "text-align: $align;" if $align;
+        $thead_tr->create_child(
+            type        => 'th',
+            attributes  => { style => $align },
+            content     => md_to_html_np($header)
+        );
+    }
+    
+    # add body cells
+    for my $row (0..$#cells) {
+        my $row_ref = $cells[$row];
+        my $tr = $tbody->create_child(type => 'tr');
+        for my $col (0..$#$row_ref) {
+            my $text  = $row_ref->[$col];
+            my $align = $aligns[$col];
+            $align = "text-align: $align;" if $align;
+            $tr->create_child(
+                type        => 'td',
+                attributes  => { style => $align },
+                content     => md_to_html_np($text)
+            );
+        }
+    }
+    
+    # make the replacement
+    my $html = $table->generate;
+    $$md_text_ref =~ s/!!TABLE!!/\n$html\n/;
 }
 
 # convert markdown to html

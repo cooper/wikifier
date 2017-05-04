@@ -82,15 +82,9 @@ my $json = JSON::XS->new->pretty->convert_blessed;
 #   (cat_type)      if applicable, this is the type of pseudocategory. examples
 #                   include 'image', 'model', and 'page'
 #
-#   (image_file)    for cat_type 'image', the image filename
+#   (page_info)     for cat_type 'page', ->page_info
 #
-#   (width)         for cat_type 'image', the image width. this may be omitted
-#                   if the image does not exist but is referenced by at least
-#                   one page
-#
-#   (height)        for cat_type 'image', the image height. this may be omitted
-#                   if the image does not exist but is referenced by at least
-#                   one page
+#   (image_info)    for cat_type 'image', image info
 #
 
 
