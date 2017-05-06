@@ -50,17 +50,17 @@ sub new {
     $wiki->{wikifier} ||= Wikifier->new;
 
     # if a config file is provided, use it.
-    $wiki->read_config($opts{config_file}, $opts{private_file})
+    $wiki->_read_config($opts{config_file}, $opts{private_file})
         if defined $opts{config_file};
 
     # make directories when necessary
-    $wiki->check_directories;
+    $wiki->_check_directories;
 
     return $wiki;
 }
 
 # read options from a configuration page file.
-sub read_config {
+sub _read_config {
     my ($wiki, $file, $private_file) = @_;
     my $conf = $wiki->{conf} = Wikifier::Page->new(
         file_path => $file,
@@ -125,7 +125,7 @@ our @cat_dirs   = qw(page image model data);
 our @cache_dirs = qw(page image);
 push @cache_dirs, map { "category/$_" } @cat_dirs;
 
-sub check_directories {
+sub _check_directories {
     my $wiki = shift;
 
     # main dirs
