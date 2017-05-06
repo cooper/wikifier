@@ -479,19 +479,19 @@ sub __page_link {
         my ($safe_name, $path, $page_target);
         if ($typ eq 'category') {
             $safe_name = cat_name($target);
-            my $cat_dir = $page->wiki_opt('dir.cache').'/category';
+            my $cat_dir = $page->opt('dir.cache').'/category';
             $path = join '/', $cat_dir, $safe_name;
             $page_target = join '/',
-                $page->wiki_opt('root.category'), $target;
+                $page->opt('root.category'), $target;
         }
         
         # page target, respecting page prefix
         else {
             $safe_name = page_name($target);
             $path = join '/', grep length,
-                $page->wiki_opt('dir.page'), $page->prefix, $safe_name;
+                $page->opt('dir.page'), $page->prefix, $safe_name;
             $page_target = join '/', grep length,
-                $page->wiki_opt('root.page'), $page->prefix, $target;
+                $page->opt('root.page'), $page->prefix, $target;
         }
             
         # make sure the page/category exists
