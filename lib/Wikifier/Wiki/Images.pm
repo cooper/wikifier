@@ -562,11 +562,10 @@ sub get_images {
     
     # do categories first.
     # images without category files will be skipped.
-    foreach my $filename ($wiki->all_images, @cat_names) {
+    foreach my $filename (@cat_names, $wiki->all_images) {
         next if $images{$filename};
         my $image_data = $wiki->get_image($filename) or next;
-        $filename = $image_data->{file};
-        $images{$filename} = $image_data;
+        $images{ $image_data->{file} } ||= $image_data;
     }
     
     return \%images;
@@ -581,7 +580,7 @@ sub get_image {
     # neither the image nor a category for it exist. this is a ghost
     return if !-f $path && (!defined $cat_path || !-f $cat_path);
 
-    # basic info available for all images
+    # basic info available for all existing images
     my @stat = stat $path; # might be empty
     my $image_data = {
         file        => $filename,
