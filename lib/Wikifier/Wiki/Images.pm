@@ -585,8 +585,8 @@ sub get_image {
     my @stat = stat $path; # might be empty
     my $image_data = {
         file        => $filename,
-        created     => $stat[10],   # ctime, probably overwritten
-        mod_unix    => $stat[9]     # mtime, probably overwritten
+        created     => $stat[10],
+        mod_unix    => $stat[9]
     };
 
     # from this point on, we need the category
@@ -596,6 +596,10 @@ sub get_image {
     my %cat = hash_maybe eval { $json->decode(file_contents($cat_path)) };
     %cat    = hash_maybe $cat{image_info};
     return $image_data if !scalar keys %cat;
+    
+    # fix creation and modified time with correct filename
+    @stat = stat($path = $cat{file});
+    @$image_data{'created', 'mod_unix'} = @stat[10, 9];
     
     # inject metadata from category
     @$image_data{ keys %cat } = values %cat;
