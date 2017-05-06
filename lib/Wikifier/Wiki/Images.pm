@@ -138,7 +138,7 @@ sub _display_image {
 
     # if image caching is disabled or both dimensions are missing,
     # display the full-size version of the image.
-    return $wiki->get_image_full_size($image, $result, \@stat, \%opts)
+    return $wiki->_get_image_full_size($image, $result, \@stat, \%opts)
         if !$wiki->opt('image.enable.cache') || $width + $height == 0;
 
     # if one dimension is missing, calculate it.
@@ -151,7 +151,7 @@ sub _display_image {
         );
         
         # if the dimension calculator failed, fall back to the full-size image.
-        return $wiki->get_image_full_size($image, $result, \@stat, \%opts)
+        return $wiki->_get_image_full_size($image, $result, \@stat, \%opts)
             if !$new_w;
 
         # create name for new image
@@ -168,7 +168,7 @@ sub _display_image {
     #============================#
 
     # this is not a retina request, but retina is enabled, and so is
-    # pregeneration. therefore, we will call ->generate_image() in order to
+    # pregeneration. therefore, we will call ->_generate_image() in order to
     # pregenerate a retina version. this only happens if gen_override is true
     # (pregenration request, not real request from user).
     my $retina = $wiki->opt('image.enable.retina');
@@ -197,7 +197,7 @@ sub _display_image {
         last if !$wiki->opt('image.enable.cache');
         $cache_path = $wiki->opt('dir.cache').'/image/'.$full_name;
         next if !-f $cache_path;
-        $result = $wiki->get_image_cache(
+        $result = $wiki->_get_image_cache(
             $image, $result, $stat[9], $cache_path, \%opts);
         return $result if $result->{cached};
     }
@@ -213,11 +213,11 @@ sub _display_image {
     }
 
     # generate the image
-    my $err = $wiki->generate_image($image, $cache_path, $result);
+    my $err = $wiki->_generate_image($image, $cache_path, $result);
     return $err if $err;
 
     # the generator says to use the full-size image.
-    return $wiki->get_image_full_size($image, $result, \@stat, \%opts)
+    return $wiki->_get_image_full_size($image, $result, \@stat, \%opts)
         if delete $result->{use_fullsize};
 
     delete $result->{content} if $opts{dont_open};
@@ -225,7 +225,7 @@ sub _display_image {
 }
 
 # get full size version of image
-sub get_image_full_size {
+sub _get_image_full_size {
     my ($wiki, $image, $result, $stat, $opts) = @_;
 
     # only include the content if dont_open is false
@@ -240,7 +240,7 @@ sub get_image_full_size {
 }
 
 # get image from cache
-sub get_image_cache {
+sub _get_image_cache {
     my ($wiki, $image, $result, $image_modify, $cache_path, $opts) = @_;
     my $cache_modify = (stat $cache_path)[9];
 
@@ -265,7 +265,7 @@ sub get_image_cache {
     $result->{length}       = -s $cache_path;
 
     # symlink scaled version if necessary.
-    $wiki->symlink_scaled_image($image);
+    $wiki->__symlink_scaled_image($image);
 
     return $result;
 }
@@ -396,7 +396,7 @@ sub parse_image_name {
 
 # generate an image of a certain size.
 # returns error on fail, nothing on success
-sub generate_image {
+sub _generate_image {
     my ($wiki, $image, $cache_path, $result) = @_;
 
     # if we are restricting to only sizes used in the wiki, check.
@@ -420,7 +420,7 @@ sub generate_image {
 
         # symlink to the full-size image.
         $image->{full_name} = $image->{name};
-        $wiki->symlink_scaled_image($image);
+        $wiki->_symlink_scaled_image($image);
 
         return; # success
     }
@@ -481,7 +481,7 @@ sub generate_image {
         $result->{cache_gen}  = 1;
 
         # if this image is available in more than 1 scale, symlink.
-        $wiki->symlink_scaled_image($image);
+        $wiki->_symlink_scaled_image($image);
     }
     
     return; # success
@@ -489,7 +489,7 @@ sub generate_image {
 
 # symlink an image to its scaled version
 # file-123x456@2x.png -> file-246x912.png
-sub symlink_scaled_image {
+sub _symlink_scaled_image {
     my ($wiki, $image) = @_;
     return unless $image->{retina};
     my $scale_path = $wiki->opt('dir.cache').'/image/'.$image->{scale_name};
