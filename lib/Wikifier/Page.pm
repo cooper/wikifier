@@ -28,7 +28,6 @@ our %wiki_defaults = (
     'dir.page'              => 'pages',
     'dir.cache'             => 'cache',
     'dir.model'             => 'models',
-    'dir.category'          => 'categories',
     'root.image'            => '/images',
     'root.category'         => '/topic',
     'root.page'             => '/page',

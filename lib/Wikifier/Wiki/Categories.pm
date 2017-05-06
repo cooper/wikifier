@@ -261,7 +261,7 @@ sub cat_check_page {
 #   cat_extras      for pseudocategories, a hash ref of additional cat data
 #
 #   create_ok       for page pseudocategories, allows ->path_for_category
-#                   to create new paths in dir.category as needed
+#                   to create new paths in dir.cache/category as needed
 #
 #   preserve        if a category has no pages in it, it is purged. this option
 #                   tells the wiki to preserve the category even when empty

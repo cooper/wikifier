@@ -160,8 +160,7 @@ that this will likely expose your wiki configuration.
 | `dir.image`       | Image originals stored here                           |
 | `dir.model`       | Model files stored here                               |
 | `dir.md`          | Markdown files stored here                            |
-| `dir.cache`       | Generated page and image cache files stored here      |
-| `dir.category`    | Generated category files stored here                  |
+| `dir.cache`       | Generated content and metadata stored here            |
 
 Directories on the filesystem. It is strongly recommended that they are
 absolute paths; otherwise they will be dictated by whichever directory the

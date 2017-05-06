@@ -120,9 +120,10 @@ sub read_config {
     return 1;
 }
 
-our @main_dirs  = qw(page image model cache category);
+our @main_dirs  = qw(page image model cache);
 our @cat_dirs   = qw(page image model data);
 our @cache_dirs = qw(page image);
+push @cache_dirs, map { "category/$_" } @cat_dirs;
 
 sub check_directories {
     my $wiki = shift;
@@ -132,11 +133,6 @@ sub check_directories {
         [ $_, $wiki->opt("dir.$_") ]
     } @main_dirs;
 
-    # pseudocategory dirs
-    push @directories, map {
-        [ 'category', $wiki->opt('dir.category')."/$_" ]
-    } @cat_dirs;
-    
     # cache dirs
     push @directories, map {
         [ 'cache', $wiki->opt('dir.cache')."/$_" ]
@@ -270,7 +266,7 @@ sub all_pages {
 # an array of file names in category directory.
 sub all_categories {
     my ($wiki, $cat_type) = @_;
-    my $dir = $wiki->opt('dir.category');
+    my $dir = $wiki->opt('dir.cache').'/category';
     $dir .= "/$cat_type" if length $cat_type;
     return unique_files_in_dir($dir, 'cat', 1);
 }
@@ -380,8 +376,9 @@ sub path_for_category {
     my ($wiki, $cat_name, $cat_type, $create_ok) = @_;
     $cat_name = cat_name($cat_name);
     $cat_type = length $cat_type ? "$cat_type/" : '';
-    make_dir($wiki->opt('dir.category'), $cat_type.$cat_name) if $create_ok;
-    return abs_path($wiki->opt('dir.category')."/$cat_type$cat_name");
+    my $dir = $wiki->opt('dir.cache').'/category';
+    make_dir($dir, $cat_type.$cat_name) if $create_ok;
+    return abs_path("$dir/$cat_type$cat_name");
 }
 
 # return abs path for an image

@@ -475,15 +475,24 @@ sub __page_link {
     my $errors;
     if (length $target) {
         
-        # create paths, respecting the page prefix
-        my $safe_name = $typ eq 'category' ?
-            cat_name($target) : page_name($target);
-        $safe_name = join '/', grep length,
-            $page->prefix, $safe_name;
-        my $path = join '/',
-            $page->opt("dir.$typ"), $safe_name;
-        my $page_target = join '/', grep length,
-            $page->opt("root.$typ"), $page->prefix, $target;
+        # category target
+        my ($safe_name, $path, $page_target);
+        if ($typ eq 'category') {
+            $safe_name = cat_name($target);
+            my $cat_dir = $page->wiki_opt('dir.cache').'/category';
+            $path = join '/', $cat_dir, $safe_name;
+            $page_target = join '/',
+                $page->wiki_opt('root.category'), $target;
+        }
+        
+        # page target, respecting page prefix
+        else {
+            $safe_name = page_name($target);
+            $path = join '/', grep length,
+                $page->wiki_opt('dir.page'), $page->prefix, $safe_name;
+            $page_target = join '/', grep length,
+                $page->wiki_opt('root.page'), $page->prefix, $target;
+        }
             
         # make sure the page/category exists
         if (!-e $path) {
