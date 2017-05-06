@@ -484,7 +484,7 @@ sub cat_get_pages {
     }
 
     # is this category now empty?
-    if ($wiki->cat_should_delete($cat_name_ne, $cat, \%final_pages)) {
+    if ($wiki->_cat_should_delete($cat_name_ne, $cat, \%final_pages)) {
         unlink $cat_file;
         return 'Purge';
     }
@@ -513,7 +513,7 @@ sub cat_get_pages {
 }
 
 # returns true if a category should be deleted.
-sub cat_should_delete {
+sub _cat_should_delete {
     my ($wiki, $cat_name_ne, $cat, $final_pages) = @_;
 
     # don't even consider it if there are still pages
