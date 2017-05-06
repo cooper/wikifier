@@ -265,7 +265,7 @@ sub _get_image_cache {
     $result->{length}       = -s $cache_path;
 
     # symlink scaled version if necessary.
-    $wiki->__symlink_scaled_image($image);
+    $wiki->_symlink_scaled_image($image);
 
     return $result;
 }
