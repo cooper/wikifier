@@ -177,12 +177,12 @@ sub _display_page {
     $result->{mime} = 'text/html';
 
     # FIRST redirect check - this is for symbolic link redirects.
-    my $redir = display_page_redirect($page->redirect, $result);
+    my $redir = _display_page_redirect($page->redirect, $result);
     return $redir if $redir;
 
     # caching is enabled, so let's check for a cached copy.
     if ($wiki->opt('page.enable.cache') && -f $cache_path) {
-        $result = $wiki->get_page_cache($page, $result, \%opts);
+        $result = $wiki->_get_page_cache($page, $result, \%opts);
         return $result if $result->{cached};
     }
 
@@ -196,13 +196,13 @@ sub _display_page {
         $page->{vars_only}++;
         $page->parse;
         $wiki->cat_check_page($page);
-        return $wiki->display_error_cache($page, $err, parse_error => 1);
+        return $wiki->_display_error_cache($page, $err, parse_error => 1);
     }
 
     # if this is a draft, so pretend it doesn't exist
     if ($page->draft && !$opts{draft_ok}) {
         L 'Draft';
-        return $wiki->display_error_cache($page,
+        return $wiki->_display_error_cache($page,
             "Page has not yet been published.",
             draft => 1
         );
@@ -210,8 +210,8 @@ sub _display_page {
 
     # THIRD redirect check - this is for pages we just generated with
     # @page.redirect in them.
-    $redir = display_page_redirect($page->redirect, $result);
-    return $wiki->write_page_cache_maybe($page, $redir) if $redir;
+    $redir = _display_page_redirect($page->redirect, $result);
+    return $wiki->_write_page_cache_maybe($page, $redir) if $redir;
 
     # generate the HTML and headers.
     $result->{generated}  = 1;
@@ -228,18 +228,18 @@ sub _display_page {
     $result->{categories} = [ _cats_to_list($page->{categories}) ];
 
     # write cache file if enabled
-    $result = $wiki->write_page_cache_maybe($page, $result);
+    $result = $wiki->_write_page_cache_maybe($page, $result);
     return $result if $result->{error};
 
     # search is enabled, so generate a text file
-    $result = $wiki->write_page_text($page, $result)
+    $result = $wiki->_write_page_text($page, $result)
         if $wiki->opt('search.enable');
 
     return $result;
 }
 
 # get page from cache
-sub get_page_cache {
+sub _get_page_cache {
     my ($wiki, $page, $result, $opts) = @_;
     my $cache_modify = $page->cache_modified;
     my $time_str = time2str($cache_modify);
@@ -284,7 +284,7 @@ sub get_page_cache {
 
     # SECOND redirect check - this cached page has @page.redirect
     if (length(my $redir = $cache_data->{redirect})) {
-        $redir = display_page_redirect($redir, $result);
+        $redir = _display_page_redirect($redir, $result);
         $redir->{cached} = 1;
         return $redir;
     }
@@ -297,14 +297,14 @@ sub get_page_cache {
 }
 
 # display an error and write the error to cache if enabled
-sub display_error_cache {
+sub _display_error_cache {
     my ($wiki, $page, @opts) = @_;
     my $res = display_error(@opts);
-    return $wiki->write_page_cache_maybe($page, $res);
+    return $wiki->_write_page_cache_maybe($page, $res);
 }
 
 # write page to cache only if enabled
-sub write_page_cache_maybe {
+sub _write_page_cache_maybe {
     my ($wiki, $page, $res) = @_;
     return $res if !$wiki->opt('page.enable.cache');
     
@@ -313,13 +313,13 @@ sub write_page_cache_maybe {
     @$res{ keys %$page_info } = values %$page_info;
 
     # caching is enabled, so let's save this for later.
-    $res = $wiki->write_page_cache($page, $res, $page_info);
+    $res = $wiki->_write_page_cache($page, $res, $page_info);
     
     return $res;
 }
 
 # write page to cache
-sub write_page_cache {
+sub _write_page_cache {
     my ($wiki, $page, $result, $page_info) = @_;
     open my $fh, '>', $page->cache_path
         or return display_error('Could not write page cache file');
@@ -361,7 +361,7 @@ sub write_page_cache {
 }
 
 # write page text for search
-sub write_page_text {
+sub _write_page_text {
     my ($wiki, $page, $result) = @_;
     open my $fh, '>', $page->search_path
         or return display_error('Could not write page text file');
@@ -373,7 +373,7 @@ sub write_page_text {
 }
 
 # returns result for redirect if there is indeed a redirect, nothing otherwise.
-sub display_page_redirect {
+sub _display_page_redirect {
     my ($redir, $result) = @_;
     return if !length $redir;
     $result->{type}     = 'redirect';
