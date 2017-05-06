@@ -46,7 +46,7 @@ sub _convert_markdown {
     $md_text =~ s/\xa0/ /g;                 # replace non-breaking space
 
     # generate the wiki source
-    my $source = $wiki->generate_from_markdown($md_name, $md_text, %opts);
+    my $source = $wiki->_generate_from_markdown($md_name, $md_text, %opts);
     $result->{content} = $source;
     
     # write to file
@@ -64,7 +64,7 @@ my %es = (
     EVENT_DONE  , 'DONE '
 );
 
-sub generate_from_markdown {
+sub _generate_from_markdown {
     my ($wiki, $md_name, $md_text, %opts) = @_;
     my $source = '';
     my $indent = 0;
@@ -73,7 +73,7 @@ sub generate_from_markdown {
     my $page_title;
     
     # before anything else, convert GFM tables to HTML
-    $md_text = $wiki->md_table_replace($md_text);
+    $md_text = $wiki->_md_table_replace($md_text);
     
     my $add_text = sub {
         my $text = shift;
@@ -303,18 +303,18 @@ END
 }
 
 # replace GFM tables with HTML
-sub md_table_replace {
+sub _md_table_replace {
     my ($wiki, $md_text) = @_;
     while ($md_text =~ s/$table_re/!!TABLE!!/) {
-        _md_table_replace(\$md_text, $1, $2, $3);
+        __md_table_replace(\$md_text, $1, $2, $3);
     }
     while ($md_text =~ s/$np_table_re/!!TABLE!!/) {
-        _md_table_replace(\$md_text, $1, $2, $3);
+        __md_table_replace(\$md_text, $1, $2, $3);
     }
     return $md_text;
 }
 
-sub _md_table_replace {
+sub __md_table_replace {
     my ($md_text_ref, $header, $align, $cell) = @_;
     
     # extract header cells
