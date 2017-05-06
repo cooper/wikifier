@@ -476,9 +476,9 @@ sub __page_link {
     if (length $target) {
         
         # category target
-        my ($safe_name, $path, $page_target);
+        my ($safe_name, $full_name, $path, $page_target);
         if ($typ eq 'category') {
-            $safe_name = cat_name($target);
+            $safe_name = $full_name = cat_name($target);
             my $cat_dir = $page->opt('dir.cache').'/category';
             $path = join '/', $cat_dir, $safe_name;
             $page_target = join '/',
@@ -488,8 +488,10 @@ sub __page_link {
         # page target, respecting page prefix
         else {
             $safe_name = page_name($target);
-            $path = join '/', grep length,
-                $page->opt('dir.page'), $page->prefix, $safe_name;
+            $full_name = join '/', grep length,
+                $page->prefix, $safe_name;
+            $path = join '/',
+                $page->opt('dir.page'), $full_name;
             $page_target = join '/', grep length,
                 $page->opt('root.page'), $page->prefix, $target;
         }
@@ -504,7 +506,7 @@ sub __page_link {
         }
         
         # add the target
-        push @{ $page->{target_pages}{$safe_name} ||= [] },
+        push @{ $page->{target_pages}{$full_name} ||= [] },
             $opts{startpos}{line} if $typ eq 'page';
         $$target_ref .= $page_target;
     }
