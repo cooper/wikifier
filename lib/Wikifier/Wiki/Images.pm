@@ -597,11 +597,12 @@ sub get_image {
     return $image_data if !scalar keys %cat;
     
     # inject metadata from category
+    
     @$image_data{ keys %cat } = values %cat;
     $image_data->{title} //= $image_data->{file};
     
     # fix creation and modified time with correct filename
-    @stat = stat $image_data->{file};
+    @stat = stat $wiki->path_for_image($image_data->{file});
     @$image_data{'created', 'mod_unix'} = @stat[10, 9];
     
     return $image_data;
