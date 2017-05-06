@@ -395,7 +395,6 @@ sub cat_add_image {
 }
 
 # returns a name-to-metadata hash of the pages in the given category.
-# if the category does not exist, returns nothing.
 # returns (error, page data, category title)
 sub cat_get_pages {
     my ($wiki, $cat_name, %opts) = @_;

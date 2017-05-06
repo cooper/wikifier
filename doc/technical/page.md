@@ -11,7 +11,7 @@ my $page = Wikifier::Page->new(%opts)
 
 Creates a new page object. The object may be associated with a page file. You
 should only use this constructor if working with page objects independently of a
-Wikifier::Wiki. Otherwise, use [`Wikifier::Wiki::page_named()`](wiki.md#pagenamed).
+Wikifier::Wiki. Otherwise, use [`Wikifier::Wiki::page_named()`](wiki.md#page_named).
 
 __%opts__ - hash of options
 * __wikifier__ - _optional_, wikifier instance to reuse
