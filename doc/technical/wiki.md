@@ -332,6 +332,8 @@ $wiki->cat_add_image($image_name, $page, %opts);
 
 Adds a page to an image category.
 
+Same options as [`cat_add_page`](#cat_add_page).
+
 ## cat_get_pages
 
 ```perl
