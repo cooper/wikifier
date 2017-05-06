@@ -133,7 +133,7 @@ this does not take redirects/symlinks into account.
 $page->rel_name_ne
 ```
 
-Like [`rel_name`](#relname), except without the file extension.
+Like [`rel_name`](#rel_name), except without the file extension.
 
 ## rel_path
 
@@ -253,7 +253,7 @@ HTML-formatted page title.
 $page->title
 ```
 
-Like [`fmt_title`](#fmttitle), except HTML tags have been stripped.
+Like [`fmt_title`](#fmt_title), except HTML tags have been stripped.
 
 ## title_or_name
 
