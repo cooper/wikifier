@@ -356,21 +356,4 @@ sub _rev_commit {
     return _rev_op_complete;
 }
 
-# convert objects to file paths.
-sub _filify {
-    my @objects_and_files = @_;
-    my @paths;
-    foreach my $thing (@objects_and_files) {
-        my $path = $thing;
-        $path = _path($thing) if blessed $thing;
-        push @paths, $path;
-    }
-    return @paths;
-}
-
-sub _path {
-    my $thing = shift;
-    return $thing->path;
-}
-
 1
