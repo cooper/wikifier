@@ -118,6 +118,14 @@ sub make_dir {
     L "mkdir $dir/$prefix: @$err" if @$err;
 }
 
+# resolve . and .. in paths
+sub resolve_dots {
+    my $path = shift;
+    $path =~ s/([^\/]+)\/\.\.\///g;
+    $path =~ s/\.\///g;
+    return $path;
+}
+
 # removes leading and trailing whitespace from a string.
 sub trim ($) {
     my $string = shift;

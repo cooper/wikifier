@@ -12,7 +12,7 @@ use 5.010;
 
 use Scalar::Util qw(blessed);
 use HTML::Entities qw(encode_entities);
-use Wikifier::Utilities qw(page_name_link page_name cat_name trim);
+use Wikifier::Utilities qw(page_name_link page_name cat_name trim resolve_dots);
 use URI::Escape qw(uri_escape);
 
 our %colors = (
@@ -469,6 +469,7 @@ sub __page_link {
 
     # apply the normalizer to both page and section
     my $page_name_hr = $target;
+    $page_name_hr =~ s/(\.+)\///g;
     ($target, $section) = map page_name_link($_), $target, $section;
 
     $$target_ref  = '';
@@ -488,12 +489,12 @@ sub __page_link {
         # page target, respecting page prefix
         else {
             $safe_name = page_name($target);
-            $full_name = join '/', grep length,
-                $page->prefix, $safe_name;
+            $full_name = resolve_dots(join '/', grep length,
+                $page->prefix, $safe_name);
             $path = join '/',
                 $page->opt('dir.page'), $full_name;
-            $page_target = join '/', grep length,
-                $page->opt('root.page'), $page->prefix, $target;
+            $page_target = resolve_dots(join '/', grep length,
+                $page->opt('root.page'), $page->prefix, $target);
         }
             
         # make sure the page/category exists
