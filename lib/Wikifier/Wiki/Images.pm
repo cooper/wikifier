@@ -597,13 +597,13 @@ sub get_image {
     %cat    = hash_maybe $cat{image_info};
     return $image_data if !scalar keys %cat;
     
-    # fix creation and modified time with correct filename
-    @stat = stat($path = $cat{file});
-    @$image_data{'created', 'mod_unix'} = @stat[10, 9];
-    
     # inject metadata from category
     @$image_data{ keys %cat } = values %cat;
     $image_data->{title} //= $image_data->{file};
+    
+    # fix creation and modified time with correct filename
+    @stat = stat $image_data->{file};
+    @$image_data{'created', 'mod_unix'} = @stat[10, 9];
     
     return $image_data;
 }
