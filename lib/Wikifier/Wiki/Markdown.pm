@@ -229,6 +229,7 @@ sub _generate_from_markdown {
             }
             else {
                 my $url = $node->get_url;
+                $url =~ s/\.md$//;
                 $add_text->(" | $url ]]");
             }
         }
