@@ -126,6 +126,13 @@ sub resolve_dots {
     return $path;
 }
 
+# remove file extension
+sub filename_ne {
+    my $name = shift;
+    $name =~ s/\.[^\.]+$//;
+    return $name;
+}
+
 # removes leading and trailing whitespace from a string.
 sub trim ($) {
     my $string = shift;
