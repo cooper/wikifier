@@ -23,8 +23,9 @@ sub convert_markdown {
 
 sub _convert_markdown {
     my ($wiki, $md_name, %opts) = @_;
-    my $md_path   = abs_path($wiki->opt('dir.md')."/$md_name");
-    my $page_path = $wiki->path_for_page($md_name, 1);
+    (my $md_name_ne = $md_name) =~ s/\.md$//;
+    my $md_path = abs_path($wiki->opt('dir.md')."/$md_name");
+    my $page_path = $wiki->path_for_page($md_name_ne, 1);
     
     # no such markdown file
     return display_error('Markdown file does not exist.')
@@ -33,8 +34,8 @@ sub _convert_markdown {
     # filename and path info
     my $result = {};
     $result->{file} = $md_name;         # with extension
-    $result->{name} = (my $md_name_ne = $md_name) =~ s/\.md$//; # without
-    $result->{path} = $page_path;       # absolute path
+    $result->{name} = $md_name_ne;      # without extension
+    $result->{path} = $page_path;       # absolute path to page
     
     # page content
     $result->{type} = 'markdown';
@@ -48,6 +49,18 @@ sub _convert_markdown {
     # generate the wiki source
     my $source = $wiki->_generate_from_markdown($md_name, $md_text, %opts);
     $result->{content} = $source;
+    
+    # page exists here already
+    if (-e $page_path) {
+        my $page = Wikifier::Page->new(
+            file_path => $page_path,
+            vars_only => 1
+        );
+        $page->parse;
+        if (!$page->generated) {
+            return display_error('Target page exists.');
+        }
+    }
     
     # write to file
     open my $fh, '>', $page_path
