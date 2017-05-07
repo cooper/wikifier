@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.014; # for /u
 
-use Wikifier::Utilities qw(E Lindent back align);
+use Wikifier::Utilities qw(E Lindent back align page_name);
 use CommonMark qw(:node :event :list);
 use Cwd qw(abs_path);
 use File::Spec;
@@ -29,7 +29,7 @@ sub _convert_markdown {
     
     # $page_path_abs is the true target in the cache
     # $page_path is where we will symlink to
-    my $page_name = "$md_name_ne.page";
+    my $page_name = page_name($md_name_ne);
     my $page_dir  = $wiki->opt('dir.page');
     my $cache_dir = $wiki->opt('dir.cache').'/md';
     make_dir($page_dir,  $md_name_ne);
