@@ -461,15 +461,18 @@ sub _category_link  { __page_link('category', @_) }
 sub __page_link {
     my ($typ, $target_ref, $tooltip_ref, $display_ref, $page, %opts) = @_;
 
-    # split the target up into page and section, then create tooltip
+    # split the target up into page and section
     my ($target, $section) = map trim($_),
         split(/#/, $$target_ref, 2);
-    $$tooltip_ref = join ' # ', map ucfirst, grep length, $target, $section;
+        
+    # create tooltip
+    my $page_name_hr = $target;
+    $page_name_hr =~ s/(\.+)\///g;
+    $$tooltip_ref = join ' # ', map ucfirst,
+        grep length, $page_name_hr, $section;
     $$display_ref = length $section ? $section : $target;
 
     # apply the normalizer to both page and section
-    my $page_name_hr = $target;
-    $page_name_hr =~ s/(\.+)\///g;
     ($target, $section) = map page_name_link($_), $target, $section;
 
     $$target_ref  = '';
