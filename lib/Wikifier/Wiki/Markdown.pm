@@ -84,7 +84,7 @@ sub _convert_markdown {
     symlink File::Spec->abs2rel($cache_dir, "$page_dir/$prefix")."/$page_basename",
         $page_path;
         
-    print "SYM: ", File::Spec->abs2rel($cache_dir, "$page_dir/$prefix")."/$page_basename",
+    print STDERR "SYM: ", File::Spec->abs2rel($cache_dir, "$page_dir/$prefix")."/$page_basename",
         " -> ", $page_path, "\n";
     
     return $result;
