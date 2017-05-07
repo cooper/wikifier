@@ -8,7 +8,7 @@ use 5.014; # for /u
 use Wikifier::Utilities qw(E Lindent back align page_name make_dir);
 use CommonMark qw(:node :event :list);
 use Cwd qw(abs_path);
-use File::Basename qw(fileparse);
+use File::Basename qw(dirname);
 use File::Spec;
 
 my $punctuation_re  = qr/[^\p{Word}\- ]/u;
@@ -32,21 +32,21 @@ sub _convert_markdown {
     return display_error('Markdown file does not exist.')
         if !-f $md_path;
         
-    # $page_path_abs is the true target in the cache
+    # $page_path_cache is the true target in the cache
     # $page_path is where we will symlink to
     my $page_name = page_name($md_name_ne);
     my $page_dir  = $wiki->opt('dir.page');
     my $cache_dir = $wiki->opt('dir.cache').'/md';
     make_dir($page_dir,  $md_name_ne);
     make_dir($cache_dir, $md_name_ne);
-    my $page_path     = "$page_dir/$page_name";
-    my $page_path_abs = "$cache_dir/$page_name";
+    my $page_path       = "$page_dir/$page_name";
+    my $page_path_cache = "$cache_dir/$page_name";
         
     # filename and path info
     my $result = {};
     $result->{file} = $md_name;         # with extension
     $result->{name} = $md_name_ne;      # without extension
-    $result->{path} = $page_path_abs;   # absolute path to page
+    $result->{path} = $page_path_cache;   # absolute path to page
     
     # page content
     $result->{type} = 'markdown';
@@ -74,19 +74,16 @@ sub _convert_markdown {
     }
     
     # write to file
-    open my $fh, '>', $page_path_abs
+    open my $fh, '>', $page_path_cache
         or return display_error('Unable to write page file.');
     print $fh $source;
     close $fh;
     
     # symlink real page to generated page in cache
     my ($prefix, $page_basename) = fileparse($page_name);
-    symlink File::Spec->abs2rel($cache_dir, "$page_dir/$prefix")."/$page_basename",
+    symlink File::Spec->abs2rel($page_path_cache, dirname($page_path)),
         $page_path;
-        
-    print STDERR "SYM: ", File::Spec->abs2rel($cache_dir, "$page_dir/$prefix")."/$page_basename",
-        " -> ", $page_path, "\n";
-    
+
     return $result;
 }
 
