@@ -16,7 +16,7 @@ sub write_page {
     Lindent "WRITE($$page{name})";
 
     # do not allow symbolic link
-    if ($page->name ne $page->rel_name) {
+    if (-s $page->rel_path) {
         back;
         return 'Page is symbolically linked';
     }
@@ -59,7 +59,7 @@ sub delete_page {
 
     
     # do not allow symbolic link
-    if ($page->name ne $page->rel_name) {
+    if (-s $page->rel_path) {
         back;
         return 'Page is symbolically linked';
     }
@@ -84,7 +84,7 @@ sub move_page {
     Lindent "MOVE($$page{name} -> $new_name)";
     
     # this should never happen
-    if ($page->name ne $page->rel_name) {
+    if (-s $page->rel_path) {
         back;
         return 'Page is symbolically linked';
     }
