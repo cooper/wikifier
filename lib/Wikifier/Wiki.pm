@@ -365,10 +365,11 @@ sub display_error {
 
 # return abs path for a page
 sub path_for_page {
-    my ($wiki, $page_name, $create_ok) = @_;
+    my ($wiki, $page_name, $create_ok, $dir_page) = @_;
+    $dir_page //= $wiki->opt('dir.page');
     $page_name = page_name($page_name);
-    make_dir($wiki->opt('dir.page'), $page_name) if $create_ok;
-    return abs_path($wiki->opt('dir.page')."/$page_name");
+    make_dir($dir_page, $page_name) if $create_ok;
+    return abs_path("$dir_page/$page_name");
 }
 
 # return abs path for a category

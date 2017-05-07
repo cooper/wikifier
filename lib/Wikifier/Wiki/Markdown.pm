@@ -29,9 +29,10 @@ sub _convert_markdown {
     
     # $page_path_abs is the true target in the cache
     # $page_path is where we will symlink to
-    my ($page_dir, $cache_dir) = map $wiki->opt("dir.$_"), qw(page cache);
+    my $page_dir  = $wiki->opt('dir.page');
+    my $cache_dir = $wiki->opt('dir.cache');
     my $page_path = $wiki->path_for_page($md_name_ne, 1);
-    my $page_path_abs = "$cache_dir/md/$md_name_ne.page";
+    my $page_path_abs = $wiki->path_for_page($md_name_ne, 1, "$cache_dir/md");
     
     # no such markdown file
     return display_error('Markdown file does not exist.')
