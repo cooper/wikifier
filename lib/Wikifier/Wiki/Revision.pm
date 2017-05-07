@@ -15,6 +15,12 @@ sub write_page {
     my ($wiki, $page, $reason) = @_;
     Lindent "WRITE($$page{name})";
 
+    # do not allow symbolic link
+    if ($page->name ne $page->rel_name) {
+        back;
+        return 'Page is symbolically linked';
+    }
+
     # determine reason
     $reason = length $reason            ?
         "Updated $$page{name}: $reason" :
@@ -51,6 +57,13 @@ sub delete_page {
     my ($wiki, $page) = @_;
     Lindent "DELETE($$page{name})";
 
+    
+    # do not allow symbolic link
+    if ($page->name ne $page->rel_name) {
+        back;
+        return 'Page is symbolically linked';
+    }
+
     # commit the change
     $wiki->rev_commit(
         message => "Deleted $$page{name}",
@@ -61,7 +74,7 @@ sub delete_page {
     unlink $page->path;
     
     back;
-    return 1;
+    return;
 }
 
 # rename a page
@@ -69,17 +82,17 @@ sub delete_page {
 sub move_page {
     my ($wiki, $page, $new_name, $allow_overwrite) = @_;
     Lindent "MOVE($$page{name} -> $new_name)";
-    $new_name = page_name($new_name);
-    my ($old_name, $old_path) = ($page->name, $page->path);
     
     # this should never happen
     if ($page->name ne $page->rel_name) {
         back;
-        return 'Page appears to be a symbolic link';
+        return 'Page is symbolically linked';
     }
     
     # change the name, but keep the old name until after we ->display_page().
     # this is used to update categories the page belongs to.
+    $new_name = page_name($new_name);
+    my ($old_name, $old_path) = ($page->name, $page->path);
     $page->{name} = $new_name;
     $page->{old_name} = $old_name;
     delete $page->{cached_props};
