@@ -366,7 +366,7 @@ sub display_error {
 # return abs path for a page
 sub path_for_page {
     my ($wiki, $page_name, $create_ok, $dir_page) = @_;
-    $dir_page //= $wiki->opt('dir.page');
+    $dir_page  = $wiki->opt('dir.page') if !length $dir_page;
     $page_name = page_name($page_name);
     make_dir($dir_page, $page_name) if $create_ok;
     return abs_path("$dir_page/$page_name");
