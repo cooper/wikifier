@@ -8,6 +8,7 @@ use 5.014; # for /u
 use Wikifier::Utilities qw(E Lindent back align page_name);
 use CommonMark qw(:node :event :list);
 use Cwd qw(abs_path);
+use File::Basename qw(fileparse);
 use File::Spec;
 
 my $punctuation_re  = qr/[^\p{Word}\- ]/u;
@@ -79,7 +80,8 @@ sub _convert_markdown {
     close $fh;
     
     # symlink real page to generated page in cache
-    symlink File::Spec->abs2rel($cache_dir, $page_dir)."/$page_name",
+    my ($prefix, $page_basename) = fileparse($page_name);
+    symlink File::Spec->abs2rel($cache_dir, "$page_dir/$prefix")."/$page_basename",
         $page_path;
     
     return $result;
