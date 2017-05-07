@@ -194,7 +194,7 @@ Accepted values for `type`
 * *wikifier* (this is default)
 * *mediawiki*
 
-The default configuration includes the `wp` identified for the
+The default configuration includes the `wp` identifier for the
 [English Wikipedia](http://en.wikipedia.org):
 
     @external.wp: {
@@ -226,10 +226,12 @@ The method which the wikifier should use to scale images.
 
 When set to _server_, the options [`image.calc`](#imagecalc) and
 [`image.sizer`](#imagesizer) are required. If using Wikifier::Page directly,
-`image.calc` is provided but requires that you install Image::Size. In that
+`image.calc` is provided but requires that you install
+[Image::Size](https://metacpan.org/pod/Image::Size). In that
 case, you are required to provide a custom `image.sizer` routine. If using
-Wikifier::Wiki, `image.calc` and `image.sizer` are both provided, but GD must be
-installed from CPAN.
+Wikifier::Wiki, `image.calc` and `image.sizer` are both provided, but
+[GD](https://metacpan.org/pod/GD) must be
+installed from the CPAN.
 
 __Default__ (Page): _javascript_
 
@@ -242,9 +244,9 @@ This is utilized only when [`image.size_method`](#imagesize_method) is _server_.
 
 Returns `(scaled width, scaled height, full width, full height, fullsize)`.
 
-__Default__ (Page): built in, uses Image::Size
+__Default__ (Page): built in, uses [Image::Size](https://metacpan.org/pod/Image::Size)
 
-__Default__ (Wiki): built in, uses GD
+__Default__ (Wiki): built in, uses [GD](https://metacpan.org/pod/GD)
 
 ### image.rounding
 
