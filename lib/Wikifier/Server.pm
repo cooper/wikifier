@@ -225,8 +225,9 @@ sub gen_wiki {
             last;
         }
 
+        (my $md_name_ne = $md_name) =~ s/\.md$//;
         my $md_path   = "$md_dir/$md_name";
-        my $page_name = page_name($md_name);
+        my $page_name = page_name($md_name_ne);
         my $page_path = "$page_dir/$page_name";
         
         # determine modification times
