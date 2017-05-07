@@ -424,10 +424,11 @@ sub _handle_page_del {
     $method  = $is_model ? 'model_named' : 'page_named';
     my $page = $wiki->$method($msg->{name});
     $method  = $is_model ? 'delete_model' : 'delete_page';
-    $wiki->$method($page);
+    my $err  = $wiki->$method($page);
 
     $msg->reply($is_model ? 'model_del' : 'page_del' => {
-        deleted => 1
+        error   => $err,
+        deleted => !$err
     });
 }
 
