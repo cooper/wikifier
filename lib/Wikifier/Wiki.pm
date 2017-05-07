@@ -122,7 +122,7 @@ sub _read_config {
 
 our @main_dirs  = qw(page image model cache);
 our @cat_dirs   = qw(page image model data);
-our @cache_dirs = qw(page image);
+our @cache_dirs = qw(page image category md);
 push @cache_dirs, map { "category/$_" } @cat_dirs;
 
 sub _check_directories {

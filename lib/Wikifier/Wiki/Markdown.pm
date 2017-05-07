@@ -8,6 +8,7 @@ use 5.014; # for /u
 use Wikifier::Utilities qw(E Lindent back align);
 use CommonMark qw(:node :event :list);
 use Cwd qw(abs_path);
+use File::Spec;
 
 my $punctuation_re  = qr/[^\p{Word}\- ]/u;
 my $table_re        = qr/ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/;
@@ -25,7 +26,12 @@ sub _convert_markdown {
     my ($wiki, $md_name, %opts) = @_;
     (my $md_name_ne = $md_name) =~ s/\.md$//;
     my $md_path = abs_path($wiki->opt('dir.md')."/$md_name");
+    
+    # $page_path_abs is the true target in the cache
+    # $page_path is where we will symlink to
+    my ($page_dir, $cache_dir) = map $wiki->opt("dir.$_"), qw(page cache);
     my $page_path = $wiki->path_for_page($md_name_ne, 1);
+    my $page_path_abs = "$cache_dir/md/$md_name_ne.page";
     
     # no such markdown file
     return display_error('Markdown file does not exist.')
@@ -35,7 +41,7 @@ sub _convert_markdown {
     my $result = {};
     $result->{file} = $md_name;         # with extension
     $result->{name} = $md_name_ne;      # without extension
-    $result->{path} = $page_path;       # absolute path to page
+    $result->{path} = $page_path_abs;   # absolute path to page
     
     # page content
     $result->{type} = 'markdown';
@@ -63,10 +69,14 @@ sub _convert_markdown {
     }
     
     # write to file
-    open my $fh, '>', $page_path
+    open my $fh, '>', $page_path_abs
         or return display_error('Unable to write page file.');
     print $fh $source;
     close $fh;
+    
+    # symlink real page to generated page in cache
+    symlink File::Spec->abs2rel($cache_dir, $page_dir)."/md/$md_name_ne.page",
+        $page_path;
     
     return $result;
 }
