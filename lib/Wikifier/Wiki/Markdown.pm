@@ -229,7 +229,7 @@ sub _generate_from_markdown {
             }
             else {
                 my $url = $node->get_url;
-                $url =~ s/\.md$//; # FIXME: relative links only
+                $url =~ s/(\.md)+(\s*#.*)$/$2/; # FIXME: relative links only
                 $add_text->(" | $url ]]");
             }
         }
