@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.014; # for /u
 
-use Wikifier::Utilities qw(E Lindent back align page_name);
+use Wikifier::Utilities qw(E Lindent back align page_name make_dir);
 use CommonMark qw(:node :event :list);
 use Cwd qw(abs_path);
 use File::Basename qw(fileparse);
@@ -28,6 +28,10 @@ sub _convert_markdown {
     (my $md_name_ne = $md_name) =~ s/\.md$//;
     my $md_path = abs_path($wiki->opt('dir.md')."/$md_name");
     
+    # no such markdown file
+    return display_error('Markdown file does not exist.')
+        if !-f $md_path;
+        
     # $page_path_abs is the true target in the cache
     # $page_path is where we will symlink to
     my $page_name = page_name($md_name_ne);
@@ -37,10 +41,6 @@ sub _convert_markdown {
     make_dir($cache_dir, $md_name_ne);
     my $page_path     = "$page_dir/$page_name";
     my $page_path_abs = "$cache_dir/$page_name";
-    
-    # no such markdown file
-    return display_error('Markdown file does not exist.')
-        if !-f $md_path;
         
     # filename and path info
     my $result = {};
@@ -83,6 +83,9 @@ sub _convert_markdown {
     my ($prefix, $page_basename) = fileparse($page_name);
     symlink File::Spec->abs2rel($cache_dir, "$page_dir/$prefix")."/$page_basename",
         $page_path;
+        
+    print "SYM: ", File::Spec->abs2rel($cache_dir, "$page_dir/$prefix")."/$page_basename",
+        " -> ", $page_path, "\n";
     
     return $result;
 }
