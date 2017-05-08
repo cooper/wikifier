@@ -5,11 +5,14 @@ use warnings;
 use strict;
 use 5.014; # for /u
 
-use Wikifier::Utilities qw(E Lindent back align page_name make_dir);
 use CommonMark qw(:node :event :list);
 use Cwd qw(abs_path);
 use File::Basename qw(dirname);
 use File::Spec;
+use Wikifier::Utilities qw(
+    E Lindent back align make_dir
+    page_name page_name_link
+);
 
 my $punctuation_re  = qr/[^\p{Word}\- ]/u;
 my $table_re        = qr/ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/;
@@ -25,16 +28,19 @@ sub convert_markdown {
 
 sub _convert_markdown {
     my ($wiki, $md_name, %opts) = @_;
-    (my $md_name_ne = $md_name) =~ s/\.md$//;
     my $md_path = abs_path($wiki->opt('dir.md')."/$md_name");
     
     # no such markdown file
     return display_error('Markdown file does not exist.')
         if !-f $md_path;
         
+
+    (my $md_name_ne = $md_name) =~ s/\.md$//;
+    $md_name_ne   = page_name_link($md_name_ne);
+    my $page_name = page_name($md_name_ne);
+
     # $page_path_cache is the true target in the cache
     # $page_path is where we will symlink to
-    my $page_name = page_name($md_name_ne);
     my $page_dir  = $wiki->opt('dir.page');
     my $cache_dir = $wiki->opt('dir.cache').'/md';
     make_dir($page_dir,  $md_name_ne);
