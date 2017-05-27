@@ -122,7 +122,7 @@ sub make_dir {
 sub resolve_dots {
     my $path = shift;
     my $pat  = qr/([^\/]+)\/\.\.\//;
-    $path =~ s/$pat//g while $s =~ $pat;
+    $path =~ s/$pat//g while $path =~ $pat;
     $path =~ s/\.\///g;
     return $path;
 }
