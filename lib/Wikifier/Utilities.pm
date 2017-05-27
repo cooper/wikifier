@@ -121,7 +121,8 @@ sub make_dir {
 # resolve . and .. in paths
 sub resolve_dots {
     my $path = shift;
-    $path =~ s/([^\/]+)\/\.\.\///g;
+    my $pat  = qr/([^\/]+)\/\.\.\//;
+    $path =~ s/$pat//g while $s =~ $pat;
     $path =~ s/\.\///g;
     return $path;
 }
