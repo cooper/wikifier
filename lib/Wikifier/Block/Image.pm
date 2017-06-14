@@ -185,10 +185,7 @@ sub image_html {
                 alt => $image->{file},
                 'data-rjs' => $retina
             },
-            styles     => {
-                width  => $width,
-                height => $height
-            }
+            styles => { width  => $width }
         );
         return;
     }
@@ -215,10 +212,7 @@ sub image_html {
             alt => $image->{file},
             'data-rjs' => $retina
         },
-        styles     => {
-            width  => $width,
-            height => $height
-        }
+        styles => { width  => $width }
     );
 
     # insert javascript if using browser sizing.
