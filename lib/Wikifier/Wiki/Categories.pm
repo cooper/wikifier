@@ -11,7 +11,7 @@ use HTML::Strip;
 use Scalar::Util qw(blessed);
 use Wikifier::Utilities qw(
     page_names_equal cat_name cat_name_ne
-    keys_maybe hash_maybe L E
+    keys_maybe hash_maybe L E align
 );
 
 my $json = JSON::XS->new->pretty->convert_blessed;
@@ -290,8 +290,7 @@ sub cat_add_page {
         hash_maybe $opts{page_extras}
     } if $page_maybe;
     
-    L "Adding to '$cat_name'"
-        if $page_data;
+    L align($page_data ? 'Add' : 'Create', "'$cat_name'");
 
     # first, check if the category exists yet.
     my $cat;
