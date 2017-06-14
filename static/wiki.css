@@ -155,7 +155,9 @@ div.wiki-imagebox-description-inner {
     line-height: 1.3em;
 }
 
-div.wiki-image {
+div.wiki-image, div.wiki-imagebox {
+    max-width: 90%;
+    overflow: hidden;
 }
 
 /* links */
