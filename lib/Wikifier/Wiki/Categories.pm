@@ -483,9 +483,9 @@ sub cat_get_pages {
     }
 
     # is this category now empty?
-    if ($wiki->_cat_should_delete($cat_name_ne, $cat, \%final_pages)) {
+    if (my $reason = $wiki->_cat_should_delete($cat_name_ne, $cat, \%final_pages)) {
         unlink $cat_file;
-        return 'Purge';
+        return "Purge: $reason";
     }
 
     # it looks like something has changed. we need to update the cat file.
@@ -520,20 +520,24 @@ sub _cat_should_delete {
 
     # no pages using the image, and the image doesn't exist
     if ($cat->{cat_type} && $cat->{cat_type} eq 'image') {
-        return !-e $wiki->path_for_image($cat_name_ne);
+        return if -e $wiki->path_for_image($cat_name_ne);
+        return "image '$cat_name_ne' does not exist";
     }
 
     # no pages using the model, and the model doesn't exist
     if ($cat->{cat_type} && $cat->{cat_type} eq 'model') {
-        return !-e $wiki->path_for_model($cat_name_ne);
+        return if -e $wiki->path_for_model($cat_name_ne);
+        return "model '$cat_name_ne' does not exist";
     }
     
     # no pages using the page, and the page doesn't exist
     if ($cat->{cat_type} && $cat->{cat_type} eq 'page') {
-        return !-e $wiki->path_for_page($cat_name_ne);
+        return if -e $wiki->path_for_page($cat_name_ne);
+        return "page '$cat_name_ne' does not exist";
     }
 
-    return !$cat->{preserve};
+    return if $cat->{preserve};
+    return 'no pages in category';
 }
 
 1
