@@ -282,29 +282,22 @@ sub cat_add_page {
         $opts{create_ok}
     );
 
-    # set page infos.
-    my ($page_data, $pages_ref);
-    $page_data = {
-        asof => $time,
-        hash_maybe $page_maybe->page_info,
-        hash_maybe $opts{page_extras}
-    } if $page_maybe;
-    
-    L align($page_data ? 'Add' : 'Create', "'$cat_name'");
-
-    # first, check if the category exists yet.
+    # first, check if the category exists
     my $cat;
     for ($cat) {
+        
+        # it doesn't exist
         last if !-f $cat_file;
-        $cat = eval { $json->decode(file_contents($cat_file)) };
-
+        
         # JSON error or the value is not a hash.
+        $cat = eval { $json->decode(file_contents($cat_file)) };
         if (!$cat || ref $cat ne 'HASH') {
-            E "Error parsing JSON category '$cat_file': $@";
+            E "Error parsing JSON category '$cat_file': $@; purged";
             unlink $cat_file;
-            return;
+            last;
         }
         
+        # the stuff below requires a page to add
         last if !$page_maybe;
         
         # if the page was just renamed, delete the old entry.
@@ -317,11 +310,6 @@ sub cat_add_page {
         if ($page_ref->{asof} && $page_ref->{asof} >= $page_maybe->modified) {
             return 1;
         }
-
-        # update information for this page,
-        # or add it if it is not there already.
-        %$page_ref = %$page_data;
-        $pages_ref = { $page_maybe->name => $page_data };
     }
 
     # if this is a new category and it has zero pages,
@@ -334,6 +322,7 @@ sub cat_add_page {
     # if this is an existing category and $page_maybe
     # is not provided, do nothing.
     if ($cat && !$opts{force_update} && !$page_maybe) {
+        E "Tried to cat_add_page() with no page to an existing category";
         return;
     }
     
@@ -344,14 +333,30 @@ sub cat_add_page {
         return;
     }
 
-    # the category does not yet exist
-    $cat ||= {
-        created => $time,
-        pages   => $pages_ref || {}
-    };
+    $cat ||= {};
     
+    # now that $cat is ready, add or update this page
+    
+    # add page info
+    if ($page_maybe) {
+        L align('Add', "'$cat_name'");
+        $cat->{pages}{ $page_maybe->name } = {
+            asof => $time,
+            hash_maybe $page_maybe->page_info,
+            hash_maybe $opts{page_extras}
+        };
+    }
+    
+    # write category
     my $json_data = $json->encode({
-        %$cat,  # stuff from before
+        
+        # stuff to be overwritten by old values
+        created => $time,
+        
+        # old and new values
+        %$cat,
+        
+        # stuff to overwrite old values
         hash_maybe $opts{cat_extras},
         category   => cat_name_ne($cat_name),
         file       => $cat_name,
