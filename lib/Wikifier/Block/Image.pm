@@ -58,9 +58,7 @@ sub image_parse {
         $image->{height} = 0;
     }
 
-    # no float; default to right.
-    $image->{float} ||= $image->{align} || 'right';
-
+    $image->{float} ||= $image->{align};
     $image->{image_root} = $page->opt('root.image');
 
     # no file - this is mandatory.
@@ -146,8 +144,15 @@ sub image_html {
     return if $image->{parse_failed};
 
     # add the appropriate float class.
-    $el->add_class('imagebox-'.$image->{float}) if $box;
-
+    my $float = $image->{float};
+    if ($box) {
+        $float ||= 'right';
+        $el->add_class('imagebox-'.$float);
+    }
+    elsif ($float) {
+        $el->add_class('image-'.$float);
+    }
+    
     # add data-rjs for retina.
     my $retina;
     if ($retina = $page->opt('image.enable.retina')) {

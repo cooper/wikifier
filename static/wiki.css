@@ -128,13 +128,15 @@ div.wiki-imagebox img {
     display: block;
 }
 
-div.wiki-imagebox-left {
+div.wiki-imagebox-left,
+div.wiki-image-left {
     float: left;
     clear: left;
     margin: .5em 1.4em .5em 0;
 }
 
-div.wiki-imagebox-right {
+div.wiki-imagebox-right,
+div.wiki-image-right {
     float: right;
     clear: right;
     margin: .5em 0 .5em 1.4em;

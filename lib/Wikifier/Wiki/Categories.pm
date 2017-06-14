@@ -322,7 +322,6 @@ sub cat_add_page {
     # if this is an existing category and $page_maybe
     # is not provided, do nothing.
     if ($cat && !$opts{force_update} && !$page_maybe) {
-        E "Tried to cat_add_page($cat_name) with no page to an existing category";
         return;
     }
     
