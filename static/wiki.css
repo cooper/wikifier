@@ -293,6 +293,6 @@ table.wiki-table th {
 
 /* built-in classes */
 
-.wiki-class-clear { clear: both; }
+.wiki-class-clear, .wiki-clear { clear: both; }
 .wiki-class-clear-left { clear: left; }
 .wiki-class-clear-right { clear: right; }
