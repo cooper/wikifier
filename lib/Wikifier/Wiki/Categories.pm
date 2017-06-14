@@ -290,7 +290,7 @@ sub cat_add_page {
         hash_maybe $opts{page_extras}
     } if $page_maybe;
     
-    L "Adding '$$page_data{name}' to '$cat_name'"
+    L "Adding to '$cat_name'"
         if $page_data;
 
     # first, check if the category exists yet.
