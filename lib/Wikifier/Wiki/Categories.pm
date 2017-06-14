@@ -350,9 +350,7 @@ sub cat_add_page {
         pages   => $pages_ref || {}
     };
     
-    # write the category file
-    binmode $fh, ':utf8';
-    print {$fh} $json->encode({
+    my $json_data = $json->encode({
         %$cat,  # stuff from before
         hash_maybe $opts{cat_extras},
         category   => cat_name_ne($cat_name),
@@ -361,6 +359,11 @@ sub cat_add_page {
         preserve   => $opts{preserve},
         mod_unix   => $time
     });
+    print STDERR "write: $json_data\n" if $ENV{WIKIFIER_DEBUG};
+    
+    # write the category file
+    binmode $fh, ':utf8';
+    print {$fh} $json_data;
 
     close $fh;
     return 1;
