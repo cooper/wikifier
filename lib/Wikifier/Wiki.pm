@@ -142,6 +142,12 @@ sub _check_directories {
     foreach (@directories) {
         my ($dir, $path) = @$_;
 
+        # wiki option for this dir isn't set
+        if (!$path) {
+            E "\@dir.$dir is not set" unless $dir eq 'md';
+            next;
+        }
+
         # already exists
         next if -d $path;
 
