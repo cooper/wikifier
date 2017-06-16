@@ -347,7 +347,9 @@ sub handle_character {
 
         # normal block. add the block itself.
         else {
-            delete $c->{conditional};
+            # FIXME: this is disabled for now because it causes problems when
+            # there are blocks inside of else{}
+            # delete $c->{conditional};
             @add_contents = $c->block;
         }
 
