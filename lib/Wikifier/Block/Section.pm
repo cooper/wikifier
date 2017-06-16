@@ -70,13 +70,14 @@ sub section_html {
     # use the page title if no other title is provided and @page.enable.title
     # is true.
     my $title = $sec->name;
-    $title = $page->get('page.title') if $is_intro && !length $title;
-
+    my $title_fmt = $title = $page->get('page.title')
+        if $is_intro && !length $title;
+    
     # if we have a title and this type of title is enabled.
     if (length $title) {
         
         # parse text formatting in title
-        my $title_fmt = $page->parse_formatted_text($title,
+        $title_fmt //= $page->parse_formatted_text($title,
             pos => $sec->create_pos
         );
         
