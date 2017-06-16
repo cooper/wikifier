@@ -370,7 +370,8 @@ sub handle_character {
     }
 
     # if we're at document level, this might be a variable declaration
-    elsif ($c->block->type eq 'main' && $variable_tokens{$char}) {
+    elsif ($c->block->type eq 'main' &&
+    $variable_tokens{$char} && $c->{last_char} ne '[') {
         $c->mark_ignored;
         next DEFAULT if $c->is_escaped;
 
