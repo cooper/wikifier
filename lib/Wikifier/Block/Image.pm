@@ -166,13 +166,14 @@ sub image_html {
     ($image->{height}, $image->{width}, $image->{image_root}, $image->{image_url});
     
     # link can be overridden
+    my $link_target;
     my $link = $image->{map_hash}{link} || "$image_root/$$image{file}";
     undef $link if lc $link eq 'none';
     if ($link) {
+        $link_target = '_blank';
         my ($ok, $target) = $page->wikifier->parse_link($page, $link);
-        print STDERR "not ok: $link\n" if !$ok;
-        print STDERR "ok: $link -> $target\n" if $ok;
-        $link = $ok ? $target : undef;
+        $link = $target;
+        undef $link if !$ok;
     }
 
     ############
@@ -181,13 +182,13 @@ sub image_html {
 
     # this is not an image box; it's just an image.
     if (!$box) {
-        my $a;
-        $a = $el->create_child(
+        my $an;
+        $an = $el->create_child(
             class      => 'image-a',
             type       => 'a',
-            attributes => { href => $link }
+            attributes => { href => $link, target => $link_target }
         ) if $link;
-        ($a || $el)->create_child(
+        ($an || $el)->create_child(
             class      => 'image-img',
             type       => 'img',
             attributes => {
@@ -207,15 +208,15 @@ sub image_html {
     );
 
     # create the anchor.
-    my $a;
-    $a = $inner->create_child(
+    my $an;
+    $an = $inner->create_child(
         class      => 'imagebox-a',
         type       => 'a',
-        attributes => { href => $link }
+        attributes => { href => $link, target => $link_target }
     ) if $link;
 
     # create the image.
-    my $img = ($a || $el)->create_child(
+    my $img = ($an || $el)->create_child(
         class      => 'imagebox-img',
         type       => 'img',
         attributes => {
