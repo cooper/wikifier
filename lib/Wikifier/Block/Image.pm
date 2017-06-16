@@ -37,7 +37,7 @@ sub image_parse {
 
     # get values from hash.
     $image->{$_} = $image->{map_hash}{$_} foreach qw(
-        file width height
+        file width height link
         align float author license
     );
 
@@ -164,7 +164,14 @@ sub image_html {
     # fetch things we determined in image_parse().
  my ($height,          $width,          $image_root,          $image_url         ) =
     ($image->{height}, $image->{width}, $image->{image_root}, $image->{image_url});
-    my $link_address = "$image_root/$$image{file}";
+    
+    # link can be overridden
+    my $link_address = $image->{link} || "$image_root/$$image{file}";
+    undef $link_address if lc $link_address eq 'none';
+    if ($link_address) {
+        my ($ok, $target) = $page->wikifier->parse_link($page, $link);
+        $link_address = $ok ? $target : undef;
+    }
 
     ############
     ### HTML ###
