@@ -166,11 +166,11 @@ sub image_html {
     ($image->{height}, $image->{width}, $image->{image_root}, $image->{image_url});
     
     # link can be overridden
-    my $link_address = $image->{link} || "$image_root/$$image{file}";
-    undef $link_address if lc $link_address eq 'none';
-    if ($link_address) {
+    my $link = $image->{link} || "$image_root/$$image{file}";
+    undef $link if lc $link eq 'none';
+    if ($link) {
         my ($ok, $target) = $page->wikifier->parse_link($page, $link);
-        $link_address = $ok ? $target : undef;
+        $link = $ok ? $target : undef;
     }
 
     ############
@@ -182,7 +182,7 @@ sub image_html {
         my $a = $el->create_child(
             class      => 'image-a',
             type       => 'a',
-            attributes => { href => $link_address }
+            attributes => { href => $link }
         );
         $a->create_child(
             class      => 'image-img',
@@ -207,7 +207,7 @@ sub image_html {
     my $a = $inner->create_child(
         class      => 'imagebox-a',
         type       => 'a',
-        attributes => { href => $link_address }
+        attributes => { href => $link }
     );
 
     # create the image.
