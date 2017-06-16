@@ -11,7 +11,7 @@ package Wikifier::Block::Image;
 use warnings;
 use strict;
 
-use Wikifier::Utilities qw(L trim);
+use Wikifier::Utilities qw(L trim html_value);
 use List::Util qw(max);
 
 our %block_types = (
@@ -169,6 +169,7 @@ sub image_html {
     my $link = $image->{link} || "$image_root/$$image{file}";
     undef $link if lc $link eq 'none';
     if ($link) {
+        html_value $link, $pos, $page, 1;
         my ($ok, $target) = $page->wikifier->parse_link($page, $link);
         print STDERR "not ok: $link\n" if !$ok;
         print STDERR "ok: $link -> $target\n" if $ok;
