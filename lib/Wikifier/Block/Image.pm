@@ -170,8 +170,8 @@ sub image_html {
     undef $link if lc $link eq 'none';
     if ($link) {
         my ($ok, $target) = $page->wikifier->parse_link($page, $link);
-        print STDERR "not ok: $link\n";
-        print STDERR "ok: $link -> $target\n";
+        print STDERR "not ok: $link\n" if !$ok;
+        print STDERR "ok: $link -> $target\n" if $ok;
         $link = $ok ? $target : undef;
     }
 
