@@ -167,13 +167,18 @@ sub image_html {
     
     # link can be overridden
     my $link_target;
-    my $link = $image->{map_hash}{link} || "$image_root/$$image{file}";
-    undef $link if lc $link eq 'none';
-    if ($link) {
+    my $link = $image->{map_hash}{link};
+    if ($link && $link eq 'none') {
+        undef $link;
+    }
+    elsif ($link) {
         $link_target = '_blank';
         my ($ok, $target) = $page->wikifier->parse_link($page, $link);
         $link = $target;
         undef $link if !$ok;
+    }
+    else {
+        $link = "$image_root/$$image{file}";
     }
 
     ############
@@ -216,7 +221,7 @@ sub image_html {
     ) if $link;
 
     # create the image.
-    my $img = ($an || $el)->create_child(
+    my $img = ($an || $inner)->create_child(
         class      => 'imagebox-img',
         type       => 'img',
         attributes => {
