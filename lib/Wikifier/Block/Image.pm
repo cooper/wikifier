@@ -170,6 +170,8 @@ sub image_html {
     undef $link if lc $link eq 'none';
     if ($link) {
         my ($ok, $target) = $page->wikifier->parse_link($page, $link);
+        print STDERR "not ok: $link\n";
+        print STDERR "ok: $link -> $target\n";
         $link = $ok ? $target : undef;
     }
 
@@ -179,12 +181,13 @@ sub image_html {
 
     # this is not an image box; it's just an image.
     if (!$box) {
-        my $a = $el->create_child(
+        my $a;
+        $a = $el->create_child(
             class      => 'image-a',
             type       => 'a',
             attributes => { href => $link }
-        );
-        $a->create_child(
+        ) if $link;
+        ($a || $el)->create_child(
             class      => 'image-img',
             type       => 'img',
             attributes => {
@@ -192,7 +195,7 @@ sub image_html {
                 alt => $image->{file},
                 'data-rjs' => $retina
             },
-            styles => { width  => $width }
+            styles => { width => $width }
         );
         return;
     }
@@ -204,14 +207,15 @@ sub image_html {
     );
 
     # create the anchor.
-    my $a = $inner->create_child(
+    my $a;
+    $a = $inner->create_child(
         class      => 'imagebox-a',
         type       => 'a',
         attributes => { href => $link }
-    );
+    ) if $link;
 
     # create the image.
-    my $img = $a->create_child(
+    my $img = ($a || $el)->create_child(
         class      => 'imagebox-img',
         type       => 'img',
         attributes => {
