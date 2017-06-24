@@ -23,6 +23,11 @@ our %block_types = (
     sec => {
         alias => 'section',
     },
+    quote => {
+        init  => \&section_init,
+        html  => \&quote_html,
+        title => 1
+    },
     clear => {
         html => \&clear_html
     }
@@ -56,11 +61,15 @@ sub section_parse {
     $sec->{header_level} = $l;
 }
 
-sub section_html {
-    my ($sec, $page, $el) = @_;
+sub section_html { _section_html(0, @_) }
+sub quote_html   { _section_html(1, @_) }
+
+sub _section_html {
+    my ($is_quote, $sec, $page, $el) = @_;
 
     # clear at end of element.
     $el->configure(clear => 1);
+    $el->configure(type  => 'blockquote') if $is_quote;
 
     # determine if this is the intro section.
     my $l = $sec->{header_level};
@@ -75,7 +84,7 @@ sub section_html {
         if $is_intro && !length $title;
     
     # if we have a title and this type of title is enabled.
-    if (length $title) {
+    if (!$is_quote && length $title) {
         
         # parse text formatting in title
         $title_fmt //= $page->parse_formatted_text($title,
