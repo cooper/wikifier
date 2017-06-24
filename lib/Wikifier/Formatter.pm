@@ -483,7 +483,7 @@ sub __page_link {
         
     # create tooltip
     my $page_name_hr = $target;
-    $page_name_hr =~ s/(\.+)\///g;
+    $page_name_hr =~ s/(.*)\///g;
     $$tooltip_ref = join ' # ', map ucfirst,
         grep length, $page_name_hr, $section;
     $$display_ref = length $section ? $section : $target;
