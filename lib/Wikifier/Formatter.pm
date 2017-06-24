@@ -580,6 +580,8 @@ sub _external_link {
 # external site link
 sub _other_link {
     my ($target_ref, $tooltip_ref, $display_ref, $page) = @_;
+    $$target_ref  =~ s/^\$//;
+    $$target_ref  = trim($$target_ref);
     $$tooltip_ref = 'External link';
     return 1;
 }
