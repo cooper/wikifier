@@ -468,6 +468,7 @@ sub md_to_html_np {
 sub md_escape {
     my $text = shift;
     $text =~ s/([\{\}\\])/\\$1/g;
+    $text =~ s{/\*}{\\/*}g; # fix comments (see issue #62)
     return $text;
 }
 
