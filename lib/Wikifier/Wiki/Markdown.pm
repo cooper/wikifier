@@ -99,12 +99,14 @@ my %es = (
     EVENT_DONE  , 'DONE '
 );
 
+# FIXME: I bet the $current_text doesn't work right when mixed with other nodes
+
 sub _generate_from_markdown {
     my ($wiki, $md_name, $md_text, %opts) = @_;
     my $source = '';
     my $indent = 0;
     my $header_level = 0;
-    my $current_header_text;
+    my $current_text = '';
     my $page_title;
     
     # before anything else, convert GFM tables to HTML
@@ -131,8 +133,12 @@ sub _generate_from_markdown {
         if ($node_type == NODE_TEXT) {
             my $text = md_escape_fmt($node->get_literal);
             $page_title = $text if !length $page_title && $header_level;
-            $add_text->($text);
-            $current_header_text .= $text if defined $current_header_text;
+            if (defined $current_text) {
+                $current_text .= $text;
+            }
+            else {
+                $add_text->($text);
+            }
         }
         
         # NODE_HEADING
@@ -158,7 +164,8 @@ sub _generate_from_markdown {
                 
                 $header_level = $level;
                 $add_text->("~sec [");
-                $current_header_text = '';
+                $current_text = '';
+
             }
             
             # closing the header starts the section block
@@ -169,13 +176,13 @@ sub _generate_from_markdown {
                 # figure the anchor. modeled after what github uses:
                 # https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/toc_filter.rb
                 # the -n suffixes are added automatically as needed in Section.pm
-                my $section_id = $current_header_text;
+                my $section_id = $current_text;
                 $section_id =~ tr/A-Z/a-z/;                 # ASCII downcase
                 $section_id =~ s/$punctuation_re//g;        # remove punctuation
                 $section_id =~ s/ /-/g;                     # replace spaces with dashes
                 $section_id = md_escape_fmt($section_id);
                 $add_text->("meta { section: $section_id; }\n");
-                undef $current_header_text;
+                undef $current_text;
             }
         }
         
@@ -258,9 +265,16 @@ sub _generate_from_markdown {
         
         # NODE_IMAGE
         elsif ($node_type == NODE_IMAGE) {
-            my $src = $node->get_url;
-            my $alt = $node->get_title;
-            $add_text->("~image { file: $src; alt: $alt; }");
+            if ($ev_type == EVENT_ENTER) {
+                my $src = $node->get_url;
+                $add_text->("~image {\n    file: $src;\n    alt: ");
+                $current_text = '';
+            }
+            else {
+                $current_text =~ s/;/\\;/g;
+                $add_text->($current_text);
+                undef $current_text;
+            }
         }
         
         # NODE_CODE
