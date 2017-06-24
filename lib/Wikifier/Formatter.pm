@@ -488,6 +488,9 @@ sub __page_link {
         grep length, $page_name_hr, $section;
     $$display_ref = length $section ? $section : $target;
 
+    # if it starts with /, it is relative to the root
+    my $start_root = $target =~ s{^/}{};
+
     # apply the normalizer to both page and section
     ($target, $section) = map page_name_link($_), $target, $section;
 
@@ -507,9 +510,10 @@ sub __page_link {
         
         # page target, respecting page prefix
         else {
+            my $prefix = $start_root ? '' : $page->prefix;
             $safe_name = page_name($target);
             $full_name = resolve_dots(join '/', grep length,
-                $page->prefix, $safe_name);
+                $prefix, $safe_name);
             $path = join '/',
                 $page->opt('dir.page'), $full_name;
             $page_target = resolve_dots(join '/', grep length,
