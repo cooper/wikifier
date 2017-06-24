@@ -270,7 +270,7 @@ sub _generate_from_markdown {
                 $current_text = '';
             }
             else {
-                $add_text->(md_escape_fmt($current_text));
+                $add_text->(md_escape_fmt($current_text).";\n}\n");
                 undef $current_text;
             }
         }
