@@ -396,8 +396,8 @@ sub parse_link {
         $display_same++;
     }
 
-    # http://google.com
-    my $link_re = qr{^(\w+)://};
+    # http://google.com or $/something (see issue #68)
+    my $link_re = qr{^((\w+)://|\$)};
     my $mlto_re = qr{^mailto:};
     my $mail_re = qr{^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,63}$}i;
     if ($target =~ $link_re) {
@@ -406,7 +406,7 @@ sub parse_link {
         $display    =~ s/$link_re// if $display_same;
     }
     
-    # mailto:someone@example.com
+    # mailto:someone@example.com (see issue #69)
     elsif ($target =~ $mlto_re) {
         $link_type = 'contact';
         $normalize = \&_email_link;
