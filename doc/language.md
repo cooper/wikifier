@@ -438,6 +438,7 @@ formatting tokens.
 * `[[ wp: Page name ]]` - [external wiki](configuration.md#external) page link
 * `[[ ~ Cat name ]]` - category link
 * `[[ http://google.com ]]` - external site link
+* `[[ someone@example.com ]]` - email link
 * For any link type, you can change the display text:
   `[[ Google | http://google.com ]]`
 
