@@ -397,12 +397,28 @@ sub parse_link {
     }
 
     # http://google.com
-    if ($target =~ /^(\w+):\/\//) {
+    my $link_re = qr{^(\w+)://};
+    my $mlto_re = qr{^mailto:};
+    my $mail_re = qr{^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,63}$}i;
+    if ($target =~ $link_re) {
         $link_type  = 'other';
         $normalize  = \&_other_link;
-        $display    =~ s/^(\w+):\/\/// if $display_same;
+        $display    =~ s/$link_re// if $display_same;
     }
-
+    
+    # mailto:someone@example.com
+    elsif ($target =~ $mlto_re) {
+        $link_type = 'contact';
+        $normalize = \&_email_link;
+        $display   =~ s/$mlto_re// if $display_same;
+    }
+    
+    # someone@example.com
+    elsif ($target =~ $mail_re) {
+        $link_type = 'contact';
+        $normalize = \&_email_link;
+    }
+    
     # wp: some page
     elsif ($target =~ s/^(\w+)://) {
         unshift @normalize_args, $1;
@@ -565,6 +581,21 @@ sub _external_link {
 sub _other_link {
     my ($target_ref, $tooltip_ref, $display_ref, $page) = @_;
     $$tooltip_ref = 'External link';
+    return 1;
+}
+
+
+# email link
+sub _email_link {
+    my ($target_ref, $tooltip_ref, $display_ref, $page) = @_;
+    my $email = $$target_ref;
+    if ($$target_ref =~ /^mailto:/) {
+        $email = substr $email, 7;
+    }
+    else {
+        $$target_ref = "mailto:$$target_ref";
+    }
+    $$tooltip_ref = "Email $email";
     return 1;
 }
 
