@@ -165,13 +165,12 @@ sub _generate_from_markdown {
                 $header_level = $level;
                 $add_text->("~sec [");
                 $current_text = '';
-
             }
             
             # closing the header starts the section block
             else {
                 $indent++;
-                $add_text->("] {\n");
+                $add_text->("$current_text] {\n");
                 
                 # figure the anchor. modeled after what github uses:
                 # https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/toc_filter.rb
@@ -271,8 +270,7 @@ sub _generate_from_markdown {
                 $current_text = '';
             }
             else {
-                $current_text =~ s/;/\\;/g;
-                $add_text->($current_text);
+                $add_text->(md_escape_fmt($current_text));
                 undef $current_text;
             }
         }
