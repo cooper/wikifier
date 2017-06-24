@@ -290,6 +290,18 @@ sub _generate_from_markdown {
             $add_text->("~html {\n$html}\n");
         }
         
+        # NODE_BLOCK_QUOTE
+        elsif ($node_type == NODE_BLOCK_QUOTE) {
+            if ($ev_type == EVENT_ENTER) {
+                $indent++;
+                $add_text->("~quote {\n");
+            }
+            else {
+                $indent--;
+                $add_text->("\n}\n");
+            }
+        }
+        
         # do nothing
         elsif ($node_type == NODE_DOCUMENT) {
             
@@ -301,7 +313,6 @@ sub _generate_from_markdown {
         }
         
         # TODO:
-        # NODE_BLOCK_QUOTE
         # NODE_THEMATIC_BREAK (horizontal rule)
     }
     

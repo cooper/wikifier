@@ -1,6 +1,19 @@
 # Copyright (c) 2017, Mitchell Cooper
 #
-# sections are containers for paragraphs, image boxes, etc., each with a title.
+# section{} or sec{} is a container block which can contain other blocks and/or
+# formatted stray text. text is automatically split into paragraphs by blank
+# lines. the optional title will be displayed in the proper size in accordance
+# with the section hierarchy.
+#
+# if the first section on a page has no title, it is assumed to be an
+# introductory section and adopts the page title as its heading. this behavior
+# can be disabled with -@page.enable.title;
+#
+# quote{} is like section{} except used for blockquotes; it may NOT have a title
+# but follows the same rules for stray text.
+#
+# clear{} is a simple clear element which may be thought of as the HTML/CSS
+# equivalent <div style="clear: both;"></div>
 #
 package Wikifier::Block::Section;
 
