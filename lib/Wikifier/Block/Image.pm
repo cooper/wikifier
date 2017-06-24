@@ -37,7 +37,7 @@ sub image_parse {
 
     # get values from hash.
     $image->{$_} = $image->{map_hash}{$_} foreach qw(
-        file width height
+        file width height alt
         align float author license
     );
 
@@ -198,7 +198,7 @@ sub image_html {
             type       => 'img',
             attributes => {
                 src => $image_url,
-                alt => $image->{file},
+                alt => $image->{alt} // $image->{file},
                 'data-rjs' => $retina
             },
             styles => { width => $width }
@@ -226,7 +226,7 @@ sub image_html {
         type       => 'img',
         attributes => {
             src => $image_url,
-            alt => $image->{file},
+            alt => $image->{alt} // $image->{file},
             'data-rjs' => $retina
         },
         styles => { width  => $width }
