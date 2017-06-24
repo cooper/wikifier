@@ -476,6 +476,7 @@ sub md_escape {
 sub md_escape_fmt {
     my $text = shift;
     $text =~ s/([;:\{\}\[\]\\])/\\$1/g;
+    $text =~ s{/\*}{[&#47]*}g; # fix comments (see issue #62)
     return $text;
 }
 
