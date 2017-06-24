@@ -13,11 +13,27 @@ use Wikifier;
 use Wikifier::Utilities qw(L);
 
 my $path = shift @ARGV;
-die "Need page file path" if !length $path;
-die "Page does not exist" if !-e $path;
+my $page;
 
-# create the page object.
-my $page = Wikifier::Page->new(file_path => $path);
+# path given as argument
+if (length $path) {
+    die "Page does not exist" if !-e $path;
+    $page = Wikifier::Page->new(file_path => $path);
+}
+
+# read from STDIN
+else {
+    my $source = '';
+    while (my $data = <>) {
+        $source .= $data;
+    }
+    die "No input given" if !length $source;
+    $page = Wikifier::Page->new(
+        source          => $source,
+        name            => '(stdin)',
+        abs_rel_name    => '(stdin)'
+    );
+}
 
 # parse the page.
 my $err = $page->parse;
