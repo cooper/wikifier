@@ -120,6 +120,11 @@ sec [Interfaces] {
 [quiki](https://github.com/cooper/quiki) is currently the easiest way to get a
 wikifier wiki up and running.
 
+wikifier dependencies can be installed with
+```
+cpanm GD Git::Wrapper HTTP::Date HTML::Strip HTML::Entities JSON::XS URI::Escape
+```
+
 ## Documentation
 
 General
