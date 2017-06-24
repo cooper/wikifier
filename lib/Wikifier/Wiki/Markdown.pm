@@ -258,7 +258,9 @@ sub _generate_from_markdown {
         
         # NODE_IMAGE
         elsif ($node_type == NODE_IMAGE) {
-            # TODO
+            my $src = $node->get_url;
+            my $alt = $node->get_title;
+            $add_text->("~image { file: $src; alt: $alt; }");
         }
         
         # NODE_CODE
