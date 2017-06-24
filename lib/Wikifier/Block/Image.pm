@@ -68,12 +68,23 @@ sub image_parse {
         return;
     }
 
+
+    $image->{image_url}  = $image->{file};
+    $image->{last_name}  = (split m{/}, $image->{file})[-1];
+
     ##############
     ### SIZING ###
     ##############
 
+    # if the file is an absolute URL, we cannot size the image
+    if ($image->{file} =~ m{^(.+)://}) {
+        # do nothing
+    }
+
     # both dimensions were given, so we need to do no sizing.
-    if ($image->{width} && $image->{height}) {
+    # FIXME: this forces the full size image instead of generating in the
+    # given dimensions
+    elsif ($image->{width} && $image->{height}) {
         $w = $image->{width};
         $h = $image->{height};
     }
@@ -85,9 +96,7 @@ sub image_parse {
     elsif (lc $page->opt('image.size_method') eq 'javascript') {
 
         # inject javascript resizer if no width is given.
-        if (!$image->{width}) {
-            $image->{javascript} = 1;
-        }
+        $image->{javascript}++ if !$image->{width};
 
         # use the image root address options to determine URL.
 
@@ -162,8 +171,8 @@ sub image_html {
     }
 
     # fetch things we determined in image_parse().
- my ($height,          $width,          $image_root,          $image_url         ) =
-    ($image->{height}, $image->{width}, $image->{image_root}, $image->{image_url});
+ my ($height,          $width,          $image_url         ) =
+    ($image->{height}, $image->{width}, $image->{image_url});
     
     # link can be overridden
     my $link_target;
@@ -178,7 +187,7 @@ sub image_html {
         undef $link if !$ok;
     }
     else {
-        $link = "$image_root/$$image{file}";
+        $link = $image->{image_url};
     }
 
     ############
@@ -198,7 +207,7 @@ sub image_html {
             type       => 'img',
             attributes => {
                 src => $image_url,
-                alt => $image->{alt} // $image->{file},
+                alt => $image->{alt} // $image->{last_name},
                 'data-rjs' => $retina
             },
             styles => { width => $width }
@@ -226,7 +235,7 @@ sub image_html {
         type       => 'img',
         attributes => {
             src => $image_url,
-            alt => $image->{alt} // $image->{file},
+            alt => $image->{alt} // $image->{last_name},
             'data-rjs' => $retina
         },
         styles => { width  => $width }
