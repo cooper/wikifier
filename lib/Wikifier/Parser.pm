@@ -126,6 +126,7 @@ sub handle_character {
 
     # comment entrance
     if ($char eq '/' && $c->{next_char} eq '*') {
+        $c->mark_ignored;
         next DEFAULT if $c->is_escaped;
         $c->mark_comment;
         next CHAR;
