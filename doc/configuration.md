@@ -34,6 +34,7 @@ of a full wiki, and others yet for the operation of a wikiserver.
     * [var\.\*](#var)
   * [Wikifier::Wiki extended options](#wikifierwiki-extended-options)
     * [main\_page](#main_page)
+    * [main\_redirect](#main_redirect)
     * [navigation](#navigation)
     * [template](#template)
     * [logo](#logo)
@@ -415,6 +416,15 @@ software built atop wikifier.
 Name of the main page. This should not be the page's title but rather a
 filename, relative to [`dir.page`](#dir). The `.page` extension is not
 necessary.
+
+### main_redirect
+
+```
+@main_redirect;
+```
+
+If enabled, the wiki root will redirect to the main page rather than just
+displaying it at the root location.
 
 ### navigation
 
