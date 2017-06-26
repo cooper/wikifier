@@ -21,9 +21,16 @@ sub style_parse {
     $block->{no_format_values}++;
     $block->parse_base(@_);
 
+    # find rules
+    my %rules;
+    foreach my $item ($block->map_array) {
+        $rules{ $item->{key_title} } = $item->{value};
+    }
+
+    # create style
     my %style = (
         apply_to => [],
-        rules    => $block->{map_hash}
+        rules    => \%rules
     );
 
     # if the block has a name, it applies to child class(es).
