@@ -49,6 +49,9 @@ sub model_parse {
     # parse the page.
     my $err = $model->parse;
     $block->warning("Model \$$name\{} error: $err") if $err;
+    
+    # determine whether to include model tags
+    $block->{include_tags} = $model->get('model.tags');
 }
 
 sub model_html {
@@ -66,6 +69,9 @@ sub model_html {
     $el->add_class('model');
     $el->add_class("model-$$model{model_name}");
     $el->add_class($model_el->{id});
+
+    # disable tags
+    $el->configure(no_tags => 1) unless $block->{include_tags};
 
     # overwrite the model element
     $block->{element} = $el;
