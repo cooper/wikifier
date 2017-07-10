@@ -625,16 +625,18 @@ sub page_info {
     };
 }
 
+sub _bool ($) { shift() ? \1 : undef }
+
 # page draft from @page.draft
 sub draft {
     my $page = shift;
-    return !!$page->get('page.draft');
+    return _bool $page->get('page.draft');
 }
 
 # page generated from @page.generated
 sub generated {
     my $page = shift;
-    return !!$page->get('page.generated');
+    return _bool $page->get('page.generated');
 }
 
 # page author from @page.author

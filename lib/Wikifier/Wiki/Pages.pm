@@ -216,7 +216,7 @@ sub _display_page {
     # generate the HTML and headers.
     $result->{generated}  = \1;
     $result->{page}       = $page;
-    $result->{draft}      = $page->draft ? \1 : undef;
+    $result->{draft}      = $page->draft;
     $result->{warnings}   = $page->{warnings};
     $result->{mod_unix}   = time;
     $result->{modified}   = time2str($result->{mod_unix});
