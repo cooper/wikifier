@@ -214,9 +214,9 @@ sub _display_page {
     return $wiki->_write_page_cache_maybe($page, $redir) if $redir;
 
     # generate the HTML and headers.
-    $result->{generated}  = 1;
+    $result->{generated}  = \1;
     $result->{page}       = $page;
-    $result->{draft}      = $page->draft;
+    $result->{draft}      = $page->draft ? \1 : undef;
     $result->{warnings}   = $page->{warnings};
     $result->{mod_unix}   = time;
     $result->{modified}   = time2str($result->{mod_unix});
@@ -285,11 +285,11 @@ sub _get_page_cache {
     # SECOND redirect check - this cached page has @page.redirect
     if (length(my $redir = $cache_data->{redirect})) {
         $redir = _display_page_redirect($redir, $result);
-        $redir->{cached} = 1;
+        $redir->{cached} = \1;
         return $redir;
     }
 
-    $result->{cached}   = 1;
+    $result->{cached}   = \1;
     $result->{content} .= shift @data;
     $result->{mod_unix} = $cache_modify;
     $result->{modified} = $time_str;
@@ -355,7 +355,7 @@ sub _write_page_cache {
     # overwrite modified date to actual.
     $result->{mod_unix}  = $page->cache_modified;
     $result->{modified}  = time2str($result->{mod_unix});
-    $result->{cache_gen} = 1;
+    $result->{cache_gen} = \1;
 
     return $result;
 }
@@ -368,7 +368,7 @@ sub _write_page_text {
     binmode $fh, ':utf8';
     print {$fh} $stripper->parse($result->{content});
     close $fh;
-    $result->{text_gen} = 1;
+    $result->{text_gen} = \1;
     return $result;
 }
 

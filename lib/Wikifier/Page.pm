@@ -555,6 +555,9 @@ sub redirect {
     return undef;
 }
 
+# true if the page is a symbolic link to another file within the page directory.
+# if it is symlinked to somewhere outside the page directory, it is treated as
+# a normal page file rather than a redirect.
 sub is_symlink {
     my $page = shift;
     return -l $page->rel_path && !index($page->path, $page->opt('dir.page'));

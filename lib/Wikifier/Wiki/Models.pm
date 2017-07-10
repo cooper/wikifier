@@ -91,7 +91,7 @@ sub _display_model {
     $result->{type}       = 'model';
     $result->{content}    = $page->html;
     $result->{css}        = $page->css;
-    $result->{generated}  = 1;
+    $result->{generated}  = \1;
     $result->{modified}   = time2str(time);
     $result->{mod_unix}   = time;
     $result->{categories} = [ _cats_to_list($page->{categories}) ];

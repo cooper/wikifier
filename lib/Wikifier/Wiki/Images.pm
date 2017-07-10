@@ -259,7 +259,7 @@ sub _get_image_cache {
 
     $result->{path}         = $cache_path;
     $result->{file}         = basename($cache_path);
-    $result->{cached}       = 1;
+    $result->{cached}       = \1;
     $result->{modified}     = time2str($cache_modify);
     $result->{mod_unix}     = $cache_modify;
     $result->{length}       = -s $cache_path;
@@ -412,7 +412,7 @@ sub _generate_image {
 
     # the request is to generate an image the same or larger than the original.
     if ($width >= $fi_width && $height >= $fi_height) {
-        $result->{use_fullsize} = 1;
+        $result->{use_fullsize} = \1;
         L align(
             'Skip',
             "${width}x${height} >= original ${fi_width}x${fi_height}"
@@ -458,7 +458,7 @@ sub _generate_image {
         $result->{content} = $sized_image->png();
     }
 
-    $result->{generated}    = 1;
+    $result->{generated}    = \1;
     $result->{modified}     = time2str(time);
     $result->{mod_unix}     = time;
     $result->{length}       = length $result->{content};
@@ -478,7 +478,7 @@ sub _generate_image {
         $result->{file}       = basename($cache_path);
         $result->{modified}   = time2str($modified);
         $result->{mod_unix}   = $modified;
-        $result->{cache_gen}  = 1;
+        $result->{cache_gen}  = \1;
 
         # if this image is available in more than 1 scale, symlink.
         $wiki->_symlink_scaled_image($image);
