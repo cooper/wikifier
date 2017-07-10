@@ -115,8 +115,8 @@ sub page_named {
 #                       text file based on the contents of this page
 #
 #       (draft)         true if the page has not yet been published for public
-#                       viewing. this only ever occurs if the 'draft_ok' option
-#                       was used; otherwise result would be of type 'not found'
+#                       viewing. note that unless 'draft_ok' option was used,
+#                       result for drafts will be of type 'not found'
 #
 #       (warnings)      an array reference of warnings produced by the parser.
 #                       omitted when no warnings were produced
