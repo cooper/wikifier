@@ -542,7 +542,7 @@ sub redirect {
     my $page = shift;
     
     # symbolic link redirect
-    if (-l $page->rel_path && !index($page->path, $page->opt('dir.page'))) {
+    if ($page->is_symlink) {
         return $page->opt('root.page').'/'.$page->name_ne;
     }
     
@@ -553,6 +553,11 @@ sub redirect {
     }
 
     return undef;
+}
+
+sub is_symlink {
+    my $page = shift;
+    return -l $page->rel_path && !index($page->path, $page->opt('dir.page'));
 }
 
 # page creation time from @page.created

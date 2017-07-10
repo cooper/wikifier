@@ -177,8 +177,8 @@ sub _display_page {
     $result->{mime} = 'text/html';
 
     # FIRST redirect check - this is for symbolic link redirects.
-    my $redir = _display_page_redirect($page->redirect, $result);
-    return $redir if $redir;
+    return _display_page_redirect($page->redirect, $result)
+        if $page->is_symlink;
 
     # caching is enabled, so let's check for a cached copy.
     if ($wiki->opt('page.enable.cache') && -f $cache_path) {
