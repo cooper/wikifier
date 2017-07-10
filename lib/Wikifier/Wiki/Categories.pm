@@ -200,7 +200,7 @@ sub cat_check_page {
         cat_type        => 'page',
         cat_extras      => { page_info => $page->page_info },   # page metadata
         create_ok       => 1,                   # allow prefix to be created
-        preserve        => 1,                   # keep the cat until page delete
+        preserve        => \1,                  # keep the cat until page delete
         force_update    => 1                    # always rewrite page metadata
     );
 
@@ -230,7 +230,7 @@ sub cat_check_page {
             cat_type    => 'page',
             page_extras => { lines => $page->{target_pages}{$page_name} },
             create_ok   => 1,
-            preserve    => 1
+            preserve    => \1
         );
     }
 
@@ -238,7 +238,7 @@ sub cat_check_page {
     foreach my $model_name (keys_maybe $page->{models}) {
         $wiki->cat_add_page($page, $model_name,
             cat_type => 'model',
-            preserve => 1
+            preserve => \1
         );
     }
 }
@@ -377,7 +377,7 @@ sub cat_add_page {
 sub cat_add_image {
     my ($wiki, $image_name, $page_maybe, %opts) = @_;
     $opts{cat_type} = 'image';
-    $opts{preserve} = 1;
+    $opts{preserve} = \1;
     my $image_data = $opts{cat_extras}{image_info} ||= {};
     $image_data->{file} = $image_name;
     
