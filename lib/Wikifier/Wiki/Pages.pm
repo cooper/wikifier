@@ -210,7 +210,7 @@ sub _display_page {
 
     # THIRD redirect check - this is for pages we just generated with
     # @page.redirect in them.
-    $redir = _display_page_redirect($page->redirect, $result);
+    my $redir = _display_page_redirect($page->redirect, $result);
     return $wiki->_write_page_cache_maybe($page, $redir) if $redir;
 
     # generate the HTML and headers.
