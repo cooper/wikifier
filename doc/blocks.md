@@ -253,6 +253,9 @@ infobox [Planet Earth] {
 * __height__ - image height in pixels.
 * __align__ - `left` or `right` to specify which side of the container the
   image should clear. defaults to `right`.
+* __link__ - hyperlink for the image. all [link types](language.md#links) are
+  supported, including pages, categories, external wiki links, and external
+  site links. `none` is also accepted. defaults to the full-sized image.
 * __float__ - alias for __align__.
 
 If neither __width__ nor __height__ is specified, the image will be full-size,

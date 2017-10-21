@@ -37,7 +37,7 @@ sub image_parse {
 
     # get values from hash.
     $image->{$_} = $image->{map_hash}{$_} foreach qw(
-        file width height alt
+        file width height alt link
         align float author license
     );
 
@@ -176,7 +176,7 @@ sub image_html {
     
     # link can be overridden
     my $link_target;
-    my $link = $image->{map_hash}{link};
+    my $link = $image->{link};
     if ($link && $link eq 'none') {
         undef $link;
     }
@@ -190,6 +190,10 @@ sub image_html {
         $link = $image->{image_url};
     }
 
+    # add href and link target if there's a link
+    my $img_a_attributes = { href => $link, target => $link_target };
+    undef $img_a_attributes if !defined $link;
+
     ############
     ### HTML ###
     ############
@@ -200,7 +204,7 @@ sub image_html {
         $an = $el->create_child(
             class      => 'image-a',
             type       => 'a',
-            attributes => { href => $link, target => $link_target }
+            attributes => $img_a_attributes
         ) if $link;
         ($an || $el)->create_child(
             class      => 'image-img',
@@ -226,7 +230,7 @@ sub image_html {
     $an = $inner->create_child(
         class      => 'imagebox-a',
         type       => 'a',
-        attributes => { href => $link, target => $link_target }
+        attributes => $img_a_attributes
     ) if $link;
 
     # create the image.
