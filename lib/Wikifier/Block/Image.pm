@@ -169,7 +169,7 @@ sub image_html {
     
     # add data-rjs for retina.
     my $retina;
-    if (!$full_size and $retina = $page->opt('image.enable.retina')) {
+    if (!$image->{full_size} and $retina = $page->opt('image.enable.retina')) {
         my @scales = split /,/, $retina;
         $retina = max grep !m/\D/, map { trim($_) } @scales;
         $retina ||= undef;
