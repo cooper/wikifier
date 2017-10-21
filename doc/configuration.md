@@ -245,6 +245,8 @@ A code reference that calculates a missing dimension of an image.
 This is utilized only when [`image.size_method`](#imagesize_method) is _server_.
 
 Returns `(scaled width, scaled height, full width, full height, fullsize)`.
+`fullsize` is true if the scaled dimensions are equal to the full-sized
+dimensions.
 
 __Default__ (Page): built in, uses [Image::Size](https://metacpan.org/pod/Image::Size)
 

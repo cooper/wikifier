@@ -404,6 +404,7 @@ sub _call_opt {
 }
 
 # default image dimension calculator. requires Image::Size.
+# returns (width, height, big_width, big_height, full_size)
 sub _default_calculator {
     my %img = @_;
     my $page_or_wiki = $img{page} || $img{wiki};
@@ -424,7 +425,7 @@ sub _default_calculator {
 
     # neither dimensions were given. use the full size.
     if (!$width && !$height) {
-        return ($big_w, $big_h, 1);
+        return ($big_w, $big_h, $big_w, $big_h, 1);
     }
 
     # now we must find the scaling factor.
@@ -445,7 +446,11 @@ sub _default_calculator {
         $final_h = $img{height};
     }
 
-    return ($final_w, $final_h);
+    return (
+        $final_w,   $final_h,
+        $big_w,     $big_h,
+        $final_w == $big_w && $final_h == $big_h
+    );
 }
 
 sub _default_sizer {

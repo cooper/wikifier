@@ -35,7 +35,7 @@ our %wiki_defaults = (
     'image.rounding'                => 'up',
     'image.size_method'             => 'server',
     'image.sizer'                   => \&_wiki_default_sizer,   # from Images
-    'image.calc'                    => \&_wiki_default_calc ,   # from Images
+    'image.calc'                    => \&_wiki_default_calc,    # from Images
     'cat.per_page'                  => 5,
     'search.enable'                 => 1
 );

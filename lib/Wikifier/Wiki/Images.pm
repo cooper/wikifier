@@ -498,6 +498,7 @@ sub _symlink_scaled_image {
 }
 
 # default image calculator for a wiki.
+# returns (width, height, big_width, big_height, full_size)
 sub _wiki_default_calc {
     my %img  = @_;
     my $wiki = $img{wiki} || $img{page}{wiki};
