@@ -131,8 +131,13 @@ sub image_parse {
             page   => $page
         );
         
+        # normalize dimensions
         $w += 0;
         $h += 0;
+
+        # remember if we're using the fullsize version
+        # so that we don't attempt to retina-scale it
+        $image->{full_size} = $full_size;
 
         # remember that we use this image.
         push @{ $page->{images} { $image->{file} } ||= [] }, $w, $h;
@@ -164,7 +169,7 @@ sub image_html {
     
     # add data-rjs for retina.
     my $retina;
-    if ($retina = $page->opt('image.enable.retina')) {
+    if (!$full_size and $retina = $page->opt('image.enable.retina')) {
         my @scales = split /,/, $retina;
         $retina = max grep !m/\D/, map { trim($_) } @scales;
         $retina ||= undef;
