@@ -21,7 +21,7 @@ sub Log {
     my $log_file = $wiki->opt('dir.cache').'/wiki.log';
     
     # unknown log type
-    my $alowed_attrs = $allowed_log_types{$log_type};
+    my $allowed_attrs = $allowed_log_types{$log_type};
     if (!$allowed_attrs) {
         E("Unknown log type '$log_type'");
         return;
