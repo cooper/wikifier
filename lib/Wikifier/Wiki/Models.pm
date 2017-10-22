@@ -102,7 +102,7 @@ sub _display_model {
     # model metadata category
     $wiki->cat_add_page(undef, $page->name,
         cat_type        => 'model',
-        cat_extras      => { model_name => $page->page_info }, # model metadata
+        cat_extras      => { model_info => $page->page_info }, # model metadata
         create_ok       => 1,                   # allow prefix to be created
         preserve        => \1,                  # keep the cat until model delete
         force_update    => 1                    # always rewrite model metadata
