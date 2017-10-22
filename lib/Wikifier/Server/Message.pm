@@ -18,7 +18,7 @@ sub error {
     my ($msg, $error, %other) = @_;
     $msg->reply(error => { reason => $error, %other });
     $msg->l("Error: $error");
-    $msg->conn->close if $conn->{close};
+    $msg->conn->close if $msg->conn->{close};
 }
 
 sub l       { shift->conn->l(@_)    }
