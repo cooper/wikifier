@@ -364,6 +364,11 @@ sub verify_login {
         return;
     }
 
+    $wiki->Log(login => {
+        username    => $username,
+        crypt       => $crypt
+    });
+    
     # return the user info, with crypt and password removed.
     return \%user;
 }

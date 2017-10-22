@@ -11,7 +11,8 @@ use JSON::XS ();
 my $json = JSON::XS->new->pretty->convert_blessed;
 
 my %allowed_log_types = (
-    
+    login_fail => [],
+    login => []
 );
 
 sub Log {
