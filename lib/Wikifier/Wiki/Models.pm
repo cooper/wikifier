@@ -96,6 +96,15 @@ sub _display_model {
     $result->{mod_unix}   = time;
     $result->{categories} = [ _cats_to_list($page->{categories}) ];
 
+    # model metadata category
+    $wiki->cat_add_page(undef, $page->name,
+        cat_type        => 'model',
+        cat_extras      => { model_name => $page->page_info }, # model metadata
+        create_ok       => 1,                   # allow prefix to be created
+        preserve        => \1,                  # keep the cat until model delete
+        force_update    => 1                    # always rewrite model metadata
+    );
+
     return $result;
 }
 
@@ -145,6 +154,52 @@ sub _display_model_code {
     }
 
     return $result;
+}
+
+sub get_model {
+    my ($wiki, $filename, $create_ok) = @_;
+    my $path = $wiki->path_for_model($filename, $create_ok);
+    my $cat_path = $wiki->path_for_category($filename, 'model');
+
+    # neither the model nor a category for it exist. this is a ghost
+    return if !-f $path && (!defined $cat_path || !-f $cat_path);
+
+    # basic info available for all models
+    my @stat = stat $path; # might be empty
+    my $model_data = {
+        file        => $filename,
+        created     => $stat[10],   # ctime, probably overwritten
+        mod_unix    => $stat[9]     # mtime, probably overwritten
+    };
+
+    # from this point on, we need the category
+    return $model_data unless -f $cat_path;
+
+    # it exists; let's see what's inside.
+    my %cat = hash_maybe eval { $json->decode(file_contents($cat_path)) };
+    %cat    = hash_maybe $cat{model_info};
+    return $model_data if !scalar keys %cat;
+    
+    # inject metadata from category
+    @$model_data{ keys %cat } = values %cat;
+    $model_data->{title} //= $model_data->{file};
+    
+    return $model_data;
+}
+
+sub get_models {
+    my ($wiki, %models) = shift;
+    my @cat_names = map substr($_, 0, -4), $wiki->all_categories('model');
+    
+    # models without category files will be skipped.
+    foreach my $filename (@cat_names, $wiki->all_models) {
+        next if $models{$filename};
+        my $model_data = $wiki->get_model($filename, 1) or next;
+        $filename = $model_data->{file};
+        $models{$filename} = $model_data;
+    }
+    
+    return \%models;
 }
 
 1
