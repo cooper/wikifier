@@ -9,7 +9,7 @@ use Wikifier::Utilities qw(E);
 use Scalar::Util qw(openhandle);
 use JSON::XS ();
 
-my $json = JSON::XS->new->pretty->convert_blessed;
+my $json = JSON::XS->new->convert_blessed;
 
 my %allowed_log_types = (
     login_fail      => [ qw(username crypt reason)                          ],
