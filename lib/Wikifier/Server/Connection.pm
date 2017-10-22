@@ -46,7 +46,7 @@ sub error {
     my ($conn, $error, %other) = @_;
     $conn->send(error => { reason => $error, %other });
     $conn->l("Error: $error");
-    $conn->close;
+    $conn->close if $conn->{close};
 }
 
 # handle a line of data.
@@ -54,10 +54,11 @@ sub handle {
     my ($conn, $line) = @_;
     my $return = undef;
     print STDERR "C: $line\n" if $ENV{WIKIFIER_DEBUG};
-
+    
     # not interested if we're dropping the connection
     return if $conn->{closed};
-
+    $conn->{close} = 1; # close if syntax is wrong
+    
     # make sure it's a JSON array.
     my $data = eval { $json->decode($line) };
     if (!$line || !$data || ref $data ne 'ARRAY') {
@@ -88,6 +89,9 @@ sub handle {
     # Safe point - the message is synactically valid, so we should use
     # $msg->reply and $msg->error from this point on.
 
+    # since the syntax is OK, let the msg decide whether to close
+    $conn->{close} = $msg->{close};
+
     # store the connection and ID
     bless $msg, 'Wikifier::Server::Message';
     weaken($msg->{conn} = $conn);
@@ -107,7 +111,7 @@ sub handle {
     }
 
     # if the 'close' option exists, close the connection afterward.
-    $conn->close if $msg->{close};
+    $conn->close if $conn->{close};
 
     return $return;
 }
