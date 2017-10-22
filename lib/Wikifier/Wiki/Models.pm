@@ -8,6 +8,9 @@ use 5.010;
 use HTTP::Date qw(time2str);
 use Wikifier::Utilities qw(page_name page_name_ne align L Lindent back);
 use Scalar::Util qw(blessed);
+use JSON::XS ();
+
+my $json = JSON::XS->new->pretty->convert_blessed;
 
 ##############
 ### MODELS ###
