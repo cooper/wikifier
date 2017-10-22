@@ -320,6 +320,10 @@ sub verify_login {
     # find the user.
     my %user = $wiki->{pconf}->get_hash("admin.$username");
     if (!keys %user) {
+        $wiki->Log(login_fail => {
+            username => $username,
+            reason   => 'username'
+        });
         L "Attempted to login as '$username' which does not exist";
         return;
     }
@@ -340,12 +344,22 @@ sub verify_login {
 
     # error
     if (!defined $hash) {
+        $wiki->Log(login_fail => {
+            username => $username,
+            crypt    => $crypt,
+            reason   => 'crypt'
+        });
         E "Error with $crypt: $@";
         return;
     }
 
     # invalid credentials
     if ($hash ne delete $user{password}) {
+        $wiki->Log(login_fail => {
+            username => $username,
+            crypt    => $crypt,
+            reason   => 'password'
+        });
         L "Incorrect password for '$username'";
         return;
     }
