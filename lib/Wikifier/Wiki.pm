@@ -17,6 +17,7 @@ use File::Path qw(make_path);
 use File::Spec;
 
 use Wikifier;
+use Wikifier::Wiki::Log;
 use Wikifier::Wiki::Pages;
 use Wikifier::Wiki::Images;
 use Wikifier::Wiki::Models;
