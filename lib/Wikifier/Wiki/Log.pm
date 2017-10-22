@@ -6,6 +6,7 @@ use strict;
 use 5.010;
 
 use Wikifier::Utilities qw(E);
+use Scalar::Util qw(openhandle);
 use JSON::XS ();
 
 my $json = JSON::XS->new->pretty->convert_blessed;
@@ -35,7 +36,7 @@ sub Log {
         
     # a filehandle is open
     return print { $wiki->{log_fh} } $json_data
-        if fileno $wiki->{log_fh};
+        if openhandle($wiki->{log_fh});
     
     # need to open a logfile
     open my $fh, '>', $log_file
