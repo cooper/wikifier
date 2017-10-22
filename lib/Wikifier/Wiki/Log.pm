@@ -54,7 +54,7 @@ sub Log {
         if openhandle($wiki->{log_fh});
     
     # need to open a logfile
-    open my $fh, '>', $log_file
+    open my $fh, '>>', $log_file
         or E("Failed to open wiki log file '$log_file'")
         and return;
     $wiki->{log_fh} = $fh;
