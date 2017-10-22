@@ -12,18 +12,33 @@ use JSON::XS ();
 my $json = JSON::XS->new->pretty->convert_blessed;
 
 my %allowed_log_types = (
-    login_fail => [],
-    login => []
+    login_fail      => [ qw(username crypt reason)                          ],
+    login           => [ qw(username name email crypt)                      ]
 );
 
 sub Log {
     my ($wiki, $log_type, $attributes) = (shift, @_);
     my $log_file = $wiki->opt('dir.cache').'/wiki.log';
     
+    # unknown log type
+    my $alowed_attrs = $allowed_log_types{$log_type};
+    if (!$allowed_attrs) {
+        E("Unknown log type '$log_type'");
+        return;
+    }
+    
     # must be hash
     if (ref $attributes ne 'HASH') {
         E("Expected HASH reference of attributes for log type '$log_type'");
         return;
+    }
+    
+    # weed out unknown attributes
+    my %ok = map { $_ => 1 } @$allowed_attrs;
+    foreach my $bad (keys %$attributes) {
+        next if $ok{$bad};
+        E("Unknown attribute '$bad' for log type '$log_type'");
+        delete $attributes->{$bad};
     }
     
     # encode to JSON

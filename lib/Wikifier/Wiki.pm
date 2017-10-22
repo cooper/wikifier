@@ -367,6 +367,8 @@ sub verify_login {
 
     $wiki->Log(login => {
         username    => $username,
+        name        => $user{name},
+        email       => $user{email},
         crypt       => $crypt
     });
     
