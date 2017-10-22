@@ -282,13 +282,7 @@ sub handle_model_list {
     $msg->l('Model list');
     
     # get all models
-    my @models;
-    foreach my $model_name ($wiki->all_models) {
-        push @models, { # FIXME: real info
-            file  => $model_name,
-            title => $model_name
-        };
-    }
+    my @models = values_maybe $wiki->get_models;
 
     # sort
     my $sorter = $sort_options{ $msg->{sort} } || $sort_options{'m-'};
