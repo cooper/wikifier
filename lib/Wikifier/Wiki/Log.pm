@@ -45,7 +45,8 @@ sub Log {
     
 
     # create a stream if possible
-    if ($INC{'IO/Async/Stream.pm'}) {
+    my $loop = $Wikifier::Server::loop;
+    if ($INC{'IO/Async/Stream.pm'} && $loop) {
         my $handle_error = sub {
             E("Error writing to $log_file: @_");
             delete $wiki->{log_stream};
@@ -56,6 +57,7 @@ sub Log {
             on_write_error => $handle_error,
             on_write_eof   => $handle_error
         );
+        $loop->add($wiki->{log_stream});
     }
 
     # redo now that we've opened the filehandle
