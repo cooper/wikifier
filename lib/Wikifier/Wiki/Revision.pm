@@ -151,6 +151,8 @@ sub move_page {
         message => "Moved $old_name -> $new_name",
         mv      => { $old_path => $page->path }
     );
+    
+    my $rev_latest;
 
     if (@errs) {
         $wiki->Log(page_move_fail => {
