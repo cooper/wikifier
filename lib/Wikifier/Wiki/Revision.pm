@@ -18,7 +18,7 @@ sub write_page {
     # do not allow symbolic link
     if (-l $page->rel_path) {
         back;
-        return 'Page is symbolically linked';
+        return (undef, 'Page is symbolically linked');
     }
 
     # determine reason
@@ -29,9 +29,8 @@ sub write_page {
     # open the file
     my $fh;
     if (!open $fh, '>', $page->path) {
-        E 'Failed to open page file for writing';
         back;
-        return;
+        return (undef, "Failed to open page file for writing: $!");
     }
     
     # write
@@ -79,7 +78,7 @@ sub delete_page {
     # do not allow symbolic link
     if (-l $page->rel_path) {
         back;
-        return 'Page is symbolically linked';
+        return (undef, 'Page is symbolically linked');
     }
 
     # commit the change
@@ -119,7 +118,7 @@ sub move_page {
     # this should never happen
     if (-l $page->rel_path) {
         back;
-        return 'Page is symbolically linked';
+        return (undef, 'Page is symbolically linked');
     }
     
     # change the name, but keep the old name until after we ->display_page().
@@ -133,17 +132,37 @@ sub move_page {
     # trying to overwrite
     if (!$allow_overwrite && -e $page->path) {
         back;
-        return 'Destination filename already exists';
+        return (undef, 'Destination filename already exists');
     }
     
     # delete the old cache file
     unlink $page->cache_path; # may or may not exist
 
     # commit the change
-    $wiki->rev_commit(
+    my @errs = $wiki->rev_commit(
         message => "Moved $old_name -> $new_name",
         mv      => { $old_path => $page->path }
     );
+
+    if (@errs) {
+        $wiki->Log(page_move_fail => {
+            src_name    => $old_name,
+            dest_name   => $new_name,
+            src_file    => $old_path,
+            dest_file   => $page->path,
+            errors      => \@errs
+        });
+    }
+    else {
+        $rev_latest = $wiki->rev_latest;
+        $wiki->Log(page_move => {
+            src_name    => $old_name,
+            dest_name   => $new_name,
+            src_file    => $old_path,
+            dest_file   => $page->path,
+            commit      => $rev_latest->{id}
+        });
+    }
 
     # update the page
     my $display_method = $page->{is_model} ? 'display_model' : 'display_page';
@@ -151,7 +170,7 @@ sub move_page {
     delete $page->{old_name};
 
     back;
-    return;
+    return ($rev_latest, @errs);
 }
 
 *write_model    = \&write_page;

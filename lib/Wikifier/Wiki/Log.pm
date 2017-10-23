@@ -12,12 +12,14 @@ use JSON::XS ();
 my $json = JSON::XS->new->convert_blessed;
 
 my %allowed_log_types = (
-    login_fail          => [ qw(username crypt reason)                      ],
-    login               => [ qw(username name email crypt)                  ],
-    page_write          => [ qw(file message commit)                        ],
-    page_write_fail     => [ qw(file message errors)                        ],
-    page_delete         => [ qw(file commit)                                ],
-    page_delete_fail    => [ qw(file errors)                                ]
+    login_fail          => [ qw(username crypt reason)                        ],
+    login               => [ qw(username name email crypt)                    ],
+    page_write          => [ qw(file message commit)                          ],
+    page_write_fail     => [ qw(file message errors)                          ],
+    page_delete         => [ qw(file commit)                                  ],
+    page_delete_fail    => [ qw(file errors)                                  ],
+    page_move           => [ qw(src_name src_file dest_name dest_file commit) ],
+    page_move_fail      => [ qw(src_name src_file dest_name dest_file errors) ]
 );
 
 sub Log {
