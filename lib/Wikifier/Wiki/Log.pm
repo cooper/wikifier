@@ -13,7 +13,9 @@ my $json = JSON::XS->new->convert_blessed;
 
 my %allowed_log_types = (
     login_fail      => [ qw(username crypt reason)                          ],
-    login           => [ qw(username name email crypt)                      ]
+    login           => [ qw(username name email crypt)                      ],
+    page_write      => [ qw(file message commit)                            ],
+    page_write_fail => [ qw(file message errors)                            ]
 );
 
 sub Log {

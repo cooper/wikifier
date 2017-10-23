@@ -44,13 +44,31 @@ sub write_page {
     $wiki->$display_method($page, draft_ok => 1);
 
     # commit the change
-    my @res = $wiki->rev_commit(
+    my @errs = $wiki->rev_commit(
         message => $reason,
         add     => [ $page->path ]
     );
     
+    my $rev_latest;
+    
+    if (@errs) {
+        $wiki->Log(page_write_fail => {
+            file        => $page->path,
+            message     => $reason,
+            errors      => \@errs
+        });
+    }
+    else {
+        $rev_latest = $wiki->rev_latest;
+        $wiki->Log(page_write => {
+            file        => $page->path,
+            message     => $reason,
+            commit      => $rev_latest->{id}
+        });
+    }
+    
     back;
-    return @res;
+    return ($rev_latest, @errs);
 }
 
 sub delete_page {

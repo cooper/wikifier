@@ -392,14 +392,14 @@ sub _handle_page_save {
     $method  = $is_model ? 'model_named' : 'page_named';
     my $page = $wiki->$method($msg->{name}, content => $content);
     $method  = $is_model ? 'write_model' : 'write_page';
-    my @errs = $wiki->$method($page, $msg->{message});
+    my ($rev_latest, @errs) = $wiki->$method($page, $msg->{message});
 
     $msg->reply($is_model ? 'model_save' : 'page_save' => {
         result     => $page->{recent_result},
         saved      => !@errs,
         rev_errors => \@errs,
         rev_error  => _simplify_errors(@errs),
-        rev_latest => @errs ? undef : $wiki->rev_latest,
+        rev_latest => @errs ? undef : $rev_latest,
     });
 }
 
