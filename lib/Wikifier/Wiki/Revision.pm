@@ -9,7 +9,6 @@ use strict;
 use Git::Wrapper;
 use Scalar::Util qw(blessed);
 use Wikifier::Utilities qw(page_name L E back);
-use File::Spec;
 
 sub write_page {
     my ($wiki, $page, $reason) = @_;
@@ -54,7 +53,7 @@ sub write_page {
         $wiki->Log(page_write_fail => {
             user        => $wiki->{user},
             is_model    => $page->{is_model} ? \1 : \0,
-            file        => $page->path,
+            file        => $wiki->rel_path($page->path),
             message     => $reason,
             errors      => \@errs
         });
@@ -64,7 +63,7 @@ sub write_page {
         $wiki->Log(page_write => {
             user        => $wiki->{user},
             is_model    => $page->{is_model} ? \1 : \0,
-            file        => $page->path,
+            file        => $wiki->rel_path($page->path),
             message     => $reason,
             commit      => $rev_latest->{id}
         });
@@ -97,7 +96,7 @@ sub delete_page {
         $wiki->Log(page_delete_fail => {
             user        => $wiki->{user},
             is_model    => $page->{is_model} ? \1 : \0,
-            file        => $page->path,
+            file        => $wiki->rel_path($page->path),
             errors      => \@errs
         });
     }
@@ -108,7 +107,7 @@ sub delete_page {
         $wiki->Log(page_delete => {
             user        => $wiki->{user},
             is_model    => $page->{is_model} ? \1 : \0,
-            file        => $page->path,
+            file        => $wiki->rel_path($page->path),
             commit      => $rev_latest->{id}
         });
     }
@@ -160,8 +159,8 @@ sub move_page {
             is_model    => $page->{is_model} ? \1 : \0,
             src_name    => $old_name,
             dest_name   => $new_name,
-            src_file    => $old_path,
-            dest_file   => $page->path,
+            src_file    => $wiki->rel_path($old_path),
+            dest_file   => $wiki->rel_path($page->path),
             errors      => \@errs
         });
     }
@@ -172,8 +171,8 @@ sub move_page {
             is_model    => $page->{is_model} ? \1 : \0,
             src_name    => $old_name,
             dest_name   => $new_name,
-            src_file    => $old_path,
-            dest_file   => $page->path,
+            src_file    => $wiki->rel_path($old_path),
+            dest_file   => $wiki->rel_path($page->path),
             commit      => $rev_latest->{id}
         });
     }
@@ -344,8 +343,7 @@ sub _prepare_git {
                     return _rev_op_complete;
                 },
                 'create .gitignore' => sub {
-                    my $cache_dir = $wiki->opt('dir.cache');
-                    $cache_dir = File::Spec->abs2rel($cache_dir, $dir);
+                    my $cache_dir = $wiki->rel_path($wiki->opt('dir.cache'));
                     open my $fh, '>', "$dir/.gitignore" or return $!;
                     print $fh <<END;
 .DS_Store

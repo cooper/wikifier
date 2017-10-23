@@ -492,4 +492,10 @@ sub file_contents {
     return $content;
 }
 
+# returns the relative path to a file
+sub rel_path {
+    my ($wiki, $dir) = @_;
+    return File::Spec->abs2rel($dir, $wiki->opt('dir.wiki'));
+}
+
 1
