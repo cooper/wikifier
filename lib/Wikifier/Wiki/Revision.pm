@@ -53,7 +53,7 @@ sub write_page {
     if (@errs) {
         $wiki->Log(page_write_fail => {
             user        => $wiki->{user},
-            is_model    => $page->{is_model},
+            is_model    => $page->{is_model} ? \1 : \0,
             file        => $page->path,
             message     => $reason,
             errors      => \@errs
@@ -63,7 +63,7 @@ sub write_page {
         $rev_latest = $wiki->rev_latest;
         $wiki->Log(page_write => {
             user        => $wiki->{user},
-            is_model    => $page->{is_model},
+            is_model    => $page->{is_model} ? \1 : \0,
             file        => $page->path,
             message     => $reason,
             commit      => $rev_latest->{id}
@@ -96,7 +96,7 @@ sub delete_page {
     if (@errs) {
         $wiki->Log(page_delete_fail => {
             user        => $wiki->{user},
-            is_model    => $page->{is_model},
+            is_model    => $page->{is_model} ? \1 : \0,
             file        => $page->path,
             errors      => \@errs
         });
@@ -107,7 +107,7 @@ sub delete_page {
         $rev_latest = $wiki->rev_latest;
         $wiki->Log(page_delete => {
             user        => $wiki->{user},
-            is_model    => $page->{is_model},
+            is_model    => $page->{is_model} ? \1 : \0,
             file        => $page->path,
             commit      => $rev_latest->{id}
         });
@@ -157,7 +157,7 @@ sub move_page {
     if (@errs) {
         $wiki->Log(page_move_fail => {
             user        => $wiki->{user},
-            is_model    => $page->{is_model},
+            is_model    => $page->{is_model} ? \1 : \0,
             src_name    => $old_name,
             dest_name   => $new_name,
             src_file    => $old_path,
@@ -169,7 +169,7 @@ sub move_page {
         $rev_latest = $wiki->rev_latest;
         $wiki->Log(page_move => {
             user        => $wiki->{user},
-            is_model    => $page->{is_model},
+            is_model    => $page->{is_model} ? \1 : \0,
             src_name    => $old_name,
             dest_name   => $new_name,
             src_file    => $old_path,
