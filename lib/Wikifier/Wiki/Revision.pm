@@ -52,6 +52,8 @@ sub write_page {
     
     if (@errs) {
         $wiki->Log(page_write_fail => {
+            user        => $wiki->{user},
+            is_model    => $page->{is_model},
             file        => $page->path,
             message     => $reason,
             errors      => \@errs
@@ -60,6 +62,8 @@ sub write_page {
     else {
         $rev_latest = $wiki->rev_latest;
         $wiki->Log(page_write => {
+            user        => $wiki->{user},
+            is_model    => $page->{is_model},
             file        => $page->path,
             message     => $reason,
             commit      => $rev_latest->{id}
@@ -91,6 +95,8 @@ sub delete_page {
     
     if (@errs) {
         $wiki->Log(page_delete_fail => {
+            user        => $wiki->{user},
+            is_model    => $page->{is_model},
             file        => $page->path,
             errors      => \@errs
         });
@@ -100,6 +106,8 @@ sub delete_page {
         unlink $page->path;
         $rev_latest = $wiki->rev_latest;
         $wiki->Log(page_delete => {
+            user        => $wiki->{user},
+            is_model    => $page->{is_model},
             file        => $page->path,
             commit      => $rev_latest->{id}
         });
@@ -146,6 +154,8 @@ sub move_page {
 
     if (@errs) {
         $wiki->Log(page_move_fail => {
+            user        => $wiki->{user},
+            is_model    => $page->{is_model},
             src_name    => $old_name,
             dest_name   => $new_name,
             src_file    => $old_path,
@@ -156,6 +166,8 @@ sub move_page {
     else {
         $rev_latest = $wiki->rev_latest;
         $wiki->Log(page_move => {
+            user        => $wiki->{user},
+            is_model    => $page->{is_model},
             src_name    => $old_name,
             dest_name   => $new_name,
             src_file    => $old_path,
