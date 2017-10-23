@@ -423,7 +423,7 @@ sub _handle_page_del {
     $msg->reply($is_model ? 'model_del' : 'page_del' => {
         rev_errors  => \@errs,
         rev_error   => _simplify_errors(@errs),
-        deleted     => !$err,
+        deleted     => !@errs,
         rev_latest  => $rev_latest
     });
 }
