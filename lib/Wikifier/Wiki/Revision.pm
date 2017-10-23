@@ -83,16 +83,31 @@ sub delete_page {
     }
 
     # commit the change
-    $wiki->rev_commit(
+    my @errs = $wiki->rev_commit(
         message => "Deleted $$page{name}",
         rm      => [ $page->path, $page->cache_path ]
     );
-
-    unlink $page->cache_path;
-    unlink $page->path;
+    
+    my $rev_latest;
+    
+    if (@errs) {
+        $wiki->Log(page_delete_fail => {
+            file        => $page->path,
+            errors      => \@errs
+        });
+    }
+    else {
+        unlink $page->cache_path;
+        unlink $page->path;
+        $rev_latest = $wiki->rev_latest;
+        $wiki->Log(page_delete => {
+            file        => $page->path,
+            commit      => $rev_latest->{id}
+        });
+    }
     
     back;
-    return;
+    return ($rev_latest, @errs);
 }
 
 # rename a page
