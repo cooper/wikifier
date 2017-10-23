@@ -33,7 +33,7 @@ Page source was written.
   * `name` - display name
   * `email`
 * __is_model__ - true if the file written is a model
-* __file__ - file path, relative to [`dir.wiki`](configuration.md#dir)
+* __file__ - file path, relative to [`dir.wiki`](../configuration.md#dir)
 * __message__ - commit message
 * __commit__ - sha commit ID
 
@@ -47,7 +47,7 @@ Page source write failed.
   * `name` - display name
   * `email`
 * __is_model__ - true if the file we tried to write is a model
-* __file__ - file path, relative to [`dir.wiki`](configuration.md#dir)
+* __file__ - file path, relative to [`dir.wiki`](../configuration.md#dir)
 * __message__ - commit message
 * __errors__ - array of string error messages
 
@@ -61,7 +61,7 @@ Page was deleted.
   * `name` - display name
   * `email`
 * __is_model__ - true if the file deleted was a model
-* __file__ - file path, relative to [`dir.wiki`](configuration.md#dir)
+* __file__ - file path, relative to [`dir.wiki`](../configuration.md#dir)
 * __message__ - commit message
 * __commit__ - sha commit ID
 
@@ -75,7 +75,7 @@ Page delete failed.
   * `name` - display name
   * `email`
 * __is_model__ - true if the file we tried to delete is a model
-* __file__ - file path, relative to [`dir.wiki`](configuration.md#dir)
+* __file__ - file path, relative to [`dir.wiki`](../configuration.md#dir)
 * __message__ - commit message
 * __errors__ - array of string error messages
 
@@ -89,8 +89,10 @@ Page was moved.
   * `name` - display name
   * `email`
 * __is_model__ - true if the file moved is a model
-* __src_file__ - source file path, relative to [`dir.wiki`](configuration.md#dir)
-* __dest_file__ - destination file path, relative to [`dir.wiki`](configuration.md#dir)
+* __src_file__ - source file path, relative to
+  [`dir.wiki`](../configuration.md#dir)
+* __dest_file__ - destination file path, relative to
+  [`dir.wiki`](../configuration.md#dir)
 * __src_name__ - old page name
 * __dest_name__ - new page name
 * __message__ - commit message
@@ -106,9 +108,10 @@ Page move failed.
   * `name` - display name
   * `email`
 * __is_model__ - true if the file we tried to move is a model
-* __src_file__ - source file path, relative to [`dir.wiki`](configuration.md#dir)
+* __src_file__ - source file path, relative to
+  [`dir.wiki`](../configuration.md#dir)
 * __dest_file__ - destination file path to which we tried moving, relative to
-  [`dir.wiki`](configuration.md#dir)
+  [`dir.wiki`](../configuration.md#dir)
 * __src_name__ - old page name
 * __dest_name__ - page name to which we tried moving
 * __errors__ - array of string error messages
