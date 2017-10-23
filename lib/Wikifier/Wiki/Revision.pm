@@ -85,7 +85,7 @@ sub delete_page {
     # commit the change
     my @errs = $wiki->rev_commit(
         message => "Deleted $$page{name}",
-        rm      => [ $page->path, $page->cache_path ]
+        rm      => [ $page->path ]
     );
     
     my $rev_latest;
