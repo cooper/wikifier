@@ -585,8 +585,8 @@ sub get_image {
     my @stat = stat $path; # might be empty
     my $image_data = {
         file        => $filename,
-        created     => $stat[10] + 0,
-        mod_unix    => $stat[9]  + 0
+        created     => $stat[10],
+        mod_unix    => $stat[9]
     };
 
     # from this point on, we need the category

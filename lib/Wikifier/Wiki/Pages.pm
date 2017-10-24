@@ -471,9 +471,9 @@ sub get_page {
     my @stat = stat $path; # might be empty
     my $page_data = {
         file        => $filename,
-        title       => $filename,       # will be overwritten probably
-        created     => $stat[10] + 0,   # ctime, probably overwritten
-        mod_unix    => $stat[9]  + 0    # mtime, probably overwritten
+        title       => $filename,   # will be overwritten probably
+        created     => $stat[10],   # ctime, probably overwritten
+        mod_unix    => $stat[9]     # mtime, probably overwritten
     };
 
     # from this point on, we need the category
