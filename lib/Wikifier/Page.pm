@@ -580,7 +580,7 @@ sub created {
 # page modification time from stat()
 sub modified {
     my $page = shift;
-    return (stat $page->path)[9];
+    return (stat $page->path)[9] + 0;
 }
 
 # absolute path to cache file
@@ -599,7 +599,7 @@ sub cache_path {
 # cache file modification time from stat()
 sub cache_modified {
     my $page = shift;
-    return (stat $page->cache_path)[9];
+    return (stat $page->cache_path)[9] + 0;
 }
 
 # absolute path to search text file

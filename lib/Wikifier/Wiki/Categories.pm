@@ -361,7 +361,7 @@ sub cat_add_page {
         file       => $cat_name,
         cat_type   => $opts{cat_type},
         preserve   => $opts{preserve},
-        mod_unix   => $time
+        mod_unix   => $time + 0
     });
     print STDERR "write: $json_data\n" if $ENV{WIKIFIER_DEBUG};
     
