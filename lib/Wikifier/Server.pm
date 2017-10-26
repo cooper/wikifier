@@ -25,10 +25,13 @@ sub start {
     Lindent 'Initialize server';
 
         # load configuration.
-        ($conf = Wikifier::Page->new(
+        my $err = ($conf = Wikifier::Page->new(
             file_path => $conf_file,
             name      => basename($conf_file)
-        ) or die "Error in configuration\n")->parse;
+        ))->parse;
+        
+        # an error occurred
+        die "Error in $conf_file: $err\n" if $err;
 
         # create a timer for session disposal.
         my $timer = IO::Async::Timer::Periodic->new(
