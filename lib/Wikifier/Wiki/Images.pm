@@ -107,8 +107,8 @@ sub _display_image {
     if (ref $image_name eq 'ARRAY') {
         my ($name, $w, $h, $s) = @$image_name;
         $image_name  = "${w}x${h}-$name";
-        $image_name  = $name                if !$w && !$h;
-        $image_name .= "@${scale}x"         if $s;
+        $image_name  = $name    if !$w && !$h;
+        $image_name .= "@${s}x" if $s;
     }
 
     # parse the image name.
