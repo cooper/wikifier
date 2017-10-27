@@ -193,6 +193,7 @@ sub handle_resume {
     my $sess = $Wikifier::Server::sessions{ $msg->{session_id} };
     if (!$sess) {
         $msg->l("Bad session ID; refusing reauthentication");
+        $conn->{close}++; # doesn't make sense not to close in this case
         $msg->error('Please login again', login_again => 1);
         return;
     }
