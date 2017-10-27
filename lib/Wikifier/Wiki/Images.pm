@@ -106,6 +106,8 @@ sub _display_image {
     # if both dimensions are 0, parse the image name normally
     if (ref $image_name eq 'ARRAY') {
         my ($name, $w, $h, $scale) = @$image_name;
+        $w //= 0;
+        $h //= 0;
         $image_name  = "${w}x${h}-$name"    if $w || $h;
         $image_name .= "@${scale}x"         if $scale;
     }
