@@ -386,6 +386,11 @@ sub rev_commit (@) {
     if ($user && length $user->{name} && length $user->{email}) {
         $opts{author} = "$$user{name} <$$user{email}>";
     }
+    
+    # specify the worktree maybe
+    if ($user && length $user->{worktree}) {
+        $opts{dir} = $git->{dir}.'/worktree/'.$user->{worktree};
+    }
 
     return eval { _rev_commit($git, %opts) };
 }
@@ -393,7 +398,11 @@ sub rev_commit (@) {
 sub _rev_commit {
     my ($git, %opts) = @_;
     my ($rm, $add, $mv) = @opts{'rm', 'add', 'mv'};
-
+    
+    # determine git dir
+    my $former_dir = $git->{dir};
+    $git->{dir} = $opts{dir} if $opts{dir};
+    
     # rm operation
     if ($rm && ref $rm eq 'ARRAY' && @$rm) {
         _rev_op_commit { $git->rm($_) } "git rm $_" foreach @$rm;
@@ -430,6 +439,7 @@ sub _rev_commit {
     } 'git commit';
 
     # return errors
+    $git->{dir} = $former_dir;
     return _rev_op_complete;
 }
 
