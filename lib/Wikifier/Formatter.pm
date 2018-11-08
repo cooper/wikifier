@@ -291,7 +291,7 @@ sub parse_format_type {
         my $val = $page->get($2);
 
         # undefined variable
-        if (!defined $val) {
+        if (!defined $val && $2 !~ m/^m\./) {
             $page->warning($opts{startpos}, "Undefined variable $1$2")
                 unless $opts{no_warnings};
             return '(null)';
