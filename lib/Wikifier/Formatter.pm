@@ -468,7 +468,7 @@ my %normalizers = (
         $target =~ s/ /_/g;
         return uri_escape(ucfirst $target);
     },
-    none => {
+    none => sub {
         my $target = shift;
         return uri_escape($target);
     }
