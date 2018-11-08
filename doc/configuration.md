@@ -195,6 +195,7 @@ identifier `[wiki_id]` consisting of word-like characters.
 Accepted values for `type`
 * *wikifier* (this is default)
 * *mediawiki*
+* *none* (URI encode only)
 
 The default configuration includes the `wp` identifier for the
 [English Wikipedia](http://en.wikipedia.org):

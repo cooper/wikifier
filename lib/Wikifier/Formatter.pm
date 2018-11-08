@@ -467,6 +467,10 @@ my %normalizers = (
         return undef if !defined $target;
         $target =~ s/ /_/g;
         return uri_escape(ucfirst $target);
+    },
+    none => {
+        my $target = shift;
+        return uri_escape($target);
     }
 );
 
