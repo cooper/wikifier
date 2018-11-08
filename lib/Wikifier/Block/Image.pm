@@ -181,7 +181,7 @@ sub image_html {
     
     # link can be overridden
     my $link_target;
-    my $link = $image->{link};
+    my $link = $image->{map_hash}{link};
     if ($link && $link eq 'none') {
         undef $link;
     }
