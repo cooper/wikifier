@@ -137,7 +137,7 @@ sub display_cat_posts {
     }
 
     # order with newest first.
-    my @pages_in_order = sort { $times{$b} cmp $times{$a} } keys %times;
+    my @pages_in_order = sort { $times{$b} <=> $times{$a} } keys %times;
     @pages_in_order    = map  { $reses{$_} } @pages_in_order;
 
     # order into PAGES of pages. wow.
