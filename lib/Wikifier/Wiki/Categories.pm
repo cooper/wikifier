@@ -128,8 +128,8 @@ sub display_cat_posts {
         # store time.
         # if this is the main page of the category, it should come first.
         my $main = $wiki->_is_main_page($cat_name_ne, $res);
-        $time = -$time if $main == 1;
-        $time = -'inf' if $main == 2;
+        $time += time  if $main == 1;
+        $time += 'inf' if $main == 2;
 
         # store res.
         $reses{$page_name} = $res;
