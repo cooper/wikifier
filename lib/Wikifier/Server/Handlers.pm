@@ -217,7 +217,7 @@ sub handle_page {
     my ($wiki, $msg) = read_required(@_, 'name') or return;
     $msg->l("Page '$$msg{name}'");
     my $result = $wiki->display_page($msg->{name});
-    $msg->reply('page', $result);
+    $msg->reply(page => $result);
 }
 
 # page code request
@@ -235,7 +235,7 @@ sub handle_page_code {
         $msg->{name},
         display_page => $msg->{display_page}
     );
-    $msg->reply('page_code', $result);
+    $msg->reply(page_code => $result);
 }
 
 # model code request
@@ -253,7 +253,7 @@ sub handle_model_code {
         $msg->{name},
         $msg->{display_model}
     );
-    $msg->reply('model_code', $result);
+    $msg->reply(model_code => $result);
 }
 
 # page list
@@ -311,7 +311,7 @@ sub handle_image {
         gen_override => $msg->{gen_override}
     );
     delete $result->{content};
-    $msg->reply('image', $result);
+    $msg->reply(image => $result);
 }
 
 sub handle_image_list {
@@ -336,7 +336,7 @@ sub handle_cat_posts {
     my ($wiki, $msg) = read_required(@_, 'name') or return;
     $msg->l("Category posts '$$msg{name}'");
     my $result = $wiki->display_cat_posts($msg->{name});
-    $msg->reply('cat_posts', $result);
+    $msg->reply(cat_posts => $result);
 }
 
 # category list.

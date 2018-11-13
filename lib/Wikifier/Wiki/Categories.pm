@@ -132,8 +132,8 @@ sub display_cat_posts {
         $time += 'inf' if $main == 2;
 
         # store res.
+        $res->{cat_time} = $times{$page_name} = +$time || 0;
         $reses{$page_name} = $res;
-        $reses{$page_name}{cat_time} = $times{$page_name} = $time || 0;
     }
 
     # order with newest first.
