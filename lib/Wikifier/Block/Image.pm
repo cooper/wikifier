@@ -176,7 +176,7 @@ sub image_html {
     if (!$image->{full_size} and $retina = $page->opt('image.enable.retina')) {
         my ($first, $ext) = $image_url =~ /(.*)\.(.+)/;
         my @retina = grep !m/\D/, map trim($_), split /,/, $retina;
-        $retina = join ', ', map { "$first\@${_}x.$ext" } @retina if @retina;
+        $retina = join ', ', map { "$first\@${_}x.$ext ${_}x" } @retina if @retina;
     }
     
     # link can be overridden
