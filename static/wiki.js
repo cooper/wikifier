@@ -3,7 +3,6 @@ var wikifier = {};
 
 document.addEvent('domready', hashLoad);
 window.addEvent('hashchange', hashLoad);
-if (window.retinajs) document.addEvent('domready', retinajs);
 
 // redirect #some-section to #wiki-anchor-some-section
 function hashLoad() {

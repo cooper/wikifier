@@ -166,18 +166,18 @@ sub image_html {
     elsif ($float) {
         $el->add_class('image-'.$float);
     }
-    
-    # add data-rjs for retina.
-    my $retina;
-    if (!$image->{full_size} and $retina = $page->opt('image.enable.retina')) {
-        my @scales = split /,/, $retina;
-        $retina = max grep !m/\D/, map { trim($_) } @scales;
-        $retina ||= undef;
-    }
 
     # fetch things we determined in image_parse().
- my ($height,          $width,          $image_url         ) =
+    my ($height,          $width,          $image_url         ) =
     ($image->{height}, $image->{width}, $image->{image_url});
+    
+    # retina
+    my $retina;
+    if (!$image->{full_size} and $retina = $page->opt('image.enable.retina')) {
+        my ($first, $ext) = $image_url =~ /(.*)\.(.+)/;
+        my @retina = grep !m/\D/, map trim($_), split /,/, $retina;
+        $retina = join ', ', map { "$first\@${_}x.$ext" } @retina if @retina;
+    }
     
     # link can be overridden
     my $link_target;
@@ -211,16 +211,16 @@ sub image_html {
             type       => 'a',
             attributes => $img_a_attributes
         ) if $link;
-        ($an || $el)->create_child(
+        my $img = ($an || $el)->create_child(
             class      => 'image-img',
             type       => 'img',
             attributes => {
                 src => $image_url,
-                alt => $image->{alt} // $image->{last_name},
-                'data-rjs' => $retina
+                alt => $image->{alt} // $image->{last_name}
             },
             styles => { width => $width }
         );
+        $img->add_attribute(srcset => $retina) if $retina;
         return;
     }
 
@@ -244,8 +244,7 @@ sub image_html {
         type       => 'img',
         attributes => {
             src => $image_url,
-            alt => $image->{alt} // $image->{last_name},
-            'data-rjs' => $retina
+            alt => $image->{alt} // $image->{last_name}
         },
         styles => { width  => $width }
     );
@@ -253,6 +252,9 @@ sub image_html {
     # insert javascript if using browser sizing.
     $img->add_attribute(onload => 'wikifier.imageResize(this);')
         if $image->{javascript};
+
+    # insert srcset for retina
+    $img->add_attribute(srcset => $retina) if $retina;
 
     # description. we have to extract this here instead of in ->parse()
     # because at the time of ->parse() its text is not yet formatted.
