@@ -1,3 +1,8 @@
+# SUPERSEDED BY QUIKI
+
+Please use [quiki](https://github.com/cooper/quiki) instead, a more comprehensive
+wiki suite based on the wikifier concept.
+
 # wikifier
 
 wikifier is a file-based wiki engine.
